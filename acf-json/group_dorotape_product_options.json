@@ -1,0 +1,278 @@
+{
+	"key": "group_dorotape_product_options",
+	"title": "Product Options",
+	"fields": [
+		{
+			"key": "field_dorotape_width_options",
+			"label": "Width Options",
+			"name": "width_options",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Define the available widths for this product. Each row drives a selectable option on the product page and adjusts the price via the dynamic pricing engine.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "table",
+			"pagination": 0,
+			"min": 0,
+			"max": 0,
+			"collapsed": "field_dorotape_width_value",
+			"button_label": "Add Width",
+			"allow_in_bindings": 0,
+			"sub_fields": [
+				{
+					"key": "field_dorotape_width_value",
+					"label": "Width (mm)",
+					"name": "width_value",
+					"aria-label": "",
+					"type": "number",
+					"instructions": "Enter the width in millimetres.",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "20",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"min": 1,
+					"max": 9999,
+					"step": 1,
+					"prepend": "",
+					"append": "mm",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_width_label",
+					"label": "Display Label",
+					"name": "width_label",
+					"aria-label": "",
+					"type": "text",
+					"instructions": "Optional. Leave blank to auto-generate from the width value (e.g. \"300mm\").",
+					"required": 0,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "25",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"maxlength": "",
+					"placeholder": "e.g. 300mm",
+					"prepend": "",
+					"append": "",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_width_modifier_type",
+					"label": "Price Modifier",
+					"name": "price_modifier_type",
+					"aria-label": "",
+					"type": "select",
+					"instructions": "How should this width affect the base product price?",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "25",
+						"class": "",
+						"id": ""
+					},
+					"choices": {
+						"none": "No modifier — use base price",
+						"percentage": "Percentage (%)",
+						"fixed": "Fixed amount (£)"
+					},
+					"default_value": "none",
+					"return_format": "value",
+					"multiple": 0,
+					"allow_null": 0,
+					"ui": 0,
+					"ajax": 0,
+					"placeholder": "",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_width_modifier_value",
+					"label": "Modifier Value",
+					"name": "price_modifier_value",
+					"aria-label": "",
+					"type": "number",
+					"instructions": "Percentage or fixed amount. Use negative values for a price reduction.",
+					"required": 0,
+					"conditional_logic": [
+						[
+							{
+								"field": "field_dorotape_width_modifier_type",
+								"operator": "!=",
+								"value": "none"
+							}
+						]
+					],
+					"wrapper": {
+						"width": "30",
+						"class": "",
+						"id": ""
+					},
+					"default_value": 0,
+					"min": "",
+					"max": "",
+					"step": 0.01,
+					"prepend": "",
+					"append": "",
+					"allow_in_bindings": 0
+				}
+			]
+		},
+		{
+			"key": "field_dorotape_roll_options",
+			"label": "Roll Options",
+			"name": "roll_options",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Define the available roll lengths for this product. Each row creates a selectable option and can apply a price modifier.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "table",
+			"pagination": 0,
+			"min": 0,
+			"max": 0,
+			"collapsed": "field_dorotape_roll_label",
+			"button_label": "Add Roll Length",
+			"allow_in_bindings": 0,
+			"sub_fields": [
+				{
+					"key": "field_dorotape_roll_label",
+					"label": "Label",
+					"name": "roll_label",
+					"aria-label": "",
+					"type": "text",
+					"instructions": "Customer-facing label shown in the roll length selector.",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "25",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"maxlength": "",
+					"placeholder": "e.g. 10m Roll",
+					"prepend": "",
+					"append": "",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_roll_length",
+					"label": "Roll Length (m)",
+					"name": "roll_length",
+					"aria-label": "",
+					"type": "number",
+					"instructions": "Length in metres.",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "20",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"min": 0.1,
+					"max": "",
+					"step": 0.1,
+					"prepend": "",
+					"append": "m",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_roll_modifier_type",
+					"label": "Price Modifier",
+					"name": "price_modifier_type",
+					"aria-label": "",
+					"type": "select",
+					"instructions": "How should this roll length affect the width-adjusted price?",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "25",
+						"class": "",
+						"id": ""
+					},
+					"choices": {
+						"none": "No modifier — use base price",
+						"percentage": "Percentage (%)",
+						"fixed": "Fixed amount (£)"
+					},
+					"default_value": "none",
+					"return_format": "value",
+					"multiple": 0,
+					"allow_null": 0,
+					"ui": 0,
+					"ajax": 0,
+					"placeholder": "",
+					"allow_in_bindings": 0
+				},
+				{
+					"key": "field_dorotape_roll_modifier_value",
+					"label": "Modifier Value",
+					"name": "price_modifier_value",
+					"aria-label": "",
+					"type": "number",
+					"instructions": "Percentage or fixed amount. Use negative values for a price reduction.",
+					"required": 0,
+					"conditional_logic": [
+						[
+							{
+								"field": "field_dorotape_roll_modifier_type",
+								"operator": "!=",
+								"value": "none"
+							}
+						]
+					],
+					"wrapper": {
+						"width": "30",
+						"class": "",
+						"id": ""
+					},
+					"default_value": 0,
+					"min": "",
+					"max": "",
+					"step": 0.01,
+					"prepend": "",
+					"append": "",
+					"allow_in_bindings": 0
+				}
+			]
+		}
+	],
+	"location": [
+		[
+			{
+				"param": "post_type",
+				"operator": "==",
+				"value": "product"
+			}
+		]
+	],
+	"menu_order": 10,
+	"position": "normal",
+	"style": "default",
+	"label_placement": "top",
+	"instruction_placement": "label",
+	"hide_on_screen": "",
+	"active": true,
+	"description": "Width and roll length options that drive the ACF dynamic pricing engine. Modifier values stack: width modifier is applied first, roll modifier second, then any customer-level discount.",
+	"show_in_rest": 0,
+	"display_title": "",
+	"allow_ai_access": false,
+	"ai_description": "",
+	"modified": 1778889600
+}

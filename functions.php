@@ -52,6 +52,11 @@ function dorotape_setup() {
 			'footer'    => esc_html__( 'Footer Navigation', 'dorotape' ),
 		)
 	);
+
+	add_image_size( 'dorotape-hero', 1920, 800, true );
+	add_image_size( 'dorotape-product-card', 600, 600, true );
+	add_image_size( 'dorotape-product-thumb', 300, 300, true );
+	add_image_size( 'dorotape-blog-card', 800, 500, true );
 }
 add_action( 'after_setup_theme', 'dorotape_setup' );
 
@@ -74,7 +79,10 @@ function dorotape_remove_block_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'dorotape_remove_block_styles', 100 );
 
-// Remove WP emoji scripts — unnecessary overhead for an e-commerce store
+// Disable WooCommerce default stylesheet — custom CSS only
+add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
+
+// Remove WP emoji scripts
 function dorotape_disable_emojis() {
 	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 	remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -86,10 +94,10 @@ function dorotape_disable_emojis() {
 }
 add_action( 'init', 'dorotape_disable_emojis' );
 
-// Remove default RSS feed links — not a blog
-remove_action( 'wp_head', 'feed_links', 2 );
-remove_action( 'wp_head', 'feed_links_extra', 3 );
-
+require get_template_directory() . '/inc/cleanup.php';
+require get_template_directory() . '/inc/admin.php';
+require get_template_directory() . '/inc/setup.php';
+require get_template_directory() . '/inc/pricing.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
