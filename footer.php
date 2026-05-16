@@ -2,29 +2,32 @@
 /**
  * The template for displaying the footer
  *
- * Contains the closing of the #content div and all content after.
- *
- * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
- *
  * @package dorotape
  */
-
 ?>
 
 	<footer id="colophon" class="site-footer">
-		<div class="site-info">
-			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'dorotape' ) ); ?>">
+		<div class="footer-inner">
+
+			<nav class="nav-footer" aria-label="<?php esc_attr_e( 'Footer menu', 'dorotape' ); ?>">
 				<?php
-				/* translators: %s: CMS name, i.e. WordPress. */
-				printf( esc_html__( 'Proudly powered by %s', 'dorotape' ), 'WordPress' );
+				wp_nav_menu(
+					array(
+						'theme_location' => 'footer',
+						'menu_id'        => 'footer-menu',
+						'container'      => false,
+						'depth'          => 1,
+					)
+				);
 				?>
-			</a>
-			<span class="sep"> | </span>
-				<?php
-				/* translators: 1: Theme name, 2: Theme author. */
-				printf( esc_html__( 'Theme: %1$s by %2$s.', 'dorotape' ), 'dorotape', '<a href="http://underscores.me/">Underscores.me</a>' );
-				?>
-		</div><!-- .site-info -->
+			</nav>
+
+			<p class="site-copyright">
+				&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>.
+				<?php esc_html_e( 'All rights reserved.', 'dorotape' ); ?>
+			</p>
+
+		</div><!-- .footer-inner -->
 	</footer><!-- #colophon -->
 </div><!-- #page -->
 
