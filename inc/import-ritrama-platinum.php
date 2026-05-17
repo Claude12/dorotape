@@ -23,7 +23,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.5' );
+define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.6' );
 
 function dorotape_maybe_run_ritrama_platinum_import(): void {
 	if ( get_option( 'dorotape_import_ritrama_platinum_version' ) === DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION ) {
@@ -223,10 +223,14 @@ function dorotape_upsert_ritrama_platinum_product(
 		update_field( 'colour_hex', sanitize_hex_color( $colour['colour_hex'] ), $product_id );
 	}
 
-	// Filter meta — used by the product filter bar on category/shop pages.
-	update_field( 'colour_group',        dorotape_ritrama_colour_group( $colour['code'] ), $product_id );
-	update_field( 'finish',              'gloss',                                           $product_id );
-	update_field( 'adhesive_properties', $colour['has_airflow'] ? array( 'standard', 'airflow' ) : array( 'standard' ), $product_id );
+	// Filter meta — written via update_post_meta() so they are saved regardless
+	// of whether the ACF field group has been synced in the current environment.
+	// The filter bar and meta_query both read raw post meta, not ACF fields.
+	update_post_meta( $product_id, 'colour_group', dorotape_ritrama_colour_group( $colour['code'] ) );
+	update_post_meta( $product_id, 'finish', 'gloss' );
+	// Store adhesive as a serialised array so the LIKE query in product-filters.php
+	// can match individual values (e.g. LIKE '%"airflow"%').
+	update_post_meta( $product_id, 'adhesive_properties', $colour['has_airflow'] ? array( 'standard', 'airflow' ) : array( 'standard' ) );
 
 	return $product_id;
 }
