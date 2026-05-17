@@ -23,7 +23,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.4' );
+define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.5' );
 
 function dorotape_maybe_run_ritrama_platinum_import(): void {
 	if ( get_option( 'dorotape_import_ritrama_platinum_version' ) === DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION ) {
@@ -104,6 +104,28 @@ function dorotape_ensure_ritrama_platinum_categories(): int {
 function dorotape_insert_product_cat( string $name, string $slug, string $description, int $parent ): int {
 	$result = wp_insert_term( $name, 'product_cat', compact( 'slug', 'description', 'parent' ) );
 	return is_wp_error( $result ) ? 0 : (int) $result['term_id'];
+}
+
+// ─── Colour group helper ──────────────────────────────────────────────────────
+
+/**
+ * Map a Ritrama colour code to a colour group slug used by the filter bar.
+ * Covers all 60 colours in the range so the full import works without changes.
+ */
+function dorotape_ritrama_colour_group( string $code ): string {
+	if ( 'P801' === $code ) {
+		return 'black';
+	}
+	$num = (int) substr( $code, 1 );
+	if ( $num >= 804 && $num <= 809 ) return 'yellows';
+	if ( $num >= 810 && $num <= 812 ) return 'oranges';
+	if ( $num >= 813 && $num <= 822 ) return 'reds';
+	if ( $num >= 823 && $num <= 826 ) return 'colours'; // pinks / purples / magentas
+	if ( $num >= 827 && $num <= 840 ) return 'blues';
+	if ( $num >= 841 && $num <= 851 ) return 'greens';
+	if ( $num >= 852 && $num <= 854 ) return 'browns';
+	if ( $num >= 855 && $num <= 868 ) return 'greys';
+	return 'colours';
 }
 
 // ─── Product upsert ───────────────────────────────────────────────────────────
@@ -200,6 +222,11 @@ function dorotape_upsert_ritrama_platinum_product(
 	if ( ! empty( $colour['colour_hex'] ) ) {
 		update_field( 'colour_hex', sanitize_hex_color( $colour['colour_hex'] ), $product_id );
 	}
+
+	// Filter meta — used by the product filter bar on category/shop pages.
+	update_field( 'colour_group',        dorotape_ritrama_colour_group( $colour['code'] ), $product_id );
+	update_field( 'finish',              'gloss',                                           $product_id );
+	update_field( 'adhesive_properties', $colour['has_airflow'] ? array( 'standard', 'airflow' ) : array( 'standard' ), $product_id );
 
 	return $product_id;
 }
