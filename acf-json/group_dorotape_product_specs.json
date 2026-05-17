@@ -1,0 +1,393 @@
+{
+	"key": "group_dorotape_product_specs",
+	"title": "Product Specifications",
+	"fields": [
+		{
+			"key": "field_dorotape_tab_technical",
+			"label": "Technical Specifications",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_thickness",
+			"label": "Thickness",
+			"name": "thickness",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "e.g. 80 micron, 3.2 mil",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"placeholder": "e.g. 80 micron",
+			"prepend": "",
+			"append": "",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_adhesive_type",
+			"label": "Adhesive Type",
+			"name": "adhesive_type",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "e.g. Permanent, Removable, High-tack",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"placeholder": "e.g. Permanent acrylic",
+			"prepend": "",
+			"append": "",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_application_environment",
+			"label": "Application Environment",
+			"name": "application_environment",
+			"aria-label": "",
+			"type": "select",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"choices": {
+				"indoor": "Indoor only",
+				"outdoor": "Outdoor",
+				"indoor_outdoor": "Indoor & Outdoor"
+			},
+			"default_value": "",
+			"return_format": "value",
+			"multiple": 0,
+			"allow_null": 1,
+			"ui": 0,
+			"ajax": 0,
+			"placeholder": "Select environment",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_durability",
+			"label": "Durability",
+			"name": "durability",
+			"aria-label": "",
+			"type": "text",
+			"instructions": "e.g. 5–7 years outdoor, 10 years indoor",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"maxlength": "",
+			"placeholder": "e.g. 5 years outdoor",
+			"prepend": "",
+			"append": "",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_application_temp_min",
+			"label": "Min Application Temp (°C)",
+			"name": "application_temp_min",
+			"aria-label": "",
+			"type": "number",
+			"instructions": "Minimum ambient temperature for application.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"min": -30,
+			"max": 100,
+			"step": 1,
+			"prepend": "",
+			"append": "°C",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_application_temp_max",
+			"label": "Max Application Temp (°C)",
+			"name": "application_temp_max",
+			"aria-label": "",
+			"type": "number",
+			"instructions": "Maximum ambient temperature for application.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"min": -30,
+			"max": 200,
+			"step": 1,
+			"prepend": "",
+			"append": "°C",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_certifications",
+			"label": "Certifications",
+			"name": "certifications",
+			"aria-label": "",
+			"type": "textarea",
+			"instructions": "List any relevant certifications or compliance standards, one per line.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"rows": 3,
+			"new_lines": "br",
+			"maxlength": "",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_tab_files",
+			"label": "Product Files",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_data_sheet",
+			"label": "Data Sheet",
+			"name": "data_sheet",
+			"aria-label": "",
+			"type": "file",
+			"instructions": "PDF only. Shown as a download link on the product page.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "33",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"library": "all",
+			"min_size": "",
+			"max_size": "10",
+			"mime_types": "pdf",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_application_guide",
+			"label": "Application Guide",
+			"name": "application_guide",
+			"aria-label": "",
+			"type": "file",
+			"instructions": "PDF only.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "33",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"library": "all",
+			"min_size": "",
+			"max_size": "10",
+			"mime_types": "pdf",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_safety_data_sheet",
+			"label": "Safety Data Sheet (SDS)",
+			"name": "safety_data_sheet",
+			"aria-label": "",
+			"type": "file",
+			"instructions": "PDF only.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "33",
+				"class": "",
+				"id": ""
+			},
+			"return_format": "array",
+			"library": "all",
+			"min_size": "",
+			"max_size": "10",
+			"mime_types": "pdf",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_tab_application",
+			"label": "Application Info",
+			"name": "",
+			"aria-label": "",
+			"type": "tab",
+			"instructions": "",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"placement": "top",
+			"endpoint": 0,
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_key_benefits",
+			"label": "Key Benefits",
+			"name": "key_benefits",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Add bullet-point benefits shown on the product page.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "table",
+			"pagination": 0,
+			"min": 0,
+			"max": 8,
+			"collapsed": "field_dorotape_benefit_text",
+			"button_label": "Add Benefit",
+			"allow_in_bindings": 0,
+			"sub_fields": [
+				{
+					"key": "field_dorotape_benefit_text",
+					"label": "Benefit",
+					"name": "benefit",
+					"aria-label": "",
+					"type": "text",
+					"instructions": "",
+					"required": 1,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"maxlength": 120,
+					"placeholder": "e.g. Easy repositioning during application",
+					"prepend": "",
+					"append": "",
+					"allow_in_bindings": 0
+				}
+			]
+		},
+		{
+			"key": "field_dorotape_application_tips",
+			"label": "Application Tips",
+			"name": "application_tips",
+			"aria-label": "",
+			"type": "textarea",
+			"instructions": "Short tips shown in a collapsible section on the product page.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"rows": 5,
+			"new_lines": "wpautop",
+			"maxlength": "",
+			"allow_in_bindings": 0
+		},
+		{
+			"key": "field_dorotape_compatible_products",
+			"label": "Compatible Products",
+			"name": "compatible_products",
+			"aria-label": "",
+			"type": "relationship",
+			"instructions": "Link related products shown in the \"Works well with\" section.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"post_type": [
+				"product"
+			],
+			"taxonomy": [],
+			"filters": [
+				"search",
+				"taxonomy"
+			],
+			"return_format": "id",
+			"min": 0,
+			"max": 6,
+			"elements": [],
+			"allow_in_bindings": 0
+		}
+	],
+	"location": [
+		[
+			{
+				"param": "post_type",
+				"operator": "==",
+				"value": "product"
+			}
+		]
+	],
+	"menu_order": 20,
+	"position": "normal",
+	"style": "default",
+	"label_placement": "top",
+	"instruction_placement": "label",
+	"hide_on_screen": "",
+	"active": true,
+	"description": "Technical specifications, downloadable product files, and application information shown on the product page.",
+	"show_in_rest": 0,
+	"display_title": "",
+	"allow_ai_access": false,
+	"ai_description": "",
+	"modified": 1778889600
+}
