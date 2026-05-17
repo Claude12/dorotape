@@ -251,6 +251,25 @@
 					"allow_in_bindings": 0
 				}
 			]
+		},
+		{
+			"key": "field_dorotape_colour_hex",
+			"label": "Colour Swatch",
+			"name": "colour_hex",
+			"aria-label": "",
+			"type": "color_picker",
+			"instructions": "Shown as a colour swatch on archive cards and the single product page when no product image has been uploaded. Leave blank if the product has a real image.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"default_value": "",
+			"enable_opacity": 0,
+			"return_format": "string",
+			"allow_in_bindings": 0
 		}
 	],
 	"location": [
@@ -274,5 +293,5 @@
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1778889600
+	"modified": 1778976000
 }

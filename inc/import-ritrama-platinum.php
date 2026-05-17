@@ -23,7 +23,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.2' );
+define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.3' );
 
 function dorotape_maybe_run_ritrama_platinum_import(): void {
 	if ( get_option( 'dorotape_import_ritrama_platinum_version' ) === DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION ) {
@@ -194,10 +194,11 @@ function dorotape_upsert_ritrama_platinum_product(
 		update_field( $field, $value, $product_id );
 	}
 
-	// Colour swatch — stored as post meta so the template can render a CSS div
-	// when no product image has been uploaded.
+	// Colour swatch — saved via ACF so the colour picker field in the admin
+	// shows the correct value. The template reads it via get_post_meta(),
+	// which works whether saved through ACF or directly.
 	if ( ! empty( $colour['colour_hex'] ) ) {
-		update_post_meta( $product_id, 'colour_hex', sanitize_hex_color( $colour['colour_hex'] ) );
+		update_field( 'colour_hex', sanitize_hex_color( $colour['colour_hex'] ), $product_id );
 	}
 
 	return $product_id;
