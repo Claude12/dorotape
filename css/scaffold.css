@@ -1065,6 +1065,73 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	color: inherit;
 }
 
+/* ── Downloads tab ───────────────────────────────────────────────────────── */
+
+.dt-downloads-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: .75rem;
+}
+
+.dt-download-item {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: .9rem 1.1rem;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-bg);
+}
+
+.dt-download-icon {
+	flex-shrink: 0;
+	width: 42px;
+	height: 42px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--dt-navy);
+	color: var(--dt-white);
+	font-size: .65rem;
+	font-weight: 700;
+	border-radius: var(--dt-radius);
+	letter-spacing: .03em;
+}
+
+.dt-download-meta {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: .15rem;
+}
+
+.dt-download-label {
+	font-weight: 600;
+	font-size: .9rem;
+	color: var(--dt-text);
+}
+
+.dt-download-size {
+	font-size: .78rem;
+	color: var(--dt-mid);
+}
+
+.dt-download-btn.button {
+	flex-shrink: 0;
+	background: var(--dt-navy);
+	color: var(--dt-white);
+	font-size: .82rem;
+	padding: .4rem .9rem;
+}
+.dt-download-btn.button:hover {
+	background: var(--dt-accent);
+	color: var(--dt-white);
+	text-decoration: none;
+}
+
 /* ── Archive "Select Options" button ─────────────────────────────────────── */
 
 .dt-select-options-btn.button {

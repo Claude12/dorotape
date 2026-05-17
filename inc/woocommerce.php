@@ -312,3 +312,58 @@ add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Pro
 		esc_html__( 'Select Options →', 'dorotape' )
 	);
 }, 10, 2 );
+
+// ─── Downloads tab ────────────────────────────────────────────────────────────
+
+/**
+ * Add a Downloads tab to the single product page when at least one of the
+ * three document fields (data_sheet, application_guide, safety_data_sheet)
+ * has a file attached. Tab is hidden entirely when no files exist.
+ */
+add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
+	if ( ! is_product() ) {
+		return $tabs;
+	}
+
+	global $post;
+	$id = $post->ID;
+
+	$files = array(
+		__( 'Technical Data Sheet', 'dorotape' ) => get_field( 'data_sheet', $id ),
+		__( 'Application Guide',    'dorotape' ) => get_field( 'application_guide', $id ),
+		__( 'Safety Data Sheet',    'dorotape' ) => get_field( 'safety_data_sheet', $id ),
+	);
+
+	// Only add the tab if at least one file is attached.
+	$files = array_filter( $files );
+	if ( empty( $files ) ) {
+		return $tabs;
+	}
+
+	$tabs['dorotape_downloads'] = array(
+		'title'    => __( 'Downloads', 'dorotape' ),
+		'priority' => 40,
+		'callback' => function () use ( $files ) {
+			echo '<h2>' . esc_html__( 'Downloads', 'dorotape' ) . '</h2>';
+			echo '<ul class="dt-downloads-list">';
+			foreach ( $files as $label => $file ) {
+				$ext      = strtoupper( pathinfo( $file['filename'], PATHINFO_EXTENSION ) );
+				$size_kb  = $file['filesize'] ? round( $file['filesize'] / 1024 ) . ' KB' : '';
+				echo '<li class="dt-download-item">';
+				echo '<span class="dt-download-icon">' . esc_html( $ext ) . '</span>';
+				echo '<span class="dt-download-meta">';
+				echo '<span class="dt-download-label">' . esc_html( $label ) . '</span>';
+				if ( $size_kb ) {
+					echo '<span class="dt-download-size">' . esc_html( $size_kb ) . '</span>';
+				}
+				echo '</span>';
+				echo '<a href="' . esc_url( $file['url'] ) . '" class="button dt-download-btn" download>'
+					. esc_html__( 'Download', 'dorotape' ) . '</a>';
+				echo '</li>';
+			}
+			echo '</ul>';
+		},
+	);
+
+	return $tabs;
+} );
