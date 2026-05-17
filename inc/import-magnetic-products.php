@@ -34,7 +34,8 @@ function dorotape_maybe_run_magnetic_import(): void {
 
 	update_option( 'dorotape_import_magnetic_version', DOROTAPE_IMPORT_MAGNETIC_VERSION );
 }
-add_action( 'admin_init', 'dorotape_maybe_run_magnetic_import' );
+// Disabled for dev — client will supply full product CSV.
+// add_action( 'admin_init', 'dorotape_maybe_run_magnetic_import' );
 
 // ─── Orchestration ────────────────────────────────────────────────────────────
 

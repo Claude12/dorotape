@@ -23,7 +23,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.3' );
+define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.4' );
 
 function dorotape_maybe_run_ritrama_platinum_import(): void {
 	if ( get_option( 'dorotape_import_ritrama_platinum_version' ) === DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION ) {
@@ -207,109 +207,36 @@ function dorotape_upsert_ritrama_platinum_product(
 // ─── Colour data ──────────────────────────────────────────────────────────────
 
 /**
- * Returns the dataset for all 60 colours in the Ritrama F-Sign Platinum range.
+ * Returns 10 representative dev colours for the Ritrama F-Sign Platinum range.
+ * Covers standard pricing, special pricing (Black, Anthracite), and airflow flag.
+ * Replace with the full 60-colour dataset once the client CSV is confirmed.
  *
- * Defaults:  price_per_m=2.75, roll_metres=25, roll_modifier_pct=2150
- *            (derived from £61.87/£2.75 = 22.4982× → +2149.82% — exact to avoid 1p rounding)
- *
- * Exceptions:
+ * Pricing notes:
  *   P801 Black     — price_per_m=2.30, roll_metres=50, roll_modifier_pct=4400
- *                    (£103.50/£2.30 = 45× → +4400%)
- *   P856 Anthracite — price_per_m=3.37, roll_modifier_pct=2155
- *                    (£76.00/£3.37 = 22.5519× → +2155.19% — exact to avoid 1p rounding)
- *
- * has_airflow flags colours available with Airflow (Easy Dot) adhesive.
- * Airflow products are not imported in Sprint 1 — flag retained for Sprint 2.
+ *   P856 Anthracite — price_per_m=3.37, roll_modifier_pct=2155.19
+ *   All others     — price_per_m=2.75, roll_metres=25, roll_modifier_pct=2149.82
  */
 function dorotape_ritrama_platinum_colours(): array {
 	$c = 'dorotape_ritrama_colour'; // local alias for readability
 
 	return array(
-		// ── Yellows & Oranges ─────────────────────────────────────────────────
-		$c( 'P804', 'Pastel Yellow' ),
-		$c( 'P805', 'Yellow' ),
-		$c( 'P806', 'Bright Yellow',  true ),
-		$c( 'P807', 'Sun Yellow',     true ),
-		$c( 'P808', 'Dark Yellow' ),
-		$c( 'P809', 'Saffran' ),
-		$c( 'P810', 'Light Orange' ),
-		$c( 'P811', 'Orange' ),
-		$c( 'P812', 'Carrot',         true ),
-
-		// ── Reds ─────────────────────────────────────────────────────────────
-		$c( 'P813', 'Poppy Red' ),
-		$c( 'P814', 'Vivid Red' ),
-		$c( 'P815', 'Tomato Red' ),
-		$c( 'P816', 'Spicy Red',      true ),
-		$c( 'P817', 'Medium Red',     true ),
-		$c( 'P818', 'Dark Red' ),
-		$c( 'P819', 'Red',            true ),
-		$c( 'P820', 'Wine Red',       true ),
-		$c( 'P821', 'Burgundy' ),
-		$c( 'P822', 'Rioja Red' ),
-
-		// ── Pinks, Purples & Magentas ─────────────────────────────────────────
-		$c( 'P823', 'Process Magenta' ),
-		$c( 'P824', 'Plum' ),
-		$c( 'P825', 'Aubergine' ),
-		$c( 'P826', 'Violet' ),
-
-		// ── Blues ─────────────────────────────────────────────────────────────
-		$c( 'P827', 'Midnight Blue' ),
-		$c( 'P828', 'Abyss Blue' ),
-		$c( 'P829', 'Old Blue' ),
-		$c( 'P830', 'Dark Blue' ),
-		$c( 'P832', 'Marine Blue' ),
-		$c( 'P833', 'Ultramarine Blue', true ),
-		$c( 'P834', 'Reflex Blue',      true ),
-		$c( 'P835', 'Cosmos Blue',      true ),
-		$c( 'P836', 'Permanent Blue',   true ),
-		$c( 'P837', 'Medium Blue' ),
-		$c( 'P838', 'Ocean Blue' ),
-		$c( 'P839', 'Olympic Blue',     true ),
-		$c( 'P840', 'Light Blue' ),
-
-		// ── Teals & Greens ────────────────────────────────────────────────────
-		$c( 'P841', 'Petrol' ),
-		$c( 'P842', 'Dark Petrol' ),
-		$c( 'P843', 'Dark Lagoon' ),
-		$c( 'P844', 'Forest Green' ),
-		$c( 'P845', 'Dark Green' ),
-		$c( 'P846', 'Freedom Green',  true ),
-		$c( 'P847', 'Medium Green' ),
-		$c( 'P848', 'Bright Green' ),
-		$c( 'P849', 'Grass Green',    true ),
-		$c( 'P850', 'Apple Green',    true ),
-		$c( 'P851', 'Yellow Green' ),
-
-		// ── Browns & Beiges ───────────────────────────────────────────────────
-		$c( 'P852', 'Light Beige' ),
-		$c( 'P853', 'Chocolate Brown' ),
-		$c( 'P854', 'Dark Brown' ),
-
-		// ── Black ─────────────────────────────────────────────────────────────
-		// Black comes on a 50m roll (not 25m) — different base price and modifier.
-		$c( 'P801', 'Black', true, array(
+		$c( 'P804', 'Pastel Yellow' ),             // standard
+		$c( 'P811', 'Orange' ),                    // standard
+		$c( 'P813', 'Poppy Red' ),                 // standard
+		$c( 'P819', 'Red',             true ),     // airflow available
+		$c( 'P823', 'Process Magenta', true ),     // airflow available
+		$c( 'P827', 'Midnight Blue' ),             // standard
+		$c( 'P838', 'Ocean Blue' ),                // standard
+		$c( 'P844', 'Forest Green' ),              // standard
+		$c( 'P801', 'Black', true, array(          // special: £2.30/m, 50m roll
 			'price_per_m'       => 2.30,
 			'roll_metres'       => 50,
 			'roll_modifier_pct' => 4400,
 		) ),
-
-		// ── Greys ─────────────────────────────────────────────────────────────
-		$c( 'P855', 'Mystic Grey',    true ),
-		// Anthracite has premium pricing (5-year durability) and slightly different
-		// roll multiplier (£76.00/£3.37 = 22.55×).
-		$c( 'P856', 'Anthracite', true, array(
+		$c( 'P856', 'Anthracite', true, array(     // special: £3.37/m, premium pricing
 			'price_per_m'       => 3.37,
 			'roll_modifier_pct' => 2155.19,
 		) ),
-		$c( 'P857', 'Traffic Grey',   true ),
-		$c( 'P858', 'Dark Grey',      true ),
-		$c( 'P859', 'Medium Grey' ),
-		$c( 'P860', 'Slate Grey',     true ),
-		$c( 'P868', 'Light Grey' ),
-		$c( 'P861', 'Grey' ),
-		$c( 'P862', 'Pearl Grey' ),
 	);
 }
 

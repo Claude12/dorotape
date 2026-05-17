@@ -121,3 +121,4 @@ require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
 require get_template_directory() . '/inc/import-magnetic-products.php';
 require get_template_directory() . '/inc/import-ritrama-platinum.php';
+require get_template_directory() . '/inc/dev-cleanup.php';
