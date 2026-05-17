@@ -297,9 +297,10 @@ add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Prod
  * Products with no ACF options (e.g. sample cards) keep the normal button.
  */
 add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Product $product ): string {
-	$id = $product->get_id();
+	$id            = $product->get_id();
+	$width_options = get_field( 'width_options', $id );
 
-	$has_options = ( ! empty( get_field( 'width_options', $id ) ) && count( get_field( 'width_options', $id ) ) > 1 )
+	$has_options = ( ! empty( $width_options ) && count( $width_options ) > 1 )
 		|| ! empty( get_field( 'roll_options', $id ) );
 
 	if ( ! $has_options ) {
