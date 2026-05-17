@@ -232,7 +232,27 @@ add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Prod
 		return $price_html;
 	}
 
-	$roll_options = get_field( 'roll_options', $product->get_id() );
+	$product_id   = $product->get_id();
+	$roll_options = get_field( 'roll_options', $product_id );
+
+	// Detect per-metre products:
+	//   (a) Magnetic imports flag _dorotape_per_metre = '1'.
+	//   (b) Ritrama products have a roll_options row with roll_length == 1 (the "Per Metre" option).
+	$is_per_metre = '1' === get_post_meta( $product_id, '_dorotape_per_metre', true );
+	if ( ! $is_per_metre && is_array( $roll_options ) ) {
+		foreach ( $roll_options as $option ) {
+			if ( abs( (float) ( $option['roll_length'] ?? 0 ) - 1.0 ) < 0.001 ) {
+				$is_per_metre = true;
+				break;
+			}
+		}
+	}
+
+	if ( $is_per_metre ) {
+		$price_html .= '<span class="dt-per-metre">/m</span>';
+	}
+
+	// Append full-roll price line when the product has roll sizes > 1 m.
 	if ( ! is_array( $roll_options ) || empty( $roll_options ) ) {
 		return $price_html;
 	}

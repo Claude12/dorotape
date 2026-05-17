@@ -17,7 +17,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_MAGNETIC_VERSION', '1.0.0' );
+define( 'DOROTAPE_IMPORT_MAGNETIC_VERSION', '1.0.1' );
 
 /**
  * Guard: only run when stored version is outdated and dependencies are present.
@@ -119,6 +119,11 @@ function dorotape_upsert_magnetic_product( array $data, int $cat_id ): int {
 	// ACF spec tab fields.
 	foreach ( ( $data['specs'] ?? array() ) as $field_name => $field_value ) {
 		update_field( $field_name, $field_value, $product_id );
+	}
+
+	// Flag per-metre products so the archive price display can append "/m".
+	if ( ! empty( $data['per_metre'] ) ) {
+		update_post_meta( $product_id, '_dorotape_per_metre', '1' );
 	}
 
 	return $product_id;
@@ -267,6 +272,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'DORO-9050',
 			'name'              => 'Doro 9050 — Magnetic Ferro Vinyl SA White Gloss 630mm',
+			'per_metre'         => true,
 			'price'             => 8.99,
 			'short_description' => 'Self-adhesive white gloss magnetic ferrous vinyl, 630mm wide. Price per linear metre.',
 			'description'       => '<p>Doro 9050 is a self-adhesive white gloss ferrous film at 630mm width. Sold by the linear metre — set cart quantity to the number of metres required. Thickness: 0.85mm. Adhesion: 53 g/cm².</p>',
@@ -288,6 +294,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'DORO-9052-WG',
 			'name'              => 'Doro 9052 — Magnetic Ferro Vinyl SA White Gloss 1000mm',
+			'per_metre'         => true,
 			'price'             => 11.47,
 			'short_description' => 'Self-adhesive white gloss ferrous film, 1000mm wide. Fire rated B-s1-d0. Price per linear metre.',
 			'description'       => '<p>Doro 9052 White Gloss is a self-adhesive ferrous vinyl at 1000mm width. Thickness: 0.6mm. Adhesion: 28 g/cm². Fire classification: B-s1-d0. Sold by the linear metre.</p>',
@@ -310,6 +317,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'ASLAN-FF490',
 			'name'              => 'ASLAN FF490 — Matt Dry Wipe SA Ferrous Film 1370mm',
+			'per_metre'         => true,
 			'price'             => 58.54,
 			'short_description' => 'Matt dry-wipe self-adhesive ferrous film, 1370mm wide. Price per linear metre.',
 			'description'       => '<p>ASLAN FF490 combines a matt dry-wipe surface with a self-adhesive ferrous backing. Accepts standard dry-wipe markers and magnetic accessories. 1370mm wide. Sold by the linear metre.</p>',
@@ -330,6 +338,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'ASLAN-FF540',
 			'name'              => 'ASLAN FF540 — Blackboard SA Ferrous Film 1250mm (PVC-Free)',
+			'per_metre'         => true,
 			'price'             => 53.70,
 			'short_description' => 'PVC-free blackboard self-adhesive ferrous film, 1250mm wide. Price per linear metre.',
 			'description'       => '<p>ASLAN FF540 is a PVC-free self-adhesive ferrous film with a blackboard surface. Accepts chalk markers and magnetic accessories. 1250mm wide. Sold by the linear metre.</p>',
@@ -431,6 +440,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'DORO-9052-WM',
 			'name'              => 'Doro 9052 — Magnetic Ferro Vinyl SA White Matt',
+			'per_metre'         => true,
 			'price'             => 11.47,
 			'short_description' => 'Self-adhesive white matt ferrous film. Available in 1000mm (per metre) and 1260mm × 10m. Fire rated B-s1-d0.',
 			'description'       => '<p>Doro 9052 White Matt is a self-adhesive matt ferrous vinyl. Thickness: 0.6mm. Adhesion: 28 g/cm². Fire classification: B-s1-d0.</p>
@@ -465,6 +475,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'ASLAN-FF410',
 			'name'              => 'ASLAN FF410 — PVC-Free SA Ferrous Film',
+			'per_metre'         => true,
 			'price'             => 17.47,
 			'short_description' => 'PVC-free self-adhesive ferrous film. Fire rated C-s1-d0. Available in 1010mm and 1370mm widths, 9m or 12m rolls.',
 			'description'       => '<p>ASLAN FF410 is a PVC-free self-adhesive ferrous film with fire classification C-s1-d0. Base price is per linear metre at 1010mm width; a 35.64% surcharge applies for the 1370mm option.</p>
@@ -498,6 +509,7 @@ function dorotape_magnetic_product_data(): array {
 		array(
 			'sku'               => 'ASLAN-FF550',
 			'name'              => 'ASLAN FF550 — Dry Wipe Whiteboard SA Ferrous Film',
+			'per_metre'         => true,
 			'price'             => 40.37,
 			'short_description' => 'Whiteboard dry-wipe self-adhesive ferrous film. Available in 1010mm and 1370mm widths, 3m or 12m rolls.',
 			'description'       => '<p>ASLAN FF550 is a self-adhesive ferrous film with a white dry-wipe whiteboard surface. Accepts standard dry-wipe markers and magnetic accessories. Base price is per linear metre at 1010mm width; a 30.48% surcharge applies for the 1370mm option.</p>

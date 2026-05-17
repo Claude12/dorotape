@@ -1067,3 +1067,12 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	font-weight: 600;
 	color: inherit;
 }
+
+/* ── Per-metre suffix ─────────────────────────────────────────────────────── */
+
+.dt-per-metre {
+	font-size: 0.82em;
+	font-weight: 400;
+	color: var(--dt-mid);
+	margin-left: 1px;
+}
