@@ -1029,7 +1029,7 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	border-radius: 4px 4px 0 0;
 }
 
-/* Single product page — fill the gallery column if no image */
+/* Single product page — fill the gallery column */
 .dt-colour-swatch--single {
 	aspect-ratio: unset;
 	border-radius: 0;
