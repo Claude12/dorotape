@@ -176,98 +176,6 @@
 			"allow_in_bindings": 0
 		},
 		{
-			"key": "field_dorotape_tab_filters",
-			"label": "Filters",
-			"name": "",
-			"aria-label": "",
-			"type": "tab",
-			"instructions": "",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": { "width": "", "class": "", "id": "" },
-			"placement": "top",
-			"endpoint": 0,
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_colour_group",
-			"label": "Colour Group",
-			"name": "colour_group",
-			"aria-label": "",
-			"type": "select",
-			"instructions": "Used for colour filtering on category pages.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": { "width": "50", "class": "", "id": "" },
-			"choices": {
-				"white":       "White",
-				"black":       "Black",
-				"reds":        "Reds",
-				"blues":       "Blues",
-				"greens":      "Greens",
-				"yellows":     "Yellows",
-				"oranges":     "Oranges",
-				"greys":       "Greys",
-				"beiges":      "Beiges",
-				"browns":      "Browns",
-				"transparent": "Transparent / Clear",
-				"colours":     "Other Colours"
-			},
-			"default_value": "",
-			"return_format": "value",
-			"multiple": 0,
-			"allow_null": 1,
-			"ui": 0,
-			"ajax": 0,
-			"placeholder": "Select colour group",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_finish",
-			"label": "Finish",
-			"name": "finish",
-			"aria-label": "",
-			"type": "select",
-			"instructions": "Used for finish filtering on category pages.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": { "width": "50", "class": "", "id": "" },
-			"choices": {
-				"gloss": "Gloss",
-				"matt":  "Matt",
-				"satin": "Satin",
-				"clear": "Clear"
-			},
-			"default_value": "",
-			"return_format": "value",
-			"multiple": 0,
-			"allow_null": 1,
-			"ui": 0,
-			"ajax": 0,
-			"placeholder": "Select finish",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_adhesive_properties",
-			"label": "Adhesive Properties",
-			"name": "adhesive_properties",
-			"aria-label": "",
-			"type": "checkbox",
-			"instructions": "Tick all adhesive options available for this product.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": { "width": "", "class": "", "id": "" },
-			"choices": {
-				"standard": "Standard Adhesive",
-				"airflow":  "Airflow Adhesive"
-			},
-			"default_value": [],
-			"return_format": "value",
-			"layout": "horizontal",
-			"toggle": 0,
-			"allow_in_bindings": 0
-		},
-		{
 			"key": "field_dorotape_tab_files",
 			"label": "Product Files",
 			"name": "",
@@ -481,5 +389,5 @@
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1779062400
+	"modified": 1778889600
 }
