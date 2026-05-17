@@ -357,8 +357,8 @@ add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
 					echo '<span class="dt-download-size">' . esc_html( $size_kb ) . '</span>';
 				}
 				echo '</span>';
-				echo '<a href="' . esc_url( $file['url'] ) . '" class="button dt-download-btn" download>'
-					. esc_html__( 'Download', 'dorotape' ) . '</a>';
+				echo '<a href="' . esc_url( $file['url'] ) . '" class="button dt-download-btn" target="_blank" rel="noopener">'
+					. esc_html__( 'View', 'dorotape' ) . '</a>';
 				echo '</li>';
 			}
 			echo '</ul>';
