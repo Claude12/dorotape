@@ -14,18 +14,7 @@
 ( function () {
 	'use strict';
 
-	/* ── 1. Scaffold banner ─────────────────────────────────────────────── */
-	function insertScaffoldBanner() {
-		const banner = document.createElement( 'div' );
-		banner.className = 'dt-scaffold-banner';
-		banner.textContent = '⚙ SCAFFOLD UI — Sprint 1 temporary styles. Replace in Sprint 2.';
-		const header = document.getElementById( 'masthead' );
-		if ( header ) {
-			header.insertAdjacentElement( 'afterend', banner );
-		}
-	}
-
-	/* ── 2. Desktop dropdown navigation ────────────────────────────────── */
+	/* ── 1. Desktop dropdown navigation ────────────────────────────────── */
 	function initDropdownNav() {
 		const nav = document.getElementById( 'site-navigation' );
 		if ( ! nav ) return;
@@ -267,7 +256,6 @@
 
 	/* ── Boot ───────────────────────────────────────────────────────────── */
 	document.addEventListener( 'DOMContentLoaded', function () {
-		insertScaffoldBanner();
 		initDropdownNav();
 		initProductOptions();
 	} );
