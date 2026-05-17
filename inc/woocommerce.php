@@ -156,6 +156,24 @@ function dorotape_ajax_get_product_options(): void {
 add_action( 'wp_ajax_dorotape_get_product_options', 'dorotape_ajax_get_product_options' );
 add_action( 'wp_ajax_nopriv_dorotape_get_product_options', 'dorotape_ajax_get_product_options' );
 
+// ─── Category product count ───────────────────────────────────────────────────
+
+// Show product count only on leaf categories (no child categories).
+// On intermediate categories the count is misleading — clicking shows another
+// subcategory page, not a product grid.
+add_filter( 'woocommerce_subcategory_count_html', function ( string $html, object $category ): string {
+	$children = get_terms( array(
+		'taxonomy'   => 'product_cat',
+		'parent'     => $category->term_id,
+		'hide_empty' => true,
+		'fields'     => 'ids',
+	) );
+	if ( ! empty( $children ) && ! is_wp_error( $children ) ) {
+		return ''; // Has child categories — suppress the count.
+	}
+	return $html; // Leaf category — show the count.
+}, 10, 2 );
+
 // ─── Colour Swatch ────────────────────────────────────────────────────────────
 
 /**

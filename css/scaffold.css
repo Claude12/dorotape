@@ -292,6 +292,15 @@ h1, h2, h3, h4, h5, h6 {
 .woocommerce-breadcrumb a { color: var(--dt-mid); }
 .woocommerce-breadcrumb a:hover { color: var(--dt-accent); }
 
+/* Count visibility on subcategory cards is controlled by PHP
+   (woocommerce_subcategory_count_html filter in inc/woocommerce.php).
+   Only leaf categories output the count HTML at all. */
+.woocommerce-loop-category__title .count {
+	font-size: .78rem;
+	font-weight: 400;
+	color: var(--dt-mid);
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    WOOCOMMERCE — NOTICES
 ════════════════════════════════════════════════════════════════════════════ */
