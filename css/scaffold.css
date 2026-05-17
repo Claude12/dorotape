@@ -1065,6 +1065,20 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	color: inherit;
 }
 
+/* ── Archive "Select Options" button ─────────────────────────────────────── */
+
+.dt-select-options-btn.button {
+	background: var(--dt-navy);
+	color: var(--dt-white);
+	width: 100%;
+	text-align: center;
+}
+.dt-select-options-btn.button:hover {
+	background: var(--dt-accent);
+	color: var(--dt-white);
+	text-decoration: none;
+}
+
 /* ── Per-metre suffix ─────────────────────────────────────────────────────── */
 
 .dt-per-metre {

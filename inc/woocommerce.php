@@ -288,3 +288,27 @@ add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Prod
 		. wc_price( $roll_price )
 		. '</span>';
 }, 10, 2 );
+
+// ─── Archive "Select Options" button ─────────────────────────────────────────
+
+/**
+ * Replace the "Add to cart" button with a "Select Options →" link on archive
+ * pages for products that have configurable width or roll options.
+ * Products with no ACF options (e.g. sample cards) keep the normal button.
+ */
+add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Product $product ): string {
+	$id = $product->get_id();
+
+	$has_options = ( ! empty( get_field( 'width_options', $id ) ) && count( get_field( 'width_options', $id ) ) > 1 )
+		|| ! empty( get_field( 'roll_options', $id ) );
+
+	if ( ! $has_options ) {
+		return $html;
+	}
+
+	return sprintf(
+		'<a href="%s" class="button dt-select-options-btn">%s</a>',
+		esc_url( get_permalink( $id ) ),
+		esc_html__( 'Select Options →', 'dorotape' )
+	);
+}, 10, 2 );
