@@ -8,7 +8,7 @@
 			"name": "width_options",
 			"aria-label": "",
 			"type": "repeater",
-			"instructions": "Define the available widths for this product. Each row drives a selectable option on the product page and adjusts the price via the dynamic pricing engine.",
+			"instructions": "Define the available widths for this product. Each row creates a selectable option on the product page. The price for each width is entered directly — no percentages needed.",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -52,7 +52,7 @@
 					"name": "width_label",
 					"aria-label": "",
 					"type": "text",
-					"instructions": "Optional. Leave blank to auto-generate from the width value (e.g. \"300mm\").",
+					"instructions": "Optional. Leave blank to auto-generate (e.g. \"610mm\").",
 					"required": 0,
 					"conditional_logic": 0,
 					"wrapper": {
@@ -62,66 +62,30 @@
 					},
 					"default_value": "",
 					"maxlength": "",
-					"placeholder": "e.g. 300mm",
+					"placeholder": "e.g. 610mm",
 					"prepend": "",
 					"append": "",
 					"allow_in_bindings": 0
 				},
 				{
-					"key": "field_dorotape_width_modifier_type",
-					"label": "Price Modifier",
-					"name": "price_modifier_type",
-					"aria-label": "",
-					"type": "select",
-					"instructions": "How should this width affect the base product price?",
-					"required": 1,
-					"conditional_logic": 0,
-					"wrapper": {
-						"width": "25",
-						"class": "",
-						"id": ""
-					},
-					"choices": {
-						"none": "No modifier — use base price",
-						"percentage": "Percentage (%)",
-						"fixed": "Fixed amount (£)"
-					},
-					"default_value": "none",
-					"return_format": "value",
-					"multiple": 0,
-					"allow_null": 0,
-					"ui": 0,
-					"ajax": 0,
-					"placeholder": "",
-					"allow_in_bindings": 0
-				},
-				{
-					"key": "field_dorotape_width_modifier_value",
-					"label": "Modifier Value",
-					"name": "price_modifier_value",
+					"key": "field_dorotape_width_price",
+					"label": "Price per metre (£)",
+					"name": "price_per_metre",
 					"aria-label": "",
 					"type": "number",
-					"instructions": "Percentage or fixed amount. Use negative values for a price reduction.",
+					"instructions": "Actual price per linear metre at this width. Leave blank (or 0) for the base width — the product's WooCommerce regular price is used automatically.",
 					"required": 0,
-					"conditional_logic": [
-						[
-							{
-								"field": "field_dorotape_width_modifier_type",
-								"operator": "!=",
-								"value": "none"
-							}
-						]
-					],
+					"conditional_logic": 0,
 					"wrapper": {
-						"width": "30",
+						"width": "55",
 						"class": "",
 						"id": ""
 					},
-					"default_value": 0,
-					"min": "",
+					"default_value": "",
+					"min": 0,
 					"max": "",
 					"step": 0.01,
-					"prepend": "",
+					"prepend": "£",
 					"append": "",
 					"allow_in_bindings": 0
 				}
@@ -133,7 +97,7 @@
 			"name": "roll_options",
 			"aria-label": "",
 			"type": "repeater",
-			"instructions": "Define the available roll lengths for this product. Each row creates a selectable option and can apply a price modifier.",
+			"instructions": "Define the available roll lengths. Enter the actual total price for each roll at the base (narrowest) width. Other widths are priced proportionally. Leave Roll Price blank for the \"Per Metre\" row.",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -155,7 +119,7 @@
 					"name": "roll_label",
 					"aria-label": "",
 					"type": "text",
-					"instructions": "Customer-facing label shown in the roll length selector.",
+					"instructions": "Customer-facing label, e.g. \"Per Metre\" or \"25m Roll\".",
 					"required": 1,
 					"conditional_logic": 0,
 					"wrapper": {
@@ -165,7 +129,7 @@
 					},
 					"default_value": "",
 					"maxlength": "",
-					"placeholder": "e.g. 10m Roll",
+					"placeholder": "e.g. 25m Roll",
 					"prepend": "",
 					"append": "",
 					"allow_in_bindings": 0
@@ -176,7 +140,7 @@
 					"name": "roll_length",
 					"aria-label": "",
 					"type": "number",
-					"instructions": "Length in metres.",
+					"instructions": "Length in metres. Use 1 for the Per Metre row.",
 					"required": 1,
 					"conditional_logic": 0,
 					"wrapper": {
@@ -193,60 +157,92 @@
 					"allow_in_bindings": 0
 				},
 				{
-					"key": "field_dorotape_roll_modifier_type",
-					"label": "Price Modifier",
-					"name": "price_modifier_type",
+					"key": "field_dorotape_roll_price",
+					"label": "Roll Price (£)",
+					"name": "roll_price",
 					"aria-label": "",
-					"type": "select",
-					"instructions": "How should this roll length affect the width-adjusted price?",
+					"type": "number",
+					"instructions": "Total price for this roll at the base width. Leave blank for the Per Metre row. If the product has multiple widths, enter the price for the narrowest — other widths scale automatically.",
+					"required": 0,
+					"conditional_logic": 0,
+					"wrapper": {
+						"width": "55",
+						"class": "",
+						"id": ""
+					},
+					"default_value": "",
+					"min": 0,
+					"max": "",
+					"step": 0.01,
+					"prepend": "£",
+					"append": "",
+					"allow_in_bindings": 0
+				}
+			]
+		},
+		{
+			"key": "field_dorotape_price_tiers",
+			"label": "Price Tiers (Quantity Discounts)",
+			"name": "price_tiers",
+			"aria-label": "",
+			"type": "repeater",
+			"instructions": "Optional. Define quantity break-points for per-metre purchasing. Each tier sets the price per metre when the customer orders at least the specified quantity. Tiers apply only when the customer selects \"Per Metre\" — fixed roll prices are not affected. Prices are stored at the base (narrowest) width; wider widths scale automatically.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "",
+				"class": "",
+				"id": ""
+			},
+			"layout": "table",
+			"pagination": 0,
+			"min": 0,
+			"max": 0,
+			"collapsed": "field_dorotape_tier_min_qty",
+			"button_label": "Add Tier",
+			"allow_in_bindings": 0,
+			"sub_fields": [
+				{
+					"key": "field_dorotape_tier_min_qty",
+					"label": "Min. Quantity (m)",
+					"name": "min_qty",
+					"aria-label": "",
+					"type": "number",
+					"instructions": "Minimum number of metres for this tier to apply.",
 					"required": 1,
 					"conditional_logic": 0,
 					"wrapper": {
-						"width": "25",
+						"width": "40",
 						"class": "",
 						"id": ""
 					},
-					"choices": {
-						"none": "No modifier — use base price",
-						"percentage": "Percentage (%)",
-						"fixed": "Fixed amount (£)"
-					},
-					"default_value": "none",
-					"return_format": "value",
-					"multiple": 0,
-					"allow_null": 0,
-					"ui": 0,
-					"ajax": 0,
-					"placeholder": "",
+					"default_value": "",
+					"min": 1,
+					"max": "",
+					"step": 1,
+					"prepend": "",
+					"append": "m+",
 					"allow_in_bindings": 0
 				},
 				{
-					"key": "field_dorotape_roll_modifier_value",
-					"label": "Modifier Value",
-					"name": "price_modifier_value",
+					"key": "field_dorotape_tier_price",
+					"label": "Price per metre (£)",
+					"name": "tier_price",
 					"aria-label": "",
 					"type": "number",
-					"instructions": "Percentage or fixed amount. Use negative values for a price reduction.",
-					"required": 0,
-					"conditional_logic": [
-						[
-							{
-								"field": "field_dorotape_roll_modifier_type",
-								"operator": "!=",
-								"value": "none"
-							}
-						]
-					],
+					"instructions": "Price per linear metre at this quantity, at the base width. Enter the actual price — no percentages.",
+					"required": 1,
+					"conditional_logic": 0,
 					"wrapper": {
-						"width": "30",
+						"width": "60",
 						"class": "",
 						"id": ""
 					},
-					"default_value": 0,
-					"min": "",
+					"default_value": "",
+					"min": 0.01,
 					"max": "",
 					"step": 0.01,
-					"prepend": "",
+					"prepend": "£",
 					"append": "",
 					"allow_in_bindings": 0
 				}
@@ -288,10 +284,10 @@
 	"instruction_placement": "label",
 	"hide_on_screen": "",
 	"active": true,
-	"description": "Width and roll length options that drive the ACF dynamic pricing engine. Modifier values stack: width modifier is applied first, roll modifier second, then any customer-level discount.",
+	"description": "Width and roll length options that drive the ACF dynamic pricing engine. Enter actual prices — the engine handles all calculations.",
 	"show_in_rest": 0,
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1778976000
+	"modified": 1778889600
 }

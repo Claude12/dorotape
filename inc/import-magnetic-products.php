@@ -8,11 +8,11 @@
  * Pricing model:
  *  - Per-metre products: WooCommerce price = price per linear metre; customer
  *    qty = metres ordered. No roll_options ACF rows needed.
- *  - Fixed-roll products (one size): price = full roll price; single roll_options row.
- *  - Fixed-roll products (multiple sizes): price = smallest roll; roll_options rows
- *    use 'fixed' modifier for additional cost of larger rolls.
- *  - Width-variable products: price = per-metre rate at narrowest width; width_options
- *    row for each width with a 'percentage' modifier.
+ *  - Fixed-roll products (one size): roll_price = full roll price (= WC base).
+ *  - Fixed-roll products (multiple sizes): WC price = smallest roll; each
+ *    roll_options row stores the actual total price as roll_price.
+ *  - Width-variable products: WC price = per-metre rate at narrowest width;
+ *    wider widths store their actual price_per_metre in width_options.
  *
  * @package dorotape
  */
@@ -109,12 +109,26 @@ function dorotape_upsert_magnetic_product( array $data, int $cat_id ): int {
 		return 0;
 	}
 
-	// ACF pricing repeaters — only written when data is present.
+	// ACF pricing repeaters — field keys used so ACF skips name-lookup.
 	if ( ! empty( $data['width_options'] ) ) {
-		update_field( 'width_options', $data['width_options'], $product_id );
+		$width_rows = array_map( static function ( array $r ): array {
+			return array(
+				'field_dorotape_width_value' => $r['width_value'] ?? 0,
+				'field_dorotape_width_label' => $r['width_label'] ?? '',
+				'field_dorotape_width_price' => $r['price_per_metre'] ?? 0,
+			);
+		}, $data['width_options'] );
+		update_field( 'field_dorotape_width_options', $width_rows, $product_id );
 	}
 	if ( ! empty( $data['roll_options'] ) ) {
-		update_field( 'roll_options', $data['roll_options'], $product_id );
+		$roll_rows = array_map( static function ( array $r ): array {
+			return array(
+				'field_dorotape_roll_label'  => $r['roll_label'] ?? '',
+				'field_dorotape_roll_length' => $r['roll_length'] ?? 1,
+				'field_dorotape_roll_price'  => $r['roll_price'] ?? 0,
+			);
+		}, $data['roll_options'] );
+		update_field( 'field_dorotape_roll_options', $roll_rows, $product_id );
 	}
 
 	// ACF spec tab fields.
@@ -153,18 +167,16 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>Doro 9054 is a self-adhesive white gloss ferrous film that accepts standard magnetic graphics. Ideal for creating magnetic whiteboards, display panels, and signage substrates. Supplied as a 1250mm × 10m roll.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1250,
-					'width_label'          => '1250mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1250,
+					'width_label'    => '1250mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
 				array(
-					'roll_label'           => '10m Roll',
-					'roll_length'          => 10,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '10m Roll',
+					'roll_length' => 10,
+					'roll_price'  => 146.00,
 				),
 			),
 			'specs'             => array(
@@ -181,18 +193,16 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>Doro 9056 is a 0.3mm PVC-free PET-based ferrous film suited to eco-conscious magnetic display projects. Supplied as a 1270mm × 30m roll.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1270,
-					'width_label'          => '1270mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1270,
+					'width_label'    => '1270mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
 				array(
-					'roll_label'           => '30m Roll',
-					'roll_length'          => 30,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '30m Roll',
+					'roll_length' => 30,
+					'roll_price'  => 263.50,
 				),
 			),
 			'specs'             => array(
@@ -209,18 +219,16 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>FF600 is a self-adhesive plain grey ferrous film that creates a magnetic-receptive surface on non-magnetic substrates. Suitable for wallcovering and display panel applications. Supplied as a 1000mm × 10m roll.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1000,
-					'width_label'          => '1000mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1000,
+					'width_label'    => '1000mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
 				array(
-					'roll_label'           => '10m Roll',
-					'roll_length'          => 10,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '10m Roll',
+					'roll_length' => 10,
+					'roll_price'  => 105.90,
 				),
 			),
 			'specs'             => array(
@@ -237,18 +245,16 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>ASLAN FF480 is a self-adhesive ferrous film with a white printable surface compatible with eco-solvent, solvent, and UV flatbed printers. Creates a magnetic-receptive substrate for printed display systems. Supplied as a 1010mm × 12m roll.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1010,
-					'width_label'          => '1010mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1010,
+					'width_label'    => '1010mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
 				array(
-					'roll_label'           => '12m Roll',
-					'roll_length'          => 12,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '12m Roll',
+					'roll_length' => 12,
+					'roll_price'  => 267.00,
 				),
 			),
 			'specs'             => array(
@@ -279,10 +285,9 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>Doro 9050 is a self-adhesive white gloss ferrous film at 630mm width. Sold by the linear metre — set cart quantity to the number of metres required. Thickness: 0.85mm. Adhesion: 53 g/cm².</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 630,
-					'width_label'          => '630mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 630,
+					'width_label'    => '630mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'specs'             => array(
@@ -301,10 +306,9 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>Doro 9052 White Gloss is a self-adhesive ferrous vinyl at 1000mm width. Thickness: 0.6mm. Adhesion: 28 g/cm². Fire classification: B-s1-d0. Sold by the linear metre.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1000,
-					'width_label'          => '1000mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1000,
+					'width_label'    => '1000mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'specs'             => array(
@@ -324,10 +328,9 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>ASLAN FF490 combines a matt dry-wipe surface with a self-adhesive ferrous backing. Accepts standard dry-wipe markers and magnetic accessories. 1370mm wide. Sold by the linear metre.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1370,
-					'width_label'          => '1370mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1370,
+					'width_label'    => '1370mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'specs'             => array(
@@ -345,10 +348,9 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>ASLAN FF540 is a PVC-free self-adhesive ferrous film with a blackboard surface. Accepts chalk markers and magnetic accessories. 1250mm wide. Sold by the linear metre.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1250,
-					'width_label'          => '1250mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1250,
+					'width_label'    => '1250mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'specs'             => array(
@@ -369,26 +371,21 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>Green Power 4 is a PVC-free non-adhesive ferrous film for eco-conscious magnetic display systems. Thickness: 0.5mm. Adhesion: 55 g/cm². 1270mm wide, available in 5m or 10m rolls.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1270,
-					'width_label'          => '1270mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1270,
+					'width_label'    => '1270mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
-				// Base: 5m @ £72.50
 				array(
-					'roll_label'           => '5m Roll',
-					'roll_length'          => 5,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '5m Roll',
+					'roll_length' => 5,
+					'roll_price'  => 72.50,
 				),
-				// 10m @ £145.00 = £72.50 + £72.50
 				array(
-					'roll_label'           => '10m Roll',
-					'roll_length'          => 10,
-					'price_modifier_type'  => 'fixed',
-					'price_modifier_value' => 72.50,
+					'roll_label'  => '10m Roll',
+					'roll_length' => 10,
+					'roll_price'  => 145.00,
 				),
 			),
 			'specs'             => array(
@@ -405,26 +402,21 @@ function dorotape_magnetic_product_data(): array {
 			'description'       => '<p>FF200 is an iron-based PVC-free non-adhesive ferrous film with a white printable surface. Compatible with eco-solvent and UV inkjet printers. 1260mm wide, available in 25m or 50m rolls.</p>',
 			'width_options'     => array(
 				array(
-					'width_value'          => 1260,
-					'width_label'          => '1260mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1260,
+					'width_label'    => '1260mm',
+					'price_per_metre' => 0,
 				),
 			),
 			'roll_options'      => array(
-				// Base: 25m @ £190.00
 				array(
-					'roll_label'           => '25m Roll',
-					'roll_length'          => 25,
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'roll_label'  => '25m Roll',
+					'roll_length' => 25,
+					'roll_price'  => 190.00,
 				),
-				// 50m @ £361.00 = £190.00 + £171.00
 				array(
-					'roll_label'           => '50m Roll',
-					'roll_length'          => 50,
-					'price_modifier_type'  => 'fixed',
-					'price_modifier_value' => 171.00,
+					'roll_label'  => '50m Roll',
+					'roll_length' => 50,
+					'roll_price'  => 361.00,
 				),
 			),
 			'specs'             => array(
@@ -450,19 +442,15 @@ function dorotape_magnetic_product_data(): array {
 <li>1260mm — typically supplied as a 10m roll at £129.30</li>
 </ul>',
 			'width_options'     => array(
-				// Base: 1000mm @ £11.47/m
 				array(
-					'width_value'          => 1000,
-					'width_label'          => '1000mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1000,
+					'width_label'    => '1000mm',
+					'price_per_metre' => 0,        // Use WC base price (£11.47/m).
 				),
-				// 1260mm @ £12.93/m = +12.73% over 1000mm (£12.93 / £11.47 = 1.1273)
 				array(
-					'width_value'          => 1260,
-					'width_label'          => '1260mm',
-					'price_modifier_type'  => 'percentage',
-					'price_modifier_value' => 12.73,
+					'width_value'    => 1260,
+					'width_label'    => '1260mm',
+					'price_per_metre' => 12.93,
 				),
 			),
 			'specs'             => array(
@@ -478,26 +466,22 @@ function dorotape_magnetic_product_data(): array {
 			'name'              => 'ASLAN FF410 — PVC-Free SA Ferrous Film',
 			'per_metre'         => true,
 			'price'             => 17.47,
-			'short_description' => 'PVC-free self-adhesive ferrous film. Fire rated C-s1-d0. Available in 1010mm and 1370mm widths, 9m or 12m rolls.',
-			'description'       => '<p>ASLAN FF410 is a PVC-free self-adhesive ferrous film with fire classification C-s1-d0. Base price is per linear metre at 1010mm width; a 35.64% surcharge applies for the 1370mm option.</p>
+			'short_description' => 'PVC-free self-adhesive ferrous film. Fire rated C-s1-d0. Available in 1010mm and 1370mm widths.',
+			'description'       => '<p>ASLAN FF410 is a PVC-free self-adhesive ferrous film with fire classification C-s1-d0.</p>
 <ul>
-<li>1010mm × 12m — £209.60</li>
-<li>1370mm × 9m — £213.30</li>
+<li>1010mm — £17.47/m (£209.60 per 12m roll)</li>
+<li>1370mm — £23.70/m (£213.30 per 9m roll)</li>
 </ul>',
 			'width_options'     => array(
-				// Base: 1010mm @ £17.47/m  (£209.60 / 12m)
 				array(
-					'width_value'          => 1010,
-					'width_label'          => '1010mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1010,
+					'width_label'    => '1010mm',
+					'price_per_metre' => 0,        // Use WC base price (£17.47/m).
 				),
-				// 1370mm @ £23.70/m  (£213.30 / 9m = +35.64% over 1010mm)
 				array(
-					'width_value'          => 1370,
-					'width_label'          => '1370mm',
-					'price_modifier_type'  => 'percentage',
-					'price_modifier_value' => 35.64,
+					'width_value'    => 1370,
+					'width_label'    => '1370mm',
+					'price_per_metre' => 23.70,
 				),
 			),
 			'specs'             => array(
@@ -512,26 +496,22 @@ function dorotape_magnetic_product_data(): array {
 			'name'              => 'ASLAN FF550 — Dry Wipe Whiteboard SA Ferrous Film',
 			'per_metre'         => true,
 			'price'             => 40.37,
-			'short_description' => 'Whiteboard dry-wipe self-adhesive ferrous film. Available in 1010mm and 1370mm widths, 3m or 12m rolls.',
-			'description'       => '<p>ASLAN FF550 is a self-adhesive ferrous film with a white dry-wipe whiteboard surface. Accepts standard dry-wipe markers and magnetic accessories. Base price is per linear metre at 1010mm width; a 30.48% surcharge applies for the 1370mm option.</p>
+			'short_description' => 'Whiteboard dry-wipe self-adhesive ferrous film. Available in 1010mm and 1370mm widths.',
+			'description'       => '<p>ASLAN FF550 is a self-adhesive ferrous film with a white dry-wipe whiteboard surface. Accepts standard dry-wipe markers and magnetic accessories.</p>
 <ul>
-<li>1010mm × 12m — £484.40</li>
-<li>1370mm × 3m — £158.07</li>
+<li>1010mm — £40.37/m (£484.40 per 12m roll)</li>
+<li>1370mm — £52.69/m (£158.07 per 3m roll)</li>
 </ul>',
 			'width_options'     => array(
-				// Base: 1010mm @ £40.37/m  (£484.40 / 12m)
 				array(
-					'width_value'          => 1010,
-					'width_label'          => '1010mm',
-					'price_modifier_type'  => 'none',
-					'price_modifier_value' => 0,
+					'width_value'    => 1010,
+					'width_label'    => '1010mm',
+					'price_per_metre' => 0,        // Use WC base price (£40.37/m).
 				),
-				// 1370mm @ £52.69/m  (£158.07 / 3m = +30.48% over 1010mm)
 				array(
-					'width_value'          => 1370,
-					'width_label'          => '1370mm',
-					'price_modifier_type'  => 'percentage',
-					'price_modifier_value' => 30.48,
+					'width_value'    => 1370,
+					'width_label'    => '1370mm',
+					'price_per_metre' => 52.69,
 				),
 			),
 			'specs'             => array(

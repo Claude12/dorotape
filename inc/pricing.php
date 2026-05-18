@@ -19,7 +19,7 @@
 // ─── Price Calculation ────────────────────────────────────────────────────────
 
 /**
- * Adjust cart item prices based on ACF width/roll modifiers and customer discount.
+ * Adjust cart item prices based on ACF width/roll prices and customer discount.
  *
  * @param WC_Cart $cart
  */
@@ -37,20 +37,30 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 	foreach ( $cart->get_cart() as $cart_item ) {
 		$product    = $cart_item['data'];
 		$product_id = $cart_item['product_id'];
-		$price      = (float) $product->get_regular_price();
+		$base_price = (float) $product->get_regular_price();
 
-		if ( $price <= 0 ) {
+		if ( $base_price <= 0 ) {
 			continue;
 		}
 
-		// Width modifier applied first.
+		// Width price resolved first (falls back to base if no match or blank).
+		$width_price = $base_price;
 		if ( ! empty( $cart_item['dorotape_width'] ) ) {
-			$price = dorotape_apply_width_modifier( $price, (int) $cart_item['dorotape_width'], $product_id );
+			$width_price = dorotape_get_width_price( (int) $cart_item['dorotape_width'], $product_id, $base_price );
 		}
 
-		// Roll modifier applied on top of width-adjusted price.
+		// Roll: fixed rolls use roll_price; per-metre rows get quantity tier pricing.
+		// When no roll is selected (no dorotape_roll_length in cart), also apply tiers.
+		$price = $width_price;
 		if ( ! empty( $cart_item['dorotape_roll_length'] ) ) {
-			$price = dorotape_apply_roll_modifier( $price, (float) $cart_item['dorotape_roll_length'], $product_id );
+			$roll_length = (float) $cart_item['dorotape_roll_length'];
+			if ( dorotape_is_per_metre_roll( $roll_length, $product_id ) ) {
+				$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $product_id, $width_price, $base_price );
+			} else {
+				$price = dorotape_get_roll_price( $roll_length, $product_id, $width_price, $base_price );
+			}
+		} else {
+			$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $product_id, $width_price, $base_price );
 		}
 
 		// Customer-level discount applied last.
@@ -83,74 +93,151 @@ function dorotape_get_customer_discount( int $user_id ): float {
 }
 
 /**
- * Find the matching width option from the ACF repeater and return the adjusted price.
+ * Return the per-metre price for the given width.
+ * Uses the stored ACF price_per_metre value; falls back to base_price when blank/zero.
  *
- * @param float $price       Base product price.
  * @param int   $width_mm    Selected width in mm.
  * @param int   $product_id
+ * @param float $base_price  WooCommerce regular price (base/narrowest width).
  * @return float
  */
-function dorotape_apply_width_modifier( float $price, int $width_mm, int $product_id ): float {
+function dorotape_get_width_price( int $width_mm, int $product_id, float $base_price ): float {
 	$options = get_field( 'width_options', $product_id );
 	if ( ! is_array( $options ) ) {
-		return $price;
+		return $base_price;
 	}
 	foreach ( $options as $option ) {
 		if ( (int) $option['width_value'] !== $width_mm ) {
 			continue;
 		}
-		return dorotape_calculate_modified_price(
-			$price,
-			$option['price_modifier_type'] ?? 'none',
-			(float) ( $option['price_modifier_value'] ?? 0 )
-		);
+		$price = (float) ( $option['price_per_metre'] ?? 0 );
+		return $price > 0 ? $price : $base_price;
 	}
-	return $price;
+	return $base_price;
 }
 
 /**
- * Find the matching roll option from the ACF repeater and return the adjusted price.
+ * Return the final price for a given roll length, scaled to the selected width.
  *
- * @param float $price       Price (already width-adjusted).
- * @param float $roll_length Selected roll length in metres.
+ * Stored roll_price is the total at the base (narrowest) width.
+ * Wider widths scale proportionally: roll_price × (width_price / base_price).
+ * A blank/zero roll_price means "per metre" — return width_price unchanged.
+ *
+ * @param float $roll_length  Selected roll length in metres.
  * @param int   $product_id
+ * @param float $width_price  Already-resolved per-metre price for selected width.
+ * @param float $base_price   WooCommerce regular price (base/narrowest width).
  * @return float
  */
-function dorotape_apply_roll_modifier( float $price, float $roll_length, int $product_id ): float {
+function dorotape_get_roll_price( float $roll_length, int $product_id, float $width_price, float $base_price ): float {
 	$options = get_field( 'roll_options', $product_id );
 	if ( ! is_array( $options ) ) {
-		return $price;
+		return $width_price;
 	}
 	foreach ( $options as $option ) {
 		if ( abs( (float) $option['roll_length'] - $roll_length ) > 0.001 ) {
 			continue;
 		}
-		return dorotape_calculate_modified_price(
-			$price,
-			$option['price_modifier_type'] ?? 'none',
-			(float) ( $option['price_modifier_value'] ?? 0 )
-		);
+		$roll_price = (float) ( $option['roll_price'] ?? 0 );
+		if ( $roll_price <= 0 ) {
+			return $width_price; // Per-metre row — no roll discount/multiplier.
+		}
+		if ( $base_price <= 0 ) {
+			return $roll_price;
+		}
+		return $roll_price * ( $width_price / $base_price );
 	}
-	return $price;
+	return $width_price;
 }
 
 /**
- * Apply a price modifier (none, percentage, or fixed amount).
+ * Return true when the given roll_length matches a "Per Metre" row
+ * (roll_price is blank/zero), or when no matching row is found.
+ * Used by the pricing engine to decide whether quantity tiers apply.
  *
- * @param float  $price Base price.
- * @param string $type  'none' | 'percentage' | 'fixed'.
- * @param float  $value Modifier value. Negative values reduce the price.
+ * @param float $roll_length Selected roll length in metres.
+ * @param int   $product_id
+ * @return bool
+ */
+function dorotape_is_per_metre_roll( float $roll_length, int $product_id ): bool {
+	$options = get_field( 'roll_options', $product_id );
+	if ( ! is_array( $options ) ) {
+		return true;
+	}
+	foreach ( $options as $option ) {
+		if ( abs( (float) $option['roll_length'] - $roll_length ) <= 0.001 ) {
+			return (float) ( $option['roll_price'] ?? 0 ) <= 0;
+		}
+	}
+	return true;
+}
+
+/**
+ * Return the tiered per-metre price for the given quantity.
+ * Tiers are stored at the base width; wider widths scale proportionally.
+ * Falls back to width_price when no tiers are configured or none match.
+ *
+ * @param int   $qty         Cart line quantity (metres ordered).
+ * @param int   $product_id
+ * @param float $width_price Already-resolved per-metre price for selected width.
+ * @param float $base_price  WooCommerce regular price (base/narrowest width).
  * @return float
  */
-function dorotape_calculate_modified_price( float $price, string $type, float $value ): float {
-	switch ( $type ) {
-		case 'percentage':
-			return max( 0.0, $price * ( 1 + ( $value / 100 ) ) );
-		case 'fixed':
-			return max( 0.0, $price + $value );
-		default:
-			return $price;
+function dorotape_get_tier_price( int $qty, int $product_id, float $width_price, float $base_price ): float {
+	$tiers = get_field( 'price_tiers', $product_id );
+	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		return $width_price;
 	}
+
+	// Sort descending so the first match is the highest applicable tier.
+	usort(
+		$tiers,
+		static function ( array $a, array $b ): int {
+			return (int) $b['min_qty'] - (int) $a['min_qty'];
+		}
+	);
+
+	foreach ( $tiers as $tier ) {
+		if ( $qty >= (int) $tier['min_qty'] ) {
+			$tier_price = (float) ( $tier['tier_price'] ?? 0 );
+			if ( $tier_price <= 0 ) {
+				continue;
+			}
+			if ( $base_price <= 0 ) {
+				return $tier_price;
+			}
+			return $tier_price * ( $width_price / $base_price );
+		}
+	}
+
+	return $width_price;
+}
+
+/**
+ * Return the tier that was applied for a given quantity, or null if none matched.
+ * Used by cart/order meta display so customers can see which discount was applied.
+ *
+ * @param int   $qty        Cart line quantity (metres).
+ * @param int   $product_id
+ * @return array|null Tier row (min_qty, tier_price) or null.
+ */
+function dorotape_find_applied_tier( int $qty, int $product_id ): ?array {
+	$tiers = get_field( 'price_tiers', $product_id );
+	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		return null;
+	}
+	usort(
+		$tiers,
+		static function ( array $a, array $b ): int {
+			return (int) $b['min_qty'] - (int) $a['min_qty'];
+		}
+	);
+	foreach ( $tiers as $tier ) {
+		if ( $qty >= (int) $tier['min_qty'] && (float) ( $tier['tier_price'] ?? 0 ) > 0 ) {
+			return $tier;
+		}
+	}
+	return null;
 }
 
 // ─── Cart Item Meta ───────────────────────────────────────────────────────────
@@ -197,6 +284,37 @@ function dorotape_cart_item_display_meta( array $item_data, array $cart_item ): 
 			'value' => esc_html( (string) $cart_item['dorotape_roll_length'] ) . 'm',
 		);
 	}
+
+	// Show quantity tier discount when: roll is not selected, or the selected roll
+	// is the per-metre row (roll_price == 0). Fixed-roll prices already reflect bulk.
+	$product_id  = $cart_item['product_id'];
+	$roll_length = ! empty( $cart_item['dorotape_roll_length'] )
+		? (float) $cart_item['dorotape_roll_length']
+		: 0.0;
+	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $product_id );
+
+	if ( $is_per_metre ) {
+		$qty  = (int) ( $cart_item['quantity'] ?? 1 );
+		$tier = dorotape_find_applied_tier( $qty, $product_id );
+
+		if ( $tier ) {
+			$product    = $cart_item['data'] ?? wc_get_product( $product_id );
+			$base_price = $product ? (float) $product->get_regular_price() : 0.0;
+			$tier_price = (float) $tier['tier_price'];
+			$saving_pct = ( $base_price > 0 )
+				? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
+				: 0;
+			$label = (int) $tier['min_qty'] . 'm+ rate';
+			if ( $saving_pct > 0 ) {
+				$label .= ' · save ' . $saving_pct . '%';
+			}
+			$item_data[] = array(
+				'name'  => esc_html__( 'Qty Discount', 'dorotape' ),
+				'value' => esc_html( $label ),
+			);
+		}
+	}
+
 	return $item_data;
 }
 add_filter( 'woocommerce_get_item_data', 'dorotape_cart_item_display_meta', 10, 2 );
@@ -229,6 +347,36 @@ function dorotape_save_order_item_meta(
 			(float) $values['dorotape_roll_length'] . 'm',
 			true
 		);
+	}
+
+	// Persist tier discount to the order record (admin screen, emails, Sage sync).
+	$product_id  = $values['product_id'] ?? 0;
+	$roll_length = ! empty( $values['dorotape_roll_length'] )
+		? (float) $values['dorotape_roll_length']
+		: 0.0;
+	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $product_id );
+
+	if ( $is_per_metre && $product_id ) {
+		$qty  = (int) ( $values['quantity'] ?? 1 );
+		$tier = dorotape_find_applied_tier( $qty, $product_id );
+
+		if ( $tier ) {
+			$product    = wc_get_product( $product_id );
+			$base_price = $product ? (float) $product->get_regular_price() : 0.0;
+			$tier_price = (float) $tier['tier_price'];
+			$saving_pct = ( $base_price > 0 )
+				? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
+				: 0;
+			$label = (int) $tier['min_qty'] . 'm+ rate';
+			if ( $saving_pct > 0 ) {
+				$label .= ' · save ' . $saving_pct . '%';
+			}
+			$item->add_meta_data(
+				esc_html__( 'Qty Discount', 'dorotape' ),
+				$label,
+				true
+			);
+		}
 	}
 }
 add_action( 'woocommerce_checkout_create_order_line_item', 'dorotape_save_order_item_meta', 10, 4 );

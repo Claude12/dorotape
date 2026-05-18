@@ -134,6 +134,7 @@
 	function renderOptionSelectors( panel, data, productId ) {
 		const widths = data.width_options || [];
 		const rolls  = data.roll_options  || [];
+		const tiers  = data.price_tiers   || [];
 
 		let html = '<h3>Product Options</h3>';
 
@@ -185,39 +186,82 @@
 		const rollHid   = panel.querySelector( '#dt_roll_val' );
 		const preview   = panel.querySelector( '#dt_price_preview' );
 
+		// Quantity input lives outside the options panel in the WC form.
+		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
+
+		function getQty() {
+			return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1;
+		}
+
 		function syncHiddenFields() {
 			if ( widthSel ) widthHid.value = widthSel.value;
 			if ( rollSel  ) rollHid.value  = rollSel.value;
-			updatePricePreview( widthSel, rollSel, widths, rolls, basePrice, preview, mainPriceEl );
+			updatePricePreview( widthSel, rollSel, widths, rolls, tiers, basePrice, preview, mainPriceEl, getQty() );
+			if ( tiers.length ) highlightActiveTier( tiers, getQty() );
 		}
 
 		if ( widthSel ) widthSel.addEventListener( 'change', syncHiddenFields );
 		if ( rollSel  ) rollSel.addEventListener( 'change', syncHiddenFields );
+		if ( qtyInput ) qtyInput.addEventListener( 'input', syncHiddenFields );
 
 		// Initialise fields and preview
 		syncHiddenFields();
 	}
 
+	// Highlight the active tier row in the PHP-rendered .dt-tier-pricing__table.
+	// When qty is below all tiers the base row (data-min="0") is highlighted instead.
+	function highlightActiveTier( tiers, qty ) {
+		const table = document.querySelector( '.dt-tier-pricing__table' );
+		if ( ! table ) return;
+
+		// Find highest applicable tier; fall back to 0 (base row) if none match.
+		const sorted = tiers.slice().sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
+		let activeMin = 0;
+		for ( var i = 0; i < sorted.length; i++ ) {
+			if ( qty >= sorted[ i ].min_qty ) {
+				activeMin = sorted[ i ].min_qty;
+				break;
+			}
+		}
+
+		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
+			row.classList.toggle( 'dt-tier-active', parseInt( row.dataset.min, 10 ) === activeMin );
+		} );
+	}
+
 	/* Compute price client-side, mirroring inc/pricing.php logic, and push it
 	   to both the main WooCommerce price element and the small options panel note.
 	   The server always recalculates the authoritative price at checkout. */
-	function updatePricePreview( widthSel, rollSel, widths, rolls, basePrice, preview, mainPriceEl ) {
+	function updatePricePreview( widthSel, rollSel, widths, rolls, tiers, basePrice, preview, mainPriceEl, qty ) {
 		if ( ! basePrice ) return;
 
 		let price = basePrice;
 
-		// Width modifier
+		// Width: use stored price_per_metre; 0/blank falls back to basePrice.
 		if ( widthSel ) {
 			const wVal = parseInt( widthSel.value, 10 );
 			const wDef = widths.find( function ( w ) { return w.value === wVal; } );
-			if ( wDef ) price = applyModifier( price, wDef.modifier_type, wDef.modifier_value );
+			if ( wDef && wDef.price_per_metre > 0 ) {
+				price = wDef.price_per_metre;
+			}
 		}
 
-		// Roll modifier
+		const selectedWidthPrice = price;
+
 		if ( rollSel ) {
 			const rVal = parseFloat( rollSel.value );
 			const rDef = rolls.find( function ( r ) { return Math.abs( r.length - rVal ) < 0.001; } );
-			if ( rDef ) price = applyModifier( price, rDef.modifier_type, rDef.modifier_value );
+			if ( rDef && rDef.roll_price > 0 ) {
+				// Fixed roll: scale stored base-width roll_price to the selected width.
+				const widthRatio = basePrice > 0 ? selectedWidthPrice / basePrice : 1;
+				price = rDef.roll_price * widthRatio;
+			} else {
+				// Per-metre row selected: apply quantity tier if available.
+				price = applyTierPrice( tiers, qty || 1, selectedWidthPrice, basePrice );
+			}
+		} else {
+			// No roll selector: always apply tier pricing.
+			price = applyTierPrice( tiers, qty || 1, selectedWidthPrice, basePrice );
 		}
 
 		const formatted = price.toFixed( 2 );
@@ -240,10 +284,18 @@
 		}
 	}
 
-	function applyModifier( price, type, value ) {
-		if ( type === 'percentage' ) return price + price * ( value / 100 );
-		if ( type === 'fixed'      ) return price + parseFloat( value );
-		return price;
+	/* Mirror of dorotape_get_tier_price() in inc/pricing.php. */
+	function applyTierPrice( tiers, qty, widthPrice, basePrice ) {
+		if ( ! tiers || ! tiers.length ) return widthPrice;
+		const sorted = tiers.slice().sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
+		for ( var i = 0; i < sorted.length; i++ ) {
+			const tier = sorted[ i ];
+			if ( qty >= tier.min_qty && tier.tier_price > 0 ) {
+				const ratio = basePrice > 0 ? widthPrice / basePrice : 1;
+				return tier.tier_price * ratio;
+			}
+		}
+		return widthPrice;
 	}
 
 	function escapeHtml( str ) {

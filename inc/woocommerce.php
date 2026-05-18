@@ -110,11 +110,13 @@ function dorotape_ajax_get_product_options(): void {
 
 	if ( ! $product_id ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid product.', 'dorotape' ) ), 400 );
+		return;
 	}
 
 	$product = wc_get_product( $product_id );
 	if ( ! $product ) {
 		wp_send_json_error( array( 'message' => __( 'Product not found.', 'dorotape' ) ), 404 );
+		return;
 	}
 
 	$width_options = get_field( 'width_options', $product_id );
@@ -128,8 +130,7 @@ function dorotape_ajax_get_product_options(): void {
 				'label'          => ! empty( $row['width_label'] )
 					? sanitize_text_field( $row['width_label'] )
 					: absint( $row['width_value'] ) . 'mm',
-				'modifier_type'  => sanitize_key( $row['price_modifier_type'] ?? 'none' ),
-				'modifier_value' => (float) ( $row['price_modifier_value'] ?? 0 ),
+				'price_per_metre' => (float) ( $row['price_per_metre'] ?? 0 ),
 			);
 		}
 	}
@@ -138,18 +139,33 @@ function dorotape_ajax_get_product_options(): void {
 	if ( is_array( $roll_options ) ) {
 		foreach ( $roll_options as $row ) {
 			$roll_data[] = array(
-				'length'         => (float) $row['roll_length'],
-				'label'          => sanitize_text_field( $row['roll_label'] ),
-				'modifier_type'  => sanitize_key( $row['price_modifier_type'] ?? 'none' ),
-				'modifier_value' => (float) ( $row['price_modifier_value'] ?? 0 ),
+				'length'     => (float) $row['roll_length'],
+				'label'      => sanitize_text_field( $row['roll_label'] ),
+				'roll_price' => (float) ( $row['roll_price'] ?? 0 ),
 			);
 		}
+	}
+
+	$price_tiers = get_field( 'price_tiers', $product_id );
+	$tier_data   = array();
+	if ( is_array( $price_tiers ) ) {
+		foreach ( $price_tiers as $tier ) {
+			$tier_data[] = array(
+				'min_qty'    => (int) $tier['min_qty'],
+				'tier_price' => (float) ( $tier['tier_price'] ?? 0 ),
+			);
+		}
+		// Sort ascending for display.
+		usort( $tier_data, static function ( array $a, array $b ): int {
+			return $a['min_qty'] - $b['min_qty'];
+		} );
 	}
 
 	wp_send_json_success(
 		array(
 			'width_options' => $width_data,
 			'roll_options'  => $roll_data,
+			'price_tiers'   => $tier_data,
 		)
 	);
 }
@@ -270,14 +286,15 @@ add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Prod
 	}
 
 	$base_price = (float) $product->get_regular_price();
-	$roll_price = dorotape_calculate_modified_price(
-		$base_price,
-		$full_roll['price_modifier_type'] ?? 'none',
-		(float) ( $full_roll['price_modifier_value'] ?? 0 )
-	);
+	$roll_price = (float) ( $full_roll['roll_price'] ?? 0 );
 
-	// Skip if the roll price is the same as the base (fixed-roll single-size products
-	// already display the full-roll price as their base price — no need to repeat it).
+	// Blank/zero roll_price means per-metre — nothing to append.
+	if ( $roll_price <= 0 ) {
+		return $price_html;
+	}
+
+	// Skip when the stored roll price equals the base (single fixed-roll products
+	// already show the full-roll price as their WC price — no need to repeat it).
 	if ( abs( $roll_price - $base_price ) < 0.01 ) {
 		return $price_html;
 	}
@@ -313,6 +330,68 @@ add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Pro
 		esc_html__( 'Select Options →', 'dorotape' )
 	);
 }, 10, 2 );
+
+// ─── Single product tier table ────────────────────────────────────────────────
+
+/**
+ * Render a "Quantity Pricing" table on the single product page when the product
+ * has price_tiers configured. Output is plain HTML so it degrades without JS.
+ * Placed at priority 15 (after title/price, before add-to-cart form).
+ */
+add_action( 'woocommerce_single_product_summary', function (): void {
+	global $post, $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	$tiers = get_field( 'price_tiers', $post->ID );
+	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		return;
+	}
+
+	// Sort ascending by min_qty for display.
+	usort( $tiers, static function ( array $a, array $b ): int {
+		return (int) $a['min_qty'] - (int) $b['min_qty'];
+	} );
+
+	$base_price = (float) $product->get_regular_price();
+
+	echo '<div class="dt-tier-pricing">';
+	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
+	echo '<table class="dt-tier-pricing__table">';
+	echo '<thead><tr>';
+	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
+	echo '</tr></thead>';
+	echo '<tbody>';
+
+	// First row: standard price (1m+). data-min="0" = no tier active.
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
+	echo '<td>1m+</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	echo '<td>—</td>';
+	echo '</tr>';
+
+	foreach ( $tiers as $tier ) {
+		$min_qty    = (int) $tier['min_qty'];
+		$tier_price = (float) ( $tier['tier_price'] ?? 0 );
+		if ( $tier_price <= 0 ) {
+			continue;
+		}
+		$saving = $base_price > 0 ? round( ( ( $base_price - $tier_price ) / $base_price ) * 100 ) : 0;
+
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
+		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '—' ) . '</td>';
+		echo '</tr>';
+	}
+
+	echo '</tbody></table>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply to per-metre orders. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '</div>';
+}, 15 );
 
 // ─── Downloads tab ────────────────────────────────────────────────────────────
 

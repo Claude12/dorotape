@@ -721,6 +721,47 @@ form.cart {
 	font-style: italic;
 }
 
+/* ── Quantity / tier pricing table ──────────────────────────────────────────── */
+.dt-tier-pricing {
+	margin: 1rem 0 .5rem;
+}
+.dt-tier-pricing__title {
+	font-size: .9rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--dt-mid);
+	margin-bottom: .5rem;
+}
+.dt-tier-pricing__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: .875rem;
+}
+.dt-tier-pricing__table th,
+.dt-tier-pricing__table td {
+	padding: .35rem .6rem;
+	border: 1px solid var(--dt-border);
+	text-align: left;
+}
+.dt-tier-pricing__table thead th {
+	background: var(--dt-bg);
+	font-weight: 600;
+	color: var(--dt-dark);
+}
+.dt-tier-pricing__row--base td { color: var(--dt-mid); }
+.dt-tier-pricing__row:hover td { background: #f0f9ff; }
+.dt-tier-active td {
+	background: #ecfdf5;
+	font-weight: 700;
+	color: var(--dt-accent);
+}
+.dt-tier-pricing__note {
+	font-size: .78rem;
+	color: var(--dt-mid);
+	margin-top: .4rem;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    WOOCOMMERCE — SIDEBAR (shop filters)
 ════════════════════════════════════════════════════════════════════════════ */

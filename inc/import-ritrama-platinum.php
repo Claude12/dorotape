@@ -12,9 +12,9 @@
  *
  * Pricing model (all products):
  *   Base price  = per-linear-metre rate at 610mm, Standard adhesive.
- *   Width 1220mm → +100% (double width = double price, exact for all colours).
- *   25m roll    → +2150% percentage modifier on base price.
- *   50m roll    → +4400% (Black P801 only — comes on 50m rolls).
+ *   Width 1220mm → price_per_metre = 2 × base (stored as actual £/m value).
+ *   25m roll    → roll_price = £61.87 (£76.00 Anthracite; £103.50 Black 50m).
+ *   The engine scales roll_price to wider widths: roll_price × (width_price / base_price).
  *   Airflow adhesive is flagged in colour data (has_airflow) but deferred to
  *   Sprint 2, when WooCommerce variation attributes are wired to the frontend.
  *
@@ -23,7 +23,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.6' );
+define( 'DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION', '1.0.8' );
 
 function dorotape_maybe_run_ritrama_platinum_import(): void {
 	if ( get_option( 'dorotape_import_ritrama_platinum_version' ) === DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION ) {
@@ -169,43 +169,39 @@ function dorotape_upsert_ritrama_platinum_product(
 		return 0;
 	}
 
-	// Width options — 1220mm is always 2× the 610mm price (+100% percentage).
+	// Width options — field keys bypass ACF name-lookup so values always save.
+	// 1220mm price = 2× the 610mm base; 610mm left blank (engine uses WC price).
 	update_field(
-		'width_options',
+		'field_dorotape_width_options',
 		array(
 			array(
-				'width_value'          => 610,
-				'width_label'          => '610mm',
-				'price_modifier_type'  => 'none',
-				'price_modifier_value' => 0,
+				'field_dorotape_width_value' => 610,
+				'field_dorotape_width_label' => '610mm',
+				'field_dorotape_width_price' => 0,
 			),
 			array(
-				'width_value'          => 1220,
-				'width_label'          => '1220mm',
-				'price_modifier_type'  => 'percentage',
-				'price_modifier_value' => 100,
+				'field_dorotape_width_value' => 1220,
+				'field_dorotape_width_label' => '1220mm',
+				'field_dorotape_width_price' => round( $colour['price_per_m'] * 2, 2 ),
 			),
 		),
 		$product_id
 	);
 
-	// Roll options — percentage modifier is width-agnostic: because the width
-	// modifier is also a percentage, both scale proportionally and the correct
-	// roll price is reached at either width without separate modifier rows.
+	// Roll options — roll_price is the total at the base (610mm) width.
+	// The engine scales to wider widths: roll_price × (width_price / base_price).
 	update_field(
-		'roll_options',
+		'field_dorotape_roll_options',
 		array(
 			array(
-				'roll_label'           => 'Per Metre',
-				'roll_length'          => 1,
-				'price_modifier_type'  => 'none',
-				'price_modifier_value' => 0,
+				'field_dorotape_roll_label'  => 'Per Metre',
+				'field_dorotape_roll_length' => 1,
+				'field_dorotape_roll_price'  => 0,
 			),
 			array(
-				'roll_label'           => $roll_label,
-				'roll_length'          => (float) $colour['roll_metres'],
-				'price_modifier_type'  => 'percentage',
-				'price_modifier_value' => $colour['roll_modifier_pct'],
+				'field_dorotape_roll_label'  => $roll_label,
+				'field_dorotape_roll_length' => (float) $colour['roll_metres'],
+				'field_dorotape_roll_price'  => $colour['roll_price'],
 			),
 		),
 		$product_id
@@ -243,9 +239,9 @@ function dorotape_upsert_ritrama_platinum_product(
  * Replace with the full 60-colour dataset once the client CSV is confirmed.
  *
  * Pricing notes:
- *   P801 Black     — price_per_m=2.30, roll_metres=50, roll_modifier_pct=4400
- *   P856 Anthracite — price_per_m=3.37, roll_modifier_pct=2155.19
- *   All others     — price_per_m=2.75, roll_metres=25, roll_modifier_pct=2149.82
+ *   Standard (£2.75/m): 25m roll = £61.87
+ *   P856 Anthracite (£3.37/m): 25m roll = £76.00
+ *   P801 Black (£2.30/m): 50m roll = £103.50
  */
 function dorotape_ritrama_platinum_colours(): array {
 	$c = 'dorotape_ritrama_colour'; // local alias for readability
@@ -259,14 +255,14 @@ function dorotape_ritrama_platinum_colours(): array {
 		$c( 'P827', 'Midnight Blue' ),             // standard
 		$c( 'P838', 'Ocean Blue' ),                // standard
 		$c( 'P844', 'Forest Green' ),              // standard
-		$c( 'P801', 'Black', true, array(          // special: £2.30/m, 50m roll
-			'price_per_m'       => 2.30,
-			'roll_metres'       => 50,
-			'roll_modifier_pct' => 4400,
+		$c( 'P801', 'Black', true, array(          // special: £2.30/m, 50m roll = £103.50
+			'price_per_m' => 2.30,
+			'roll_metres' => 50,
+			'roll_price'  => 103.50,
 		) ),
-		$c( 'P856', 'Anthracite', true, array(     // special: £3.37/m, premium pricing
-			'price_per_m'       => 3.37,
-			'roll_modifier_pct' => 2155.19,
+		$c( 'P856', 'Anthracite', true, array(     // special: £3.37/m, 25m roll = £76.00
+			'price_per_m' => 3.37,
+			'roll_price'  => 76.00,
 		) ),
 	);
 }
@@ -287,13 +283,13 @@ function dorotape_ritrama_colour(
 ): array {
 	return array_merge(
 		array(
-			'code'             => $code,
-			'name'             => $name,
-			'price_per_m'      => 2.75,
-			'roll_metres'      => 25,
-			'roll_modifier_pct' => 2149.82,
-			'has_airflow'      => $airflow,
-			'colour_hex'       => '',
+			'code'        => $code,
+			'name'        => $name,
+			'price_per_m' => 2.75,
+			'roll_metres' => 25,
+			'roll_price'  => 61.87, // Standard 25m roll at 610mm: £2.75 × 22.498 ≈ £61.87
+			'has_airflow' => $airflow,
+			'colour_hex'  => '',
 		),
 		$overrides
 	);
