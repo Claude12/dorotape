@@ -67,6 +67,31 @@ add_filter( 'body_class', function ( $classes ) {
 	return $classes;
 } );
 
+// ─── ACF locale fix ───────────────────────────────────────────────────────────
+
+// On servers where PHP locale uses comma as decimal separator, ACF number fields
+// can receive "61,87" from the browser and (float)'61,87' silently truncates to 61.
+// Normalise all dorotape price sub-fields at save time: replace any comma with a dot
+// before ACF casts to float, so £61.87 is stored correctly regardless of locale.
+$dorotape_price_field_keys = array(
+	'field_dorotape_width_price',
+	'field_dorotape_roll_price',
+	'field_dorotape_tier_price',
+);
+foreach ( $dorotape_price_field_keys as $_key ) {
+	add_filter(
+		'acf/update_value/key=' . $_key,
+		function ( $value ) {
+			if ( is_string( $value ) ) {
+				$value = str_replace( ',', '.', $value );
+			}
+			return $value;
+		},
+		5
+	);
+}
+unset( $_key );
+
 // ─── Product Options AJAX ─────────────────────────────────────────────────────
 
 /**
