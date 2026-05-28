@@ -14,7 +14,7 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_DEV_CLEANUP_VERSION', '1.0.2' );
+define( 'DOROTAPE_DEV_CLEANUP_VERSION', '1.0.3' );
 
 function dorotape_maybe_run_dev_cleanup(): void {
 	if ( get_option( 'dorotape_dev_cleanup_version' ) === DOROTAPE_DEV_CLEANUP_VERSION ) {
@@ -26,6 +26,7 @@ function dorotape_maybe_run_dev_cleanup(): void {
 
 	dorotape_dev_cleanup_rit_products();
 	dorotape_fix_size_width_terms();
+	dorotape_remove_acf_product_groups();
 
 	update_option( 'dorotape_dev_cleanup_version', DOROTAPE_DEV_CLEANUP_VERSION );
 }
@@ -159,4 +160,36 @@ function dorotape_fix_size_width_terms(): void {
 	// Clear WooCommerce's attribute term caches.
 	delete_transient( 'wc_attribute_taxonomies' );
 	WC_Cache_Helper::invalidate_cache_group( 'product_' . $taxonomy );
+}
+
+/**
+ * Delete the ACF Product Options and Product Documents field groups from the DB.
+ *
+ * These groups were built for custom imports (Ritrama, magnetic) that have since
+ * been replaced by the WooCommerce CSV migration. Width/roll/tier repeaters are
+ * gone; a native WC field handles tiers and colour swatches for simple products.
+ * Removing the DB records stops ACF rendering empty metaboxes on product pages.
+ */
+function dorotape_remove_acf_product_groups(): void {
+	$slugs = array( 'group_dorotape_product_options', 'group_dorotape_product_specs' );
+
+	foreach ( $slugs as $slug ) {
+		$group = get_page_by_path( $slug, OBJECT, 'acf-field-group' );
+		if ( ! $group ) {
+			continue;
+		}
+
+		// Delete all child acf-field posts first.
+		$field_ids = get_posts( array(
+			'post_type'      => 'acf-field',
+			'post_parent'    => $group->ID,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		) );
+		foreach ( $field_ids as $field_id ) {
+			wp_delete_post( (int) $field_id, true );
+		}
+
+		wp_delete_post( $group->ID, true );
+	}
 }

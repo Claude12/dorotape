@@ -67,31 +67,6 @@ add_filter( 'body_class', function ( $classes ) {
 	return $classes;
 } );
 
-// ─── ACF locale fix ───────────────────────────────────────────────────────────
-
-// On servers where PHP locale uses comma as decimal separator, ACF number fields
-// can receive "61,87" from the browser and (float)'61,87' silently truncates to 61.
-// Normalise all dorotape price sub-fields at save time: replace any comma with a dot
-// before ACF casts to float, so £61.87 is stored correctly regardless of locale.
-$dorotape_price_field_keys = array(
-	'field_dorotape_width_price',
-	'field_dorotape_roll_price',
-	'field_dorotape_tier_price',
-);
-foreach ( $dorotape_price_field_keys as $_key ) {
-	add_filter(
-		'acf/update_value/key=' . $_key,
-		function ( $value ) {
-			if ( is_string( $value ) ) {
-				$value = str_replace( ',', '.', $value );
-			}
-			return $value;
-		},
-		5
-	);
-}
-unset( $_key );
-
 // ─── Product Options AJAX ─────────────────────────────────────────────────────
 
 /**
@@ -144,52 +119,27 @@ function dorotape_ajax_get_product_options(): void {
 		return;
 	}
 
-	$width_options = get_field( 'width_options', $product_id );
-	$roll_options  = get_field( 'roll_options', $product_id );
-
-	$width_data = array();
-	if ( is_array( $width_options ) ) {
-		foreach ( $width_options as $row ) {
-			$width_data[] = array(
-				'value'          => absint( $row['width_value'] ),
-				'label'          => ! empty( $row['width_label'] )
-					? sanitize_text_field( $row['width_label'] )
-					: absint( $row['width_value'] ) . 'mm',
-				'price_per_metre' => (float) ( $row['price_per_metre'] ?? 0 ),
-			);
+	// Width and roll options are no longer managed as product-level fields.
+	// This endpoint is now called only for variation IDs (variable product tier table).
+	$raw_tiers = dorotape_parse_legacy_tiers( $product_id );
+	$tier_data = array();
+	foreach ( $raw_tiers as $tier ) {
+		if ( (int) $tier['min_qty'] <= 1 ) {
+			continue; // Skip base-rate row — JS renders it explicitly.
 		}
+		$tier_data[] = array(
+			'min_qty'    => (int) $tier['min_qty'],
+			'tier_price' => (float) $tier['tier_price'],
+		);
 	}
-
-	$roll_data = array();
-	if ( is_array( $roll_options ) ) {
-		foreach ( $roll_options as $row ) {
-			$roll_data[] = array(
-				'length'     => (float) $row['roll_length'],
-				'label'      => sanitize_text_field( $row['roll_label'] ),
-				'roll_price' => (float) ( $row['roll_price'] ?? 0 ),
-			);
-		}
-	}
-
-	$price_tiers = get_field( 'price_tiers', $product_id );
-	$tier_data   = array();
-	if ( is_array( $price_tiers ) ) {
-		foreach ( $price_tiers as $tier ) {
-			$tier_data[] = array(
-				'min_qty'    => (int) $tier['min_qty'],
-				'tier_price' => (float) ( $tier['tier_price'] ?? 0 ),
-			);
-		}
-		// Sort ascending for display.
-		usort( $tier_data, static function ( array $a, array $b ): int {
-			return $a['min_qty'] - $b['min_qty'];
-		} );
-	}
+	usort( $tier_data, static function ( array $a, array $b ): int {
+		return $a['min_qty'] - $b['min_qty'];
+	} );
 
 	wp_send_json_success(
 		array(
-			'width_options' => $width_data,
-			'roll_options'  => $roll_data,
+			'width_options' => array(),
+			'roll_options'  => array(),
 			'price_tiers'   => $tier_data,
 		)
 	);
@@ -258,108 +208,6 @@ add_filter( 'woocommerce_single_product_image_thumbnail_html', function ( string
 		. '</div>';
 }, 10, 2 );
 
-// ─── Archive Roll Price ───────────────────────────────────────────────────────
-
-/**
- * Append the full-roll price to the per-metre price on category/shop archive pages.
- * Mirrors the old site's dual-price display on product cards.
- * Only fires on archive pages — single product pages use the JS-driven price preview.
- */
-add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Product $product ): string {
-	if ( is_product() || is_cart() || is_checkout() || is_account_page() ) {
-		return $price_html;
-	}
-	if ( ! is_product_category() && ! is_shop() && ! is_search() ) {
-		return $price_html;
-	}
-
-	$product_id   = $product->get_id();
-	$roll_options = get_field( 'roll_options', $product_id );
-
-	// Detect per-metre products:
-	//   (a) Magnetic imports flag _dorotape_per_metre = '1'.
-	//   (b) Ritrama products have a roll_options row with roll_length == 1 (the "Per Metre" option).
-	$is_per_metre = '1' === get_post_meta( $product_id, '_dorotape_per_metre', true );
-	if ( ! $is_per_metre && is_array( $roll_options ) ) {
-		foreach ( $roll_options as $option ) {
-			if ( abs( (float) ( $option['roll_length'] ?? 0 ) - 1.0 ) < 0.001 ) {
-				$is_per_metre = true;
-				break;
-			}
-		}
-	}
-
-	if ( $is_per_metre ) {
-		$price_html .= '<span class="dt-per-metre">/m</span>';
-	}
-
-	// Append full-roll price line when the product has roll sizes > 1 m.
-	if ( ! is_array( $roll_options ) || empty( $roll_options ) ) {
-		return $price_html;
-	}
-
-	// Find the first full-roll option (length > 1 metre).
-	$full_roll = null;
-	foreach ( $roll_options as $option ) {
-		if ( (float) ( $option['roll_length'] ?? 0 ) > 1.0 ) {
-			$full_roll = $option;
-			break;
-		}
-	}
-	if ( ! $full_roll ) {
-		return $price_html;
-	}
-
-	$base_price = (float) $product->get_regular_price();
-	$roll_price = (float) ( $full_roll['roll_price'] ?? 0 );
-
-	// Blank/zero roll_price means per-metre — nothing to append.
-	if ( $roll_price <= 0 ) {
-		return $price_html;
-	}
-
-	// Skip when the stored roll price equals the base (single fixed-roll products
-	// already show the full-roll price as their WC price — no need to repeat it).
-	if ( abs( $roll_price - $base_price ) < 0.01 ) {
-		return $price_html;
-	}
-
-	return $price_html
-		. '<span class="dt-archive-roll-price">'
-		. esc_html( $full_roll['roll_label'] ) . ': '
-		. wc_price( $roll_price )
-		. '</span>';
-}, 10, 2 );
-
-// ─── Archive "Select Options" button ─────────────────────────────────────────
-
-/**
- * Replace the "Add to cart" button with a "Select Options →" link on archive
- * pages for products that have configurable width or roll options.
- * Products with no ACF options (e.g. sample cards) keep the normal button.
- */
-add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Product $product ): string {
-	// Variable products already render a "Select Options" link natively.
-	if ( $product->is_type( 'variable' ) ) {
-		return $html;
-	}
-
-	$id            = $product->get_id();
-	$width_options = get_field( 'width_options', $id );
-
-	$has_options = ( ! empty( $width_options ) && count( $width_options ) > 1 )
-		|| ! empty( get_field( 'roll_options', $id ) );
-
-	if ( ! $has_options ) {
-		return $html;
-	}
-
-	return sprintf(
-		'<a href="%s" class="button dt-select-options-btn">%s</a>',
-		esc_url( get_permalink( $id ) ),
-		esc_html__( 'Select Options →', 'dorotape' )
-	);
-}, 10, 2 );
 
 // ─── Single product tier table ────────────────────────────────────────────────
 
@@ -379,16 +227,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		return;
 	}
 
-	// ACF price_tiers first (our managed products); fall back to legacy _price_tiers meta.
-	$tiers = get_field( 'price_tiers', $post->ID );
-	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
-		$tiers = dorotape_parse_legacy_tiers( $post->ID );
-	}
+	$tiers = dorotape_parse_legacy_tiers( $post->ID );
+	// Strip the base-rate row (min_qty=1) — we render that explicitly.
+	$tiers = array_values( array_filter( $tiers, static function ( array $t ): bool {
+		return (int) $t['min_qty'] > 1;
+	} ) );
 	if ( empty( $tiers ) ) {
 		return;
 	}
 
-	// Sort ascending by min_qty for display.
 	usort( $tiers, static function ( array $a, array $b ): int {
 		return (int) $a['min_qty'] - (int) $b['min_qty'];
 	} );
@@ -432,57 +279,3 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</div>';
 }, 15 );
 
-// ─── Downloads tab ────────────────────────────────────────────────────────────
-
-/**
- * Add a Downloads tab to the single product page when at least one of the
- * three document fields (data_sheet, application_guide, safety_data_sheet)
- * has a file attached. Tab is hidden entirely when no files exist.
- */
-add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
-	if ( ! is_product() ) {
-		return $tabs;
-	}
-
-	global $post;
-	$id = $post->ID;
-
-	$files = array(
-		__( 'Technical Data Sheet', 'dorotape' ) => get_field( 'data_sheet', $id ),
-		__( 'Application Guide',    'dorotape' ) => get_field( 'application_guide', $id ),
-		__( 'Safety Data Sheet',    'dorotape' ) => get_field( 'safety_data_sheet', $id ),
-	);
-
-	// Only add the tab if at least one file is attached.
-	$files = array_filter( $files );
-	if ( empty( $files ) ) {
-		return $tabs;
-	}
-
-	$tabs['dorotape_downloads'] = array(
-		'title'    => __( 'Downloads', 'dorotape' ),
-		'priority' => 40,
-		'callback' => function () use ( $files ) {
-			echo '<h2>' . esc_html__( 'Downloads', 'dorotape' ) . '</h2>';
-			echo '<ul class="dt-downloads-list">';
-			foreach ( $files as $label => $file ) {
-				$ext      = strtoupper( pathinfo( $file['filename'], PATHINFO_EXTENSION ) );
-				$size_kb  = $file['filesize'] ? round( $file['filesize'] / 1024 ) . ' KB' : '';
-				echo '<li class="dt-download-item">';
-				echo '<span class="dt-download-icon">' . esc_html( $ext ) . '</span>';
-				echo '<span class="dt-download-meta">';
-				echo '<span class="dt-download-label">' . esc_html( $label ) . '</span>';
-				if ( $size_kb ) {
-					echo '<span class="dt-download-size">' . esc_html( $size_kb ) . '</span>';
-				}
-				echo '</span>';
-				echo '<a href="' . esc_url( $file['url'] ) . '" class="button dt-download-btn" target="_blank" rel="noopener">'
-					. esc_html__( 'View', 'dorotape' ) . '</a>';
-				echo '</li>';
-			}
-			echo '</ul>';
-		},
-	);
-
-	return $tabs;
-} );

@@ -116,7 +116,6 @@ require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/setup.php';
 require get_template_directory() . '/inc/pricing.php';
-require get_template_directory() . '/inc/migrate-price-tiers.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';

@@ -77,6 +77,71 @@ add_action( 'woocommerce_save_product_variation', function ( int $variation_id, 
 	}
 }, 10, 2 );
 
+// ─── Simple product meta fields ──────────────────────────────────────────────
+
+/**
+ * Add Quantity Tiers and Colour Swatch fields to the simple product General tab.
+ * Both read/write post_meta directly — no ACF dependency.
+ *
+ * Quantity Tiers: same _price_tiers format as the variation field
+ *   (e.g. "1-24:11.00;25:9.90"). The pricing engine reads this on every cart
+ *   calculation — changing the value here takes effect immediately.
+ *
+ * Colour Swatch: stores a CSS hex colour in the colour_hex post_meta key.
+ *   Shown as a CSS swatch on archive cards and the product page when no
+ *   product image has been uploaded.
+ */
+add_action( 'woocommerce_product_options_general_product_data', function (): void {
+	global $post;
+
+	echo '<div class="options_group dorotape-product-fields show_if_simple">';
+
+	woocommerce_wp_text_input( array(
+		'id'          => 'dorotape_price_tiers_simple',
+		'label'       => __( 'Quantity Tiers', 'dorotape' ),
+		'value'       => get_post_meta( $post->ID, '_price_tiers', true ),
+		'placeholder' => 'e.g. 1-24:11.00;25:9.90',
+		'desc_tip'    => true,
+		'description' => __( 'Quantity discount tiers. Format: min[-max]:price segments separated by semicolons. Example: 1-24:11.00;25:9.90 — standard rate £11.00, buy 25+ for £9.90. Leave blank for no discount.', 'dorotape' ),
+	) );
+
+	woocommerce_wp_text_input( array(
+		'id'          => 'dorotape_colour_hex',
+		'label'       => __( 'Colour Swatch', 'dorotape' ),
+		'value'       => get_post_meta( $post->ID, 'colour_hex', true ),
+		'placeholder' => '#rrggbb',
+		'desc_tip'    => true,
+		'description' => __( 'CSS hex colour shown as a swatch when no product image is uploaded (e.g. #cc0028). Leave blank if the product has a real image.', 'dorotape' ),
+	) );
+
+	echo '</div>';
+} );
+
+/**
+ * Save Quantity Tiers and Colour Swatch from the simple product General tab.
+ */
+add_action( 'woocommerce_process_product_meta', function ( int $post_id ): void {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
+	if ( isset( $_POST['dorotape_price_tiers_simple'] ) ) {
+		$tiers = sanitize_text_field( wp_unslash( $_POST['dorotape_price_tiers_simple'] ) );
+		if ( '' === $tiers ) {
+			delete_post_meta( $post_id, '_price_tiers' );
+		} else {
+			update_post_meta( $post_id, '_price_tiers', $tiers );
+		}
+	}
+
+	if ( isset( $_POST['dorotape_colour_hex'] ) ) {
+		$hex = sanitize_hex_color( wp_unslash( $_POST['dorotape_colour_hex'] ) );
+		if ( ! $hex ) {
+			delete_post_meta( $post_id, 'colour_hex' );
+		} else {
+			update_post_meta( $post_id, 'colour_hex', $hex );
+		}
+	}
+	// phpcs:enable
+} );
+
 // ─── Admin interface cleanup ──────────────────────────────────────────────────
 
 // Hide admin bar on the frontend for non-admin users
