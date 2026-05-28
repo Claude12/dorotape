@@ -1,16 +1,18 @@
 <?php
 /**
- * Dev cleanup — removes bulk-imported products not needed during development.
+ * Dev cleanup — removes test-import products created during theme development.
  *
- * Removes all Magnetic Ferrous Vinyl products and all but 10 Ritrama colours.
- * Client will supply a full product CSV for the real import.
+ * v1.0.0: removed dev magnetic and partial Ritrama imports.
+ * v1.0.1: removes all remaining RIT-* products now that canonical P-* SKUs
+ *         are in the database from the CSV migration import. Also removes the
+ *         dev-only Ritrama and Signmaking Vinyl categories if empty.
  *
- * Safe to delete this file once the real products are imported.
+ * Safe to delete this file once confirmed clean.
  *
  * @package dorotape
  */
 
-define( 'DOROTAPE_DEV_CLEANUP_VERSION', '1.0.0' );
+define( 'DOROTAPE_DEV_CLEANUP_VERSION', '1.0.1' );
 
 function dorotape_maybe_run_dev_cleanup(): void {
 	if ( get_option( 'dorotape_dev_cleanup_version' ) === DOROTAPE_DEV_CLEANUP_VERSION ) {
@@ -20,77 +22,47 @@ function dorotape_maybe_run_dev_cleanup(): void {
 		return;
 	}
 
-	dorotape_dev_cleanup_magnetic();
-	dorotape_dev_cleanup_ritrama();
+	dorotape_dev_cleanup_rit_products();
 
 	update_option( 'dorotape_dev_cleanup_version', DOROTAPE_DEV_CLEANUP_VERSION );
 }
 add_action( 'admin_init', 'dorotape_maybe_run_dev_cleanup' );
 
 /**
- * Delete all Magnetic Ferrous Vinyl products and the category.
+ * Delete all products whose SKU starts with 'RIT-'.
+ * These were created by import-ritrama-platinum.php during development.
+ * The canonical F-Sign Platinum products (P800–P868) came via CSV import.
  */
-function dorotape_dev_cleanup_magnetic(): void {
-	$term = get_term_by( 'slug', 'magnetic-ferrous-vinyl', 'product_cat' );
-	if ( ! $term ) {
-		return;
-	}
-
+function dorotape_dev_cleanup_rit_products(): void {
 	$ids = get_posts( array(
 		'post_type'      => 'product',
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
-		'tax_query'      => array( array(
-			'taxonomy' => 'product_cat',
-			'field'    => 'term_id',
-			'terms'    => $term->term_id,
-		) ),
-	) );
-
-	foreach ( $ids as $id ) {
-		wp_delete_post( (int) $id, true );
-	}
-
-	wp_delete_term( $term->term_id, 'product_cat' );
-}
-
-/**
- * Delete all Ritrama F-Sign Platinum products except the 10 dev colours.
- */
-function dorotape_dev_cleanup_ritrama(): void {
-	$keep = array(
-		'RIT-P804', // Pastel Yellow  — standard pricing
-		'RIT-P811', // Orange         — standard pricing
-		'RIT-P813', // Poppy Red      — standard pricing
-		'RIT-P819', // Red            — has airflow flag
-		'RIT-P823', // Process Magenta — has airflow flag
-		'RIT-P827', // Midnight Blue  — standard pricing
-		'RIT-P838', // Ocean Blue     — standard pricing
-		'RIT-P844', // Forest Green   — standard pricing
-		'RIT-P801', // Black          — special: £2.30/m, 50m roll, 4400% modifier
-		'RIT-P856', // Anthracite     — special: £3.37/m, 2155.19% modifier
-	);
-
-	$term = get_term_by( 'slug', 'ritrama-f-sign-platinum', 'product_cat' );
-	if ( ! $term ) {
-		return;
-	}
-
-	$ids = get_posts( array(
-		'post_type'      => 'product',
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-		'tax_query'      => array( array(
-			'taxonomy' => 'product_cat',
-			'field'    => 'term_id',
-			'terms'    => $term->term_id,
-		) ),
+		'meta_query'     => array(
+			array(
+				'key'     => '_sku',
+				'value'   => 'RIT-',
+				'compare' => 'LIKE',
+			),
+		),
 	) );
 
 	foreach ( $ids as $id ) {
 		$product = wc_get_product( (int) $id );
-		if ( $product && ! in_array( $product->get_sku(), $keep, true ) ) {
-			wp_delete_post( (int) $id, true );
+		if ( $product && str_starts_with( $product->get_sku(), 'RIT-' ) ) {
+			$product->delete( true );
+		}
+	}
+
+	// Remove the dev-only category hierarchy if it's now empty.
+	foreach ( array( 'ritrama-f-sign-platinum', 'signmaking-vinyl' ) as $slug ) {
+		$term = get_term_by( 'slug', $slug, 'product_cat' );
+		if ( ! $term ) {
+			continue;
+		}
+		$count = (int) $term->count;
+		if ( $count === 0 ) {
+			wp_delete_term( $term->term_id, 'product_cat' );
 		}
 	}
 }

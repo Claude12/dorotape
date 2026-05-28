@@ -68,8 +68,10 @@
 
 	/* ── 3 & 4. Product option panel ───────────────────────────────────── */
 	function initProductOptions() {
-		// Only run on single product pages
+		// Only run on single product pages.
 		if ( ! document.body.classList.contains( 'single-product' ) ) return;
+		// Variable products use WooCommerce's native variation UI — skip entirely.
+		if ( document.body.classList.contains( 'product-type-variable' ) ) return;
 
 		// dorotapeProduct is localised by inc/woocommerce.php on product pages
 		if ( typeof dorotapeProduct === 'undefined' ) return;
@@ -164,10 +166,15 @@
 		}
 
 		if ( ! widths.length && ! rolls.length ) {
-			html += '<p style="font-size:.83rem;color:var(--dt-mid)">No configurable options for this product.</p>';
-		} else {
-			html += '<div class="dt-price-preview" id="dt_price_preview"></div>';
+			// No ACF options — remove the panel. The server-side tier table (if any)
+			// is already rendered above the form by the PHP hook.
+			if ( panel.parentNode ) {
+				panel.parentNode.removeChild( panel );
+			}
+			return;
 		}
+
+		html += '<div class="dt-price-preview" id="dt_price_preview"></div>';
 
 		panel.innerHTML = html;
 

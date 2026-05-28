@@ -43,10 +43,15 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 			continue;
 		}
 
+		// For variations, ACF fields and _price_tiers meta live on the variation post.
+		$lookup_id = ! empty( $cart_item['variation_id'] )
+			? (int) $cart_item['variation_id']
+			: $product_id;
+
 		// Width price resolved first (falls back to base if no match or blank).
 		$width_price = $base_price;
 		if ( ! empty( $cart_item['dorotape_width'] ) ) {
-			$width_price = dorotape_get_width_price( (int) $cart_item['dorotape_width'], $product_id, $base_price );
+			$width_price = dorotape_get_width_price( (int) $cart_item['dorotape_width'], $lookup_id, $base_price );
 		}
 
 		// Roll: fixed rolls use roll_price; per-metre rows get quantity tier pricing.
@@ -54,13 +59,13 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 		$price = $width_price;
 		if ( ! empty( $cart_item['dorotape_roll_length'] ) ) {
 			$roll_length = (float) $cart_item['dorotape_roll_length'];
-			if ( dorotape_is_per_metre_roll( $roll_length, $product_id ) ) {
-				$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $product_id, $width_price, $base_price );
+			if ( dorotape_is_per_metre_roll( $roll_length, $lookup_id ) ) {
+				$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $lookup_id, $width_price, $base_price );
 			} else {
-				$price = dorotape_get_roll_price( $roll_length, $product_id, $width_price, $base_price );
+				$price = dorotape_get_roll_price( $roll_length, $lookup_id, $width_price, $base_price );
 			}
 		} else {
-			$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $product_id, $width_price, $base_price );
+			$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $lookup_id, $width_price, $base_price );
 		}
 
 		// Customer-level discount applied last.
@@ -173,6 +178,44 @@ function dorotape_is_per_metre_roll( float $roll_length, int $product_id ): bool
 }
 
 /**
+ * Parse the legacy Kryptronic _price_tiers post meta into our tier array format.
+ *
+ * Meta format: "1-24:11.00;25:9.90" — each segment is "min[-max]:price".
+ * Only min_qty and tier_price are extracted; the upper bound is unused because
+ * tiers are evaluated highest-first (first match wins).
+ *
+ * @param int $product_id Variation ID or product ID.
+ * @return array Array of arrays with 'min_qty' and 'tier_price' keys.
+ */
+function dorotape_parse_legacy_tiers( int $product_id ): array {
+	$raw = get_post_meta( $product_id, '_price_tiers', true );
+	if ( ! $raw || ! is_string( $raw ) ) {
+		return array();
+	}
+	$tiers = array();
+	foreach ( explode( ';', $raw ) as $segment ) {
+		$segment = trim( $segment );
+		if ( '' === $segment ) {
+			continue;
+		}
+		$parts = explode( ':', $segment, 2 );
+		if ( 2 !== count( $parts ) ) {
+			continue;
+		}
+		$price   = (float) trim( str_replace( ',', '.', $parts[1] ) );
+		$min_qty = (int) explode( '-', trim( $parts[0] ) )[0];
+		if ( $price <= 0 || $min_qty <= 0 ) {
+			continue;
+		}
+		$tiers[] = array(
+			'min_qty'    => $min_qty,
+			'tier_price' => $price,
+		);
+	}
+	return $tiers;
+}
+
+/**
  * Return the tiered per-metre price for the given quantity.
  * Tiers are stored at the base width; wider widths scale proportionally.
  * Falls back to width_price when no tiers are configured or none match.
@@ -184,8 +227,13 @@ function dorotape_is_per_metre_roll( float $roll_length, int $product_id ): bool
  * @return float
  */
 function dorotape_get_tier_price( int $qty, int $product_id, float $width_price, float $base_price ): float {
+	// ACF price_tiers repeater takes priority (manually managed / our imports).
+	// Fall back to _price_tiers post meta (format from Kryptronic CSV migration).
 	$tiers = get_field( 'price_tiers', $product_id );
 	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		$tiers = dorotape_parse_legacy_tiers( $product_id );
+	}
+	if ( empty( $tiers ) ) {
 		return $width_price;
 	}
 
@@ -224,6 +272,9 @@ function dorotape_get_tier_price( int $qty, int $product_id, float $width_price,
 function dorotape_find_applied_tier( int $qty, int $product_id ): ?array {
 	$tiers = get_field( 'price_tiers', $product_id );
 	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		$tiers = dorotape_parse_legacy_tiers( $product_id );
+	}
+	if ( empty( $tiers ) ) {
 		return null;
 	}
 	usort(
@@ -288,14 +339,17 @@ function dorotape_cart_item_display_meta( array $item_data, array $cart_item ): 
 	// Show quantity tier discount when: roll is not selected, or the selected roll
 	// is the per-metre row (roll_price == 0). Fixed-roll prices already reflect bulk.
 	$product_id  = $cart_item['product_id'];
+	$lookup_id   = ! empty( $cart_item['variation_id'] )
+		? (int) $cart_item['variation_id']
+		: $product_id;
 	$roll_length = ! empty( $cart_item['dorotape_roll_length'] )
 		? (float) $cart_item['dorotape_roll_length']
 		: 0.0;
-	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $product_id );
+	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $lookup_id );
 
 	if ( $is_per_metre ) {
 		$qty  = (int) ( $cart_item['quantity'] ?? 1 );
-		$tier = dorotape_find_applied_tier( $qty, $product_id );
+		$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
 		if ( $tier ) {
 			$product    = $cart_item['data'] ?? wc_get_product( $product_id );
@@ -351,14 +405,17 @@ function dorotape_save_order_item_meta(
 
 	// Persist tier discount to the order record (admin screen, emails, Sage sync).
 	$product_id  = $values['product_id'] ?? 0;
+	$lookup_id   = ! empty( $values['variation_id'] )
+		? (int) $values['variation_id']
+		: $product_id;
 	$roll_length = ! empty( $values['dorotape_roll_length'] )
 		? (float) $values['dorotape_roll_length']
 		: 0.0;
-	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $product_id );
+	$is_per_metre = $roll_length <= 0 || dorotape_is_per_metre_roll( $roll_length, $lookup_id );
 
-	if ( $is_per_metre && $product_id ) {
+	if ( $is_per_metre && $lookup_id ) {
 		$qty  = (int) ( $values['quantity'] ?? 1 );
-		$tier = dorotape_find_applied_tier( $qty, $product_id );
+		$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
 		if ( $tier ) {
 			$product    = wc_get_product( $product_id );

@@ -37,7 +37,8 @@ function dorotape_maybe_run_ritrama_platinum_import(): void {
 
 	update_option( 'dorotape_import_ritrama_platinum_version', DOROTAPE_IMPORT_RITRAMA_PLATINUM_VERSION );
 }
-add_action( 'admin_init', 'dorotape_maybe_run_ritrama_platinum_import' );
+// Disabled: F-Sign Platinum products are now managed via the CSV migration import.
+// add_action( 'admin_init', 'dorotape_maybe_run_ritrama_platinum_import' );
 
 // ─── Orchestration ────────────────────────────────────────────────────────────
 

@@ -339,6 +339,11 @@ add_filter( 'woocommerce_get_price_html', function ( string $price_html, WC_Prod
  * Products with no ACF options (e.g. sample cards) keep the normal button.
  */
 add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $html, WC_Product $product ): string {
+	// Variable products already render a "Select Options" link natively.
+	if ( $product->is_type( 'variable' ) ) {
+		return $html;
+	}
+
 	$id            = $product->get_id();
 	$width_options = get_field( 'width_options', $id );
 
@@ -368,9 +373,18 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product ) {
 		return;
 	}
+	// Variable products show a price range (£11–£22) natively; tier pricing is
+	// per-variation and complex to display before a variation is selected.
+	if ( $product->is_type( 'variable' ) ) {
+		return;
+	}
 
+	// ACF price_tiers first (our managed products); fall back to legacy _price_tiers meta.
 	$tiers = get_field( 'price_tiers', $post->ID );
 	if ( ! is_array( $tiers ) || empty( $tiers ) ) {
+		$tiers = dorotape_parse_legacy_tiers( $post->ID );
+	}
+	if ( empty( $tiers ) ) {
 		return;
 	}
 
