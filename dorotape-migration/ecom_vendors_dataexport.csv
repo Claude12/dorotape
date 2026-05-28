@@ -1,0 +1,4 @@
+"id","name","custacct","minorder","shiptime","purchacctref","purchemail","shipstateprov","shipcountry","shipzip","acctsyspri","acctsysalt","acctsysprimod","acctsysaltmod","purchterms","purchshipmethod"
+"AMAZONFBA","Amazon FBA","mick.ingram@dorotape.co.uk","0.00","1","","","","","","","","0","0","Due on receipt","STANDARD"
+"DEFAULT","Default Vendor","mick.ingram@dorotape.co.uk","100.00","5","","","","","","","","0","0","Net 30","STANDARD"
+"TAXAUTHORITY","Tax Authority","mick.ingram@dorotape.co.uk","0.00","5","","","","","","","","0","0","Net 30","STANDARD"
