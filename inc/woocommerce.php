@@ -67,85 +67,27 @@ add_filter( 'body_class', function ( $classes ) {
 	return $classes;
 } );
 
-// ─── Product Options AJAX ─────────────────────────────────────────────────────
+// ─── Product page JS data ─────────────────────────────────────────────────────
 
 /**
- * Localise the AJAX URL and nonce for product option requests.
- * The product.js script (enqueued in Sprint 2) consumes dorotapeProduct.ajaxUrl
- * and dorotapeProduct.nonce to fetch width/roll options dynamically.
+ * Localise currency and decimal settings for the product page tier table JS.
+ * scaffold.js reads dorotapeProduct.currencySymbol and .priceDecimals to format
+ * prices when rebuilding the tier table tbody on variation change.
  */
-function dorotape_product_ajax_data(): void {
-	if ( ! is_product() && ! is_shop() && ! is_product_category() ) {
+function dorotape_product_js_data(): void {
+	if ( ! is_product() ) {
 		return;
 	}
-
-	$data = array(
-		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-		'nonce'   => wp_create_nonce( 'dorotape_product_options' ),
-	);
-
-	// Pass the raw float price on product pages so JS never has to parse the
-	// formatted display string (which varies with locale decimal separators).
-	if ( is_product() ) {
-		global $post;
-		$product = wc_get_product( $post->ID );
-		if ( $product ) {
-			$data['basePrice'] = (float) $product->get_regular_price();
-		}
-	}
-
-	wp_localize_script( 'dorotape-navigation', 'dorotapeProduct', $data );
-}
-add_action( 'wp_enqueue_scripts', 'dorotape_product_ajax_data', 20 );
-
-/**
- * AJAX: return sanitised width and roll options for a given product ID.
- * Used by the product page JS to populate and conditionally show selectors.
- * Accessible to both logged-in and guest users (products are publicly visible).
- */
-function dorotape_ajax_get_product_options(): void {
-	check_ajax_referer( 'dorotape_product_options', 'nonce' );
-
-	$product_id = absint( $_POST['product_id'] ?? 0 );
-
-	if ( ! $product_id ) {
-		wp_send_json_error( array( 'message' => __( 'Invalid product.', 'dorotape' ) ), 400 );
-		return;
-	}
-
-	$product = wc_get_product( $product_id );
-	if ( ! $product ) {
-		wp_send_json_error( array( 'message' => __( 'Product not found.', 'dorotape' ) ), 404 );
-		return;
-	}
-
-	// Width and roll options are no longer managed as product-level fields.
-	// This endpoint is now called only for variation IDs (variable product tier table).
-	$raw_tiers = dorotape_parse_legacy_tiers( $product_id );
-	$tier_data = array();
-	foreach ( $raw_tiers as $tier ) {
-		if ( (int) $tier['min_qty'] <= 1 ) {
-			continue; // Skip base-rate row — JS renders it explicitly.
-		}
-		$tier_data[] = array(
-			'min_qty'    => (int) $tier['min_qty'],
-			'tier_price' => (float) $tier['tier_price'],
-		);
-	}
-	usort( $tier_data, static function ( array $a, array $b ): int {
-		return $a['min_qty'] - $b['min_qty'];
-	} );
-
-	wp_send_json_success(
+	wp_localize_script(
+		'dorotape-navigation',
+		'dorotapeProduct',
 		array(
-			'width_options' => array(),
-			'roll_options'  => array(),
-			'price_tiers'   => $tier_data,
+			'currencySymbol' => get_woocommerce_currency_symbol(),
+			'priceDecimals'  => wc_get_price_decimals(),
 		)
 	);
 }
-add_action( 'wp_ajax_dorotape_get_product_options', 'dorotape_ajax_get_product_options' );
-add_action( 'wp_ajax_nopriv_dorotape_get_product_options', 'dorotape_ajax_get_product_options' );
+add_action( 'wp_enqueue_scripts', 'dorotape_product_js_data', 20 );
 
 // ─── Category product count ───────────────────────────────────────────────────
 
@@ -280,10 +222,48 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 }, 15 );
 
 /**
- * Variable product: render a tier pricing placeholder at the same priority.
- * JS (initVariableProductTiers) replaces the content with the real table once
- * a variation is selected, and restores the placeholder when it is cleared.
- * The placeholder ensures something meaningful is shown without JS too.
+ * Detect which variation is selected via URL attribute parameters (server-side).
+ * Returns null when the URL does not fully specify a variation.
+ *
+ * @param WC_Product_Variable $product
+ * @return WC_Product_Variation|null
+ */
+function dorotape_get_selected_variation( WC_Product_Variable $product ): ?WC_Product_Variation {
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	$attr_names = array_keys( $product->get_variation_attributes() );
+	if ( empty( $attr_names ) ) {
+		return null;
+	}
+	$selected = array();
+	foreach ( $attr_names as $attr_name ) {
+		$key = 'attribute_' . $attr_name;
+		if ( ! empty( $_GET[ $key ] ) ) {
+			$selected[ $attr_name ] = sanitize_title( wp_unslash( $_GET[ $key ] ) );
+		}
+	}
+	// phpcs:enable
+	if ( count( $selected ) !== count( $attr_names ) ) {
+		return null;
+	}
+	$data_store = WC_Data_Store::load( 'product' );
+	$var_id     = $data_store->find_matching_product_variation( $product, $selected );
+	if ( ! $var_id ) {
+		return null;
+	}
+	$variation = wc_get_product( $var_id );
+	return ( $variation instanceof WC_Product_Variation ) ? $variation : null;
+}
+
+/**
+ * Render a tier pricing table for variable products directly in PHP.
+ *
+ * The table is always present in the HTML — no JS event-timing dependency.
+ * Initial prices come from the URL-selected variation, or the first variation
+ * with tiers if no URL selection is present.
+ *
+ * All variation tier data is also embedded as data-variation-tiers JSON so
+ * that the lightweight JS handler can swap prices when the user changes the
+ * variation dropdown — still zero AJAX.
  */
 add_action( 'woocommerce_single_product_summary', function (): void {
 	global $product;
@@ -291,26 +271,89 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		return;
 	}
 
-	// Only render if at least one variation has real tier data — avoids a
-	// misleading "Quantity discounts available" notice on products with no tiers.
-	$has_tiers = false;
+	// Build the tier map for all variations, loading each object once.
+	// Includes base_price so JS never has to rely on display_regular_price parsing.
+	$variation_tiers = array(); // { varId: { base_price, tiers: [{min_qty, tier_price}] } }
+	$var_objects     = array(); // cached WC_Product_Variation objects
 	foreach ( $product->get_children() as $var_id ) {
-		$tiers = array_filter(
+		$tiers = array_values( array_filter(
 			dorotape_parse_legacy_tiers( (int) $var_id ),
 			static function ( array $t ): bool { return (int) $t['min_qty'] > 1; }
-		);
-		if ( ! empty( $tiers ) ) {
-			$has_tiers = true;
-			break;
+		) );
+		if ( empty( $tiers ) ) {
+			continue;
 		}
+		$var_obj = wc_get_product( (int) $var_id );
+		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		$var_objects[ (int) $var_id ]  = $var_obj;
+		$variation_tiers[ (int) $var_id ] = array(
+			'base_price' => (float) $var_obj->get_regular_price(),
+			'tiers'      => array_map(
+				static function ( array $t ): array {
+					return array(
+						'min_qty'    => (int) $t['min_qty'],
+						'tier_price' => (float) $t['tier_price'],
+					);
+				},
+				$tiers
+			),
+		);
 	}
-	if ( ! $has_tiers ) {
+	if ( empty( $variation_tiers ) ) {
 		return;
 	}
 
-	echo '<div class="dt-tier-pricing" id="dt_variable_tier_placeholder">';
+	// Prefer URL-selected variation; fall back to the first variation with tiers.
+	$url_var = dorotape_get_selected_variation( $product );
+	$init_id = ( $url_var && isset( $variation_tiers[ $url_var->get_id() ] ) )
+		? $url_var->get_id()
+		: (int) array_key_first( $variation_tiers );
+	$init_var = $var_objects[ $init_id ];
+
+	$init_tiers = $variation_tiers[ $init_id ]['tiers'];
+	$base_price = $variation_tiers[ $init_id ]['base_price'];
+
+	usort( $init_tiers, static function ( array $a, array $b ): int {
+		return (int) $a['min_qty'] - (int) $b['min_qty'];
+	} );
+
+	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
+		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts available on this product. Select a size above to view pricing.', 'dorotape' ) . '</p>';
+	echo '<table class="dt-tier-pricing__table">';
+	echo '<thead><tr>';
+	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
+	echo '</tr></thead>';
+	echo '<tbody>';
+
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
+	echo '<td>1m+</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	echo '<td>&mdash;</td>';
+	echo '</tr>';
+
+	foreach ( $init_tiers as $tier ) {
+		$min_qty    = (int) $tier['min_qty'];
+		$tier_price = (float) $tier['tier_price'];
+		if ( $tier_price <= 0 ) {
+			continue;
+		}
+		$saving = $base_price > 0
+			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
+			: 0;
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
+		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&mdash;' ) . '</td>';
+		echo '</tr>';
+	}
+
+	echo '</tbody></table>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
 	echo '</div>';
 }, 15 );
 

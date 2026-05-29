@@ -122,24 +122,14 @@ function dorotape_setup_product_categories(): void {
  * Idempotent — checks existing attributes by slug before creating.
  */
 function dorotape_setup_product_attributes(): void {
+	// Note: 'width' (pa_width) and 'roll-type' (pa_roll-type) were removed here
+	// after the ACF-based pricing model was replaced by CSV import + _price_tiers meta.
+	// The existing DB records for those two attributes should be deleted manually
+	// via WooCommerce → Attributes in the admin.
 	$attributes = array(
 		array(
 			'name'         => 'Colour',
 			'slug'         => 'colour',
-			'type'         => 'select',
-			'order_by'     => 'menu_order',
-			'has_archives' => false,
-		),
-		array(
-			'name'         => 'Width',
-			'slug'         => 'width',
-			'type'         => 'select',
-			'order_by'     => 'menu_order',
-			'has_archives' => false,
-		),
-		array(
-			'name'         => 'Roll Type',
-			'slug'         => 'roll-type',
 			'type'         => 'select',
 			'order_by'     => 'menu_order',
 			'has_archives' => false,

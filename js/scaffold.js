@@ -1,14 +1,10 @@
 /**
- * scaffold.js — TEMPORARY (Sprint 1)
+ * scaffold.js — Sprint 1 UI scaffold
  *
- * Covers:
- *  1. Scaffold banner insertion (visible reminder this is temp UI)
- *  2. Desktop dropdown navigation (hover + keyboard)
- *  3. Product option panel — width and roll selectors fetched via AJAX,
- *     populates hidden fields that the server-side pricing hook reads.
- *  4. Estimated price preview on the single product page.
- *
- * Remove / replace entirely in Sprint 2.
+ * 1. Desktop dropdown navigation (hover + keyboard)
+ * 2. Tier-table row highlighting driven by the qty input (simple + variable products)
+ * 3. Variable-product tier table price swap when the variation dropdown changes
+ *    (table is already rendered by PHP on page load — no AJAX, no timing issues)
  */
 
 ( function () {
@@ -28,22 +24,17 @@
 				clearTimeout( closeTimer );
 				item.classList.add( 'dt-open' );
 			} );
-
 			item.addEventListener( 'mouseleave', function () {
-				closeTimer = setTimeout( function () {
-					item.classList.remove( 'dt-open' );
-				}, 120 );
+				closeTimer = setTimeout( function () { item.classList.remove( 'dt-open' ); }, 120 );
 			} );
 
-			// Keyboard: open on Enter/Space when focused on the parent link
 			const link = item.querySelector( ':scope > a' );
 			if ( link ) {
 				link.addEventListener( 'keydown', function ( e ) {
 					if ( e.key === 'Enter' || e.key === ' ' ) {
 						const isOpen = item.classList.contains( 'dt-open' );
-						// If has a real href and not currently open, navigate on Enter
 						if ( e.key === 'Enter' && ! isOpen && link.getAttribute( 'href' ) && link.getAttribute( 'href' ) !== '#' ) {
-							return; // let the browser follow the link
+							return;
 						}
 						e.preventDefault();
 						item.classList.toggle( 'dt-open' );
@@ -56,178 +47,124 @@
 			}
 		} );
 
-		// Close all dropdowns when clicking outside the nav
 		document.addEventListener( 'click', function ( e ) {
 			if ( ! nav.contains( e.target ) ) {
-				parents.forEach( function ( item ) {
-					item.classList.remove( 'dt-open' );
-				} );
+				parents.forEach( function ( item ) { item.classList.remove( 'dt-open' ); } );
 			}
 		} );
 	}
 
-	/* ── 3 & 4. Product option panel ───────────────────────────────────── */
-	function initProductOptions() {
-		// Only run on single product pages.
-		if ( ! document.body.classList.contains( 'single-product' ) ) return;
-		// Variable products use WooCommerce's native variation UI — skip entirely.
-		if ( document.body.classList.contains( 'product-type-variable' ) ) return;
+	/* ── 2 & 3. Tier table: highlight + variable price swap ─────────────
+	 *
+	 * Works for both simple and variable products.
+	 * Simple products: table is fully rendered by PHP, we only handle highlighting.
+	 * Variable products: table is rendered by PHP for the initial/URL variation;
+	 *   when the user changes the dropdown, we swap the tbody prices in-place.
+	 * ──────────────────────────────────────────────────────────────────── */
+	function initTierTable() {
+		const table = document.querySelector( '.dt-tier-pricing__table' );
+		if ( ! table ) return;
 
-		// dorotapeProduct is localised by inc/woocommerce.php on product pages
-		if ( typeof dorotapeProduct === 'undefined' ) return;
-
-		const cartForm = document.querySelector( 'form.cart' );
-		if ( ! cartForm ) return;
-
-		const productIdInput = cartForm.querySelector( '[name="product_id"], [name="add-to-cart"]' );
-		const productId = productIdInput
-			? productIdInput.value
-			: ( document.querySelector( 'button.single_add_to_cart_button' ) || {} ).value;
-
-		if ( ! productId ) return;
-
-		// Inject the scaffold option panel before the quantity/add-to-cart row
-		const panel = buildOptionsPanel();
-		const quantityDiv = cartForm.querySelector( '.quantity' );
-		if ( quantityDiv ) {
-			cartForm.insertBefore( panel, quantityDiv );
-		} else {
-			cartForm.prepend( panel );
-		}
-
-		// Fetch width and roll options from the AJAX endpoint (inc/woocommerce.php)
-		fetchProductOptions( productId, panel );
-	}
-
-	function buildOptionsPanel() {
-		const panel = document.createElement( 'div' );
-		panel.className = 'dt-options-panel';
-		panel.innerHTML = '<h3>Product Options</h3>'
-			+ '<p class="dt-options-loading">Loading options…</p>';
-		return panel;
-	}
-
-	function fetchProductOptions( productId, panel ) {
-		const body = new URLSearchParams( {
-			action:     'dorotape_get_product_options',
-			nonce:      dorotapeProduct.nonce,
-			product_id: productId,
-		} );
-
-		fetch( dorotapeProduct.ajaxUrl, {
-			method:  'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body:    body.toString(),
-		} )
-			.then( function ( r ) { return r.json(); } )
-			.then( function ( data ) {
-				if ( ! data.success ) {
-					panel.innerHTML = '<h3>Product Options</h3>'
-						+ '<p style="color:#9b1c1c;font-size:.83rem;">Could not load options.</p>';
-					return;
-				}
-				renderOptionSelectors( panel, data.data, productId );
-			} )
-			.catch( function () {
-				panel.querySelector( '.dt-options-loading' ).textContent = 'Options unavailable.';
-			} );
-	}
-
-	function renderOptionSelectors( panel, data, productId ) {
-		const widths = data.width_options || [];
-		const rolls  = data.roll_options  || [];
-		const tiers  = data.price_tiers   || [];
-
-		let html = '<h3>Product Options</h3>';
-
-		// Hidden fields picked up by inc/pricing.php add-to-cart hook
-		html += '<input type="hidden" name="dorotape_width" id="dt_width_val" value="">';
-		html += '<input type="hidden" name="dorotape_roll_length" id="dt_roll_val" value="">';
-
-		if ( widths.length ) {
-			html += '<div class="dt-option-group">'
-				+ '<label for="dt_width_sel">Width</label>'
-				+ '<select id="dt_width_sel">';
-			widths.forEach( function ( w ) {
-				const label = w.label || ( w.value + 'mm' );
-				html += '<option value="' + w.value + '">' + escapeHtml( label ) + '</option>';
-			} );
-			html += '</select></div>';
-		}
-
-		if ( rolls.length ) {
-			html += '<div class="dt-option-group">'
-				+ '<label for="dt_roll_sel">Roll Length</label>'
-				+ '<select id="dt_roll_sel">';
-			rolls.forEach( function ( r ) {
-				html += '<option value="' + r.length + '">' + escapeHtml( r.label ) + '</option>';
-			} );
-			html += '</select></div>';
-		}
-
-		if ( ! widths.length && ! rolls.length ) {
-			// No ACF options — remove the panel. The server-side tier table (if any)
-			// is already rendered above the form by the PHP hook.
-			if ( panel.parentNode ) {
-				panel.parentNode.removeChild( panel );
-			}
-			return;
-		}
-
-		html += '<div class="dt-price-preview" id="dt_price_preview"></div>';
-
-		panel.innerHTML = html;
-
-		// Use the PHP-localised raw float — avoids locale decimal-separator issues
-		// (e.g. WooCommerce displaying £2,30 instead of £2.30 breaks DOM parsing).
-		const basePrice = ( dorotapeProduct.basePrice !== undefined )
-			? parseFloat( dorotapeProduct.basePrice )
-			: 0;
-
-		// Main WooCommerce price element — updated live as options change.
-		const mainPriceEl = document.querySelector( '.entry-summary .price .woocommerce-Price-amount' );
-
-		const widthSel  = panel.querySelector( '#dt_width_sel' );
-		const rollSel   = panel.querySelector( '#dt_roll_sel' );
-		const widthHid  = panel.querySelector( '#dt_width_val' );
-		const rollHid   = panel.querySelector( '#dt_roll_val' );
-		const preview   = panel.querySelector( '#dt_price_preview' );
-
-		// Quantity input lives outside the options panel in the WC form.
 		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
+		function getQty() { return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1; }
 
-		function getQty() {
-			return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1;
+		// Collect tiers from DOM rows (only min_qty needed for highlighting).
+		var currentTiers = tiersFromTable( table );
+		highlightActiveTier( currentTiers, getQty() );
+
+		if ( qtyInput ) {
+			qtyInput.addEventListener( 'input', function () {
+				highlightActiveTier( currentTiers, getQty() );
+			} );
 		}
 
-		function syncHiddenFields() {
-			if ( widthSel ) widthHid.value = widthSel.value;
-			if ( rollSel  ) rollHid.value  = rollSel.value;
-			updatePricePreview( widthSel, rollSel, widths, rolls, tiers, basePrice, preview, mainPriceEl, getQty() );
-			if ( tiers.length ) highlightActiveTier( tiers, getQty() );
-		}
+		// Variable products only: swap prices when a variation is selected.
+		if ( typeof jQuery === 'undefined' ) return;
 
-		if ( widthSel ) widthSel.addEventListener( 'change', syncHiddenFields );
-		if ( rollSel  ) rollSel.addEventListener( 'change', syncHiddenFields );
-		if ( qtyInput ) qtyInput.addEventListener( 'input', syncHiddenFields );
+		const variationsForm = document.querySelector( 'form.variations_form' );
+		if ( ! variationsForm ) return;
 
-		// Initialise fields and preview
-		syncHiddenFields();
+		const tierContainer = document.getElementById( 'dt_variable_tier_table' );
+		if ( ! tierContainer ) return;
+
+		// JSON structure: { "varId": { "base_price": float, "tiers": [{min_qty, tier_price}] } }
+		var variationTiers = {};
+		try {
+			variationTiers = JSON.parse( tierContainer.dataset.variationTiers || '{}' );
+		} catch ( e ) {}
+
+		// WooCommerce's onFoundVariation sets input.variation_id and calls .trigger('change')
+		// on it directly — this is more reliable than catching the found_variation custom event
+		// which can be silently swallowed by stopPropagation in other plugins.
+		var varIdInput = variationsForm.querySelector( 'input.variation_id, input[name="variation_id"]' );
+		if ( ! varIdInput ) return;
+
+		jQuery( varIdInput ).on( 'change', function () {
+			var newId = parseInt( this.value, 10 );
+			if ( ! newId ) return; // 0 or empty = variation deselected, keep current table
+			var varData = variationTiers[ String( newId ) ];
+			if ( ! varData || ! varData.tiers || ! varData.tiers.length ) return;
+			rebuildTbody( table, varData.tiers, varData.base_price || 0 );
+			currentTiers = tiersFromTable( table );
+			highlightActiveTier( currentTiers, getQty() );
+		} );
 	}
 
-	// Highlight the active tier row in a .dt-tier-pricing__table.
-	// Skips min_qty=1 entries — those map to the base price row (data-min="0").
-	// When qty is below all real tiers the base row is highlighted instead.
+	/* Build a minimal tier list from the data-min attributes in a rendered table. */
+	function tiersFromTable( table ) {
+		var tiers = [];
+		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
+			var min = parseInt( row.dataset.min, 10 );
+			if ( min > 0 ) tiers.push( { min_qty: min } );
+		} );
+		return tiers;
+	}
+
+	/* Replace the tbody rows with updated prices, preserving the thead. */
+	function rebuildTbody( table, tiers, basePrice ) {
+		var sym      = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.currencySymbol )
+			? dorotapeProduct.currencySymbol : '£';
+		var decimals = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.priceDecimals != null )
+			? dorotapeProduct.priceDecimals : 2;
+
+		function fmt( price ) { return sym + price.toFixed( decimals ) + '/m'; }
+
+		var tbody = table.querySelector( 'tbody' );
+		if ( ! tbody ) return;
+
+		var html = '';
+
+		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">'
+			+ '<td>1m+</td>'
+			+ '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&mdash;' ) + '</td>'
+			+ '<td>&mdash;</td>'
+			+ '</tr>';
+
+		tiers.forEach( function ( tier ) {
+			if ( tier.tier_price <= 0 ) return;
+			var saving = basePrice > 0
+				? Math.round( ( ( basePrice - tier.tier_price ) / basePrice ) * 100 )
+				: 0;
+			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '">'
+				+ '<td>' + escapeHtml( tier.min_qty + 'm+' ) + '</td>'
+				+ '<td>' + fmt( tier.tier_price ) + '</td>'
+				+ '<td>' + ( saving > 0 ? saving + '% off' : '&mdash;' ) + '</td>'
+				+ '</tr>';
+		} );
+
+		tbody.innerHTML = html;
+	}
+
+	/* Highlight the active tier row based on the current quantity. */
 	function highlightActiveTier( tiers, qty ) {
 		const table = document.querySelector( '.dt-tier-pricing__table' );
 		if ( ! table ) return;
 
-		// Ignore the min_qty=1 tier (base price row in legacy _price_tiers format).
 		const sorted = tiers
 			.filter( function ( t ) { return t.min_qty > 1; } )
 			.sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
 
-		let activeMin = 0; // default: base row (data-min="0")
+		let activeMin = 0;
 		for ( var i = 0; i < sorted.length; i++ ) {
 			if ( qty >= sorted[ i ].min_qty ) {
 				activeMin = sorted[ i ].min_qty;
@@ -240,203 +177,16 @@
 		} );
 	}
 
-	/* ── 5. Variable product tier table ─────────────────────────────────── */
-	// The PHP hook renders a placeholder container (#dt_variable_tier_placeholder)
-	// at priority 15. This function replaces its content with the real tier table
-	// when a variation is selected, and restores the placeholder on clear.
-	function initVariableProductTiers() {
-		if ( ! document.body.classList.contains( 'product-type-variable' ) ) return;
-		if ( typeof dorotapeProduct === 'undefined' ) return;
-		if ( typeof jQuery === 'undefined' ) return;
-
-		const tierContainer = document.getElementById( 'dt_variable_tier_placeholder' );
-		if ( ! tierContainer ) return;
-
-		const variationsForm = document.querySelector( 'form.variations_form' );
-		if ( ! variationsForm ) return;
-
-		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
-		function getQty() {
-			return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1;
-		}
-
-		const placeholderHTML = tierContainer.innerHTML;
-		let currentTiers = [];
-
-		jQuery( variationsForm )
-			.on( 'found_variation', function ( event, variation ) {
-				const variationId = variation.variation_id;
-				const basePrice   = parseFloat( variation.display_regular_price ) || 0;
-				if ( ! variationId ) return;
-
-				fetchVariationTiers( variationId, basePrice, tierContainer, function ( tiers ) {
-					currentTiers = tiers;
-					if ( tiers.length ) highlightActiveTier( tiers, getQty() );
-				} );
-			} )
-			.on( 'reset_data', function () {
-				// Restore placeholder and ensure the container is visible again.
-				tierContainer.innerHTML = placeholderHTML;
-				tierContainer.hidden = false;
-				currentTiers = [];
-			} );
-
-		if ( qtyInput ) {
-			qtyInput.addEventListener( 'input', function () {
-				if ( currentTiers.length ) highlightActiveTier( currentTiers, getQty() );
-			} );
-		}
-	}
-
-	function fetchVariationTiers( variationId, basePrice, container, onSuccess ) {
-		var placeholderHTML = container.innerHTML; // snapshot before replacing
-		var body = new URLSearchParams( {
-			action:     'dorotape_get_product_options',
-			nonce:      dorotapeProduct.nonce,
-			product_id: variationId,
-		} );
-
-		fetch( dorotapeProduct.ajaxUrl, {
-			method:  'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body:    body.toString(),
-		} )
-			.then( function ( r ) { return r.json(); } )
-			.then( function ( data ) {
-				var tiers = ( data.success && data.data.price_tiers ) ? data.data.price_tiers : [];
-				// Strip the min_qty=1 base-price entry — we render that row explicitly.
-				tiers = tiers.filter( function ( t ) { return t.min_qty > 1; } );
-				if ( ! tiers.length ) {
-					// No tiers for this variation — restore placeholder so the
-					// container stays visible with the "select a size" message.
-					container.innerHTML = placeholderHTML;
-					container.hidden = false;
-					onSuccess( [] );
-					return;
-				}
-				renderVariationTierTable( container, tiers, basePrice );
-				container.hidden = false;
-				onSuccess( tiers );
-			} )
-			.catch( function () {
-				container.innerHTML = placeholderHTML;
-				container.hidden = false;
-				onSuccess( [] );
-			} );
-	}
-
-	function renderVariationTierTable( container, tiers, basePrice ) {
-		var html = '<h3 class="dt-tier-pricing__title">Quantity Pricing</h3>';
-		html += '<table class="dt-tier-pricing__table"><thead><tr>';
-		html += '<th>Quantity</th><th>Price / metre</th><th>Save</th>';
-		html += '</tr></thead><tbody>';
-
-		// Base row — standard rate, no tier active yet.
-		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
-		html += '<td>1m+</td>';
-		html += '<td>' + ( basePrice > 0 ? '£' + basePrice.toFixed( 2 ) + '/m' : '—' ) + '</td>';
-		html += '<td>—</td>';
-		html += '</tr>';
-
-		tiers.forEach( function ( tier ) {
-			if ( tier.tier_price <= 0 ) return;
-			var saving = basePrice > 0
-				? Math.round( ( ( basePrice - tier.tier_price ) / basePrice ) * 100 )
-				: 0;
-			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '">';
-			html += '<td>' + escapeHtml( tier.min_qty + 'm+' ) + '</td>';
-			html += '<td>£' + tier.tier_price.toFixed( 2 ) + '/m</td>';
-			html += '<td>' + ( saving > 0 ? saving + '% off' : '—' ) + '</td>';
-			html += '</tr>';
-		} );
-
-		html += '</tbody></table>';
-		html += '<p class="dt-tier-pricing__note">Quantity discounts apply automatically at checkout.</p>';
-		container.innerHTML = html;
-	}
-
-	/* Compute price client-side, mirroring inc/pricing.php logic, and push it
-	   to both the main WooCommerce price element and the small options panel note.
-	   The server always recalculates the authoritative price at checkout. */
-	function updatePricePreview( widthSel, rollSel, widths, rolls, tiers, basePrice, preview, mainPriceEl, qty ) {
-		if ( ! basePrice ) return;
-
-		let price = basePrice;
-
-		// Width: use stored price_per_metre; 0/blank falls back to basePrice.
-		if ( widthSel ) {
-			const wVal = parseInt( widthSel.value, 10 );
-			const wDef = widths.find( function ( w ) { return w.value === wVal; } );
-			if ( wDef && wDef.price_per_metre > 0 ) {
-				price = wDef.price_per_metre;
-			}
-		}
-
-		const selectedWidthPrice = price;
-
-		if ( rollSel ) {
-			const rVal = parseFloat( rollSel.value );
-			const rDef = rolls.find( function ( r ) { return Math.abs( r.length - rVal ) < 0.001; } );
-			if ( rDef && rDef.roll_price > 0 ) {
-				// Fixed roll: scale stored base-width roll_price to the selected width.
-				const widthRatio = basePrice > 0 ? selectedWidthPrice / basePrice : 1;
-				price = rDef.roll_price * widthRatio;
-			} else {
-				// Per-metre row selected: apply quantity tier if available.
-				price = applyTierPrice( tiers, qty || 1, selectedWidthPrice, basePrice );
-			}
-		} else {
-			// No roll selector: always apply tier pricing.
-			price = applyTierPrice( tiers, qty || 1, selectedWidthPrice, basePrice );
-		}
-
-		const formatted = price.toFixed( 2 );
-
-		// Update the main product price — preserve the WooCommerce currency symbol span.
-		if ( mainPriceEl ) {
-			const bdi = mainPriceEl.querySelector( 'bdi' );
-			if ( bdi ) {
-				const sym    = bdi.querySelector( '.woocommerce-Price-currencySymbol' );
-				const symHtml = sym
-					? sym.outerHTML
-					: '<span class="woocommerce-Price-currencySymbol">£</span>';
-				bdi.innerHTML = symHtml + formatted;
-			}
-		}
-
-		// Small note below the options panel.
-		if ( preview ) {
-			preview.textContent = 'Final price recalculated at checkout.';
-		}
-	}
-
-	/* Mirror of dorotape_get_tier_price() in inc/pricing.php. */
-	function applyTierPrice( tiers, qty, widthPrice, basePrice ) {
-		if ( ! tiers || ! tiers.length ) return widthPrice;
-		const sorted = tiers.slice().sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
-		for ( var i = 0; i < sorted.length; i++ ) {
-			const tier = sorted[ i ];
-			if ( qty >= tier.min_qty && tier.tier_price > 0 ) {
-				const ratio = basePrice > 0 ? widthPrice / basePrice : 1;
-				return tier.tier_price * ratio;
-			}
-		}
-		return widthPrice;
-	}
-
 	function escapeHtml( str ) {
 		return String( str )
-			.replace( /&/g, '&amp;' )
-			.replace( /</g, '&lt;' )
-			.replace( />/g, '&gt;' )
-			.replace( /"/g, '&quot;' );
+			.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' ).replace( /"/g, '&quot;' );
 	}
 
 	/* ── Boot ───────────────────────────────────────────────────────────── */
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initDropdownNav();
-		initProductOptions();
-		initVariableProductTiers();
+		initTierTable();
 	} );
 
 }() );
