@@ -53,7 +53,7 @@ add_action( 'woocommerce_product_after_variable_attributes', function ( int $loo
 			style="width:100%;max-width:360px;"
 		/>
 		<p class="description">
-			<?php esc_html_e( 'Optional. Format: min[-max]:price segments separated by semicolons. Example: 1-24:11.00;25:9.90 gives £11.00 for qty 1–24 and £9.90 for 25+. Leave blank for no quantity discount.', 'dorotape' ); ?>
+			<?php esc_html_e( 'Quantity discount tiers for this specific width/variation. Format: min:price segments separated by semicolons — e.g. 1-24:11.00;25:9.90 means £11.00/m for 1–24 metres, £9.90/m for 25+. Each variation can have its own tier prices (wider widths are typically higher). The tier table on the product page updates automatically when a customer selects this variation. Leave blank for no quantity discount on this variation.', 'dorotape' ); ?>
 		</p>
 	</div>
 	<?php
@@ -112,16 +112,16 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 		'value'       => $tiers_raw,
 		'placeholder' => 'e.g. 1-24:11.00;25:9.90',
 		'desc_tip'    => true,
-		'description' => __( 'Quantity discount tiers. Format: min[-max]:price segments separated by semicolons. Example: 1-24:11.00;25:9.90 — standard rate £11.00, buy 25+ for £9.90. Leave blank for no discount.', 'dorotape' ),
+		'description' => __( 'Set quantity discount tiers for per-metre orders. Format: each tier is min:price (or min-max:price), tiers separated by semicolons. The price is £ per metre at the base (narrowest) width — wider widths scale proportionally. Example: 1-24:11.00;25:9.90 means £11.00/m for 1–24 metres and £9.90/m for 25 metres or more. The discount is applied automatically in the cart and shown on the product page. Leave blank for a single fixed price with no quantity discount.', 'dorotape' ),
 	) );
 
 	woocommerce_wp_text_input( array(
 		'id'          => 'dorotape_colour_hex',
 		'label'       => __( 'Colour Swatch', 'dorotape' ),
 		'value'       => get_post_meta( $post->ID, 'colour_hex', true ),
-		'placeholder' => '#rrggbb',
+		'placeholder' => 'e.g. #cc0028',
 		'desc_tip'    => true,
-		'description' => __( 'CSS hex colour shown as a swatch when no product image is uploaded (e.g. #cc0028). Leave blank if the product has a real image.', 'dorotape' ),
+		'description' => __( 'CSS hex colour code displayed as a colour swatch on archive and product pages when no product image has been uploaded. Format: #rrggbb (e.g. #cc0028 for red, #1a1a1a for black). Used for coloured vinyl ranges where each SKU is a different colour. Leave blank if this product has a real product image uploaded above.', 'dorotape' ),
 	) );
 
 	echo '</div>';

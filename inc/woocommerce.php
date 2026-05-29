@@ -275,7 +275,24 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	}
 
 	echo '</tbody></table>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply to per-metre orders. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '</div>';
+}, 15 );
+
+/**
+ * Variable product: render a tier pricing placeholder at the same priority.
+ * JS (initVariableProductTiers) replaces the content with the real table once
+ * a variation is selected, and restores the placeholder when it is cleared.
+ * The placeholder ensures something meaningful is shown without JS too.
+ */
+add_action( 'woocommerce_single_product_summary', function (): void {
+	global $product;
+	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
+		return;
+	}
+	echo '<div class="dt-tier-pricing" id="dt_variable_tier_placeholder">';
+	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts available on this product. Select a size above to view pricing.', 'dorotape' ) . '</p>';
 	echo '</div>';
 }, 15 );
 

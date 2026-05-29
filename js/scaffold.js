@@ -241,28 +241,26 @@
 	}
 
 	/* ── 5. Variable product tier table ─────────────────────────────────── */
-	// Listens to WooCommerce's found_variation jQuery event. When a variation is
-	// selected, fetches its _price_tiers via AJAX and renders the same tier table
-	// that simple products get, so customers see the quantity discount up front.
+	// The PHP hook renders a placeholder container (#dt_variable_tier_placeholder)
+	// at priority 15. This function replaces its content with the real tier table
+	// when a variation is selected, and restores the placeholder on clear.
 	function initVariableProductTiers() {
 		if ( ! document.body.classList.contains( 'product-type-variable' ) ) return;
 		if ( typeof dorotapeProduct === 'undefined' ) return;
 		if ( typeof jQuery === 'undefined' ) return;
 
+		const tierContainer = document.getElementById( 'dt_variable_tier_placeholder' );
+		if ( ! tierContainer ) return;
+
 		const variationsForm = document.querySelector( 'form.variations_form' );
 		if ( ! variationsForm ) return;
-
-		// Container inserted immediately before the variations form.
-		const tierContainer = document.createElement( 'div' );
-		tierContainer.className = 'dt-tier-pricing';
-		tierContainer.hidden = true;
-		variationsForm.parentNode.insertBefore( tierContainer, variationsForm );
 
 		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
 		function getQty() {
 			return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1;
 		}
 
+		const placeholderHTML = tierContainer.innerHTML;
 		let currentTiers = [];
 
 		jQuery( variationsForm )
@@ -277,8 +275,7 @@
 				} );
 			} )
 			.on( 'reset_data', function () {
-				tierContainer.innerHTML = '';
-				tierContainer.hidden = true;
+				tierContainer.innerHTML = placeholderHTML;
 				currentTiers = [];
 			} );
 
