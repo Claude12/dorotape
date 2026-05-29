@@ -187,11 +187,44 @@ function dorotape_is_per_metre_roll( float $roll_length, int $product_id ): bool
  * @param int $product_id Variation ID or product ID.
  * @return array Array of arrays with 'min_qty' and 'tier_price' keys.
  */
-function dorotape_parse_legacy_tiers( int $product_id ): array {
-	$raw = get_post_meta( $product_id, '_price_tiers', true );
-	if ( ! $raw || ! is_string( $raw ) ) {
+/**
+ * Fallback: read tier data from ACF's flat repeater storage.
+ *
+ * When ACF was active and update_field('price_tiers') was called, it stored:
+ *   _price_tiers    = 'field_dorotape_price_tiers'  (field-key reference — corrupt)
+ *   price_tiers     = N                              (row count)
+ *   price_tiers_0_min_qty    = 25
+ *   price_tiers_0_tier_price = 9.90
+ * This function recovers the tiers from those flat meta keys.
+ */
+function dorotape_read_acf_flat_tiers( int $product_id ): array {
+	$count = (int) get_post_meta( $product_id, 'price_tiers', true );
+	if ( $count <= 0 ) {
 		return array();
 	}
+	$tiers = array();
+	for ( $i = 0; $i < $count; $i++ ) {
+		$min_qty    = (int)   get_post_meta( $product_id, "price_tiers_{$i}_min_qty",    true );
+		$tier_price = (float) get_post_meta( $product_id, "price_tiers_{$i}_tier_price", true );
+		if ( $min_qty > 0 && $tier_price > 0 ) {
+			$tiers[] = array( 'min_qty' => $min_qty, 'tier_price' => $tier_price );
+		}
+	}
+	return $tiers;
+}
+
+function dorotape_parse_legacy_tiers( int $product_id ): array {
+	$raw = get_post_meta( $product_id, '_price_tiers', true );
+
+	// ACF overwrote _price_tiers with its internal field-key reference string
+	// (e.g. "field_dorotape_price_tiers") when products were saved while the
+	// ACF field group was active. Detect this and fall back to ACF's flat
+	// repeater meta (price_tiers_N_min_qty / price_tiers_N_tier_price) which
+	// the migration script populated before the corruption occurred.
+	if ( ! $raw || ! is_string( $raw ) || str_starts_with( $raw, 'field_' ) ) {
+		return dorotape_read_acf_flat_tiers( $product_id );
+	}
+
 	$tiers = array();
 	foreach ( explode( ';', $raw ) as $segment ) {
 		$segment = trim( $segment );

@@ -12,7 +12,7 @@ function dorotape_remove_admin_menus() {
 add_action( 'admin_menu', 'dorotape_remove_admin_menus' );
 
 // Remove Comments and WP logo from the admin toolbar
-function dorotape_remove_toolbar_items( $wp_admin_bar ) {
+function dorotape_remove_toolbar_items( WP_Admin_Bar $wp_admin_bar ): void {
 	$wp_admin_bar->remove_node( 'comments' );
 	$wp_admin_bar->remove_node( 'wp-logo' );
 }
@@ -36,7 +36,7 @@ add_action( 'wp_dashboard_setup', 'dorotape_remove_dashboard_widgets' );
  * the data came from the Kryptronic CSV migration and was otherwise invisible.
  * This field surfaces it so the client can read and change tier prices directly.
  */
-add_action( 'woocommerce_product_after_variable_attributes', function ( int $loop, array $variation_data, WP_Post $variation ): void {
+add_action( 'woocommerce_product_after_variable_attributes', function ( int $loop, array $_variation_data, WP_Post $variation ): void {
 	$tiers = get_post_meta( $variation->ID, '_price_tiers', true );
 	?>
 	<div class="form-row form-row-full dorotape-variation-tiers">
@@ -96,10 +96,20 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 
 	echo '<div class="options_group dorotape-product-fields show_if_simple">';
 
+	// Resolve the display value: if ACF corrupted _price_tiers with its field-key
+	// reference string, reconstruct the human-readable value from ACF flat meta.
+	$tiers_raw = get_post_meta( $post->ID, '_price_tiers', true );
+	if ( ! $tiers_raw || str_starts_with( (string) $tiers_raw, 'field_' ) ) {
+		$flat = dorotape_read_acf_flat_tiers( $post->ID );
+		$tiers_raw = empty( $flat ) ? '' : implode( ';', array_map( static function ( array $t ): string {
+			return $t['min_qty'] . ':' . $t['tier_price'];
+		}, $flat ) );
+	}
+
 	woocommerce_wp_text_input( array(
 		'id'          => 'dorotape_price_tiers_simple',
 		'label'       => __( 'Quantity Tiers', 'dorotape' ),
-		'value'       => get_post_meta( $post->ID, '_price_tiers', true ),
+		'value'       => $tiers_raw,
 		'placeholder' => 'e.g. 1-24:11.00;25:9.90',
 		'desc_tip'    => true,
 		'description' => __( 'Quantity discount tiers. Format: min[-max]:price segments separated by semicolons. Example: 1-24:11.00;25:9.90 — standard rate £11.00, buy 25+ for £9.90. Leave blank for no discount.', 'dorotape' ),
