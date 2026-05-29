@@ -290,6 +290,24 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
 		return;
 	}
+
+	// Only render if at least one variation has real tier data — avoids a
+	// misleading "Quantity discounts available" notice on products with no tiers.
+	$has_tiers = false;
+	foreach ( $product->get_children() as $var_id ) {
+		$tiers = array_filter(
+			dorotape_parse_legacy_tiers( (int) $var_id ),
+			static function ( array $t ): bool { return (int) $t['min_qty'] > 1; }
+		);
+		if ( ! empty( $tiers ) ) {
+			$has_tiers = true;
+			break;
+		}
+	}
+	if ( ! $has_tiers ) {
+		return;
+	}
+
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_placeholder">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
 	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts available on this product. Select a size above to view pricing.', 'dorotape' ) . '</p>';

@@ -275,7 +275,9 @@
 				} );
 			} )
 			.on( 'reset_data', function () {
+				// Restore placeholder and ensure the container is visible again.
 				tierContainer.innerHTML = placeholderHTML;
+				tierContainer.hidden = false;
 				currentTiers = [];
 			} );
 
@@ -287,6 +289,7 @@
 	}
 
 	function fetchVariationTiers( variationId, basePrice, container, onSuccess ) {
+		var placeholderHTML = container.innerHTML; // snapshot before replacing
 		var body = new URLSearchParams( {
 			action:     'dorotape_get_product_options',
 			nonce:      dorotapeProduct.nonce,
@@ -304,8 +307,10 @@
 				// Strip the min_qty=1 base-price entry — we render that row explicitly.
 				tiers = tiers.filter( function ( t ) { return t.min_qty > 1; } );
 				if ( ! tiers.length ) {
-					container.innerHTML = '';
-					container.hidden = true;
+					// No tiers for this variation — restore placeholder so the
+					// container stays visible with the "select a size" message.
+					container.innerHTML = placeholderHTML;
+					container.hidden = false;
 					onSuccess( [] );
 					return;
 				}
@@ -314,7 +319,8 @@
 				onSuccess( tiers );
 			} )
 			.catch( function () {
-				container.hidden = true;
+				container.innerHTML = placeholderHTML;
+				container.hidden = false;
 				onSuccess( [] );
 			} );
 	}

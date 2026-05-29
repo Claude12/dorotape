@@ -111,8 +111,8 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 		'label'       => __( 'Quantity Tiers', 'dorotape' ),
 		'value'       => $tiers_raw,
 		'placeholder' => 'e.g. 1-24:11.00;25:9.90',
-		'desc_tip'    => true,
-		'description' => __( 'Set quantity discount tiers for per-metre orders. Format: each tier is min:price (or min-max:price), tiers separated by semicolons. The price is £ per metre at the base (narrowest) width — wider widths scale proportionally. Example: 1-24:11.00;25:9.90 means £11.00/m for 1–24 metres and £9.90/m for 25 metres or more. The discount is applied automatically in the cart and shown on the product page. Leave blank for a single fixed price with no quantity discount.', 'dorotape' ),
+		'desc_tip'    => false,
+		'description' => __( 'Format: min:price segments separated by semicolons. The price is £/metre at the base width — wider widths scale automatically. Example: 1-24:11.00;25:9.90 → £11.00/m for 1–24m, £9.90/m for 25m+. The table appears on the product page and the discount applies automatically in the cart. Leave blank for no quantity discount.', 'dorotape' ),
 	) );
 
 	woocommerce_wp_text_input( array(
@@ -120,8 +120,8 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 		'label'       => __( 'Colour Swatch', 'dorotape' ),
 		'value'       => get_post_meta( $post->ID, 'colour_hex', true ),
 		'placeholder' => 'e.g. #cc0028',
-		'desc_tip'    => true,
-		'description' => __( 'CSS hex colour code displayed as a colour swatch on archive and product pages when no product image has been uploaded. Format: #rrggbb (e.g. #cc0028 for red, #1a1a1a for black). Used for coloured vinyl ranges where each SKU is a different colour. Leave blank if this product has a real product image uploaded above.', 'dorotape' ),
+		'desc_tip'    => false,
+		'description' => __( 'CSS hex colour shown as a swatch on archive and product pages when no product image is uploaded. Format: #rrggbb — e.g. #cc0028 (red), #1a1a1a (black). Used for coloured vinyl ranges. Leave blank when a real product image is uploaded.', 'dorotape' ),
 	) );
 
 	echo '</div>';
