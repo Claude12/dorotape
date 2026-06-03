@@ -82,7 +82,7 @@ function dorotape_scripts() {
 	wp_enqueue_script(
 		'dorotape-scaffold',
 		get_template_directory_uri() . '/js/scaffold.js',
-		array( 'dorotape-navigation' ),
+		array( 'dorotape-navigation', 'jquery' ),
 		DOROTAPE_VERSION,
 		true
 	);
@@ -119,3 +119,4 @@ require get_template_directory() . '/inc/pricing.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
+require get_template_directory() . '/inc/poa.php';

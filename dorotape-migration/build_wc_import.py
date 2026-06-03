@@ -370,8 +370,9 @@ def emit_variable_parent(r: pd.Series, parent_name: str, all_variant_labels: lis
     row["meta:_price_tiers"] = ""
     row["meta:_price_poa"]   = ""
     flt = filter_values(r, flt_lookup)
-    # Pack variant attribute with all values (for WC to register the attribute)
-    all_values = " | ".join(all_variant_labels)
+    # Pack variant attribute with all values (for WC to register the attribute).
+    # WooCommerce CSV importer splits on comma (parse_comma_field), not on |.
+    all_values = ", ".join(all_variant_labels)
     _pack_attributes(row, ("Size / Width", all_values), flt)
     return row
 

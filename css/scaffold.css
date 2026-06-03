@@ -558,9 +558,76 @@ li.product { position: relative; }
 	font-size: 1.5rem;
 	font-weight: 700;
 	color: var(--dt-accent);
+	transition: opacity 0.1s ease;
 }
 .entry-summary .price del { color: var(--dt-mid); font-size: 1rem; font-weight: 400; }
 .entry-summary .price ins { text-decoration: none; }
+.entry-summary .price.dt-price-fading { opacity: 0; }
+
+/* Variation price block inside the form is suppressed — we update the main
+   price element in-place via JS (initVariationPriceSwap) instead. */
+.woocommerce-variation-price { display: none !important; }
+
+/* Tier table on variable products is hidden until a variation is selected. */
+#dt_variable_tier_table {
+	display: none;
+	opacity: 0;
+	transform: translateY(6px);
+	transition: opacity 0.15s ease, transform 0.15s ease;
+}
+#dt_variable_tier_table.dt-table-in {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Discount hint — shown before variation is selected, hidden after */
+.dt-discount-hint {
+	display: flex;
+	align-items: center;
+	gap: .85rem;
+	background: #fdf2f8;
+	border: 1px solid #f0c0dc;
+	border-left: 4px solid var(--dt-accent);
+	border-radius: var(--dt-radius);
+	padding: .75rem 1rem;
+	margin-bottom: 1.1rem;
+	transition: opacity 0.12s ease, transform 0.12s ease;
+	transform-origin: top;
+}
+.dt-discount-hint.dt-hint-out {
+	opacity: 0;
+	transform: translateY(-5px);
+	pointer-events: none;
+}
+.dt-discount-hint__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--dt-accent);
+	color: var(--dt-white);
+	font-size: .72rem;
+	font-weight: 700;
+	line-height: 1;
+	min-width: 2.4rem;
+	height: 2.4rem;
+	border-radius: 50%;
+	flex-shrink: 0;
+	letter-spacing: -.02em;
+}
+.dt-discount-hint__body {
+	display: flex;
+	flex-direction: column;
+	gap: .15rem;
+}
+.dt-discount-hint__headline {
+	font-size: .9rem;
+	font-weight: 700;
+	color: var(--dt-accent);
+}
+.dt-discount-hint__sub {
+	font-size: .8rem;
+	color: var(--dt-mid);
+}
 
 /* Short description */
 .woocommerce-product-details__short-description {
@@ -600,6 +667,197 @@ form.cart {
 }
 .single_add_to_cart_button:hover,
 .button.alt:hover { background: var(--dt-accent-dk); }
+
+/* ── Variations form ─────────────────────────────────────────────────────── */
+
+/* Variable product cart form stacks sections vertically */
+form.variations_form.cart {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 1rem;
+}
+
+/* Attribute table: label + select on one row, no table chrome */
+.variations {
+	width: 100%;
+	border-collapse: collapse;
+}
+.variations th,
+.variations td {
+	padding: 0;
+	text-align: left;
+	vertical-align: middle;
+}
+.variations th.label {
+	padding-right: 1rem;
+	white-space: nowrap;
+	font-size: .85rem;
+	font-weight: 600;
+	color: var(--dt-text);
+	width: 1%;
+}
+.variations th.label label { margin: 0; cursor: default; }
+
+/* Value cell: select + clear link in a row */
+.variations td.value {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+}
+
+/* Custom-styled select */
+.variations select {
+	flex: 1;
+	-webkit-appearance: none;
+	appearance: none;
+	background-color: var(--dt-white);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%234a5568' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right .85rem center;
+	border: 1.5px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	padding: .6rem 2.4rem .6rem .85rem;
+	font-size: .9rem;
+	color: var(--dt-text);
+	cursor: pointer;
+	transition: border-color .15s, box-shadow .15s;
+	min-width: 160px;
+}
+.variations select:hover  { border-color: #b0b9c6; }
+.variations select:focus  {
+	outline: none;
+	border-color: var(--dt-accent);
+	box-shadow: 0 0 0 3px rgba(215, 50, 138, .12);
+}
+
+/* "Clear" link */
+.reset_variations {
+	font-size: .78rem;
+	font-weight: 500;
+	color: var(--dt-mid);
+	text-decoration: none;
+	border-bottom: 1px dashed currentColor;
+	white-space: nowrap;
+	line-height: 1;
+	transition: color .12s;
+}
+.reset_variations:hover { color: var(--dt-accent); border-bottom-style: solid; }
+
+/* Add-to-cart row inside variable products */
+.single_variation_wrap { width: 100%; }
+.woocommerce-variation-add-to-cart {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	flex-wrap: wrap;
+}
+
+/* ── Price on Application ────────────────────────────────────────────────── */
+
+/* POA badge replaces the price on product cards and single pages */
+.dt-poa-badge {
+	display: inline-block;
+	font-size: .78rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: var(--dt-navy);
+	background: #e8f4fb;
+	border: 1.5px solid #b3d9ef;
+	border-radius: 2rem;
+	padding: .3rem .85rem;
+	line-height: 1.4;
+}
+
+/* "Enquire" button on archive product cards */
+.dt-btn-enquire {
+	background: transparent;
+	color: var(--dt-accent);
+	border: 1.5px solid var(--dt-accent);
+	padding: .55rem 1.1rem;
+	font-size: .85rem;
+	font-weight: 600;
+	border-radius: var(--dt-radius);
+	cursor: pointer;
+	transition: background .12s, color .12s;
+	text-decoration: none;
+	display: inline-block;
+}
+.dt-btn-enquire:hover {
+	background: var(--dt-accent);
+	color: var(--dt-white);
+}
+
+/* Enquiry form section on single product pages */
+.dt-poa-enquiry {
+	border-top: 1px solid var(--dt-border);
+	padding-top: 1.25rem;
+	margin-top: .25rem;
+}
+.dt-poa-enquiry__intro {
+	font-size: .88rem;
+	color: var(--dt-mid);
+	margin-bottom: 1.25rem;
+	line-height: 1.6;
+}
+
+/* ── WPForms theme integration ───────────────────────────────────────────── */
+
+.dt-poa-enquiry .wpforms-form .wpforms-field-label {
+	font-size: .83rem;
+	font-weight: 600;
+	color: var(--dt-text);
+	margin-bottom: .3rem;
+}
+.dt-poa-enquiry .wpforms-form input[type="text"],
+.dt-poa-enquiry .wpforms-form input[type="email"],
+.dt-poa-enquiry .wpforms-form input[type="tel"],
+.dt-poa-enquiry .wpforms-form input[type="number"],
+.dt-poa-enquiry .wpforms-form textarea,
+.dt-poa-enquiry .wpforms-form select {
+	width: 100%;
+	border: 1.5px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	padding: .6rem .85rem;
+	font-size: .9rem;
+	color: var(--dt-text);
+	background: var(--dt-white);
+	transition: border-color .12s, box-shadow .12s;
+	box-sizing: border-box;
+}
+.dt-poa-enquiry .wpforms-form input:focus,
+.dt-poa-enquiry .wpforms-form textarea:focus,
+.dt-poa-enquiry .wpforms-form select:focus {
+	outline: none;
+	border-color: var(--dt-accent);
+	box-shadow: 0 0 0 3px rgba(215, 50, 138, .12);
+}
+.dt-poa-enquiry .wpforms-form textarea { min-height: 100px; resize: vertical; }
+.dt-poa-enquiry .wpforms-field { margin-bottom: 1rem; }
+.dt-poa-enquiry .wpforms-submit-container { margin-top: .25rem; }
+.dt-poa-enquiry .wpforms-form .wpforms-submit {
+	background: var(--dt-accent);
+	color: var(--dt-white);
+	border: none;
+	padding: .65rem 1.75rem;
+	font-size: .95rem;
+	font-weight: 600;
+	border-radius: var(--dt-radius);
+	cursor: pointer;
+	transition: background .12s;
+}
+.dt-poa-enquiry .wpforms-form .wpforms-submit:hover { background: var(--dt-accent-dk); }
+
+/* Confirmation message after submission */
+.dt-poa-enquiry .wpforms-confirmation-container-full {
+	background: #f0faf4;
+	border: 1px solid #a8d5b5;
+	border-left: 4px solid var(--dt-success);
+	border-radius: var(--dt-radius);
+	padding: 1rem 1.1rem;
+	font-size: .9rem;
+	color: var(--dt-success);
+}
 
 /* Tabs */
 .woocommerce-tabs {

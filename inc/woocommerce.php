@@ -151,6 +151,80 @@ add_filter( 'woocommerce_single_product_image_thumbnail_html', function ( string
 }, 10, 2 );
 
 
+// ─── Variable product discount hint ──────────────────────────────────────────
+
+/**
+ * Show a "volume discounts available" nudge on variable products before the
+ * user has selected a variation. Rendered at priority 12 so it sits between
+ * the price range (10) and the hidden tier table (15).
+ * JS hides this once a variation is chosen and restores it on reset.
+ */
+add_action( 'woocommerce_single_product_summary', function (): void {
+	global $product;
+	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
+		return;
+	}
+
+	// Scan all variations to find the best saving % and the qualifying min qty.
+	$max_saving  = 0;
+	$min_qty_for = 0;
+	foreach ( $product->get_children() as $var_id ) {
+		$var_obj = wc_get_product( (int) $var_id );
+		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		$base = (float) $var_obj->get_regular_price();
+		if ( $base <= 0 ) {
+			continue;
+		}
+		foreach ( dorotape_parse_legacy_tiers( (int) $var_id ) as $tier ) {
+			if ( (int) $tier['min_qty'] <= 1 || (float) $tier['tier_price'] <= 0 ) {
+				continue;
+			}
+			$saving = (int) round( ( ( $base - (float) $tier['tier_price'] ) / $base ) * 100 );
+			if ( $saving > $max_saving ) {
+				$max_saving  = $saving;
+				$min_qty_for = (int) $tier['min_qty'];
+			}
+		}
+	}
+
+	if ( $max_saving <= 0 ) {
+		return;
+	}
+
+	// Build a human-readable label from the product's variation attribute(s).
+	$attr_labels = array_map(
+		static function ( string $attr_name ): string {
+			return wc_attribute_label( $attr_name );
+		},
+		array_keys( $product->get_variation_attributes() )
+	);
+	$attr_label = implode( ' / ', $attr_labels );
+
+	printf(
+		'<div class="dt-discount-hint" id="dt_discount_hint">'
+			. '<span class="dt-discount-hint__badge">%1$s%%</span>'
+			. '<span class="dt-discount-hint__body">'
+				. '<strong class="dt-discount-hint__headline">%2$s</strong>'
+				. '<span class="dt-discount-hint__sub">%3$s</span>'
+			. '</span>'
+		. '</div>',
+		esc_html( $max_saving ),
+		esc_html( sprintf(
+			/* translators: %d: discount percentage */
+			__( 'Save up to %d%% with a volume order', 'dorotape' ),
+			$max_saving
+		) ),
+		esc_html( sprintf(
+			/* translators: 1: minimum quantity, 2: attribute label e.g. "Size / Width" */
+			__( 'Order %1$dm or more — select a %2$s below to see full pricing', 'dorotape' ),
+			$min_qty_for,
+			$attr_label
+		) )
+	);
+}, 12 );
+
 // ─── Single product tier table ────────────────────────────────────────────────
 
 /**
