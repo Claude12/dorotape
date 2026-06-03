@@ -502,8 +502,6 @@ li.product { position: relative; }
 
 /* Gallery */
 .woocommerce-product-gallery {
-	border: 1px solid var(--dt-border);
-	border-radius: var(--dt-radius);
 	overflow: hidden;
 }
 .woocommerce-product-gallery__image img {

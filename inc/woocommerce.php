@@ -431,3 +431,51 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</div>';
 }, 15 );
 
+
+// ─── Custom product tabs (from Kryptronic tabonecontent / tabtwocontent) ─────
+
+/**
+ * Register up to two custom tabs per product if _dt_tab_one_content meta is set.
+ * Content was imported from Kryptronic tabonecontent / tabtwocontent fields.
+ */
+add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return $tabs;
+	}
+	$id = $product->get_id();
+
+	$tab_defs = array(
+		array(
+			'name_key'    => '_dt_tab_one_name',
+			'content_key' => '_dt_tab_one_content',
+			'tab_id'      => 'dt_tab_one',
+			'priority'    => 50,
+		),
+		array(
+			'name_key'    => '_dt_tab_two_name',
+			'content_key' => '_dt_tab_two_content',
+			'tab_id'      => 'dt_tab_two',
+			'priority'    => 55,
+		),
+	);
+
+	foreach ( $tab_defs as $def ) {
+		$content = get_post_meta( $id, $def['content_key'], true );
+		if ( ! $content ) {
+			continue;
+		}
+		$title = get_post_meta( $id, $def['name_key'], true ) ?: esc_html__( 'Additional Information', 'dorotape' );
+		$tabs[ $def['tab_id'] ] = array(
+			'title'    => esc_html( $title ),
+			'priority' => $def['priority'],
+			'callback' => static function () use ( $content ) {
+				echo '<div class="dt-product-tab">';
+				echo wp_kses_post( $content );
+				echo '</div>';
+			},
+		);
+	}
+
+	return $tabs;
+} );

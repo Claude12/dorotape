@@ -1,0 +1,47 @@
+﻿Type,SKU,Name,Published,Is featured?,Visibility in catalog,Short description,Description,Tax status,Tax class,In stock?,Stock,Backorders allowed?,Sold individually?,Sale price,Regular price,Categories,Tags,Shipping class,Images,Parent,Upsells,Cross-sells,Attribute 1 name,Attribute 1 value(s),Attribute 1 visible,Attribute 1 global,Attribute 2 name,Attribute 2 value(s),Attribute 2 visible,Attribute 2 global,Attribute 3 name,Attribute 3 value(s),Attribute 3 visible,Attribute 3 global,Attribute 4 name,Attribute 4 value(s),Attribute 4 visible,Attribute 4 global,Attribute 5 name,Attribute 5 value(s),Attribute 5 visible,Attribute 5 global,Attribute 6 name,Attribute 6 value(s),Attribute 6 visible,Attribute 6 global,meta:_price_tiers,meta:_price_poa,meta:_sage_income_code,meta:_sage_pri,meta:_sage_alt,meta:_sage_primod,meta:_sage_altmod,meta:_sage_class_id,meta:_sage_price_tier,meta:_manufacturer,meta:_kryp_seourl,meta:_kryp_prodnum
+variable,STX,Hotronix Auto Open Clam / Sprint Mag Digital Heatpress,1,0,visible,"Our best selling Auto-Open Heatpress now has digital time, temperature & pressure control.  The magnetic lock and auto open feature allows for safer, faster production.","<html><head><title>Stahls Hotronix Auto Open Clam Heatpress</title></head>
+<body>
+<p>The most innovative manual heat press range available, with patented Magnetic Auto Open and Assist Lock functions, allowing the operator to be more productive. The two larger Hotronix® heat presses also feature a digital pressure control which enables faster set up times.</p>
+<p><b>Hotronix Auto Open Clam Heatpress.  Features & Benefits</b><br>
+<ul><li>Three sizes available 40cm x 50cm, 40cm x 40cm & 38cm x 28cm</li>
+<li>Patented magnetic auto-open feature prevents scorching and allows for easier multi-tasking</li>
+<li>Easy-to read digital time, temperature, and pressure display for consistent pressing everytime</li>
+<li>Locks down easily with patented magnetic assist, causing less fatigue on wrists and shoulders</li>
+<li>Twin Timer™ allows user to pre-set individual time settings for two-step application or for pre-heating and application</li>
+<li>Wide opening for easy layout</li>
+<li>Space-saving clamshell design</li>
+<li>Over-the-Center Pressure Adjustment for even, edge-to-edge heat and pressure regardless of the substrate thickness</li>
+<li>Easy release quick change platen compatible</li>
+</p>
+<img style=""margin: 0px 0px 0px 0px; width: 400px; height: 100px;"" alt=""Stahls delivery""
+src=""media/ecom/onpagegraphics/Stahls_Delivery.png""><br><br>
+<a href=""media/ecom/pdfs/datasheets/SPRINTbrochure.pdf""
+target=""_blank""><img
+style=""border: 0px solid ; width: 200px; height: 60px;"" alt=""pdf""
+src=""media/ecom/onpagegraphics/Brox.png""></a></ul>
+</body>
+</html>",taxable,,1,,0,0,,,Equipment > Stahls Hotronix Heat Presses,,,,,,,Platen Size,38cm x 28cm | 40cm x 40cm | 50cm x 40cm,1,,,,,,,,,,,,,,,,,,,,,,,,income-invitem,,,0,0,1,,Stahls,Stahls-Hotronix-Auto-Open-Clam-Heatpress,STX
+variation,STX11,Hotronix Auto Open Clam / Sprint Mag Digital Heatpress :: 38cm x 28cm,1,,visible,,,,,1,,0,0,,1130,,,,,STX,,,Platen Size,38cm x 28cm,1,,,,,,,,,,,,,,,,,,,,,,1130.00,,income-invitem,,,0,0,1,,Stahls,,STX
+variation,STX16,Hotronix Auto Open Clam / Sprint Mag Digital Heatpress :: 40cm x 40cm,1,,visible,,,,,1,,0,0,,1450,,,,,STX,,,Platen Size,40cm x 40cm,1,,,,,,,,,,,,,,,,,,,,,,1450.00,,income-invitem,,,0,0,1,,Stahls,,STX
+variation,STX20,Hotronix Auto Open Clam / Sprint Mag Digital Heatpress :: 50cm x 40cm,1,,visible,,,,,1,,0,0,,1720,,,,,STX,,,Platen Size,50cm x 40cm,1,,,,,,,,,,,,,,,,,,,,,,1720.00,,income-invitem,,,0,0,1,,Stahls,,STX
+simple,XF,Hotronix Fusion IQ Heatpress,1,0,visible,Fusion IQ is the worlds smartest and most advanced manual heatpress. It combines a pull out draw with a swing away platen for a safe working  area and a fully digital touch screen controller for full control.,"<html><head><title>Stahls Hotronix Fusion IQ Heatpress</title></head>
+<body>
+<p>Fusion IQ is the worlds smartest and most advanced manual heatpress. It combines a pull out draw with a swing away platen for a safe working  area and a fully digital touch screen controller for full control.</p>
+<b>Hotronix Fusion IQ Heatpress.  Features & Benefits</b><br>
+<ul><li>Draw and swing for a safe heat free workspace</li>
+<li>Patented over the centre pressure for the most evenly consistant press available</li>
+<li>Greater clearance under the platen for more accuracy</li>
+<li>Quick change platens with a simple pull of a lever - comes with 50cm x 40cm platen as standard</li>
+<li>Fusion IQ controller gives you live time, temperature and pressure readings</li>
+<li>Easily set and change settings with ease using the large touch screen</li>
+<li>Access reports including press count, active / idle time and many more</li>
+<li>Wi-fi enabled to manage users and create reports</li>
+
+<img style=""margin: 0px 0px 0px 0px; width: 400px; height: 100px;"" alt=""Stahls delivery""
+src=""media/ecom/onpagegraphics/Stahls_Delivery.png""><br><br>
+<a href=""media/ecom/pdfs/datasheets/SPRINTbrochure.pdf""
+target=""_blank""><img
+style=""border: 0px solid ; width: 200px; height: 60px;"" alt=""pdf""
+src=""media/ecom/onpagegraphics/Brox.png""></a></ul>
+</body>
+</html>",taxable,,1,,0,0,,2250,Equipment > Stahls Hotronix Heat Presses,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2250.00,,income-invitem,,,0,0,1,,Stahls,,XF
