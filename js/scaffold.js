@@ -12,9 +12,25 @@
 
 	/* ── 1. Desktop dropdown navigation ────────────────────────────────── */
 	function initDropdownNav() {
-		const nav = document.getElementById( 'site-navigation' );
-		if ( ! nav ) return;
+		const navs = [
+			document.getElementById( 'site-navigation' ),
+			document.getElementById( 'secondary-navigation' ),
+		].filter( Boolean );
+		if ( ! navs.length ) return;
 
+		navs.forEach( function ( nav ) { initSingleNav( nav ); } );
+
+		document.addEventListener( 'click', function ( e ) {
+			navs.forEach( function ( nav ) {
+				if ( ! nav.contains( e.target ) ) {
+					nav.querySelectorAll( '.menu-item-has-children' )
+						.forEach( function ( item ) { item.classList.remove( 'dt-open' ); } );
+				}
+			} );
+		} );
+	}
+
+	function initSingleNav( nav ) {
 		const parents = nav.querySelectorAll( '.menu-item-has-children' );
 
 		parents.forEach( function ( item ) {
@@ -44,12 +60,6 @@
 						link.focus();
 					}
 				} );
-			}
-		} );
-
-		document.addEventListener( 'click', function ( e ) {
-			if ( ! nav.contains( e.target ) ) {
-				parents.forEach( function ( item ) { item.classList.remove( 'dt-open' ); } );
 			}
 		} );
 	}
@@ -215,6 +225,16 @@
 		function showVariation( variation ) {
 			clearTimeout( swapTimer );
 
+			// Does this specific variation have tier pricing?
+			var hasTiers = false;
+			if ( variation && tierTable ) {
+				try {
+					var allTiers = JSON.parse( tierTable.dataset.variationTiers || '{}' );
+					var varTierData = allTiers[ String( variation.variation_id ) ];
+					hasTiers = !! ( varTierData && varTierData.tiers && varTierData.tiers.length );
+				} catch ( e ) {}
+			}
+
 			// Kick off fade-outs.
 			rangePrice.classList.add( 'dt-price-fading' );
 			if ( discountHint ) discountHint.classList.add( 'dt-hint-out' );
@@ -232,14 +252,20 @@
 					discountHint.classList.remove( 'dt-hint-out' );
 				}
 
-				// Reveal tier table and animate it in.
 				if ( tierTable ) {
-					tierTable.style.display = 'block';
-					requestAnimationFrame( function () {
+					if ( hasTiers ) {
+						// Reveal tier table and animate it in.
+						tierTable.style.display = 'block';
 						requestAnimationFrame( function () {
-							tierTable.classList.add( 'dt-table-in' );
+							requestAnimationFrame( function () {
+								tierTable.classList.add( 'dt-table-in' );
+							} );
 						} );
-					} );
+					} else {
+						// Flat-price variation — hide tier table immediately.
+						tierTable.classList.remove( 'dt-table-in' );
+						tierTable.style.display = 'none';
+					}
 				}
 			}, 110 );
 		}

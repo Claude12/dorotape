@@ -9,7 +9,7 @@
 /* ── Variables ───────────────────────────────────────────────────────────── */
 :root {
 	--dt-black:      #1a1a1a;
-	--dt-navy:       #0072a3;
+	--dt-gray:       #424240;
 	--dt-accent:     #d7328a;
 	--dt-accent-dk:  #b5266d;
 	--dt-blue:       #009fe3;
@@ -96,7 +96,7 @@ h1, h2, h3, h4, h5, h6 {
    HEADER
 ════════════════════════════════════════════════════════════════════════════ */
 .site-header {
-	background: linear-gradient(135deg, var(--dt-navy) 0%, #005a82 100%);
+	background: linear-gradient(135deg, var(--dt-gray) 0%, #005a82 100%);
 	position: sticky;
 	top: 0;
 	z-index: 500;
@@ -142,8 +142,7 @@ h1, h2, h3, h4, h5, h6 {
 	gap: 0;
 }
 
-.nav-primary > ul > li > a,
-.nav-secondary > ul > li > a {
+.nav-primary > ul > li > a {
 	display: flex;
 	align-items: center;
 	height: var(--dt-header-h);
@@ -167,13 +166,78 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-secondary > ul > li > a {
-	font-size: .8rem;
-	padding: 0 .75rem;
+	font-size: .78rem;
+	padding: 0 .7rem;
 	font-weight: 500;
-	color: rgba(255,255,255,.8);
+	color: var(--dt-white);
 	border-bottom: none;
+	letter-spacing: .01em;
 }
-.nav-secondary > ul > li > a:hover { color: var(--dt-white); background: rgba(255,255,255,.1); text-decoration: none; }
+.nav-secondary > ul > li > a:hover,
+.nav-secondary > ul > li.focus > a,
+.nav-secondary > ul > li:hover > a {
+	color: var(--dt-white);
+	background: rgba(255,255,255,.12);
+	text-decoration: none;
+}
+
+/* Current page indicator — subtle underline only */
+.nav-secondary > ul > li.current-menu-item > a,
+.nav-secondary > ul > li.current-menu-ancestor > a {
+	color: var(--dt-white);
+	border-bottom: 2px solid rgba(255,255,255,.6);
+	margin-bottom: -3px;
+}
+
+/* Dropdown arrow on secondary items that have children */
+.nav-secondary .menu-item-has-children > a::after {
+	content: "▾";
+	margin-left: .25rem;
+	font-size: .65em;
+	opacity: .7;
+}
+
+/* Secondary dropdowns */
+.nav-secondary li { position: relative; }
+
+.nav-secondary ul ul {
+	display: none;
+	position: absolute;
+	top: 100%;
+	right: 0;
+	left: auto;
+	flex-direction: column;
+	background: var(--dt-white);
+	min-width: 200px;
+	box-shadow: 0 6px 20px rgba(0,0,0,.15);
+	border-top: 2px solid var(--dt-accent);
+	border-radius: 0 0 var(--dt-radius) var(--dt-radius);
+	z-index: 600;
+}
+
+.nav-secondary ul ul li a {
+	display: block;
+	width: 100%;
+	padding: .55rem 1rem;
+	font-size: .82rem;
+	font-weight: 500;
+	color: var(--dt-text);
+	border-bottom: 1px solid var(--dt-border);
+	height: auto;
+	white-space: normal;
+	background: none;
+}
+.nav-secondary ul ul li:last-child a { border-bottom: none; }
+.nav-secondary ul ul li a:hover {
+	color: var(--dt-accent);
+	background: #fef0f7;
+	text-decoration: none;
+}
+
+/* Show secondary dropdowns on hover/focus (reuses same JS dt-open class) */
+.nav-secondary li.dt-open > ul,
+.nav-secondary li:hover > ul,
+.nav-secondary li.focus > ul { display: flex; }
 
 /* Current / active */
 .nav-primary > ul > li.current-menu-item > a,
@@ -759,7 +823,7 @@ form.variations_form.cart {
 	font-weight: 700;
 	letter-spacing: .04em;
 	text-transform: uppercase;
-	color: var(--dt-navy);
+	color: var(--dt-gray);
 	background: #e8f4fb;
 	border: 1.5px solid #b3d9ef;
 	border-radius: 2rem;
@@ -1067,7 +1131,7 @@ form.variations_form.cart {
 }
 
 .cart_totals h2 {
-	background: var(--dt-navy);
+	background: var(--dt-gray);
 	color: var(--dt-white);
 	padding: .75rem 1rem;
 	font-size: 1rem;
@@ -1201,7 +1265,7 @@ input[type="submit"] {
 	align-items: center;
 	justify-content: center;
 	padding: .55rem 1.25rem;
-	background: var(--dt-navy);
+	background: var(--dt-gray);
 	color: var(--dt-white);
 	border: none;
 	border-radius: var(--dt-radius);
@@ -1290,5 +1354,57 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 .dt-gallery-colour-swatch {
 	width: 100%;
 	line-height: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECONDARY MENU (#secondary-menu)
+════════════════════════════════════════════════════════════════════════════ */
+#secondary-menu {
+	padding: 0 var(--dt-gap);
+}
+
+#secondary-menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+#secondary-menu ul li { position: relative; }
+
+#secondary-menu ul li a {
+	display: flex;
+	align-items: center;
+	height: var(--dt-header-h);
+	padding: 0 .7rem;
+	font-size: .78rem;
+	font-weight: 500;
+	color: var(--dt-white);
+	letter-spacing: .01em;
+	white-space: nowrap;
+	transition: background .15s;
+}
+
+#secondary-menu ul li a:hover {
+	color: var(--dt-white);
+	background: rgba(255, 255, 255, .12);
+	text-decoration: none;
+}
+
+#secondary-menu ul li.current_page_item > a,
+#secondary-menu ul li.current_page_parent > a {
+	color: var(--dt-white);
+	border-bottom: 2px solid rgba(255, 255, 255, .6);
+	margin-bottom: -3px;
+}
+
+@media (max-width: 768px) {
+	#secondary-menu { display: none; }
+}
+
+.woocommerce-loop-category__title {
+	margin: 16px;
 }
 
