@@ -1,0 +1,2331 @@
+"id","dispname","htmlsummary","htmlcontent","featuredisp","createdate","sortorder","bannergroup","videourl","imgthumb","imgstash","catparent","xcat","xprod","xarticles","articlesortorder","metatitle","metakeywords","metadesc","seourl","seoexact","xmultisite","articleview","articleviewg"
+"35th_Birthday","Celebrating 35 Years of Business","This year marks the 35th anniversary of Dorotape! ","<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<p>35 years is a long time in any business and we are genuinely grateful to not only still be working within the industry but also progressing and thriving in the marketplace too. We’ve been getting a little nostalgic, looking back at the old photo album reminiscing on how it all began. Read on for a potted history of Dorotape.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Exhibition_1996.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Warehouse_1996.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Exhibition_2000.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Exhibition_1996.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Dorotape Exhibition 1996"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Warehouse_1996.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Dorotape Warehouse 1996"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Exhibition_2000.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Dorotape Exhibition 2000"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+<h3 style=color:#009ee3;"">From the beginning<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Our story begins in 1988. As part of a German / European group of companies, we became one of the first manufacturers of film application tape to supply the UK graphics market. The range quickly grew to include self-adhesive films. Something new to the market.</p>
+
+<p>Mick Ingram joined the company in 1995 and was promoted to director in 2004. He steered the good ship Dorotape to independence in 2009 when we left our German sister company to go it alone.</p>
+
+<p>As the business grew so too did the need for larger premises, three moves within Market harborough followed until in 2013 the business upped sticks to move to the other side of town of where we are still based today.</p>
+
+<h3 style=color:#009ee3;"">To the present day<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>In 2021 Mick became the sole owner of Dorotape. Today we’re partners with over 20 global manufacturers, supplying specialist films and vinyl to all manner of industries. And we’re still growing and developing into new sectors, creating bespoke products for specialist projects and reaching people right across the world. There is never a dull moment.</p>
+
+<p>This seems like the perfect time to say a huge thank you to all our loyal customers and suppliers for supporting us throughout the years. Here’s to the next 35!</p>
+
+<h3 style=color:#009ee3;"">Want to find out more<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>To learn more about what makes us tick <a href=""https://www.dorotape.co.uk/About-Us"" target=""_blank""><font color=""#d7328a""><b>click here</b></font></a></p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1699637302","999","","","Sign UK 1996.jpg","Sign UK 1996.jpg","EXAMPLE-ARTICLE-CAT","EXAMPLE-ARTICLE-CAT","","","0","","","","","0","","A",""
+"Application_Tape","Let's talk about...application tape","We drill down on the two main types of application tape","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>There’s not a day that goes by here at Dorotape that we don’t field questions about <a href=""https://www.dorotape.co.uk/Category/Application-Tape"" target=""_blank""><font color=""#d7328a""><b>application tape</a></b></font>. With a wide range of tack levels and types of face film, choosing the right one is not always straightforward.  To make life easier we’re here to untangle this sticky dilemma.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Coffee_Sign_Application.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Van_Application.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Truck_Application.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Coffee_Sign_Application.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Coffee Sign Application"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Van_Application.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Van Application"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Truck_Application.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Truck Application"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+<br><p>What is now Dorotape began life almost 35 years ago. As part of a European group of companies, we were one of the first to supply application tape to the UK signs and graphics market, so we’re confident that we can reliably be on hand to advise on which one is right for each job.</p>
+
+<h3 style=color:#009ee3;"">In brief, here’s a quick guide to which tape to use and when<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>&#9679; Paper tapes are more suitable for wet application vinyl.</p>
+
+<p>&#9679; Clear filmic application tapes are the preferred choice if overlaying and aligning vinyl and films.</p>
+
+<p>&#9679; The most common tack level is medium to high tack which is suitable for most small to mid-sized graphics.</p>
+
+<p>&#9679; Low tack application tape is best for large sized vinyl graphics and lettering, wall graphics, frosted window films and stencil films.</p>
+
+<p>&#9679; Low-tack paper application tape is also ideal for protecting printed graphics during handling, storage and transport.</p>
+
+<p>&#9679; High-tack application tapes lend themselves to smaller sized graphics and lettering as well as high-tack self-adhesive films such as reflective vinyl.</p>
+
+<p>&#9679; Conform® paper application tapes feature 'Release Liner Adhesion'  for an even adhesion to the backing liner without dog-earing.</p>
+
+<p>We supply a wide range of <a href=""https://www.dorotape.co.uk/Category/Paper-Application-Tape"" target=""_blank""><font color=""#d7328a""><b>paper application tape</b></a></font> and <a href=""https://www.dorotape.co.uk/Category/Clear-Application-Tape"" target=""_blank""><font color=""#d7328a""><b>clear filmic application tapes</b></a></font>, including new Conform® tapes designed for use with AirFlow liners and UV digitally printed graphics.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+","0","1687782021","994","","","Application-Tape.jpg","","Example-Article-Category-3","Example-Article-Category-3","40001220, 40501520, 4075CT1220, 47601370, 47611370, 900EMT1220, 903C1220, 907CT1220, ASLAN_TMO","","0","Application Tape","application, tape, masking, transfer, conform, rla","","Application-Tape","0","DEFAULT","A","admin, superuser"
+"Arndale_Christmas_Decorations","Manchester Arndale - Recreating the mesmerising dichroic effect","Manchester Arndale - Recreating the mesmerising dichroic effect","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Arndale_Christmas_Tree.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Arndale_Christmas_Star.jpg"" style=""width:100%"">
+  </div>
+
+ <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Arndale_Christmas_Reindeer.jpg"" style=""width:100%"">
+  </div>
+
+     
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Arndale_Christmas_Tree.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Christmas tree at the Arndale Centre"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Arndale_Christmas_Star.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Christmas star at the Arndale Centre"">
+    </div>
+<div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Arndale_Christmas_Reindeer.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Christmas reindeer at the Arndale Centre"">
+    </div>
+     </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+
+<h3 style=color:#009ee3;"">Have you ever been captivated by the stunning colour-shifting properties of dichroic materials? The way they transform light into a spectrum of colours that change based on your viewing angle is truly magical. If you're interested in recreating this eye-catching effect in your own space, here's how to get started<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<a><img style=""border: 0px solid ; width: 250px; height: 168px; float: right;"" alt=""Ask the expert""
+src=""media/ecom/onpagegraphics/Ask_the_expert.png""></a>
+
+<h3 style=color:#009ee3;"">Getting started with dichroic film<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The first step is simple: request a sample of dichroic film to experiment with. You can e-mail <a href=""mailto:paul.houghton@dorotape.co.uk"" target=""_blank"" style=""color: #d7328a;""><b>Paul</b></a>, who will be happy to help. Once you have it in hand, you can begin exploring the various applications that would work best in your space.</p>
+
+
+<h3 style=color:#009ee3;"">Understanding dichroic properties<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Dichroic materials, particularly the <a href=""https://www.dorotape.co.uk/Category/Dichroic-Films"" target=""_blank""><font color=""#d7328a""><b>Transparent</b></font></a> and new <a href=""https://www.dorotape.co.uk/Category/Dichroic-Films"" target=""_blank""><font color=""#d7328a""><b>Translucent</b></font></a> versions, rely on light interaction to showcase their full potential. These films don't just reflect light—they transform it.</p>
+    <p>Our <a href=""https://www.dorotape.co.uk/Item/ASLAN-13140S-Nebula-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Nebula</b></font></a> and <a href=""https://www.dorotape.co.uk/Item/ASLAN-13141S-Solar-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Solar</b></font></a> films create stunning effects when applied to clear glass or acrylic surfaces. What makes them truly special is their remarkable colour-shifting ability. View the material from one angle, then shift your position, and you'll witness an entirely different colour emerge—creating a dynamic, ever-changing visual experience.</p>
+
+
+<h3 style=color:#009ee3;"">Real world application<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+       <p>The Arndale Christmas decorations demonstrate this principle beautifully. Their effectiveness comes from the strategic placement at various angles relative to light sources. As light passes through the dichroic material, it creates spectacular colour patterns that perfectly complement the festive holiday theme.</p>
+<p>In this installation, the decorations are made up of triangles which, combined with the colour-changing material, create a striking visual impact.</p>
+
+<h3 style=color:#009ee3;"">Choosing the right material<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+<p>To achieve a similar effect, you have several options: 
+        <ul><li>For maximum impact on transparent surfaces, our transparent <a href=""https://www.dorotape.co.uk/Item/ASLAN-13140S-Nebula-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Nebula</b></font></a> or <a href=""https://www.dorotape.co.uk/Item/ASLAN-13141S-Solar-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Solar</b></font></a> film is ideal as they offer deep vivid colours without hotspot blemishes</li>
+        <li>For a more subtle, diffused effect, try the new <a href=""https://www.dorotape.co.uk/Item/ASLAN-13155S-Luna-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Luna</b></font></a> or <a href=""https://www.dorotape.co.uk/Item/ASLAN-13156S-Nova-Dichroic"" target=""_blank""><font color=""#d7328a""><b>Nova</b></font></a> translucent film offering a softer silvery shimmer of different colours</li>
+        <li>If you're working with non-transparent backgrounds, <a href=""https://www.dorotape.co.uk/Item/13142SPET_Aurora"" target=""_blank""><font color=""#d7328a""><b>Aurora</b></font></a> or one of the other four opaque versions of the material offers similar colour-shifting properties</li></ul></p>
+<p>Many designers create depth and visual interest by combining different versions of these materials in a single project, layering them to create fascinating dimensional effects.</p>
+
+
+<h3 style=color:#009ee3;"">Request your free sample<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Ready to transform your space with the magic of dichroic film?  Just <a href=""https://https://www.dorotape.co.uk/Category/Dichroic-Films"" target=""_blank""><font color=""#d7328a""><b>Click here</b></font></a> to view the range. The possibilities are limited only by your imagination!</p>
+
+<p>If you'd like to get a feel for these films first, you can <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>order your free samples here</b></a></font></p>
+
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1745500708","989","","","Arndale_Christmas_Decorations.jpg","","Example-Article-Category-3","Example-Article-Category-3","13140S_Nebula, 13141S_Solar, 13155S_Luna, 13156S_Nova, 13142SPET_Aurora, 13143SPET_Alpha","","0","Manchester Arndale - Recreating the mesmerising dichroic effect","dichroic, arndale","Have you ever been captivated by the stunning colour-shifting properties of dichroic materials? The way they transform light into a spectrum of colours that change based on your viewing angle is truly magical. If you're interested in recreating this eye-catching effect in your own space, here's how to get started.","","0","DEFAULT","A","admin, superuser"
+"ASLAN-Sparkle-Colour","Time to Sparkle!","Read on to find out why this is no average glitter film!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>We’re excited to introduce SparkleColour, an innovative new product from ASLAN, and the latest edition to our range of specialist vinyl.</p>
+
+<p>Newly launched on the market, this is no average glitter film. It boasts all the credentials of a modern, outstanding-quality glitter film… and then some. </p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_SC123_Christmas_Window.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_SC123_Wall.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_SC123_Necklace.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_SC123_Christmas_Window.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""ASLAN SC123 Christmas Window"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_SC123_Wall.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""ASLAN SC123 Wall"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_SC123_Necklace.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""ASLAN SC123 Necklace"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+<h3 style=color:#009ee3;"">What is SparkleColour<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>&#9679; A 50-micron PVC-free film coated with a surface of glitter particles</p>
+
+<p>&#9679; An eye-catching film offering superb light reflection that intensifies the sparkling effect, making it the perfect choice for retail displays and POS</p>
+
+<p>&#9679; Coated with a strong, transparent adhesive for long-term use, making it suitable for interior decoration, retail displays and furniture renovation</p>
+
+<p>&#9679; Residue-free removal from smooth flat surfaces </p>
+
+
+<h3 style=color:#009ee3;"">So, what makes this film really special<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Most glitter films come with just a backing liner. Anyone familiar with the application of glitter vinyl will know that this can make them extremely tricky to apply, as using a squeegee to create a smooth and even application can create a horrible glittery mess. The use of an application tape to avoid this is pretty much out of the question. However, as well as a backing liner ASLAN has cleverly given SparkleColour a transparent top protective liner too which does the job of an application tape and allows for a much cleaner application. This also means the film is ideal for cad cutting, by cutting and weeding in reverse through the backing liner. </p>
+
+<h3 style=color:#009ee3;"">And what about the application<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>To apply SparkleColour simply remove the backing liner and apply it to the surface using a squeegee. When the vinyl is in position remove the protective top liner. And the result? A show-stopping vinyl that catches the light and the eye of any passerby.</p>
+
+<p><iframe width=""560"" height=""315"" src=""https://www.youtube.com/embed/PbUgqEj-j2I"" title=""YouTube video player"" frameborder=""0"" allow=""accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"" allowfullscreen></iframe></p>
+
+<p>SparkleColour is available in six colours including silver, red and rainbow white, and an additional 29 colours where an MOQ is applied.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1680609090","997","","","Sparkle Colour.jpg","Sparkle Colour.jpg","Example-Article-Category-3","Example-Article-Category-3","","","0","ASLAN Sparkle Colour","Sparkle, glitter","","ASLAN-Sparkle-Colour","0","","A",""
+"Cast-Calendered","Cast or calendered? Know your vinyl","Do you you know the key differences, benefits and limitations between the different types of self-adhesive vinyl (PVC)?","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>It’s important to understand the key differences between the two but how well do you know your vinyl?</p>
+
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Vinyl-Production.png"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Vinyl-Packing.png"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Vinyl-Production-Lab.png"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Vinyl-Production.png"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Self-adhesive vinyl coating line"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Vinyl-Packing.png"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Robotic vinyl packaging"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Vinyl-Production-Lab.png"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Analysis of vinyl in the laboratory"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+
+<h3 style=color:#009ee3;"">If you’re puzzled about which one to use here’s our quick guide to the benefits and limitations of the types and grades of vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<a><img style=""border: 0px solid ; width: 250px; height: 168px; float: right;"" alt=""Ask the expert""
+src=""media/ecom/onpagegraphics/Ask_the_expert.png""></a>
+
+<p>Firstly, for the record, all pvc vinyl is made one of two ways: cast or calendered. And we have both types.</p>
+
+<h3 style=color:#009ee3;"">Calendered<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Calendered vinyl is the most commonly used type by signmakers and large format printers. They start life as a solid resin that is melted together with a plasticiser to make it soft and flexible as well as a pigment to add colour. This is then compounded and as it cools, it is extruded, being drawn through a series of temperature controlled rollers which stretches and flattens the film to a uniform thickness; typically between 70<span>&#181;</span> - 100<span>&#181;</span>. This is then wound into jumbo rolls ready to be coated with an adhesive and a liner added. Calendered films come in two main categories; monomeric and polymeric.</p>
+
+ <p><ul><li><b>Monomeric</b> grade PVC is the most economical and least durable, best suited to interior and short-term exterior applications (5 years for black & white, 4 years for colours in the case of the <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Event-Grade-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Event Range</a></b></font>) on to flat 1D and slightly curved 2D surfaces. The monomeric plasticisers used in their production to make the film softer and more flexible have a low molecular weight which after time, slowly migrates to the surface of the film causing it to shrink and become brittle. These films are therefore not suitable for demanding exterior applications such as vehicle graphics or fascia signage as it will almost certainly start to shrink back from the edges to reveal the adhesive beneath. Once this starts, any dirt in the atmosphere will quickly create a dirty grey outline around the graphics and eventually, the vinyl will begin to flake off like peeling paint.</li></p>
+
+<p><li><b>Polymeric</b> grade vinyl uses polymeric plasticisers that have a more complex molecular chain meaning that this binds well together and they shrink back at a slower rate. This makes them more durable and with better UV and temperature resistance, suitable for longer term use outdoors on 1D and 2D surfaces (10 years for black & white, 8 years for colours in the case of the <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Platinum-Range-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Platinum Range</a></b></font>). If used on more complex curves, it is still recommended to cut and overlap seams as opposed to heating and stretching like you can a cast film.</li></ul></p>
+
+<h3 style=color:#009ee3;"">Cast<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Cast films are made differently to calendered films, starting off as a liquid which is then poured onto a casting sheet before moving slowly through a set of temperature-controlled ovens where the liquid evaporates leaving behind an extremely thin layer. This then gets rolled; typically to 50µ or even as thin as 30µ. Cast films have little internal tension and are dimensionally stable, so shrinkage is barely perceptible. Cast films are thinner and softer, they are highly flexible and easier to apply over 3D curved surfaces using heat. With a durability in excess of 12 years (in the case of <a href=""https://www.dorotape.co.uk/Item/Ri-Jet-C50-Ultimate-Slide-Tack"" target=""_blank""><font color=""#d7328a""><b>Ri-Jet C50 Ultimate</a></b></font>, cast vinyl offers the ultimate in terms of durability.</p>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1738242678","991","","","Cast-Calendered.png","","Example-Article-Category-3","Example-Article-Category-3, EXAMPLE-ARTICLE-CAT","","","0","Cast or Calendered","cast, calendered, vinyl, pvc","Do you you know the key differences, benefits and limitations between the different types of self-adhesive vinyl (PVC)?","Cast-vs-Calendered","0","DEFAULT","A","admin, superuser"
+"Colorbase","ColorBase Toolbox: Your Key to Streamlined Printing","Dorotape explains why ColorBase is key for precision and efficiency in the printing industry. Read why ColorBase is a must for printing professionals.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>Read why ColorBase is a must for printing professionals.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Colorbase_screen.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Colorbase_filter.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Colorbase_web.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Colorbase_screen.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""ASLAN Gold Distributor Logo"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Colorbase_filter.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""ASLAN Building"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Colorbase_web.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""ASLAN Rolls"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<h3 style=color:#009ee3;"">Smarter printing<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">!</span></h3>
+
+<p>In the dynamic world of printing, where precision and efficiency reign supreme, finding the right tools to optimise your workflow is essential. Enter <a href=""https://colorbase.com"" target=""_blank""><font color=""#d7328a""><b>ColorBase</a></b></font> – the digital foundation for a smarter printing industry. But who are they, and what sets them apart in this bustling landscape?</p>
+
+<h3 style=color:#009ee3;"">How do I get started<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>ColorBase registration is free and once you’ve signed up, you gain access to over 2.1 million profiles, an expert centre, printing hubs, blogs, and more. It's like having a virtual printing arsenal at your disposal, ready to tackle any project that comes your way.</p>
+
+<h3 style=color:#009ee3;"">Easy to use<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>At the heart of ColorBase is its toolbox. This serves as the profile centre for all types of machines and materials, a one-stop shop designed to streamline your printing experience. Whether you're a seasoned pro or just starting out, its user-friendly interface and comprehensive profile libraries mean navigating through profiles has never been easier. Simply input the manufacturer of your printer and/or material, along with your colour setup and RIP software, and voila! You're ready to explore a plethora of profiles tailored to your specific needs. Combined with the printing hubs, which are manufacturer-specific areas that allow you to explore profiles tailored to your printer, material, or RIP software, it's like having insider access to a treasure trove of printing resources, all neatly organized for your convenience.</p>
+
+<h3 style=color:#009ee3;"">Versatility at the core<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>ColorBase doesn't stop at just one machine. If you're juggling multiple printers, you can access profiles for all your machines conveniently from the same platform. And thanks to its profile storage feature, you can say goodbye to the headache of losing your settings during computer updates or mishaps. Securely store your profiles, ensuring that your printing configurations remain intact and accessible whenever you need them.</p>
+
+<h3 style=color:#009ee3;"">To summarise<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>ColorBase Toolbox isn't just a tool – it's a game changer for the printing industry. With its intuitive interface, extensive profile libraries, and array of features, ColorBase empowers printers of all levels to achieve unparalleled precision and efficiency in their workflows.</p>
+
+<h3 style=color:#009ee3;"">Got a question<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>For more information on the benefits of ColorBase, <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact </b></font></a>our knowledgeable team who will be happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+","0","1709035510","998","","","Colorbase.jpg","","Example-Article-Category-2","Example-Article-Category-2","","","0","","colorbase, profiles, icc","Dorotape explains why ColorBase is key for precision and efficiency in the printing industry. Read why ColorBase is a must for printing professionals.","","0","DEFAULT","A","admin, superuser"
+"Easy-On-Easy-Off","Easy On, Easy Off, No Residue","Every retailer, and every graphics installer, has the need for short-term, self-adhesive window and wall graphics that are easy to remove without leaving any adhesive residue. New Year's sales are a perfect example of one of those times.   ","<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<p>Every retailer, and every graphics installer, has the need for short-term, self-adhesive window and wall graphics that are easy to remove without leaving any adhesive residue. New Year's sales are a perfect example of one of those times.</p>
+
+<p>We’re happy to report that we have the perfect solutions.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_Lifetime_Removable.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Easy_Dot_Clear_Butterfly.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Easy_Dot_Red_Sale.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_Lifetime_Removable.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""ASLAN Lifetime Removable"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Easy_Dot_Clear_Butterfly.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Easy Dot Clear Printable"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Easy_Dot_Red_Sale.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Easy Dot Red"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+</div>
+
+<h3 style=color:#009ee3;"">Easy to remove self-adhesive graphics from two market-leading manufacturers<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<h3 style=color:#009ee3;"">Neschen Easy Dot<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Easy Dot was created by this fantastic German manufacturer who has been in the marketplace for decades. They offer three types of Easy Dot vinyl, all of which feature an easy-to-apply dot pattern adhesive which makes application easy, due to the air channels between the adhesive dots any trapped air can simply be squeezed out so as not to leave any air pockets.</p>
+
+<p>Here are our favourite and best-selling Easy Dot products:</p>
+
+<p>&#9679; Easy Dot wide format digitally printable vinyl for wall and window graphics is available in matt white, gloss white and clear matt.</p>
+<p>&#9679; UVprint Easy Dot PVC-free wide format UV printable vinyl is available in matt white and transparent finishes.</p>
+<p>&#9679; Easy Dot coloured vinyl in red, gold, and silver are stocked items.</p>
+
+<h3 style=color:#009ee3;"">ASLAN DFP Lifetime Removable Vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>We work closely with ASLAN as one of their Gold Distributors, so we’re always pleased to test and recommend their innovative products.</p>
+
+<p>&#9679; The adhesive on this vinyl is specifically designed for interior promotions and wall advertising allowing graphics to be repositioned and removed without leaving an adhesive residue. Available in white gloss, clear gloss and white matt.</p>
+
+
+<h3 style=color:#009ee3;"">How can we help<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>For more information on graphics that can be removed without leaving a residue, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact</b></font></a> our knowledgable team who will be happy to advise on the best product for your job.
+
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+
+</div>","0","1697107929","991","","","Easy-Dot.jpg","","Example-Article-Category-3","Example-Article-Category-3","Easy_Dot_Red, Neschen_Easy_Dot, DFP_40, Neschen_Easy_Dot_PP, Easy_Dot_Silver, Easy_Dot_Gold","","0","Easy On, Easy Off, No Residue","removable, easy dot, lifetime removable, dfp40, dfp41, dfp42","Every retailer, and every graphics installer, has the need for short-term, self-adhesive window and wall graphics that are easy to remove without leaving any adhesive residue. New Year's sales are a perfect example of one of those times.   ","Easy-On-Easy-Off-No-Residue","0","DEFAULT","A","admin, superuser"
+"Fire-Ratings","Fire Certified Materials: More than just a tick box","The use of fire-certified materials is more than just a tick box, they can, and do, save lives and they’re there for that very reason. It’s a duty of care and it’s an area that we here at Dorotape take very seriously. ","<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<p>The use of fire-certified materials is more than just a tick box, they can, and do, save lives and they’re there for that very reason. It’s a duty of care and it’s an area that we here at Dorotape take very seriously.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 1</div>
+    <img src=""skins/CUSTOM-2023/media/Fire_Escape.jpg"" style=""width:100%"">
+  </div>
+
+      
+ </div>
+
+
+
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+
+<h3 style=color:#009ee3;"">Background<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The use of non-fire-retardant materials in recent times has brought into sharp focus the continued need for all industries to ensure the right fire-certified materials are used. This is important in any sector, including ours, particularly for materials installed in public places such as retail stores, community spaces and airports where fire-certified materials are strictly specified. </p>
+
+<h3 style=color:#009ee3;"">Fire Protection Standards<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Given the complexities of the differing standards of certification and so many regulations in place to make products safe, how do you know which ones will make sure you’re compliant?</p>
+
+<h3 style=color:#009ee3;"">That’s where we can help<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>We’ve created a useful guide to help explain the various industry standards and an easy-to-use table making clear which materials that we stock meet which criteria. You can take a look for yourself <a href=""https://www.dorotape.co.uk/Fire-Certification"" target=""_blank""><font color=""#d7328a""><b>here</b></font></a> and if you’re in any doubt, and would like to talk to us, please <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+
+</div>","0","1695896479","992","","","Fire_Escape_Cropped.jpg","","Example-Article-Category-3","Example-Article-Category-3, EXAMPLE-ARTICLE-CAT","","","0","Fire Certified Materials","fire, rating, rated, certificate, class 0, 13501-1","The use of fire-certified materials is more than just a tick box, they can, and do, save lives and they’re there for that very reason. It’s a duty of care and it’s an area that we here at Dorotape take very seriously. ","Fire-Certified-Materials","0","DEFAULT","A","admin, superuser"
+"Get-to-know-us","Get to know us","Find out more about what makes us so unique!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<p>Whether or not you’re familiar with the products we supply, we pride ourselves on supplying more than just high-quality vinyls and films from world-class manufacturers - we are proud to offer outstanding service from our team of highly knowledgeable industry professionals.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Team.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Team_Hamburg.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Team_Hidden.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Team.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Dorotape Team"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Team_Hamburg.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Dorotape team in Hamburg"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Team_Hidden.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Dorotape team hiding"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+<h3 style=color:#009ee3;"">For a start, let's talk about work<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The world of vinyls and films can be complex and confusing, so we’ve worked hard over the last 34 years to be the go-to industry expert.</p>
+
+<p>That’s right - 34 years! From humble beginnings we’ve grown in team, size and technology, building on our expertise and offering innovative solutions without compromising on the friendly and approachable service that keeps our customers coming back.</p>
+
+<p>Our portfolio is a big one, full of materials and solutions that mean we operate in a number of sectors including promotions and POS, sign making, graphic design and retail advertising. Oh - and we haven’t even mentioned our bespoke service yet. Going the extra mile is a big thing in our books and if that means creating one-of-a-kind solutions, we’ll get it sorted. By using state-of-the-art in-house technology we can produce something to match your specific colour, finish and texture requirements.</p>
+
+<p>For us, building a close working relationship with our customers is vital, working with you to ensure the right product for the right job. And when it comes to tight deadlines we’ve seen them all before, so know the challenges you can sometimes face and will help you through them.</p>
+
+<p>We’re completely independent which allows us to source the best materials from the world’s leading manufacturers and provide unbiased advice. In fact, we live and breathe our products and work closely with our manufacturing partners to research and develop new and innovative adhesives, colours and finishes.</p>
+
+<p>We’re also passionate about bringing you choice in a fast-moving industry, particularly around emerging environmentally friendly options. Our goal is to offer the most sustainable display materials on the market.</p>
+
+<h3 style=color:#009ee3;"">What are we like<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">........</span><span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Away from work, we all have different interests and priorities but we share the same desire to have some fun. Farm shop Fridays are an essential part of our week especially for their amazing fried chicken wraps and we can often be spotted heading off to the pub after leaving the office a bit earlier on a Friday too! </p>
+
+<p>Night's out out are a big thing too! Anything from a gentle round of petanque to an adrenalin fuelled evening on the kart circuit, our inner competitiveness spills over!</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1678986574","1000","","","TEAM PHOTO.jpg","TEAM PHOTO.jpg","EXAMPLE-ARTICLE-CAT","EXAMPLE-ARTICLE-CAT","","","0","","","","","0","","A",""
+"Glass-Etch-Vinyl","Glass Etch Vinyl - Wet or Dry Application?","To wet apply or dry apply? That is the question!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>When it comes to etched glass-effect vinyl and films the question we get asked the most by customers is whether we recommend a dry or wet apply product, we supply both kinds, by the way! The answer to this really does come down to the location of the glass, the environment, the complexity of the job and also the user’s preference.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Etch_Office.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Etch_Squeegee.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Etch_Lines.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Etch_Office.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Etch glass vinyl on office partition"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Etch_Squeegee.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Using a squeegee to apply glass etch vinyl"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Etch_Lines.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Lines of etch glass vinyl on office window"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+<br><p>Historically wet apply has been the go-to for applications, but with the introduction of impressive dry apply products to the market the usage of both is levelling up.</p>
+
+<h3 style=color:#009ee3;"">If you’re puzzled about which one to use here’s our quick guide to the benefits and limitations of both applications<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<h3 style=color:#009ee3;"">Wet Application Method<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>This method is commonly used when applying large areas of etch glass vinyl but for this purpose we will assume here that we are applying some simple text or graphics using <a href=""https://www.dorotape.co.uk/Item/Float-On-Vinyl-Application-Fluid""><font color=""#d7328a""><b>Float-On</b></font></a> application fluid. It is also possible to substitute application fluid for some water with a couple of drops of Johnsons Baby Bath mixed by hand to produce a foamy solution.</p>
+
+ <p>Note: Graphics applied in low temperatures may suffer from reduced initial adhesion which can lead to problems later so it is best to apply at a minimum of 15<sup>o</sup>C.</p>
+
+<p>Ensure that the glass has been cleaned adequately. First using warm soapy water, then with a degreaser such as <a href=""https://www.dorotape.co.uk/Item/Isopropyl-alcohol""><font color=""#d7328a""><b>isopropanol</b></font></a> (or methylated spirit) and a <a href=""https://www.dorotape.co.uk/Item/Lint-Free-Cloths""><font color=""#d7328a""><b>lint free cloth</b></font></a> or <a href=""https://www.dorotape.co.uk/Item/Easy-Wipe""><font color=""#d7328a""><b>lint free wipes</b></font></a>. Hardened debris such as paint spots can be removed with a blade flat against the glass. Particular attention should be payed to the edges of the glass panel and rubber seals to avoid dirt being drawn under the film.</p>
+
+<p>Once the design has been cad-cut and weeded,  cover the graphic with an application tape that has a good quality paper such as <a href=""https://www.dorotape.co.uk/Item/900EMT1220""><font color=""#d7328a""><b>900E</b></font></a> or <a href=""https://www.dorotape.co.uk/Item/R-Tape-Conform-4075RLA""><font color=""#d7328a""><b>Conform &reg: 4075RLA</b></font></a>.  and prepare the surface ready for the graphics.</p>
+
+<p>To apply the graphics, simply spray the glass with a fine mist of your chosed application fluid, remove the backing liner from the etch glass vinyl, lightly spray the adhesive side and lay the graphics down onto the wet surface. As this layer of liquid acts as a barrier between the graphics and the substrate it reduces the adhesion level and makes it possible to make slight adjustments to the graphics position.</p>
+
+<p>Once in the correct position dab down and apply pressure using a good quality squeegee and by working from the centre outwards remove all the liquid from underneath the graphics using a firm <a href=""https://www.dorotape.co.uk/Category/Application-Tools""><font color=""#d7328a""><b>squeegee</b></font></a> to enable the adhesive to key on to the glass.</p>
+
+<p>When applying graphics wet, the adhesive takes longer to reach it's final adhesive strength so the more liquid is used the longer it takes before the graphics are firmly adhered. We recommend at least 1 hour before the next step.</p>
+
+<p>Re-squeegee the entire area to make sure that the liquid has been completely expelled and carefully peel back the application tape diagonally at 180<sup>o</sup> to the surface and not lifting at 90<sup>o</sup> towards yourself as this can encourage air bubbles to form. Finally re-squeegee the entire graphics again paying particular attention to the edges and trimming 1mm-2mm from any rubber seals.</p>
+
+<p><iframe width=""560"" height=""315"" src=""https://www.youtube.com/embed/BRLnyKJU_vU"" title=""YouTube video player"" frameborder=""0"" allow=""accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"" allowfullscreen></iframe></p>
+
+<h3 style=color:#009ee3;"">Advantages<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+<p>&#9679;	Suitable for indoor and outdoor use</p>
+
+<p>&#9679;	Ideal for areas which can experience moisture such as hair salons and launderettes</p>
+
+<h3 style=color:#009ee3;"">Dry Application Method<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Using our Dry Apply Etch Glass films is easy whether you are cutting logos and lettering or applying one large piece to the glass. These etched glass vinyls must be applied 'dry' using a soft squeegee such as a <a href=""https://www.dorotape.co.uk/Item/ASLAN-Universal-Squeegee_Felt-Edge""><font color=""#d7328a""><b>felt edged squeegee</b></font></a></p>
+
+<p>Glass surface preparation is just as important here as it was with the wet apply method so take time to thoroughly clean.</p>
+
+<p>If cutting out a design with pre-spaced elements you will first need to cad-cut and weed the waste away, then cover the graphic with an application tape such as <a href=""https://www.dorotape.co.uk/Item/R-Tape-Conform-4761RLA""><font color=""#d7328a""><b>Conform &reg; 4761RLA</b></font></a> which is specifically designed for use with dry apply films.</p>
+
+<p>Once you are ready to apply, establish exactly where the graphics need to be positioned and fix in place by using small tabs of 50mm wide <a href=""https://www.dorotape.co.uk/Item/Blue_Masking_Tape_50mm""><font color=""#d7328a""><b>masking tape</b></font></a>. Then use a strip of 50mm masking tape the full width of the graphic and create a hinge by fixing this along the top of the graphic, half on the application tape of the graphic and half on the glass.</p>
+
+<p>To apply the glass etch vinyl, lift the graphic up from the glass, folding it back on the hinge, then loosen and peel down about 150mm of the backing liner before lowering the now exposed film back down into place on to the glass, while at the same time applying squeegee pressure starting at the centre and working down and towards each edge in turn in overlapping strokes. Remove another 150mm or so of backing liner and repeat the process until the graphic is applied.</p>
+
+<p>It is also possible to use this hinge method for larger lettering applications by slitting up between each letter, pairs of letters or groups of letters once the top hinge has been applied and applying these separately. Similarly, for long narrow graphics it is possible to fix the hinge on the left or right hand side instead of the top.</p>
+
+<p>Now remove the application tape by carefully peeling it back diagonally at 180° to the surface and not lifting at 90° towards yourself as this can encourage air bubbles to form.</p>
+
+<p>Finally re-squeegee the entire graphics again paying particular attention to the edges and trimming 1mm-2mm from any rubber seals using a <a href=""https://www.dorotape.co.uk/Category/Knives-Cutting-Tools""><font color=""#d7328a""><b>sharp knife</b>.</font></a></p>
+
+<p>You will see from this video just how easy it is to apply and how any remaining creases or bubbles can be removed using heat and a squeegee.</p>
+
+<p><iframe width=""560"" height=""315"" src=""https://www.youtube.com/embed/mqLoBHt-jXU"" title=""YouTube video player"" frameborder=""0"" allow=""accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"" allowfullscreen></iframe></p>
+
+<h3 style=color:#009ee3;"">Advantages<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>&#9679;	Clean, no mess application</p>
+
+<p>&#9679;	Easier to remove and reposition during installation</p>
+
+<p>&#9679;  ASLAN Dry Apply Etch films are Fire Rated to Euroclass DIN EN 13501-1:2019-05 with classification B-s1-d0</p>
+
+<p>At Dorotape we work closely with etch vinyl and film market leaders, ASLAN and Ritrama, to ensure we stock a good range of their products. Our team have a great breadth of knowledge to help you get the best out of your project, so we’re always here for friendly advice and know-how. </p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1680602534","998","","","Glass Etch.jpg","","Example-Article-Category-3","Example-Article-Category-3","SGE56S1220, DGE56D1220, Aslan_EL300_1260, Float_On, 4075CT1220, 47611370, Blue_Masking_Tape_50mm, IPA_100","","0","","","","","0","","A",""
+"GlassApeel","Glass Apeel - Removable films for glass","Glass Apeel - A Focus on Removable Films for Glass","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Glass_Apeel.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Glass_Apeel_White.jpg"" style=""width:100%"">
+  </div>
+
+ <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Glass_Apeel_Printed.jpg"" style=""width:100%"">
+  </div>
+
+     
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Glass_Apeel.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""GlassApeel Transparent"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Glass_Apeel_White.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""GlassApeel White"">
+    </div>
+<div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Glass_Apeel_Printed.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""GlassApeel Printed Window"">
+    </div>
+     </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+
+<h3 style=color:#009ee3;"">Choosing the right product for advertising on retail windows—where clean and easy removability is essential—can be confusing. Finding a solution that saves both time and money is key<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<a><img style=""border: 0px solid ; width: 250px; height: 168px; float: right;"" alt=""Ask the expert""
+src=""media/ecom/onpagegraphics/Ask_the_expert.png""></a>
+
+<h3 style=color:#009ee3;"">The problem<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Traditionally, the go-to material for temporary window graphics would have been Static Cling Vinyl. This PVC-based film relies on the static electrical charge within the film to attract (cling) to a surface that has an opposite charge such as glass without the need of adhesive.</p>
+
+<p>While Static Cling Vinyl offers some benefits, it has significant downsides:</p>
+    <ul>
+        <li><strong>Environmental concerns</strong> – Being a highly plasticised PVC film, it is one of the worst plastics for the environment.</li>
+        <li><strong>Limited shelf life</strong> – The material degrades after about six months as plasticisers migrate out of the PVC, leading to a less flexible film and a reduction in its effectiveness.</li>
+        <li><strong>Performance issues</strong> – It struggles in colder conditions and high-humidity environments such as beauty salons and launderettes.</li>
+    </ul>
+
+<h3 style=color:#009ee3;"">The solution<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p><a href=""https://www.dorotape.co.uk/Item/GlassApeel"" target=""_blank""><font color=""#d7328a""><b>Glass Apeel</b></font></a> window graphic material works differently, utilising something called <i>van der Waals force</i>. Its smooth, non-sticky underside has a microporous layer that expands the film's surface area, creating a dull, grip-like feel. When applied to a smooth surface such as glass or metal, the film naturally aligns with it, keeping it firmly in place.</p>
+    <p>To remove it, simply peel from one corner—the alignment breaks, and the grip releases instantly, leaving no residue.</p>
+<p><a href=""https://www.dorotape.co.uk/Item/GlassApeel"" target=""_blank""><font color=""#d7328a""><b>Glass Apeel</b></font></a> is available in transparent clear and white with block-out properties. It is printable using Latex, UV, and Eco-solvent inks, making it easy to create effective advertising on glass, acrylic, and other smooth surfaces.</p>
+
+
+<h3 style=color:#009ee3;"">Benefits of Glass Apeel<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+       <ul><li><strong>Easy to install</strong> – Completely repositionable and fully reusable</li>
+        <li><strong>Residue-free</strong> – Quick, easy and clean removal</li>
+        <li><strong>Eco-friendly</strong> – Free from PVC, Phthalates and VOCs</li>
+        <li><strong>Temperature-resistant</strong> – Stays flat and performs well in varying conditions without shrinkage</li></ul>
+
+<h3 style=color:#009ee3;"">Typical uses<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+        <ul><li>Retail window & in-store displays</li>
+        <li>Temporary point-of-sale advertising</li>
+        <li>Exhibitions and events</li>
+        <li>Office branding and partition screening</li>
+        <li>Architectural and interior design</li>
+        <li>Trade fairs</li></ul>
+
+<h3 style=color:#009ee3;"">Application method<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+        <ul><li>Use dry or wet application on clean and degreased smooth substrates at temperatures above 10<sup>o</sup>C</li>
+        <li>Printed media should dry for at least 24 hours before lamination</li></ul>
+
+<h3 style=color:#009ee3;"">The range<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+<p>All available in 10m and 30m rolls
+        <ul><li><strong>Transparent</strong> – is 100% optically clear for use on glass and acrylic and can be front or mirror printed</li>
+        <li><strong>White</strong> – 99% light block-out for windows and smooth metal surfaces</li>
+        <li><strong>Frosted</strong> – has a bright translucency for front or mirror printing, providing privacy while letting light through</li>
+        <li><strong>Solar</strong> – is a transparent film with energy conservation properties for use on windows to help maintain an even indoor temperature</li></ul></p>
+
+<h3 style=color:#009ee3;"">Request your free sample<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">!</span></h3>
+
+<p><a href=""https://www.dorotape.co.uk/Item/GlassApeel"" target=""_blank""><font color=""#d7328a""><b>Click here</b></font></a> to discover more about Glass Apeel and to experience the benefits of Glass Apeel for yourself you can <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>order a sample here</b></a></font></p>
+
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1741083445","990","","","GlassApeel.jpg","","Example-Article-Category-3","Example-Article-Category-3","GLASSAPEEL","","0","GlassApeel - Removable Films for Glass","glass, glassapeel, cling","Choosing the right product for advertising on retail windows—where clean and easy removability is essential—can be confusing. Finding a solution that saves both time and money is key.","","0","DEFAULT","A","admin, superuser"
+"Going_For_Gold","Going for Gold","We are proud to report that once again we’ve achieved Golden Distributor status from ASLAN for 2023. Making us the only Gold Distributor in the UK. We’re very proud to have worked with this marketing-leading specialist self-adhesive vinyl and film manufacturer for many years and to have built a strong relationship.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>We are proud to report that once again we’ve achieved Golden Distributor status from ASLAN for 2023. Making us the only Gold Distributor in the UK. We’re very proud to have worked with this marketing-leading specialist self-adhesive vinyl and film manufacturer for many years and to have built a strong relationship.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_Gold.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_Building.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/ASLAN_Rolls.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_Gold.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""ASLAN Gold Distributor Logo"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_Building.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""ASLAN Building"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/ASLAN_Rolls.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""ASLAN Rolls"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<h3 style=color:#009ee3;"">What does Gold Distributor mean<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>We are one of a selection of hand-picked Gold Distributor suppliers from across Europe. This allows us to work closely with ASLAN to ensure that not only do we receive news and information about any new launches but also any industry and product research and development they are working on.</p>
+
+<p>One of the most interesting and useful aspects of holding Gold Distributor status is offering insight into what our customers are looking for and feedback on any products missing from the market.</p>
+
+<h3 style=color:#009ee3;"">What's in it for our customers<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Working so closely with ASLAN and our wide customer base, allows us to be the eyes and ears of the industry. By sharing trends and buying patterns, we can ensure that our customers’ needs are continually met. Take the trend for rose gold over the last few years, at the time when this was gaining momentum there wasn’t a self-adhesive product to reflect the growing demand. We relayed this feedback to ASLAN who filled the gap in the market by developing their still extremely popular <a href=""https://www.dorotape.co.uk/Item/ASLAN_13101_Polished_Rose_Gold"" target=""_blank""><font color=""#d7328a""><b>Polished Rose Gold vinyl</a></b></font></p>
+
+<h3 style=color:#009ee3;"">Sharing knowledge<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>As one of a select group of European Gold Distributors we also have the opportunity to hear from other European Gold Distributors about which ASLAN products they sell which can lead to innovative ways of products being used in the UK.</p>
+
+<p>To take a look at all the ASLAN products that we supply <a href=""https://www.dorotape.co.uk/Manufacturer/Aslan-Folien"" target=""_blank""><font color=""#d7328a""><b>click here</b></font></a></p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+","0","1688558654","999","","","ASLAN_Logo_Gold Distributor_2023.jpg","","Example-Article-Category-2","Example-Article-Category-2","","","0","","aslan, gold, distributor","We are proud to report that once again we’ve achieved Golden Distributor status from ASLAN for 2023. Making us the only Gold Distributor in the UK. We’re very proud to have worked with this marketing-leading specialist self-adhesive vinyl and film manufacturer for many years and to have built a strong relationship.","","0","DEFAULT","A","admin, superuser"
+"Heat-Transfer-Vinyl","Heat Transfer Vinyl Do's and Don'ts","Find out all you need to know about selecting the right HTV for the job!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>Using heat transfer vinyl (HTV) is a fantastic way of adding branding, lettering, numbering and imagery to sportswear, workwear, bags and other materials. But to get long-lasting results there are some definite do’s and don’ts. Here is our quick guide:</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/HTV_Turbo.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/HTV_Glitter.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/HTV_Queen.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/HTV_Turbo.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Poli-TapeTurbo Flex"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/HTV_Glitter.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Poli-Tape Pearl Glitter"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/HTV_Queen.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Poli-Tape"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+<h3 style=color:#009ee3;"">Do's<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>&#9679; <b>Find out what the material you are applying to is made from.</b><br>Sounds obvious but you'd be surprised how many times this causes confusion. The reason this is super important is because an htv film designed to transfer on to cotton will have different properties than one that is designed to be applied to polyester fabric.</p>
+
+<p>&#9679; <b>Consider whether you need block out or not.</b><br>When transferring onto polyester fabric it is important that the htv has an added layer to offer dye-blocking capabilities. This will stop any dye migration from the garment showing through the vinyl</p>
+
+<p>&#9679; <b>Think about whether you need to reverse your design</b><br>This is crucial for success and is probably the most forgotton rule on the HTV world. Coloured HTV requires reverse cutting as you are going to wedd it then flip it over and press it on to he garment using the clear liner as it's own application tape. However, if you are digitally printing the design you treat this like a regular print and cut film, before using a special heat proof application tape such as <a href=""https://www.dorotape.co.uk/Item/Trans_Print"" target=""_blank""><font color=""#d7328a""><b>Transprint</b></font></a> to transfer it to the garment for pressing.</p>
+
+<p>&#9679; <b>Check the recommended time and temp settings for the HTV you are using.</b><br>Again, this is critical but sometimes easy to be complacent so make sure you double check the specific pressure and time advised for transferring on to the garments. We have everything available for you on our website so there should't be any confusion.</p>
+
+<h3 style=color:#009ee3;"">Don'ts<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>&#9679; <b>Don’t forget to consider the wash resistance needed.</b><br>Nobody wants to receive garments back from their clients with the lettering hanging off so it is important to know what the limitations are when it comes to laundering. We have everything you need to know so if you can't see it on the website please just give us a call and ask one of the team.</p>
+
+<p>&#9679; <b>Don’t forget to have a can of <a href=""https://www.dorotape.co.uk/Item/Flex_Off"" target=""_blank""><font color=""#d7328a"">Flex Off</font></a> ready for any mishaps.</b> <br>Accidents can happen and customers can change their minds so it’s best to be prepared just in case.</p>
+
+<p>&#9679; <b>Don’t forget to contact us if you’re not sure which HTV to use and need some advice.</b><br>We’re always happy to help!</p>
+
+<h3 style=color:#009ee3;"">Our range of Poli-Tape HTV includes<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p style=font-size:150%""><a href=""https://www.dorotape.co.uk/Category/Poli-Flex-Turbo"" target=""_blank""><b>Poli-Flex Turbo Heat Transfer Vinyl</b></font></a><br>
+Part of the Turbo range, this best-in-class coloured HTV has a heat pressing time of as little as three seconds. A super soft, PU film, it’s suitable for a variety of textiles including cotton, polyester, blended fabrics and uncoated nylon. With increased levels of stretch, it’s ideal for leisure and activewear.</p>
+
+<p style=font-size:150%""><a href=""https://www.dorotape.co.uk/Category/Poli-Flex-Premium"" target=""_blank""><b>Blockout Heat Transfer Vinyl</b></font></a><br>
+Team sports garments are made of, or contain a high content of polyester, making the fabric sensitive to heat and prone to dye migration. For a successful print, an HTV with dye-blocking properties is essential. Poli-Flex Blockout has an additional flexible layer that prevents discolouration from dye migration. After application, the flex film is soft but durable enough to withstand sporting activities.</p>
+
+<p style=font-size:150%""><a href=""https://www.dorotape.co.uk/Item/Poli-Tape-4036-Image-Flex-Turbo-Print-500mm"" target=""_blank""><b>Image Flex Turbo Print</b></font></a><br>
+Image Flex 4036 Turbo Print from Poli-Tape is our best-selling printable HTV. A soft white PU film designed for cotton, polyester, blended fabrics and uncoated nylon. Suitable for solvent, eco-solvent and latex inks, the special primer topcoat offers unrivalled ink anchorage, high-resolution image printing and excellent washing resistance. It can be applied at press temperatures as low as 130oC making it a great all-rounder.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1680528889","999","","","HTV Selection.jpg","","Example-Article-Category-3","Example-Article-Category-3","Image_Flex_Pro_Sub, Image_Flex_Turbo_Print_500","","0","Heat Transfer Vinyl","htv, heat transfer vinyl, flex, ","Find out all you need to know about selecting the right HTV for the job!","Heat-Transfer-Vinyl","0","","A",""
+"HTV-Reflective","Shining a light on reflective HTV","It’s that time of year when the nights start drawing in. If you are working outside or taking part in any outdoor leisure or sporting activities, you need to consider the safety benefits of being seen in the dark.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<p>When it comes to reflective heat transfer vinyl (HTV), you’d think the options would be pretty straightforward, but in fact, there are many different variants. To confuse matters more, we have recently expanded our range to provide an even wider choice in terms of quality as well as budget.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Reflective-HTV.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Reflective-HTV-Badge.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Reflective-HTV-Garments.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Reflective-HTV.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Reflective HTV"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Reflective-HTV-Badge.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Reflective HTV Badge"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Reflective-HTV-Garments.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Reflective garments"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<h3 style=color:#009ee3;"">Reflective HTV: what is it and how does it work<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>All reflective HTV is made up of metallised microscopic glass beads which reflect light directly back towards its source, therefore making the material appear bright and highly visible in darkened conditions. This retroreflective glass bead surface is overlaminated with a transparent PET film to aid cad-cutting. It’s also coated with a dry heat-activated adhesive backing for heat pressing onto a wide range of fabrics.</p>
+
+<h3 style=color:#009ee3;"">What can reflective HTV be used on<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Reflective HTV is suitable for transferring onto textiles such as cotton, uncoated nylon, mixtures of polyester/cotton and polyester/acrylic. Depending on which film is selected, the cad-cut lettering, logos and safety markings can be heat pressed onto workwear, safety clothing, sportswear, leisurewear and promotional items.</p>
+
+<h3 style=color:#009ee3;"">Our range<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>&#9679; First up is the ever-popular Silva-Lite material, which is a high-quality UK-produced material designed for the cad-cutting of garment lettering and logos. The minimum retroreflective value conforms to EN ISO 20471:2013 making it perfect for a wide variety of uses.</p>
+
+<p>&#9679; Our Reflex Black reflective HTV offers something completely different. The black surface of the film looks standard in the daytime but when hit by direct light in darkened conditions the reflective colour turns bright silver white. Ideal for adding inconspicuous branding to any item.</p>
+
+<p>&#9679; Also in our range is the Poli-Flex 4783 silver reflective HTV that has a ‘turbo’ adhesive. The main benefit of using this material is that it can be applied at a lower temperature and for a shorter time, giving time and cost savings. It’s also suitable for a wider range of materials and items. Conforms to EN ISO 20471:2013</p>
+
+<p>&#9679; Finally, and at the top end of the reflective HTV range is the Poli-Flex 4781 which uses 3M® Scotchlite film. This film offers the highest level of visibility as well as guaranteeing a secure and long-lasting bond to the textile. Ideal for hi-vis safety wear and a must for anyone working on our roads. Conforms to EN ISO 20471:2013</p>
+
+<h3 style=color:#009ee3;"">Finally<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.....</span></h3>
+
+<p>Don’t be mistaken in thinking these films are only necessary after the clocks have changed. They also provide safety in low-light conditions, such as rain and snow. As well as the safety aspect of these films, they can also add something unusual to leisurewear and clothing such as dancewear too, great for subtle branding.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+
+</div>","0","1693329036","993","","","Reflective_HTV.jpg","","Example-Article-Category-3","Example-Article-Category-3","SL0500, 4785-Reflex-Black, 4783-Reflective-Silver, 4781-Reflective-Silver-3M","","0","Reflective HTV","reflective, htv","","Reflective-HTV","0","DEFAULT","A","admin, superuser"
+"MagvFerro","Magnetic vinyl vs. ferrous film: What’s the difference and which should you choose?","Magnetic vinyl vs. ferrous film: What’s the difference and which should you choose? - Explaining the differences in films.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Magnetic_Menu_Board.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Magnetic_Ferrous.jpg"" style=""width:100%"">
+  </div>
+
+ <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ferrous_School-Wall.jpg"" style=""width:100%"">
+  </div>
+
+     
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Magnetic_Menu_Board.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Magnetic menu board display"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Magnetic_Ferrous.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Ferrous material being applied"">
+    </div>
+<div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ferrous_School-Wall.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Ferrous material being applied in a school"">
+    </div>
+     </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+<br><p>If you’re working with graphics, signage, or display systems, you’ve probably come across magnetic vinyl and ferrous film. While they’re often used together, these materials have very different properties and understanding how each one works, and how to pair them correctly, can help you save time, reduce waste, and improve the look and flexibility of your display setup.</p>
+<p>In this post, we break down what each material is, how they work and the best ways to use them for your next project.</p>
+
+
+
+<h3 style=color:#d7328a;"">Understanding ferrous film<span style=""color:#009fe3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p><a href=""https://www.dorotape.co.uk/Category/Magnetic-Ferrous-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Ferrous Film</b></font></a> is a flexible material that contains iron powder, making it magnetically receptive. In other words, magnetic materials and objects will easily attract to its surface. This makes it ideal for applications where you want to layer or change graphics quickly and efficiently.</p>
+
+<p>Ferrous film is available in both self-adhesive and non-adhesive forms. The non-adhesive version is often used as an interchangeable face layer over a magnetic base, while the self-adhesive version is commonly used to create a magnetically receptive surface on walls, doors, or other smooth surfaces. Some ferrous films have a plain grey-brown finish for use with magnetic overlays, while others are printable, allowing for custom graphics. You’ll also find writable options with whiteboard or chalkboard finishes - perfect for classrooms, offices or reusable signage.</p>
+
+<p>Lightweight and easy to handle, ferrous film is also an eco-friendly option, with PVC-free varieties available. It can be rolled, cut and transported easily, making it well-suited for projects across the UK and beyond.</p>
+
+
+<h3 style=color:#d7328a;"">Benefits of ferrous film<span style=""color:#009ee3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<ul><li>Lightweight and flexible for easy transport and installation</li>
+<li>Compatible with non-adhesive magnetic films</li>
+<li>Writable and printable finishes available</li>
+<li>PVC-free and reusable options for eco-conscious users</li></ul>
+
+<h3 style=color:#d7328a;"">What is magnetic vinyl<span style=""color:#009fe3; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p><a href=""https://www.dorotape.co.uk/Category/Magnetic-Ferrous-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Magnetic Vinyl</b></font></a> is the counterpart to ferrous film. Instead of being purely magnet receptive, it contains magnetised material and is designed to attach directly to steel or other ferrous surfaces (metals containing iron). It is available in different thicknesses and magnetic strengths, and is a popular choice for signage, retail displays and even vehicle graphics. It is important to remember that magnetic vinyl will not attract to vehicles that incorporate aluminium in their construction.</p>
+
+<p>Thicker magnetic vinyl offers a stronger hold and is ideal for demanding situations, such as vehicle graphics, where staying in place at high speeds is essential. Thinner versions are more suited to light-duty uses like POS displays, posters, or signage.</p>
+
+<p>Magnetic vinyl is available in both self-adhesive and non-adhesive forms. The non-adhesive type is popular for temporary displays that need to be applied and removed easily. The self-adhesive version can be applied to non-metal surfaces to create a magnetic base, allowing you to attach ferrous film on top for a versatile, changeable system.</p>
+
+<p>It is worth noting that if you try and apply a magnetic vinyl on to another magnetic vinyl you will always have trouble lining the two layers up edge to edge due to the polarity.</p>
+
+<h3 style=color:#d7328a;"">Benefits of Magnetic Vinyl<span style=""color:#009ee3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<ul><li>Quick to apply and remove to steel and ferrous surfaces - great for temporary or seasonal signage</li>
+<li>Printable options available for direct graphic application</li>
+<li>Reusable and easy to reposition</li>
+<li>Suitable for indoor or outdoor use, including vehicles and retail spaces</li></ul>
+
+
+<h3 style=color:#d7328a;"">How to choose the right combination<span style=""color:#009ee3; font-weight:bold; font-size: 1.25em;"">.</span></h3>
+
+<p>When deciding between self-adhesive and non-adhesive options, consider how the display will be used and how often it needs to be updated.</p><br>
+
+<p>For spaces that need regular updates, like event venues or retail displays, a self-adhesive base combined with a non-adhesive face is ideal. This setup lets you swap out graphics quickly without damaging walls or surfaces.</p>
+
+<p><b>Use:</b> Self-adhesive magnetic (base) + non-adhesive ferrous face</p>
+<ul><li><p><b>Example: </b><i><a href=""https://www.dorotape.co.uk/Item/Self-Adhesive-Magnetic"" target=""_blank""><font color=""#d7328a""><b>Doro 9054</b></font></a> (magnetic)</i> + <i><a href=""https://www.dorotape.co.uk/Item/FF200-Printable-Ferrous-Film"" target=""_blank""><font color=""#d7328a""><b>FF200</b></font></a> (ferrous)</i></p></li></ul>
+<p><b>Use:</b> Self-adhesive ferrous (base) + non-adhesive magnetic face</p>
+<ul><li><p><b>Example: </b><i><a href=""https://www.dorotape.co.uk/Item/ASLAN-Ferrosoft-FF410"" target=""_blank""><font color=""#d7328a""><b>ASLAN FF410</b></font></a> (ferrous)</i> + <i><a href=""https://www.dorotape.co.uk/Item/9052-Gloss-Magnetic-1000mm"" target=""_blank""><font color=""#d7328a""><b>9052</b></font></a> or <a href=""https://www.dorotape.co.uk/Item/Doro-9056"" target=""_blank""><font color=""#d7328a""><b>9056</b></font></a> (magnetic)</i></p><br></li></ul>
+
+<p>If you're designing a removable vehicle sign, non-adhesive magnetic vinyl is your best option. It’s easy to take on and off, and its strength ensures the graphic stays put while driving.</p>
+
+<p><b>Use:</b> Non-adhesive magnetic vinyl</p>
+<ul><li><p><b>Example:</b> <i><a href=""https://www.dorotape.co.uk/Item/9050-Vehicle-Grade-Magnetic"" target=""_blank""><font color=""#d7328a""><b>9050</b></font></a></i></p></li></ul>
+
+<p>If you're looking to create a writable blackboard surface that also holds magnetic tools or displays, opt for a self-adhesive ferrous film with a blackboard face and magnetic receptiveness.</p>
+
+<p><b>Use:</b> Self-adhesive ferrous film with blackboard finish</p>
+<ul><li><p><b>Example:</b> <i><a href=""https://www.dorotape.co.uk/Item/ASLAN-FF540"" target=""_blank""><font color=""#d7328a""><b>ASLAN FF540</b></font></a></i></p></li></ul>
+
+<p>And if you're looking for a dry wipe surface that also supports magnetic tools or displays, go with a self-adhesive ferrous film featuring a whiteboard surface and magnetic receptivity.</p>
+
+<p><b>Use:</b> Self-adhesive ferrous film with whiteboard finish</p>
+<ul><li><p><b>Example:</b> <i><a href=""https://www.dorotape.co.uk/Item/ASLAN-FF550-1370"" target=""_blank""><font color=""#d7328a""><b>ASLAN FF550</b></font></a></i></p></li></ul>
+
+<h3 style=color:#d7328a;"">Need help with your next project<span style=""color:#009ee3; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>When used correctly, magnetic vinyl and ferrous film offer a highly flexible, reusable and professional solution for everything from signage to interactive displays. Whether you're building a dynamic retail setup or updating vehicle graphics, choosing the right material, or combination, makes the entire process smoother and more efficient.
+
+<p>Have questions about which product is right for your application? <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>Contact us</b></font></a> for personalised recommendations or samples.</p>
+
+</div>
+</body>
+
+</html>
+","0","1752065663","990","","","Magnetic_Ferrous_Display.jpg","","Example-Article-Category-3","Example-Article-Category-3, EXAMPLE-ARTICLE-CAT","FF4101010, FF4101370, FF5401250, FF5501010, FF5501370, Printable-Ferrous-Film, 90521260, 90561270, D90500610, D90521000, D9052M1000, D90541250, Green_Power_4, Ferrous-Film, FF4801010, FF4901370","","0","Magnetic Vinyl vs. Ferrous Film: What’s the Difference and Which Should You Choose?","Magnetic, Ferrous, mag, ferro, difference, POS, display, graphics, quick change, magnetic graphics, magnetic display, ferrous display","Magnetic Vinyl vs. Ferrous Film: What’s the Difference and Which Should You Choose? - Explaining the differences in films.","","0","DEFAULT","A","admin, superuser"
+"Mono_vs_Poly","Monomeric vs polymeric calendered vinyl: shrinkage, durability & uses","Learn the difference between monomeric and polymeric calendered vinyl, including plasticisers, shrinkage, durability, and how each performs in graphic applications.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>It’s important to understand the key differences between the two but how well do you know your vinyl?</p>
+
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Mono-Poly-Vinyl.webp"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Mono-Poly-Colours.webp"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Mono-Poly-Testing.webp"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Mono-Poly-Vinyl.webp"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Self-adhesive vinyl coating line"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Mono-Poly-Colours.webp"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Robotic vinyl packaging"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Mono-Poly-Testing.webp"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Analysis of vinyl in the laboratory"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+
+<h3 style=color:#009ee3;"">Monomeric vs polymeric calendered vinyl: shrinkage, durability & uses<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<a><img style=""border: 0px solid ; width: 250px; height: 168px; float: right;"" alt=""Ask the expert""
+src=""media/ecom/onpagegraphics/Ask_the_expert.png""></a>
+
+<p>Learn the difference between monomeric and polymeric calendered vinyl, including plasticisers, shrinkage, durability, and how each performs in graphic applications.</p>
+
+<h3 style=color:#009ee3;"">Monomeric vs polymeric calendared vinyl: understanding shrinkage and performance<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Calendared vinyl is one of the most commonly used materials in the sign and graphics industry. Its popularity comes from its versatility, wide availability, and cost efficiency. However, not all calendared vinyl performs the same. Understanding the difference between monomeric and polymeric calendared vinyl and how shrinkage affects performance is essential to achieving predictable, long lasting results.</p>
+
+<h3 style=color:#009ee3;"">What is calendared vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.0em;""> ?</span></h3>
+
+ <p>Calendared vinyl starts as a solid PVC resin. During manufacturing, the resin is heated and combined with a plasticiser, which gives the material flexibility, along with pigments that add colour. The softened compound is then drawn through a series of heated, temperature controlled rollers that stretch and flatten it into a uniform film, typically between 70 and 100 microns thick.</p>
+
+<p>Once formed, the vinyl is wound into large rolls, coated with a pressure sensitive adhesive, and finished with a release liner. This process makes calendared vinyl economical to produce and suitable for a wide range of graphic applications. Calendared films are generally divided into two categories: monomeric and polymeric.</p>
+
+<h3 style=color:#009ee3;"">The role of plasticisers in vinyl graphics<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The key difference between monomeric and polymeric vinyl lies in the type of plasticiser used.</p>
+
+<p>In graphics applications, the most common plasticiser families are phthalates, typically associated with monomeric vinyl, and adipates, most often associated with polymeric vinyl. These plasticisers differ in molecular structure, which directly affects flexibility, stability, and long term behaviour.</p>
+
+<p>Phthalate based plasticisers have shorter molecular chains, meaning that they easily migrate to the surface of the vinyl and to the adhesive, while adipate based plasticisers use longer, more complex chains that are also more stable and take longer to migrate. This difference is central to how each vinyl type shrinks and ages over time.</p>
+
+
+<h3 style=color:#009ee3;"">Monomeric calendared vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Monomeric calendared vinyl is the most economical option and is widely used for interior graphics and short term exterior applications. It is best suited to flat (1D) and slightly curved (2D) surfaces, where minimal stress is placed on the film.</p>
+
+<p>Because monomeric vinyl relies on low molecular weight plasticisers, these plasticisers gradually migrate to the surface as the material ages. This migration causes the vinyl to shrink and slowly lose flexibility, eventually becoming brittle.</p>
+
+<p>Typical durability is around five years for black and white films and four years for coloured films, depending on exposure and conditions. For temporary signage, promotional graphics, and short life displays, this level of performance is often sufficient. However, in more demanding outdoor applications, shrinkage can become noticeable as the vinyl pulls back from edges and corners.</p>
+
+<p>View all of our <a href=""https://www.dorotape.co.uk/index.php?ecom--prodsearch--type=ALL&app=ecom&ns=prodsearchp&ecom--prodsearch--string=monomeric&SUBMIT=Go"" target=""_blank""><font color=""#d7328a""><b>Monomeric Vinyl</b></font></a> here.</p>
+
+<h3 style=color:#009ee3;"">Polymeric calendared vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Polymeric calendared vinyl is designed for greater dimensional stability and longer term use. It uses polymeric plasticisers, commonly adipates, which bind more effectively within the PVC structure and migrate far more slowly.</p>
+
+<p>As a result, polymeric vinyl exhibits reduced shrinkage, improved resistance to UV exposure, and better performance across temperature changes. This makes it suitable for long term outdoor graphics on flat and gently curved surfaces.</p>
+
+<p>Polymeric films typically offer durability of around ten years for black and white films and eight years for coloured films, depending on the product range. While they can handle gentle curves, they are not intended for deep recesses or complex three dimensional shapes.</p>
+
+<p>View all of our <a href=""https://www.dorotape.co.uk/index.php?ecom--prodsearch--type=ALL&app=ecom&ns=prodsearchp&ecom--prodsearch--string=polymeric&SUBMIT=Go"" target=""_blank""><font color=""#d7328a""><b>Polymeric Vinyl</b></font></a> here.</p>
+
+<h3 style=color:#009ee3;"">How shrinkage affects installation and appearance<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Shrinkage is a natural characteristic of calendared vinyl, but its impact varies significantly between monomeric and polymeric grades. As vinyl shrinks, it attempts to return to its original, unstressed state. This movement can lead to edge pull back, corner lifting, and gaps between panels in multi panel graphics.</p>
+
+<p>On curved surfaces, shrinkage can introduce tension that increases the likelihood of lifting over time. In printed graphics, uneven shrinkage may also cause subtle distortion, particularly noticeable in logos or precise text alignment. Temperature changes can accelerate these effects, especially in exterior environments.</p>
+
+<h3 style=color:#009ee3;"">Choosing the right calendared vinyl<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Ultimately, the choice between monomeric and polymeric calendared vinyl is a balance between cost, expected lifespan, and dimensional stability. Monomeric vinyl provides a cost effective solution for short term, low stress applications, while polymeric vinyl offers improved stability and appearance retention for longer term use.</p>
+
+<p>Understanding how plasticiser chemistry influences shrinkage helps ensure more reliable performance and better long term visual results.</p>
+
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1770978628","988","","","Mono-Poly.png","","Example-Article-Category-3","Example-Article-Category-3, EXAMPLE-ARTICLE-CAT","","","0","","calendered, vinyl, pvc, monomeric, polymeric, plasticiser, plasticizer, phthalate, adipate","Learn the difference between monomeric and polymeric calendered vinyl, including plasticisers, shrinkage, durability, and how each performs in graphic applications.","Understanding-Calendered-Vinyl","0","DEFAULT","A","admin, superuser"
+"Ri-Jet-100","A Focus on Ritrama Ri-Jet 100","Find out what makes this one of the most popular print products of the last decade.","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>For an excellent value self-adhesive film for large format digital printing, Ri-Jet 100 is our go-to product.</p>
+
+<p>Specially designed by Ritrama, under the Fedrigoni umbrella, it’s ideal for short-term advertising on flat surfaces and is the perfect product for retail and public transport. And what’s more we stock both the standard and block-out versions, both with a gloss white finish and removable adhesive.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 2</div>
+    <img src=""skins/CUSTOM-2023/media/Ri-Jet_M100.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 2</div>
+    <img src=""skins/CUSTOM-2023/media/Fedrigoni_Logo.jpg"" style=""width:100%"">
+  </div>
+
+     
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ri-Jet_M100.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Ri-Jet M100"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Fedrigoni_Logo.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Fedrigoni Logo"">
+    </div>
+   
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+<h3 style=color:#009ee3;"">So what makes Ri-Jet 100 so special<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>This monomeric vinyl is UV-stabilised and in accordance with ISO 4892-2 has an external colour stability of up to three years.</p>
+
+<p>Ri-Jet 100 is fire rated according to EN 13501 – 1, it is classified as B-s1-d0.</p>
+
+<p>Developed to be printed with solvent, eco-solvent, latex and UV Inkjet printing presses, the 100-micron vinyl offers good ink absorption without making the face film too soft, allowing for an easier application, which is one of the reasons why we recommend it so highly. What’s more, when it’s time to take it down, the water-based adhesive provides easy removal from most substrates.</p>
+
+<h3 style=color:#009ee3;"">What are its typical uses<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>&#9679;  Short-term outdoor advertising for trains, buses and billboards</p>
+
+<p>&#9679;  Short-term indoor advertising for shops, shopping centres and airport terminals</p>
+
+<p>&#9679;	Temporary point-of-sale advertising</p>
+
+<h2 style=color:#009ee3;"">What do I need to know for a successful application<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h2>
+
+<p>&#9679;	Dry and wet application on clean and degreased substrates with an application temperature of above 10 degrees</p>
+
+<p>&#9679;	Printed media should dry for a minimum of 24 hours before lamination</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+","0","1682093557","996","","","RJ100.jpg","","Example-Article-Category-3","Example-Article-Category-3","Ri_Jet_100, Ri_Jet_100_Blockout","","0","Ritrama Ri-Jet M100","ritrama, fedrigoni, m100, ri-jet","","Ritrama-Ri-Jet-M100","0","","A",""
+"Ri-Mark-Platinum","Introducing Ri-Mark Platinum Series by Ritrama","All you need to know about the new Ri-Mark Platinum series!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>Regular Dorotape customers will know that we are huge fans of Ritrama’s Ri-Mark vinyl range and that we already stock the popular <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Event-Grade-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Event Series</a></b></font> and <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Optima-Range-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Optima Series</a></b></font> ranges, so we’re delighted to be adding the <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Platinum-Range-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Platinum Series</a></b></font> to our range this month. </p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Restaurant.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Bank.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Van.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Restaurant.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Ri-Mark Platinum Restaurant"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Bank.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Ri-Mark Platinum Bank"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ri-Mark_Platinum_Van.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Ri-Mark Platinum Van"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+</div>
+
+
+<h3 style=color:#009ee3;"">Market leaders in the self-adhesive film sector, Ritrama are a trusted supplier, but what makes the Platinum Series different<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Where the Event series fits the bill for monomeric sign-making vinyl with external colour stability of up to five years and Optima polymeric films have external durability of up to six years, the new polymeric <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Platinum-Range-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Platinum Series</a></b></font> offers outdoor stability of up to 10 years making it their premium product in terms of durability.</p>
+
+<h3 style=color:#009ee3;"">Here are just a few more reasons why we love the high performance Platinum Series and we think you will too<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">....</span></h3>
+
+<p>&#9679; It’s suitable for a wide range of uses from long term vehicle graphics and exterior signage to point-of-sale advertising as well as interior signage and other decorative displays.</p>
+
+<p>&#9679; Thin 65 micron face film available in a massive range of 72 colours with 25 of those on an embossed AIRFLOW liner.</p>
+
+<p>&#9679; It offers both dry and wet application options depending on the backing liner selected.</p>
+
+<p>&#9679; Very cohesive solvent based adhesive provides excellent dimensional stability and water resisitance for long term durability.</p>
+
+<p>&#9679; Excellent conformability to 3D curved surfaces (for extremely curved surfaces or corrugations this vinyl should be cut and applied with an overlap).</p>
+
+<p>&#9679; Outdoor durability of up to 10 years.</p>
+
+<p>&#9679; Easier stripping & weeding with a liner of white films coated with a blue contrast silicone.</p>
+
+<p>&#9679; Fire Rated to Euroclass DIN EN 13501-1:2019-05 with classification B-s1-d0.</p>
+
+<h3 style=color:#009ee3;"">Airflow vs Non-airflow<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The <a href=""https://www.dorotape.co.uk/Category/Ritrama-Ri-Mark-Platinum-Range-Vinyl"" target=""_blank""><font color=""#d7328a""><b>Platinum Series</a></b></font> is coated with a clear permanent solvent based adhesive and is available with two different backing liners. The standard clay coated kraft liner of the non-airflow version allows for traditional wet application so the film can be ‘floated’ onto the glass surface and slipped into position. This version is more suitable in areas where there is a higher level of humidity such as launderettes and hair salons. The micro-embosssed PE coated kraft liner of the AIRFLOW colours helps to reduce the risk of unsightly bubbles during application and offers a reduced application time.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+
+</div>
+
+","0","1684927403","995","","","Platinum.jpg","","Example-Article-Category-3","Example-Article-Category-3","","","0","Ri-Mark Platinum Series","Fedrigoni, Ritrama, Ri-Mark, Platinum, polymeric, vinyl","Ritrama Platinum Range is a high performance 65 micron polymeric signmaking vinyl with a permanent adhesive offering an outdoor durability of up to 10 years. The range of 72 colours is designed for long term external applications, vehicle graphics and advertising and is suitable for application to uneven and curved surfaces.  The solvent based adhesive means that the Platinum range can be applied wet (except air flow adhesive, which is dry apply only). Suitable for long term signage and advertising on to flat and 3D convex surfaces. For deeply concave surface and corrugations, the film should be applied with an overlap. The water resistant permanent adhesive provides good dimensional stability and is suitable for dry and wet application on to clean surfaces. Fire Rated to Euroclass DIN EN 13501-1:2019-05 with classification B-s1-d0. Available in 72 colours.","Ri-Mark-Platinum","0","DEFAULT","A","admin, superuser"
+"Ritrama","Remarkable Ri-Mark!","Find out what makes Ritrama's Ri-Mark ranges a good choice!","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>For value for money, choice of colour, versatility and innovation, Ritrama’s Ri-Mark ranges are difficult to beat. With an almost endless range of shades, suitable for indoor and outdoor use and in a choice of matt or gloss it’s no surprise that they’re one of our best-sellers.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Fedrigoni_Logo.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ritrama_Event.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Ritrama_Optima.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Fedrigoni_Logo.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Fedrigoni Logo"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ritrama_Event.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Ri-Mark Event Colourcard"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Ritrama_Optima.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Ri-mark Optima Colourcard"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<p>The Ri-Mark series is currently made up of two ranges - Event and Optima, with a third range, Platinum coming later this year. To differentiate the ranges we think of them as good, better and best. Here’s a snapshot of the first two in the series.</p>
+
+<h3 style=color:#009ee3;"">Event Series<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>An entry-level monomeric range with an almost countless choice of colours in a matt or gloss finish with a clever contrast colour for its white option, instead of standard white liner to make weeding super-easy. Event monomeric vinyl is perfect for short to medium-term indoor and outdoor use and is suitable for flat surfaces for up to five years.</p>
+
+<p style=font-weight:bold; font-size:150%"">Click <a href=""https://bit.ly/Ritrama-Event-Range"" target=""_blank""><font color=""#009ee3"">here</font></a> to view the full range.</p>
+
+<h3 style=color:#009ee3;"">Optima Series<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>The mid-range polymeric range offering, again with an extensive choice of colours and contrast colour liners. Optima vinyl is polymeric, suitable for medium to long-term indoor and outdoor use. Ideal for flat and slightly convex surfaces for up to six years.</p>
+
+<p style=font-weight:bold; font-size:150%"">Click <a href=""https://bit.ly/Ritrama-Optima-Range"" target=""_blank""><font color=""#009ee3"">here</font></a> to view the full range.</p>
+
+<h3 style=color:#009ee3;"">Typical uses for the Ri-Mark ranges include<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>&#9679;	Promotional displays</p>
+
+<p>&#9679;	Exhibition and Event graphics</p>
+
+<p>&#9679;	Directional signage</p>
+
+<p>&#9679;  Window graphics</p>
+
+<p>&#9679;  Vehicle graphics</p>
+
+<p>&#9679;  Signs and graphics</p>
+
+<h3 style=color:#009ee3;"">About Ritrama<span style=""color:#d7328a; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>As an independent supplier, we only work with the world’s best manufacturers. Ritrama is one of Europe’s leading independent manufacturers of self-adhesive materials and a major player in the global market. After 50 years of manufacturing Ritrama was bought by the Fedrigoni Group, who’ve continued the company’s tradition of quality, innovation and Italian flair.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+","0","1680606538","1000","","","Optima Range.jpg","Event Range.jpg, Optima Range.jpg","Example-Article-Category-2","Example-Article-Category-2","","","0","","","","","0","DEFAULT","A",""
+"Sandblasting-Shotpeening","Sandblasting and Shotpeening","An in-depth look into sandblasting and shot peening","<div id=""kskin_casestudies"" class=""kpadded"">
+
+<p>Not only do we supply specialist self-adhesive films to the retail design, display and graphics sectors, but we also play a major part in supplying industrial-grade stencil films to various industries both in the UK and abroad. Consider it our best-kept secret!</p>
+
+<p>Offering protection to a wide variety of substrates including wood, slate, glass, stone and metal, our tough stencil films are used to mask off areas during the processes of sandblasting and shot peening.</p>
+
+<div class=""kcenter kgridsep kgrid2"">
+
+
+
+<div class=""container kgridxcol80"">
+  <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Shotpeening.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Sandblasted_Marble.jpg"" style=""width:100%"">
+  </div>
+
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Stone.jpg"" style=""width:100%"">
+  </div>
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Shotpeening.jpg"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Shotpeening"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Sandblasted_Marble.jpg"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Sandblasted Marble"">
+    </div>
+    <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Stone.jpg"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Stone"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<h3 style=color:#009ee3;"">What is sandblasting<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+
+<p>Used to decorate and personalise signs and plaques made from wood, glass and slate, the sandblasting process requires strong stencil film. ASLAN supplies stencil films ranging from 80 micron to 250 micron thick which are perfect for these light-to-medium-duty sandblasting projects.</p>
+
+<p>&#9679; Sandblast 80 | ASLAN S69 | 80 micron</p>
+<p>&#9679; Sandblast 180 | ASLAN S68 | 180 micron</p>
+<p>&#9679; Sandblast 250 | ASLAN S66 | 250 micron</p>
+
+<p>Higher-pressure sandblasting requires a more robust stencil film. This is typically used by stone masons when crafting headstones and other memorials, as well as decorative features in the construction industry and ornamental areas in public spaces. Products that are commonly used to mask off and protect areas during these heavy-duty sandblasting jobs range from 330 micron to 600 micron.</p>
+
+<p>&#9679; Sandblast 330 | ASLAN S64 | 330 micron</p>
+<p>&#9679; Sandblast 600 | ASLAN S62 | 600 micron</p>
+
+<h3 style=color:#009ee3;"">What is shot peening<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>The shot peening of metal surfaces and components involves firing small ‘shot’ at high speed into a metal surface. This increases the density and strengthens that area, which in turn makes it highly resistant to fatigue and failure. </p>
+
+<p>Due to the critical nature of some of these components, it’s super important to use the right stencil film. We’ve been working alongside a number of customers involved in the Automotive, Aviation and Aerospace industries, as well as those manufacturing pipes, valves and pumps for the Water, Oil and Gas sectors, to develop new products that offer increased adhesion values to cope with this rigorous process.</p>
+
+<p>&#9679; Sandblast 600 | ASLAN S62HT | 600 micron with high tack adhesive</p>
+<p>&#9679; Blast Film 330 | 330 micron paper based stencil with high tack adhesive</p>
+
+<p>All of our sandblast and shot peen stencil films offer high-definition edges during the blasting process. They also feature residue-free removal so no matter which film is selected you can be absolutely sure that your project will be a success.</p>
+
+<h3 style=color:#009ee3;"">How can we help you<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>If you have a project that you are working on and need a little help selecting the right materials, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+<h3 style=color:#009ee3;"">And before you go<span style=""color:#d7328a; font-weight:bold; font-size: 1.25em;"">:</span></h3>
+
+<p>We hope that you found this blog relevant and informative and that you'd be interested in reading some of our <a href=""https://www.dorotape.co.uk/Articles"" target=""_blank""><font color=""#d7328a""><b>other blogs</b></font></a></p>
+
+</div>
+
+","0","1680276458","1000","","","S62HT.jpg","S62HT.jpg","Example-Article-Category-3","Example-Article-Category-3","Aslan-S62-625, Aslan-S62HT-1250, BT330, S64_0625","","0","Sandblasting and Shotpeening","sandblasting, sandblast, shotpeen, shotpeening, blast, blasting","An in-depth look into sandblasting and shot peening","Sandblasting-Shotpeening","0","","A",""

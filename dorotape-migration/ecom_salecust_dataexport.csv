@@ -1,0 +1,232 @@
+"id","name","incdisp"
+"amtamt","Total Of X Save Y Amount","<?php 
+
+// +--
+// | All custom sale scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsale' and 'ecom.customsale_text' which
+// | contain the sale total and the sale text respectively.
+// |
+// | NOTE: Do not print anything within custom sale 
+// | scripts.  They are designed only to return amounts and
+// | text for custom sale methods.
+// |
+// | This script is a Total Of X Save Y Amount script that
+// | returns a sale amount based on the subtotal of items
+// | being purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | sale_amount   = The amount of the sale.
+// | sale_subtotal = The subtotal needed to get the sale.
+// | sale_textshow = The text to be displayed for the sale.
+// +--
+
+$sale_amount   = 10;
+$sale_subtotal = 100;
+$sale_textshow = 'Spend More and Save Sale';
+
+foreach ($cartids as $cartid => $item) {$subtotal = $subtotal + $item['subtotal'];}
+
+if ($subtotal >= $sale_subtotal) {
+
+     $this->globals('ecom.total_customsale',$sale_amount);
+     $this->globals('ecom.customsale_text',$sale_textshow);
+
+} // End of if statement.
+
+?>"
+"amtpct","Total Of X Save Y Percent","<?php 
+
+// +--
+// | All custom sale scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsale' and 'ecom.customsale_text' which
+// | contain the sale total and the sale text respectively.
+// |
+// | NOTE: Do not print anything within custom sale 
+// | scripts.  They are designed only to return amounts and
+// | text for custom sale methods.
+// |
+// | This script is a Total of X Save Y Percent script that
+// | returns a sale amount based on the subtotal of items 
+// | being purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | sale_percent  = The sale percentage.
+// | sale_subtotal = The subtotal needed to get the sale.
+// | sale_textshow = The text to be displayed for the sale.
+// +--
+
+$sale_percent   = 10;
+$sale_subtotal  = 100;
+$sale_textshow  = 'Spend More and Save ' . $sale_percent . '% Sale';
+
+$subtotal = 0;
+
+foreach ($cartids as $cartid => $item) {
+
+     $subtotal = $subtotal + $item['subtotal'];
+
+} // End of foreach statement.
+
+if ($subtotal >= $sale_subtotal) {
+
+     $sale_amount = $subtotal * ($sale_percent / 100);
+
+     $this->globals('ecom.total_customsale',$sale_amount);
+     $this->globals('ecom.customsale_text',$sale_textshow);
+
+} // End of if statement.
+
+?>"
+"qtyamt","Buy X Items Save Y Amount","<?php 
+
+// +--
+// | All custom sale scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsale' and 'ecom.customsale_text' which
+// | contain the sale total and the sale text respectively.
+// |
+// | NOTE: Do not print anything within custom sale 
+// | scripts.  They are designed only to return amounts and
+// | text for custom sale methods.
+// |
+// | This script is a Buy X Items Save Y Amount script that
+// | returns a sale amount based on the number of items being
+// | purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | sale_amount   = The amount of the sale.
+// | sale_items    = The number of items needed to get the sale.
+// | sale_textshow = The text to be displayed for the sale.
+// +--
+
+$sale_amount    = 10;
+$sale_items     = 3;
+$sale_textshow  = 'Buy ' . $sale_items . ' or More Items and Save Sale';
+
+$count = 0;
+
+foreach ($cartids as $cartid => $item) {$count = $count + $item['quantity'];}
+
+if ($count >= $sale_items) {
+
+     $this->globals('ecom.total_customsale',$sale_amount);
+     $this->globals('ecom.customsale_text',$sale_textshow);
+
+} // End of if statement.
+
+?>"
+"qtypct","Buy X Items Save Y Percent","<?php 
+
+// +--
+// | All custom sale scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsale' and 'ecom.customsale_text' which
+// | contain the sale total and the sale text respectively.
+// |
+// | NOTE: Do not print anything within custom sale 
+// | scripts.  They are designed only to return amounts and
+// | text for custom sale methods.
+// |
+// | This script is a Buy X Items Save Y Percent script that
+// | returns a sale amount based on the number of items being
+// | purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | sale_percent  = The sale percentage.
+// | sale_items    = The number of items needed to get the sale.
+// | sale_textshow = The text to be displayed for the sale.
+// +--
+
+$sale_percent   = 10;
+$sale_items     = 3;
+$sale_textshow  = 'Buy ' . $sale_items . ' or More Items and Save ' . $sale_percent . '% Sale';
+
+$count    = 0;
+$subtotal = 0;
+
+foreach ($cartids as $cartid => $item) {
+
+     $count    = $count    + $item['quantity'];
+     $subtotal = $subtotal + $item['subtotal'];
+
+} // End of foreach statement.
+
+if ($count >= $sale_items) {
+
+     $sale_amount = $subtotal * ($sale_percent / 100);
+
+     $this->globals('ecom.total_customsale',$sale_amount);
+     $this->globals('ecom.customsale_text',$sale_textshow);
+
+} // End of if statement.
+
+?>"
+"user","User Defined Sale","<?php 
+
+// +--
+// | All custom sale scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsale' and 'ecom.customsale_text' which
+// | contain the sale total and the sale text respectively.
+// |
+// | NOTE: Do not print anything within custom sale 
+// | scripts.  They are designed only to return amounts and
+// | text for custom sale methods.
+// |
+// | This script is a User Defined script that returns a sale 
+// | amount based for all orders.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | sale_amount   = The amount of the sale.
+// | sale_textshow = The text to be displayed for the sale.
+// +--
+
+$sale_amount    = 10;
+$sale_textshow  = 'Customer Appreciation Sale';
+
+$this->globals('ecom.total_customsale',$sale_amount);
+$this->globals('ecom.customsale_text',$sale_textshow);
+
+?>"

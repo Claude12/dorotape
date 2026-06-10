@@ -1408,3 +1408,7 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	margin: 16px;
 }
 
+.wc-block-components-button.wp-element-button.wc-block-cart__submit-button.contained {
+	color: var(--dt-bg);
+}
+

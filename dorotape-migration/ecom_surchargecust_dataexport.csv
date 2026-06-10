@@ -1,0 +1,232 @@
+"id","name","incdisp"
+"amtamt","Total Of X - Y Amount Surcharge","<?php 
+
+// +--
+// | All custom surcharge scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsurcharge' and 'ecom.customsurcharge_text' which
+// | contain the surcharge total and the surcharge text respectively.
+// |
+// | NOTE: Do not print anything within custom surcharge 
+// | scripts.  They are designed only to return amounts and
+// | text for custom surcharge methods.
+// |
+// | This script is a Total Of X - Y Amount Surcharge script that
+// | returns a surcharge amount based on the subtotal of items
+// | being purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | surcharge_amount   = The amount of the surcharge.
+// | surcharge_subtotal = The subtotal needed to get the surcharge.
+// | surcharge_textshow = The text to be displayed for the surcharge.
+// +--
+
+$surcharge_amount   = 10;
+$surcharge_subtotal = 100;
+$surcharge_textshow = 'Surcharge Total';
+
+foreach ($cartids as $cartid => $item) {$subtotal = $subtotal + $item['subtotal'];}
+
+if ($subtotal >= $surcharge_subtotal) {
+
+     $this->globals('ecom.total_customsurcharge',$surcharge_amount);
+     $this->globals('ecom.customsurcharge_text',$surcharge_textshow);
+
+} // End of if statement.
+
+?>"
+"amtpct","Total Of X - Y Percent Surcharge","<?php 
+
+// +--
+// | All custom surcharge scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsurcharge' and 'ecom.customsurcharge_text' which
+// | contain the surcharge total and the surcharge text respectively.
+// |
+// | NOTE: Do not print anything within custom surcharge 
+// | scripts.  They are designed only to return amounts and
+// | text for custom surcharge methods.
+// |
+// | This script is a Total Of X - Y Percent Surcharge script that
+// | returns a surcharge amount based on the subtotal of items 
+// | being purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | surcharge_percent  = The surcharge percentage.
+// | surcharge_subtotal = The subtotal needed to get the surcharge.
+// | surcharge_textshow = The text to be displayed for the surcharge.
+// +--
+
+$surcharge_percent   = 10;
+$surcharge_subtotal  = 100;
+$surcharge_textshow  = 'Surcharge Total';
+
+$subtotal = 0;
+
+foreach ($cartids as $cartid => $item) {
+
+     $subtotal = $subtotal + $item['subtotal'];
+
+} // End of foreach statement.
+
+if ($subtotal >= $surcharge_subtotal) {
+
+     $surcharge_amount = $subtotal * ($surcharge_percent / 100);
+
+     $this->globals('ecom.total_customsurcharge',$surcharge_amount);
+     $this->globals('ecom.customsurcharge_text',$surcharge_textshow);
+
+} // End of if statement.
+
+?>"
+"qtyamt","Buy X Items - Y Amount Surcharge","<?php 
+
+// +--
+// | All custom surcharge scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsurcharge' and 'ecom.customsurcharge_text' which
+// | contain the surcharge total and the surcharge text respectively.
+// |
+// | NOTE: Do not print anything within custom surcharge 
+// | scripts.  They are designed only to return amounts and
+// | text for custom surcharge methods.
+// |
+// | This script is a Buy X Items - Y Amount Surcharge script that
+// | returns a surcharge amount based on the number of items being
+// | purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | surcharge_amount   = The amount of the surcharge.
+// | surcharge_items    = The number of items needed to get the surcharge.
+// | surcharge_textshow = The text to be displayed for the surcharge.
+// +--
+
+$surcharge_amount    = 10;
+$surcharge_items     = 3;
+$surcharge_textshow  = 'Surcharge Total';
+
+$count = 0;
+
+foreach ($cartids as $cartid => $item) {$count = $count + $item['quantity'];}
+
+if ($count >= $surcharge_items) {
+
+     $this->globals('ecom.total_customsurcharge',$surcharge_amount);
+     $this->globals('ecom.customsurcharge_text',$surcharge_textshow);
+
+} // End of if statement.
+
+?>"
+"qtypct","Buy X Items - Y Percent Surcharge","<?php 
+
+// +--
+// | All custom surcharge scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsurcharge' and 'ecom.customsurcharge_text' which
+// | contain the surcharge total and the surcharge text respectively.
+// |
+// | NOTE: Do not print anything within custom surcharge 
+// | scripts.  They are designed only to return amounts and
+// | text for custom surcharge methods.
+// |
+// | This script is a Buy X Items - Y Percent Surcharge script that
+// | returns a surcharge amount based on the number of items being
+// | purchased.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | surcharge_percent  = The surcharge percentage.
+// | surcharge_items    = The number of items needed to get the surcharge.
+// | surcharge_textshow = The text to be displayed for the surcharge.
+// +--
+
+$surcharge_percent   = 10;
+$surcharge_items     = 3;
+$surcharge_textshow  = 'Surcharge Total';
+
+$count    = 0;
+$subtotal = 0;
+
+foreach ($cartids as $cartid => $item) {
+
+     $count    = $count    + $item['quantity'];
+     $subtotal = $subtotal + $item['subtotal'];
+
+} // End of foreach statement.
+
+if ($count >= $surcharge_items) {
+
+     $surcharge_amount = $subtotal * ($surcharge_percent / 100);
+
+     $this->globals('ecom.total_customsurcharge',$surcharge_amount);
+     $this->globals('ecom.customsurcharge_text',$surcharge_textshow);
+
+} // End of if statement.
+
+?>"
+"user","User Defined Surcharge","<?php 
+
+// +--
+// | All custom surcharge scripts work in the same way.  Global
+// | variables named 'ecom.checkout_cartids' and 
+// | 'ecom.checkout_cosess' contain cart information and 
+// | checkout session information respectively.
+// |
+// | This script must set global variables named 
+// | 'ecom.total_customsurcharge' and 'ecom.customsurcharge_text' which
+// | contain the surcharge total and the surcharge text respectively.
+// |
+// | NOTE: Do not print anything within custom surcharge 
+// | scripts.  They are designed only to return amounts and
+// | text for custom surcharge methods.
+// |
+// | This script is a User Defined script that returns a surcharge 
+// | amount based for all orders.
+// +--
+
+$cartids = $this->globals('ecom.checkout_cartids');
+$cosess  = $this->globals('ecom.checkout_cosess');
+
+// +--
+// | surcharge_amount   = The amount of the surcharge.
+// | surcharge_textshow = The text to be displayed for the surcharge.
+// +--
+
+$surcharge_amount    = 10;
+$surcharge_textshow  = 'Surcharge Total';
+
+$this->globals('ecom.total_customsurcharge',$surcharge_amount);
+$this->globals('ecom.customsurcharge_text',$surcharge_textshow);
+
+?>"

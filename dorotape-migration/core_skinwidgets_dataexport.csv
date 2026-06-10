@@ -1,0 +1,267 @@
+"id","name","status","widgetgroup","widgetclass","iconclass","sortorder","widgetcontent","xmultisite"
+"Account_Basic","Manage Account","0","HEADER","kwidget_collapsedi","kicon_widget-account","5","<?php return $this->include_file('core','skinwidget_account_basic.php'); ?>",""
+"BANNER-NEW","Main Banner NEW","1","BANNERNEW","kwidget_content","kicon_widget-bannermain","10","<?php return $this->include_file('cms','skinwidget_bannermain.php'); ?>","DEFAULT"
+"CART-NEW","Your Cart","1","HEADERNEW","kwidget_iconexpanded","kicon_widget-cart","30","<?php @include($this->globals('core.path_public') . '/skins/CUSTOM-2023/includes/skinwidget_minicart.php'); ?>",""
+"CAT-NAV-DEV","ShopNav","1","NAVBARNEW","kwidget_fulldrop","kicon_widget-categories","20","<?php @include($this->globals('core.path_public') . '/skins/CUSTOM-2023/includes/SHOPNAV.php'); ?>
+
+
+","DEFAULT"
+"Christmas Message","Christmas Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
+div.title {border-radius: 2px; background-color: #009ee3; font-size:22px; margin: 20px 0px 0px 0px; padding: 20px; border-width: 24px; color: #ffffff;}
+
+div.message {border-style: solid; border-radius: 20px; margin: 20px 0px 0px 0px; padding: 20px 0px 20px 0px; font-size:24px; border-width: 10px; color: #009ee3;}
+
+</style>
+
+<div class=""message"" align=""center""><b>We are now closed for the festive season and re-open for business on Monday 5th January 2026.</b><br><i>Thank you for all your valued custom, we wish you a joyful, peaceful Christmas along with a happy New Year!</i>
+</div>
+
+
+
+
+","DEFAULT"
+"cms.skinwidget_banneradverts","Banner Adverts","0","FOOTER","kwidget_content","kicon_widget-banneradverts","10","<?php return $this->include_file('cms','skinwidget_banneradverts.php'); ?>",""
+"cms.skinwidget_bannermain","Main Banner","1","BANNER","kwidget_content","kicon_widget-bannermain","10","<?php return $this->include_file('cms','skinwidget_bannermain.php'); ?>",""
+"cms.skinwidget_pages","Main Menu","1","FOOTER","kwidget_expandedi","kicon_widget-pages","10","<?php return $this->include_file('cms','skinwidget_pages.php'); ?>",""
+"cms.xmodarticleswidgetbreads","Location","1","LOCATION","kwidget_content","kicon_widget-breadcrumbs","12","<?php return $this->include_file('cms','xmodarticleswidgetbreads.php'); ?>",""
+"cms.xmodarticleswidgetcat","Article Categories","0","SIDEBAR1","kwidget_expandedi","kicon_widget-pages","40","<?php return $this->include_file('cms','xmodarticleswidgetcat.php'); ?>",""
+"cms.xmodarticleswidgetfeed","Article Feed","0","SIDEBAR1","kwidget_expandedi","kicon_widget-pages","50","<?php return $this->include_file('cms','xmodarticleswidgetfeed.php'); ?>",""
+"cms.xmodarticleswidgetrecent","Recent Articles","0","SIDEBAR1","kwidget_expandedi","kicon_widget-pages","30","<?php return $this->include_file('cms','xmodarticleswidgetrecent.php'); ?>",""
+"Company-ddress","Company Address","1","FOOTERNEW","kwidget_content","kicon_widget-companyinfo","20","<p class=""ktxt_popreg"">This is where you'll find us</p>
+<div id=""kcompany_foot"" class=""kgridbox"">
+<p>
+New Mill<br>
+Farndon Road<br>
+Market Harborough<br>
+LE16 9NP<br><br>
+<a href=""https://w3w.co/exclusive.blues.farm"" target=""_blank"">///exclusive.blues.farm</a></p>
+
+</div>
+
+","DEFAULT"
+"Contact-Footer","Contact Us","1","FOOTERNEW","kwidget_content","kicon_widget-companyinfo","10","<div id=""kcontact_foot"" class=""kgridbox"">
+
+<p class=""ktxt_popreg"">Need our expert advice?</p>
+<p class=""ktxt_popmed"">Get in touch and we’ll walk<br>
+you through your project.</p>
+
+<p><span class=""kskin_phone""><b>01858 431642</b></span><br>
+<span class=""ktxt_popmed"">Monday – Friday</span></p>
+<p class=""ktxt_popmed"">or just drop us an <a href=""mailto:sales@dorotape.co.uk"">email</a></p>
+
+
+<div class=""kgridbox kgridsep kgrid5"">
+
+<div id=""ksocial"" class=""kgridbox"">
+    <a href=""https://www.linkedin.com/company/doro-tape-uk-ltd/"" target=""_blank""> <img src=""skins/CUSTOM-2023/media/linkedin-logo.png"" alt=""LinkedIn""  class=""kpadded kimgnice""></a>
+</div>
+<div id=""ksocial"" class=""kgridbox"">
+ <a href=""https://www.instagram.com/dorotapeuk/"" target=""_blank"">  <img src=""skins/CUSTOM-2023/media/instagram-logo.png"" alt=""Instagram""  class= ""kpadded kimgnice""></a>
+</div>
+<div id=""ksocial"" class=""kgridbox"">
+ <a href=""https://www.youtube.com/@Dorotapeukltd/"" target=""_blank"">  <img src=""skins/CUSTOM-2023/media/youtube-logo.png"" alt=""YouTube""  class= ""kpadded kimgnice""></a>
+</div>
+<div class=""kgridbox"">
+<!--  <a href=""INSERT SOCIAL URL"" target=""_blank"">  <img src=""skins/CUSTOM-2023/media/SOCIALIIMAGE.jpg"" alt=""SOCIAL SITE NAME"" class=""kpadded""></a> -->
+</div>
+<div class=""kgridbox"">
+<!--   <a href=""INSERT SOCIAL URL"" target=""_blank"">  <img src=""skins/CUSTOM-2023/media/SOCIALIIMAGE.jpg"" alt=""SOCIAL SITE NAME""  class=""kpadded""></a>  -->
+</div>
+
+</div> 
+
+
+</div>
+","DEFAULT"
+"Contact-Nav","Contact Us","0","NAVBARDEV","kwidget_fulldrop","kicon_widget-categories","30","<?php @include($this->globals('core.path_public') . '/skins/DEVCUSTOM/includes/skinwidget_custmenu.php'); ?>
+
+
+
+",""
+"core.skinwidget_account","Account","1","FOOTER","kwidget_expandedi","kicon_widget-account","25","<?php return $this->include_file('core','skinwidget_account.php'); ?>",""
+"core.skinwidget_companyinfo","Company Info","1","FOOTER","kwidget_expandedi","kicon_widget-companyinfo","30","<?php 
+
+$eol   = $this->globals('core.eol');
+
+$link = $this->link_namespace('core','contact');
+$this->globals('core.skinwidgetoutputlink',$link);
+
+$phone   = $this->xhtml_encode($this->globals('core_settings.core.siteownerphone'));
+
+$address = array('addone'     => $this->globals('core_settings.core.siteowneradd'),
+                 'addtwo'     => '',
+                 'city'       => $this->globals('core_settings.core.siteownercity'),
+                 'stateprov'  => $this->globals('core_settings.core.siteownerstateprov'),
+                 'country'    => $this->globals('core_settings.core.siteownercountry'),
+                 'postalcode' => $this->globals('core_settings.core.siteownerzip'));
+
+$dispaddress = $this->include_namespace('core','getaddress',array('address' => $address, 'format' => 'XHTML'));
+
+print '<div class=""kwidget_padmax"">' . $eol;
+
+print $address['addone'] .  '<br />';
+print $address['city'] . '<br />';
+print $address['stateprov'] . '<br />';
+print $address['postalcode'] . '<br />';
+print $address['country'] . '<br /><br />';
+print 'Telephone: <a href=""tel://' . $phone . '"">' . $phone . '</a>' . $eol;
+
+print '</div>' . $eol;
+
+if (($this->globals('core_settings.core.xmodseomicrodataactive')) && ($this->globals('core.interface') == 'FrontEnd')) {
+
+     $sitename    = $this->globals('core_settings.core.site_name');
+
+     if ($address['stateprov'] == 'Not Applicable') {$locality = $address['city'] . ', ' . $address['country'];}
+     else                                           {$locality = $address['city'] . ', ' . $address['stateprov'];}
+
+     $microdata  = '<div vocab=""http://schema.org/"" typeof=""Organization"" class=""khidden"">' . $eol;
+     $microdata .= '<span property=""name"">' . $this->xhtml_encode($sitename) . '</span>' . $eol;
+     $microdata .= '<div property=""address"" typeof=""PostalAddress"">' . $eol;
+     $microdata .= '<span property=""streetAddress"">' . $this->xhtml_encode($address['addone']) . '</span>' . $eol;
+     $microdata .= '<span property=""postalCode"">' . $this->xhtml_encode($address['postalcode']) . '</span>' . $eol;
+     $microdata .= '<span property=""addressLocality"">' . $this->xhtml_encode($locality) . '</span>' . $eol;
+     $microdata .= '</div>' . $eol;
+     $microdata .= '<span property=""telephone"">' . $this->xhtml_encode($phone) . '</span></div>' . $eol;
+
+     print $microdata;
+
+
+} // End of if statement.
+
+return 1;
+
+?>
+","DEFAULT"
+"core.skinwidget_currency","Currencies","0","FOOTER","kwidget_expandedi","kicon_widget-currency","10","<?php return $this->include_file('core','skinwidget_currency.php'); ?>",""
+"core.skinwidget_miniacctlogin","Account","1","HEADERNEW","kwidget_iconexpanded","kicon_widget-miniaccount","20","<?php @include($this->globals('core.path_public') . '/skins/CUSTOM-2023/includes/skinwidget_miniacctlogin.php'); ?>",""
+"core.skinwidget_social","Let's get social","1","HEADER","kwidget_content","kicon_widget-social","5","<?php return $this->include_file('core','skinwidget_social.php'); ?>",""
+"CS-Message","Christmas Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
+div.title {border-radius: 2px; background-color: #fba100; font-size:22px; margin: 20px 0px 0px 0px; padding: 20px; border-width: 24px; color: #ffffff;}
+
+div.message {border-style: solid; border-radius: 20px; margin: 20px 0px 0px 0px; padding: 20px 0px 20px 0px; font-size:24px; border-width: 10px; color: #fba100;}
+
+</style>
+
+<div class=""message"" align=""center""><b>We are now closed for the festive season and re-open for business on Monday 5th January 2026.</b><br><i>Thank you for all your valued custom, we wish you a joyful,<br>peaceful Christmas along with a happy New Year!</i>
+</div>
+
+
+
+
+
+
+","CRAFTSTICK"
+"ecom.skinwidget_breadcrumbs","Location","1","LOCATION","kwidget_content","kicon_widget-breadcrumbs","10","<?php return $this->include_file('ecom','skinwidget_breadcrumbs.php'); ?>","DEFAULT"
+"ecom.skinwidget_categories","Categories","1","NAVBAR","kwidget_fulldrop","kicon_widget-categories","20","<?php return $this->include_file('ecom','skinwidget_categories.php'); ?>","CRAFTSTICK"
+"ecom.skinwidget_loyaltypointsmult","Extra Loyalty Points!","1","LOCATION","kwidget_content","kicon_widget-loyaltypointsmult","20","<?php return $this->include_file('ecom','skinwidget_loyaltypointsmult.php'); ?>",""
+"ecom.skinwidget_menustore","Store","1","FOOTER","kwidget_expandedi","kicon_widget-menustore","20","<?php return $this->include_file('ecom','skinwidget_menustore.php'); ?>",""
+"ecom.skinwidget_minicart","Your Cart","1","HEADER","kwidget_iconcollapsed","kicon_widget-cart","10","<?php return $this->include_file('ecom','skinwidget_minicart.php'); ?>",""
+"ecom.skinwidget_minisearch","Search doro","1","HEADER","kwidget_content","kicon_widget-search","10","<?php return $this->include_file('ecom','skinwidget_minisearch.php'); ?>",""
+"Image-Widget","Image Footer Widget","1","FOOTERNEW","kwidget_content","kicon_widget-companyinfo","40"," <div class=""kfoot_row"">
+<div class=""kfoot_column"">
+     <a href=""https://www.aslanfolien.de/en/index.html"" target=""_blank""><img style= ""padding: 20px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/ASLAN_Platinum_Distributor_2026.png"" alt=""visit ASLAN website"" class=""kimgnice"">
+  </div></a>
+<div class=""kfoot_column"">
+    <a href=""http://www.shopdisplay.org/"" target=""_blank""><img style= ""padding: 40px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/SDEA logo MEMBER CMYK W.png"" alt=""visit SDEA website"" class=""kimgnice"">
+  </div></a>
+    <div class=""kfoot_column"">
+    <a href=""https://uksigns.org/"" target=""_blank""><img style= ""padding: 20px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/BSGA_Logo.png"" alt=""visit BSGA website"" class=""kimgnice"">
+  </div></a>
+</div> 
+
+ <div class=""kfoot_row"">
+  <div class=""kfoot_column"">
+    <a href=""https://www.livingwage.org.uk/"" target=""_blank""><img src=""skins/CUSTOM-2023/media/LW_Employer_logo.png"" alt=""visit Living Wage website"" class=""kimgnice"">
+  </div></a>
+<div class=""kfoot_column"">
+    <a href=""https://www.goodbusinesscharter.com/"" target=""_blank""><img src=""skins/CUSTOM-2023/media/gbc-accredited.png"" alt=""visit Good Business Charter website"" class=""kimgnice"">
+  </div></a>
+  <div class=""kfoot_column"">
+     <a href=""https://www.fsb.org.uk/"" target=""_blank""><img src=""skins/CUSTOM-2023/media/FSB-member-logo.png"" alt=""visit FSB's website"" class=""kimgnice"">
+  </div></a>
+</div>
+
+
+
+","DEFAULT"
+"Menu-Footer","Footer Menu","1","FOOTERNEW","kwidget_content","kicon_widget-pages","30","<style>
+.responsive {
+  width: 50%;
+  height: auto;
+}
+</style>
+
+
+<?php
+
+
+print '<li><a href=""' . $this->link_namespace('cms','display','About-Us') . '"" title=""About Us"">About Us</a></li>' . $eol;
+print '<li><a href=""' . $this->link_namespace('cms','display','ItemAdvancedSearch') . '"" title=""Advanced Search"">Advanced Search</a></li>' . $eol;
+print '<li><a href=""' . $this->link_namespace('cms','display','delivery') . '"" title=""Delivery Information"">Delivery Information</a></li>' . $eol;
+print '<li><a href=""' . $this->link_namespace('cms','display','returns') . '"" title=""Returns and Refunds Policy"">Returns & Refunds Policy</a></li>' . $eol;
+print '<li><a href=""' . $this->link_namespace('cms','display','termsofuse') . '"" title=""Terms and Conditions"">Terms and Conditions</a></li>' . $eol;
+print '<li><a href=""' . $this->link_namespace('cms','display','privacy') . '"" title=""Privacy Policy"">Privacy Policy</a></li>' . $eol;
+
+
+?>
+
+<a href=""https://smeclimatehub.org/"" target=""_blank"">
+  <img 
+    style=""padding: 20px 0;"" 
+    src=""skins/CUSTOM-2023/media/SME_Climate_Hub_2025.png"" 
+    alt=""visit SME Climate Hub website"" 
+    width=""165"" 
+    height=""69""
+    class=""responsive""
+  >
+</a>","DEFAULT"
+"message2","Maintenance Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<html>
+<head>
+<style>
+p.solid {background-color: #525252; padding: 10px; border-width: 10px; color: white;}
+</style>
+</head>
+<body>
+<p class=""solid""; align=""center""><big><b>TELEPHONE ISSUES</big></b><br>Due to reasons beyond our control, we are currently experiencing problems with our telephone system<br>To get in touch with us, please drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a></p>
+</body>
+</html>","CRAFTSTICK, DEFAULT"
+"Pre-Christmas-Message","Pre Christmas Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
+div.title {border-radius: 2px; background-color: #009ee3; font-size:20px; margin: 20px 0px 0px 0px; padding: 20px; border-width: 10px; color: #ffffff;}
+
+div.message {border-style: dashed; border-radius: 10px; font-size:18px; border-width: 5px; color: #009ee3; padding: 10px;}
+
+</style>
+
+<br>
+<div class=""message"" align=""center"">We are now closed for the festive season and re-open for business on Monday 5th January 2026. We thank you for all your valued custom and wish you all a joyful, peaceful, and warm-hearted Christmas along with a happy New Year!</b></p>
+</div>
+
+
+
+<p style=""text-align: center; font-size:18px""><i>We hope that you and your families have a very Merry Christmas and a wonderful new year.  </i></p>
+
+
+
+
+
+","DEFAULT"
+"SC_Social_Media","Let's get social","0","HEADER","kwidget_content","kicon_widget-social","5","<?php return $this->include_file('core','skinwidget_social.php'); ?>","CRAFTSTICK"
+"SEARCH-NEW","Search doro","1","HEADERNEW","kwidget_iconcollapsed","kicon_widget-search","10","<?php return $this->include_file('ecom','skinwidget_minisearch.php'); ?>",""
+"Xmas_Message","Bank Holiday Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
+div.title {border-radius: 2px; background-color: #009ee3; font-size:28px; margin: 20px 0px 0px 0px; padding: 20px; border-width: 24px; color: #ffffff;}
+
+div.message {border-radius: 2px; background-color: #009ee3; font-size:18px; color: #ffffff; padding: 20px;}
+
+</style>
+
+
+<div class=""title"" align=""center"">EASTER 2025</div>
+
+<div class=""message"" align=""center""><p style=""text-align: center; font-size:18px""><b>Our offices will be closed on Friday 18th and Monday 21st April for the Easter holidays.</b></p>
+</div>
+
+
+
+
+","CRAFTSTICK, DEFAULT"

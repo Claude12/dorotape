@@ -1,0 +1,5 @@
+"id","acctnamepri","acctnamealt","disporders","disppurchords","convertdays"
+"Due on receipt","Due on receipt","Due on receipt","1","1","0"
+"Net 15","Net 15","Net 15","1","1","15"
+"Net 30","Net 30","Net 30","1","1","30"
+"Net 60","Net 60","Net 60","1","1","60"
