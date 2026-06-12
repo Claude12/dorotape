@@ -3,24 +3,6 @@
 	"title": "Customer Account (Sage)",
 	"fields": [
 		{
-			"key": "field_dorotape_tab_sage",
-			"label": "Sage Account",
-			"name": "",
-			"aria-label": "",
-			"type": "tab",
-			"instructions": "",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "",
-				"class": "",
-				"id": ""
-			},
-			"placement": "top",
-			"endpoint": 0,
-			"allow_in_bindings": 0
-		},
-		{
 			"key": "field_dorotape_sage_account_number",
 			"label": "Sage Account Number",
 			"name": "sage_account_number",
@@ -42,12 +24,12 @@
 			"allow_in_bindings": 0
 		},
 		{
-			"key": "field_dorotape_sage_approved",
-			"label": "Approved for Account Payment",
-			"name": "sage_approved_for_account",
+			"key": "field_dorotape_sage_last_sync",
+			"label": "Sage Last Sync",
+			"name": "sage_last_sync",
 			"aria-label": "",
-			"type": "true_false",
-			"instructions": "When enabled, this customer can select \"Pay on Account\" at checkout. Only activate for Sage-approved customers.",
+			"type": "date_time_picker",
+			"instructions": "Automatically updated by the sync connector. Do not edit manually.",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -55,89 +37,9 @@
 				"class": "",
 				"id": ""
 			},
-			"default_value": 0,
-			"message": "Customer is approved to pay on account",
-			"ui": 1,
-			"ui_on_text": "Approved",
-			"ui_off_text": "Not approved",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_credit_limit",
-			"label": "Credit Limit (£)",
-			"name": "sage_credit_limit",
-			"aria-label": "",
-			"type": "number",
-			"instructions": "Synced from Sage. Orders that would exceed this limit are blocked at checkout or flagged for admin review.",
-			"required": 0,
-			"conditional_logic": [
-				[
-					{
-						"field": "field_dorotape_sage_approved",
-						"operator": "==",
-						"value": "1"
-					}
-				]
-			],
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": 0,
-			"min": 0,
-			"max": "",
-			"step": 0.01,
-			"prepend": "£",
-			"append": "",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_current_balance",
-			"label": "Current Balance (£)",
-			"name": "sage_current_balance",
-			"aria-label": "",
-			"type": "number",
-			"instructions": "Outstanding balance synced from Sage. Read-only — updated by the sync connector.",
-			"required": 0,
-			"conditional_logic": [
-				[
-					{
-						"field": "field_dorotape_sage_approved",
-						"operator": "==",
-						"value": "1"
-					}
-				]
-			],
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": 0,
-			"min": 0,
-			"max": "",
-			"step": 0.01,
-			"prepend": "£",
-			"append": "",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_tab_pricing",
-			"label": "Pricing & Discounts",
-			"name": "",
-			"aria-label": "",
-			"type": "tab",
-			"instructions": "",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "",
-				"class": "",
-				"id": ""
-			},
-			"placement": "top",
-			"endpoint": 0,
+			"display_format": "d/m/Y H:i",
+			"return_format": "d/m/Y H:i",
+			"first_day": 1,
 			"allow_in_bindings": 0
 		},
 		{
@@ -175,7 +77,7 @@
 			"name": "customer_discount_rate",
 			"aria-label": "",
 			"type": "number",
-			"instructions": "A percentage discount applied across all products at checkout for this customer. Applied after width and roll modifiers. 0 = no discount.",
+			"instructions": "A percentage discount applied across all products at checkout for this customer, on top of tier pricing. Synced from Sage where available. 0 = no discount.",
 			"required": 0,
 			"conditional_logic": 0,
 			"wrapper": {
@@ -189,113 +91,6 @@
 			"step": 0.01,
 			"prepend": "",
 			"append": "%",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_vat_exempt",
-			"label": "VAT Exempt",
-			"name": "vat_exempt",
-			"aria-label": "",
-			"type": "true_false",
-			"instructions": "When enabled, VAT is not applied to this customer's orders. Requires a valid VAT number on file.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": 0,
-			"message": "Customer is VAT exempt",
-			"ui": 1,
-			"ui_on_text": "Exempt",
-			"ui_off_text": "Standard VAT",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_vat_number",
-			"label": "VAT Number",
-			"name": "vat_number",
-			"aria-label": "",
-			"type": "text",
-			"instructions": "Required when VAT Exempt is enabled. Validated against VIES on first entry.",
-			"required": 0,
-			"conditional_logic": [
-				[
-					{
-						"field": "field_dorotape_vat_exempt",
-						"operator": "==",
-						"value": "1"
-					}
-				]
-			],
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": "",
-			"maxlength": 20,
-			"placeholder": "e.g. GB123456789",
-			"prepend": "",
-			"append": "",
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_tab_meta",
-			"label": "Sync & Notes",
-			"name": "",
-			"aria-label": "",
-			"type": "tab",
-			"instructions": "",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "",
-				"class": "",
-				"id": ""
-			},
-			"placement": "top",
-			"endpoint": 0,
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_sage_last_sync",
-			"label": "Sage Last Sync",
-			"name": "sage_last_sync",
-			"aria-label": "",
-			"type": "date_time_picker",
-			"instructions": "Automatically updated by the sync connector. Do not edit manually.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"display_format": "d/m/Y H:i",
-			"return_format": "d/m/Y H:i",
-			"first_day": 1,
-			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_account_notes",
-			"label": "Account Notes",
-			"name": "account_notes",
-			"aria-label": "",
-			"type": "textarea",
-			"instructions": "Internal notes about this customer. Not visible to the customer.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": "",
-			"rows": 4,
-			"new_lines": "br",
-			"maxlength": "",
 			"allow_in_bindings": 0
 		}
 	],
@@ -315,10 +110,10 @@
 	"instruction_placement": "label",
 	"hide_on_screen": "",
 	"active": true,
-	"description": "Sage 50 account data, credit limits, and customer-specific pricing. Shown on the admin user edit screen only. Fields are populated by the Sage sync connector and should only be edited manually where the connector cannot reach.",
+	"description": "Sage 50 account linkage and customer-specific pricing. Shown on the admin user edit screen only. Trimmed 2026-06-10 to the fields the Kryptronic data and Sage integration actually use — pay-on-account, VAT-exemption, and notes fields were removed (zero usage on the old site).",
 	"show_in_rest": 0,
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1778889600
+	"modified": 1781136000
 }
