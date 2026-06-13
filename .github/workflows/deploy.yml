@@ -1,0 +1,41 @@
+name: Deploy on version bump
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'style.css'
+
+jobs:
+  check-version-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version bumped
+        id: version_check
+        run: |
+          PREV=$(git show HEAD~1:style.css | grep "^Version:" | awk '{print $2}')
+          CURR=$(grep "^Version:" style.css | awk '{print $2}')
+          echo "Previous: $PREV → Current: $CURR"
+          if [ "$PREV" != "$CURR" ]; then
+            echo "bumped=true" >> $GITHUB_OUTPUT
+          else
+            echo "bumped=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy via SSH
+        if: steps.version_check.outputs.bumped == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            git -C ~/www/dorotape.altitude-dev.digital/public_html/wp-content/themes/dorotape pull dorotape main
