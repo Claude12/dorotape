@@ -1381,7 +1381,7 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	padding: 0 .7rem;
 	font-size: .78rem;
 	font-weight: 500;
-	color: var(--dt-white);
+	color: green;
 	letter-spacing: .01em;
 	white-space: nowrap;
 	transition: background .15s;
