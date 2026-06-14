@@ -10,10 +10,11 @@ on:
 jobs:
   check-version-and-deploy:
     runs-on: ubuntu-latest
+    environment: dorotape
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 2
 
