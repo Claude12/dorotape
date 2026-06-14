@@ -10,7 +10,6 @@ on:
 jobs:
   check-version-and-deploy:
     runs-on: ubuntu-latest
-    environment: dorotape
 
     steps:
       - name: Checkout
