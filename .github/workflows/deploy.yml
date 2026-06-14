@@ -29,11 +29,6 @@ jobs:
             echo "bumped=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Debug
-        run: |
-          echo "Bumped: ${{ steps.version_check.outputs.bumped }}"
-          echo "Host is set: ${{ secrets.SSH_HOST != '' }}"
-
       - name: Deploy via SSH
         if: steps.version_check.outputs.bumped == 'true'
         uses: appleboy/ssh-action@v1.0.3
@@ -42,6 +37,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          debug: true
           script: |
             git -C ~/www/dorotape.altitude-dev.digital/public_html/wp-content/themes/dorotape pull dorotape main
