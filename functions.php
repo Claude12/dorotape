@@ -120,3 +120,4 @@ require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
 require get_template_directory() . '/inc/poa.php';
+require get_template_directory() . '/inc/cutsize.php';

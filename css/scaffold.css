@@ -1412,3 +1412,118 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	color: var(--dt-bg);
 }
 
+
+/* ── Cut Sizes field (products migrated with the Kryptronic CUTSIZE box) ── */
+
+.dt-cutsize {
+	margin: 16px 0;
+	padding: 14px 16px;
+	background: var(--dt-bg);
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+}
+
+.dt-cutsize__label {
+	display: block;
+	font-weight: 600;
+	color: var(--dt-text);
+	margin-bottom: 4px;
+}
+
+.dt-cutsize__hint {
+	font-size: .85em;
+	color: var(--dt-mid);
+	margin: 0 0 8px;
+}
+
+.dt-cutsize__input {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font: inherit;
+	resize: vertical;
+}
+
+.dt-cutsize__input:focus {
+	outline: none;
+	border-color: var(--dt-blue);
+	box-shadow: 0 0 0 2px rgba(0, 159, 227, .18);
+}
+
+/* ── Header product search ─────────────────────────────────────────────── */
+
+.dt-header-search {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.dt-header-search__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: var(--dt-radius);
+	color: var(--dt-white);
+	cursor: pointer;
+	transition: background .15s;
+}
+
+.dt-header-search__toggle:hover,
+.dt-header-search--open .dt-header-search__toggle {
+	background: rgba(255, 255, 255, .12);
+}
+
+.dt-header-search__form {
+	display: none;
+	position: absolute;
+	top: calc(100% + 10px);
+	right: 0;
+	z-index: 600;
+	width: min(340px, calc(100vw - 2 * var(--dt-gap)));
+	padding: 10px;
+	gap: 8px;
+	background: var(--dt-white);
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+}
+
+.dt-header-search--open .dt-header-search__form {
+	display: flex;
+}
+
+.dt-header-search__input {
+	flex: 1;
+	min-width: 0;
+	padding: 8px 10px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font: inherit;
+}
+
+.dt-header-search__input:focus {
+	outline: none;
+	border-color: var(--dt-blue);
+	box-shadow: 0 0 0 2px rgba(0, 159, 227, .18);
+}
+
+.dt-header-search__submit {
+	padding: 8px 14px;
+	background: var(--dt-accent);
+	border: none;
+	border-radius: var(--dt-radius);
+	color: var(--dt-white);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .15s;
+}
+
+.dt-header-search__submit:hover {
+	background: var(--dt-accent-dk);
+}
