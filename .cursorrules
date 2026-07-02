@@ -1,0 +1,98 @@
+# Project Rules
+
+## Stack
+- WordPress custom theme (no page builders, no Gutenberg)
+- ACF PRO + Classic Editor
+- WooCommerce
+- Vanilla JS (no jQuery unless WP provides it)
+- SASS/SCSS with variables and partials
+- PHP 8.0+ with strict types and full type hints
+
+## Agent behaviour
+- You CAN make decisions and proceed with tasks confidently
+- You MUST flag and notify me when any of the following happen — do not silently proceed:
+  - Adding a new SCSS variable
+  - Adding a new SCSS partial
+  - Using !important
+  - Nesting deeper than 3 levels
+  - Introducing a new mixin
+  - Creating a new file outside the established structure
+- Flag format: start your response with ⚠️ FLAGGED: and explain what and why before proceeding
+- Never commit unless I explicitly say "commit this" or "commit"
+- Always make sure the commit message summarise what has been done
+
+## Git rules
+- Never switch to or push directly to main or production branches
+- Always work on the current branch
+- Follow conventional commits: feature / bugfix / style / refactor / chore
+- Never modify the Version line in style.css — I do that manually
+- Never touch wp-config.php, .env, or any file containing credentials
+
+## BEM rules
+- All new selectors must follow BEM: block__element--modifier
+- Block = standalone component (e.g. .card, .hero, .product-grid)
+- Element = part of a block (e.g. .card__title, .hero__image)
+- Modifier = variant or state (e.g. .card--featured, .hero--dark)
+- Never use a modifier without the base class also being present
+- Never create a new block name that conflicts with an existing one — check first
+- Never style raw HTML elements directly (h1, p, ul etc) inside a component — always use a BEM class
+- JavaScript hooks use a js- prefix and are never styled: e.g. .js-toggle, .js-slider
+- State classes use is- or has- prefix: e.g. .is-active, .has-error
+- If a component needs more than 3 levels of nesting in BEM, it should be split into sub-components
+
+## SASS rules
+- Always use existing variables from _variables.scss — never create new ones without flagging
+- Never hardcode hex values, font sizes, spacing, or breakpoints — always reference a variable
+- Never use magic numbers — if a value isn't in _variables.scss, flag it before using it
+- Always import via the central index/manifest file
+- Follow the existing partial structure — flag before creating new partials
+- Nesting max 3 levels deep — flag if going deeper
+- Never use @extend — use mixins or shared classes instead
+- Always use mixins for repeated patterns (breakpoints, flex centring, typography scales)
+- Never use ID selectors for styling
+- Never use !important unless overriding a third-party plugin — flag it and comment why inline
+- Mobile first — base styles target mobile, use min-width breakpoints to scale up
+- Never use max-width media queries — always min-width
+- Media queries go inside the component they affect, not in a separate file
+- Breakpoints must use variables from _variables.scss, never hardcoded px values
+- Always compile to check for errors before committing
+
+## PHP rules
+- strict_types=1 at the top of every file
+- Full type hints on all function arguments and return types
+- Prefix all functions and hooks with the theme slug to avoid conflicts
+- No direct database queries — use WP_Query or WP functions
+- Always use prepared statements if raw queries are unavoidable
+- ACF fields accessed via get_field() only, never directly from $_POST
+- Never dequeue or remove scripts/styles you didn't add
+- No hardcoded URLs — use home_url(), get_template_directory_uri() etc
+
+## JavaScript rules
+- Vanilla JS only — no jQuery unless WP provides it and it's unavoidable
+- No console.log left in committed code
+- Use js- prefixed classes for DOM hooks, never style them
+- No inline event handlers in HTML — always addEventListener in JS files
+
+## File structure rules
+- Template files in /templates
+- Reusable parts in /partials
+- ACF JSON saved to /acf-json
+- JS in /assets/js
+- SCSS partials in /assets/scss following existing folder structure
+- Compiled CSS output to /assets/css — never edit compiled files directly
+- Flag before creating any new file outside this structure
+
+## WooCommerce rules
+- Never modify WooCommerce core files
+- Override templates by copying to /woocommerce/ in the theme root
+- Always check if WooCommerce is active before using WC functions
+- Flag any WooCommerce template override changes before making them
+
+## Before committing checklist
+- No debug code left (console.log, var_dump, print_r, error_log)
+- No hardcoded credentials or hex values
+- No wp-config.php changes
+- SCSS compiled successfully with no errors
+- All new selectors follow BEM
+- No new variables, partials, or files created without flagging
+- Version line in style.css unchanged

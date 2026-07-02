@@ -61,9 +61,9 @@ Blue Chinagraph Pencils :: Pack of 12|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Black Chinagraph Pencils :: Pack of 12|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Yellow Chinagraph Pencils :: Pack of 12|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Mixed Chinagraph Pencils :: Pack of 12|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
-"ACC_PLOTPEN","To fit cutter","Select plotter pen to fit your cutter","RADIO-CUSTOM","","1","10","Item Options","To fit Roland cutters|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
-To fit Mutoh cutters|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
-To fit Graphtec cutters|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
+"ACC_PLOTPEN","To fit cutter","Select plotter pen to fit your cutter","RADIO-CUSTOM","","1","10","Item Options","To fit Roland cutters|11.50|0.00|0|STANDARD|STANDARD|STANDARD|
+To fit Mutoh cutters|11.50|0.00|0|STANDARD|STANDARD|STANDARD|
+To fit Graphtec cutters|14.30|0.00|0|STANDARD|STANDARD|STANDARD|"
 "ACC_RULER","Choose length","Choose length of ruler","CHECKBOX-CUSTOM","","1","10","Item Options","0.50m Length|21.50|0.00|0|STANDARD|STANDARD|STANDARD|
 1.00m Length|35.70|0.00|0|STANDARD|STANDARD|STANDARD|
 Handle - Self-adhesive|6.50|0.00|0|STANDARD|STANDARD|STANDARD|"
@@ -978,53 +978,45 @@ Neon Green 441 (8827)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Neon Orange 442 (8837)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Neon Pink 443 (8835)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Neon Blue 403 (8842) |0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
-"Col_Roland_Ink","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 440cc Cyan|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 440cc Magenta|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 440cc Yellow|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 440cc Black|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 440cc Light Cyan|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 440cc Light Magenta|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Cyan|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Magenta|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Yellow|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Black|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Light Cyan|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Light Magenta|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 220cc Metallic|185.00|0.00|0|STANDARD|STANDARD|STANDARD|
+"Col_Roland_Ink","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 440cc Cyan|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 440cc Magenta|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 440cc Yellow|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 440cc Black|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 220cc Cyan|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 220cc Magenta|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 220cc Yellow|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 220cc Black|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 220cc Light Cyan|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
 Roland Eco Sol Max Cleaning Cartridge|79.00|0.00|0|STANDARD|STANDARD|STANDARD|"
-"Col_Roland_Ink_2","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 2 440cc Cyan|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Magenta|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Yellow|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Black|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Light Cyan|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Light Magenta|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 440cc Light Black|105.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 220cc White|90.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 220cc Metallic|202.00|0.00|0|STANDARD|STANDARD|STANDARD|
+"Col_Roland_Ink_2","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 2 440cc Cyan|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 440cc Magenta|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 440cc Yellow|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 440cc Black|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 440cc Light Cyan|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 440cc Light Magenta|111.30|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 220cc White|95.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 220cc Metallic|214.20|0.00|0|STANDARD|STANDARD|STANDARD|
 Roland Eco Sol Max 2 Cleaning Cartridge|63.00|0.00|0|STANDARD|STANDARD|STANDARD|"
-"Col_Roland_Ink_3","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 3 500cc Cyan|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Magenta|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Yellow|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Black|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Light Cyan|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Light Magenta|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 500cc Light Black|106.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 220cc Cyan|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 220cc Magenta|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 220cc Yellow|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 3 220cc Black|67.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 220cc White|90.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland Eco Sol Max 2 220cc Metallic|202.00|0.00|0|STANDARD|STANDARD|STANDARD|
+"Col_Roland_Ink_3","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland Eco Sol Max 3 500cc Cyan|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 500cc Magenta|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 500cc Yellow|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 500cc Black|112.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 220cc Cyan|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 220cc Magenta|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 220cc Yellow|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 3 220cc Black|71.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 220cc White|95.40|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland Eco Sol Max 2 220cc Metallic|214.20|0.00|0|STANDARD|STANDARD|STANDARD|
 Roland Eco Sol Max 2 Cleaning Cartridge|63.00|0.00|0|STANDARD|STANDARD|STANDARD|"
-"Col_Roland_TR2_Ink","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland TrueVIS TR2 500ml Cyan|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Magenta|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Yellow|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml  Black|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Light Cyan|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Light Magenta|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Orange|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Green|101.00|0.00|0|STANDARD|STANDARD|STANDARD|
-Roland TrueVIS TR2 500ml Cleaning|53.00|0.00|0|STANDARD|STANDARD|STANDARD|"
+"Col_Roland_TR2_Ink","Select Colour & Size Below","Choose as many items as you like from the list.  Your total will change each time you add an item.","CHECKBOX-CUSTOM","","1","10","Item Options","Roland TrueVIS TR2 500ml Cyan|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Magenta|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Yellow|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml  Black|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Light Cyan|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Light Magenta|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Orange|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Green|107.10|0.00|0|STANDARD|STANDARD|STANDARD|
+Roland TrueVIS TR2 500ml Cleaning|53.78|0.00|0|STANDARD|STANDARD|STANDARD|"
 "Col_SM2","Choose Colour Below","","CHECKBOX-CUSTOM","","1","10","Item Options","Cyan|59.99|0.00|0|STANDARD|STANDARD|STANDARD|
 Magenta|59.99|0.00|0|STANDARD|STANDARD|STANDARD|
 Yellow|59.99|0.00|0|STANDARD|STANDARD|STANDARD|
@@ -1323,7 +1315,7 @@ A4 Sheet|11.44|0.00|0|STANDARD|STANDARD|STANDARD|"
 "CS-PAPER-APP-TAPE","Choose Width","Please select width of roll required","CHECKBOX-CUSTOM","","1","10","Item Options","100mm x 15m|3.47|0.00|0|STANDARD|STANDARD|STANDARD|
 200mm x 15m|4.95|0.00|0|STANDARD|STANDARD|STANDARD|
 305mm x 15m|6.25|0.00|0|STANDARD|STANDARD|STANDARD|
-610mm x 91.4m|45.20|0.00|0|STANDARD|STANDARD|STANDARD|"
+610mm x 91.4m|65.84|0.00|0|STANDARD|STANDARD|STANDARD|"
 "CS-SAV-Classic-Christmas-Bundle-Roll","Please select either 'Roll' size here:","","CHECKBOX-CUSTOM","","0","2","Order your short rolls here","203mm x 1m|42.46|0.00|0|STANDARD|STANDARD|STANDARD|
 305mm x 1m|59.09|0.00|0|STANDARD|STANDARD|STANDARD|
 500mm x 1m|91.19|0.00|0|STANDARD|STANDARD|STANDARD|
@@ -1391,12 +1383,19 @@ For a 50m roll, set the quantity to 1 and select '1220mm x 50m'</b></p>","RADIO-
 "dfp05","Select Length of Roll","<p><b>For a 20m roll, set the quantity to 2 and select '1220mm x 10m'<br>
 For a 50m roll, set the quantity to 1 and select '1220mm x 50m'</b></p>","RADIO-CUSTOM","","1","1","Prices are per roll at 1220mm wide","1220mm x 10m Roll|108.80|0.00|1|STANDARD|STANDARD|STANDARD|
 1220mm x 50m Roll|516.80|0.00|5|STANDARD|STANDARD|STANDARD|"
+"dfp06","Select Length of Roll","<p><b>For a 20m roll, set the quantity to 2 and select '1370mm x 10m'<br>
+For a 50m roll, set the quantity to 1 and select '1370mm x 50m'</b></p>","RADIO-CUSTOM","","1","1","Prices are per roll at 1370mm wide","1370mm x 10m Roll|84.00|0.00|1|STANDARD|STANDARD|STANDARD|
+1370mm x 50m Roll|378|0.00|5|STANDARD|STANDARD|STANDARD|"
 "dfp07","Select Length of Roll","<p><b>For a 20m roll, set the quantity to 2 and select '1370mm x 10m'<br>
 For a 50m roll, set the quantity to 1 and select '1370mm x 50m'</b></p>","RADIO-CUSTOM","","1","1","Prices are per roll at 1370mm wide","1370mm x 10m Roll|84.00|0.00|1|STANDARD|STANDARD|STANDARD|
-1370mm x 50m Roll|378.00|0.00|5|STANDARD|STANDARD|STANDARD|"
+1370mm x 10m Roll (Grey Adhesive)|87.40|0.00|1|STANDARD|STANDARD|STANDARD|
+1370mm x 50m Roll|378|0.00|5|STANDARD|STANDARD|STANDARD|
+1370mm x 50m Roll (Grey Adhesive)|393.30|0.00|5|STANDARD|STANDARD|STANDARD|"
 "dfp08","Select Length of Roll","<p><b>For a 20m roll, set the quantity to 2 and select '1370mm x 10m'<br>
 For a 50m roll, set the quantity to 1 and select '1370mm x 50m'</b></p>","RADIO-CUSTOM","","1","1","Prices are per roll at 1370mm wide","1370mm x 10m Roll|84|0.00|1|STANDARD|STANDARD|STANDARD|
-1370mm x 50m Roll|378|0.00|5|STANDARD|STANDARD|STANDARD|"
+1370mm x 10m Roll (Grey Adhesive)|87.40|0.00|1|STANDARD|STANDARD|STANDARD|
+1370mm x 50m Roll|378|0.00|5|STANDARD|STANDARD|STANDARD|
+1370mm x 50m Roll (Grey Adhesive)|393.30|0.00|5|STANDARD|STANDARD|STANDARD|"
 "DFP10","Select Length of Roll","<p><b>For a 20m roll, set the quantity to 2 and select '1370mm x 10m'<br>
 For a 50m roll, set the quantity to 1 and select '1370mm x 50m'</b></p>","RADIO-CUSTOM","","1","1","Prices are per roll at 1370mm wide","1370mm x 10m Roll|93.20|0.00|1|STANDARD|STANDARD|STANDARD|
 1370mm x 50m Roll|419.40|0.00|5|STANDARD|STANDARD|STANDARD|"
@@ -1829,7 +1828,8 @@ SD 750R :: For Rubber Sandblast Film|15.60|0.00|0|STANDARD|STANDARD|STANDARD|
 SNV :: Tangential Vinyl Blade|16.75|0.00|0|STANDARD|STANDARD|STANDARD|"
 "NYLOFLEX-C","500mm wide","","CHECKBOX-CUSTOM","","1","1","Order 500mm wide by the metre or by the roll here","per metre|8.07|0.00|0|STANDARD|STANDARD|STANDARD|
 per 25 metre roll|181.50|0.00|0|STANDARD|STANDARD|STANDARD|"
-"orajet3162","Select Size & Quantity of Rolls","<p>The 1600mm wide roll includes a special non-conveyable delivery charge.</p>","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|146.40|0.00|0|STANDARD|STANDARD|STANDARD|
+"orajet3162","Select Size & Quantity of Rolls","<p>The 1600mm wide roll includes a special non-conveyable delivery charge.</p>","CHECKBOX-CUSTOM","","1","1","Prices are per roll","760mm x 50m|81.30|0.00|0|STANDARD|STANDARD|STANDARD|
+1370mm x 50m|146.40|0.00|0|STANDARD|STANDARD|STANDARD|
 1600mm x 50m|185.00|0.00|0|STANDARD|STANDARD|STANDARD|"
 "orajet3164","Select Size & Quantity of Rolls","<p>Please select size and quantity of rolls required.</p>
 <p>The 1600mm wide roll price includes a special non-conveyable delivery charge due to its size.</p>","CHECKBOX-CUSTOM","","1","1","Prices are per roll","760mm x 50m|81.30|0.00|0|STANDARD|STANDARD|STANDARD|
@@ -2004,8 +2004,7 @@ per 25 metre roll|147.75|0.00|0|STANDARD|STANDARD|STANDARD|"
 "Ri-Dot-matt_cleargloss","Choose Colour Below","Please select required colour below","CHECKBOX-CUSTOM","","1","1","Colour Options","Matt White|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
 "RJ075","Select Size & Quantity of Rolls","Please select size of rolls below","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|168.00|0.00|0|STANDARD|STANDARD|STANDARD|"
 "rj100","Select Size & Quantity of Rolls","<p>Please select size and quantity of rolls required.</p>
-<p>The 1600mm wide roll price includes a special non-conveyable delivery charge due to its size.</p>","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|143.30|0.00|0|STANDARD|STANDARD|STANDARD|
-1600mm x 50m|177.40|0.00|0|STANDARD|STANDARD|STANDARD|"
+<p>The 1600mm wide roll price includes a special non-conveyable delivery charge due to its size.</p>","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|143.30|0.00|0|STANDARD|STANDARD|STANDARD|"
 "rj100af","Select Quantity of Rolls","Please select size and quantity of rolls below","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|161.20|0.00|0|STANDARD|STANDARD|STANDARD|"
 "rj100bo","Select Size & Quantity of Rolls","Please select size and quantity of rolls below","CHECKBOX-CUSTOM","","1","1","Prices are per roll","1370mm x 50m|157.10|0.00|0|STANDARD|STANDARD|STANDARD|
 1600mm x 50m|191.35|0.00|0|STANDARD|STANDARD|STANDARD|"
@@ -2367,6 +2366,8 @@ Slate Charcoal 35 (34% Light Transmittance)|0.00|0.00|0|STANDARD|STANDARD|STANDA
 Slate Charcoal 50 (49% Light Transmittance)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
 "SC_SHADE_3550","Shade","Choose Shade properties","RADIO-CUSTOM","","1","10","Item Options","Slate Charcoal 35 (34% Light Transmittance)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|
 Slate Charcoal 50 (49% Light Transmittance)|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
+"SE801250","1250mm wide - Please select either:","","CHECKBOX-CUSTOM","","1","2","Order 1250mm wide by the metre or by the roll here","part roll - price per mtr|23.80|0.00|0|STANDARD|STANDARD|STANDARD|
+full 25 mtr roll|535.50|0.00|0|STANDARD|STANDARD|STANDARD|"
 "Signcut_Pro2","Choose Renewal Below","<p>Please choose the type of renewal to your SignCut Pro2 Software below.</p>
 <p>Please remember:
 <ul><li><b>Student & Home</b>- works with cutters up to 460mm wide</li></ul>
@@ -2429,7 +2430,7 @@ per 25 metre roll|162.25|141.00|0|STANDARD|STANDARD|STANDARD|"
 Ball End|0.00|0.00|0|STANDARD|STANDARD|STANDARD|"
 "ultrac","Choose Size Below","Choose Size of Roll","CHECKBOX-CUSTOM","","1","10","Prices are per roll","1050mm x 50m Perm / Perm|254.20|0.00|0|STANDARD|STANDARD|STANDARD|
 1310mm x 50m Perm / Perm|315.70|0.00|0|STANDARD|STANDARD|STANDARD|
-1310mm x 50m Perm / Removable - reverse wound|305.50|0.00|0|STANDARD|STANDARD|STANDARD|
+1310mm x 50m Perm / Removable - reverse wound|323.90|0.00|0|STANDARD|STANDARD|STANDARD|
 1530mm x 50m Perm / Perm|366.50|0.00|0|STANDARD|STANDARD|STANDARD|"
 "Uni_Can","Select Size of Roll","Please select size or roll below","CHECKBOX-CUSTOM","","1","1","Prices are per roll","500mm x 15m Roll|53.70|43.01|0|STANDARD|STANDARD|STANDARD|
 760mm x 15m Roll|70.50|56.50|0|STANDARD|STANDARD|STANDARD|

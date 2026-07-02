@@ -1275,7 +1275,13 @@ foreach ($vars as $varid => $varval) {$this->globals($varid,$varval);}
 
 <div class=""kpadded kgridsep kgrid3"">
 
-<div class=""kcatlistitemimage kgridbox""><img src=""skins/CUSTOM-2023/media/Bookshop.webp"" class=""kimgnicecenter"" alt=""Creating Privacy Through Branded Etched Glass at IY Commissioning"">
+<div class=""kcatlistitemimage kgridbox""><img src=""skins/CUSTOM-2023/media/Northampton-University-Window.webp"" class=""kimgnicecenter"" alt=""Light, Privacy & Precision: Window Graphics for a Multi-Site University Project"">
+<div class=""ktopmargindbl kcenter"">
+<button class=""kbutton""><a href=""https://dorotape.co.uk/Study-University-Windows"" title=""Light, Privacy & Precision: Window Graphics for a Multi-Site University Project"">View University Windows Case Study</a></button>
+</div>
+</div>
+
+<div class=""kcatlistitemimage kgridbox""><img src=""skins/CUSTOM-2023/media/Bookshop.webp"" class=""kimgnicecenter"" alt=""Using specialist self-adhesive film to bring a bookshop window to life"">
 <div class=""ktopmargindbl kcenter"">
 <button class=""kbutton""><a href=""https://dorotape.co.uk/Study-Bookshop-Window"" title=""Using specialist self-adhesive film to bring a bookshop window to life"">View Bookshop Window Case Study</a></button>
 </div>
@@ -6869,6 +6875,140 @@ function showSlides(n) {
 
 </div>
 </body>","10","0","0","","","","A","admin, superuser","","0","","1",""
+"Study-University-Windows","Light, Privacy & Precision: Window Graphics for a Multi-Site University Project","DEFAULT","<head>
+<meta name=""viewport"" content=""width=device-width, initial-scale=1"">
+<style>
+.iframecontainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id=""kskin_casestudies"" class=""kpadded"">
+
+
+<h2 style= ""text-align:center"">Light, Privacy & Precision: Window Graphics for a Multi-Site University Project<span style=""color:#009fe3; font-weight:bold; font-size: 1.5em;"">.</span></h2>
+
+<div class=""kcenter kgridsep kgrid2"">
+<div class=""container kgridxcol80"">
+ <div class=""mySlides"">
+    <div class=""numbertext"">1 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Northampton-University-Welcome-Window
+.webp"" style=""width:100%"">
+  </div>
+  <div class=""mySlides"">
+    <div class=""numbertext"">2 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Northampton-University-Radio-Window.webp"" style=""width:100%"">
+  </div>
+  <div class=""mySlides"">
+    <div class=""numbertext"">3 / 3</div>
+    <img src=""skins/CUSTOM-2023/media/Northampton-University-Residence-Window.webp"" style=""width:100%"">
+  </div>
+ 
+    
+  <a class=""prev"" onclick=""plusSlides(-1)"">&#10094;</a>
+  <a class=""next"" onclick=""plusSlides(1)"">&#10095;</a>
+  
+</div>
+
+
+  <div class=""column kgridxcol15"">
+<div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Northampton-University-Welcome-Window.webp"" style=""width:100%"" onclick=""currentSlide(1)"" alt=""Applying graphics to bookshop window"">
+    </div>
+       <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Northampton-University-Radio-Window.webp"" style=""width:100%"" onclick=""currentSlide(2)"" alt=""Projection of colours from the window onto the floor of the bookshop"">
+    </div>
+     <div class=""row"">
+      <img class=""demo cursor"" src=""skins/CUSTOM-2023/media/Northampton-University-Residence-Window.webp"" style=""width:100%"" onclick=""currentSlide(3)"" alt=""Artwork of the book and the finished bookshop window"">
+    </div>
+  </div>
+
+
+<script>
+let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName(""mySlides"");
+  let dots = document.getElementsByClassName(""demo"");
+  let captionText = document.getElementById(""caption"");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = ""none"";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace("" active"", """");
+  }
+  slides[slideIndex-1].style.display = ""block"";
+  dots[slideIndex-1].className += "" active"";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
+</script>
+
+
+
+
+</div>
+
+<h3 style=color:#d7328a;"">The brief<span style=""color:#009fe3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Creative print agency <a href=""https://tangerine-red.co.uk/ ""target=""_blank""><font color=""#d7328a""><b>Tangerine Red</a></b></font>, were invited to create window graphics for University of Northampton, covering three locations: the Creative Hub and two areas within the St Johns Halls.</p>
+
+<p>All buildings remained in daily use, meaning the graphics needed to balance high visibility, natural light, and daytime privacy without creating a closed-in feel.</p>
+
+
+<h3 style=color:#d7328a;"">The solution<span style=""color:#009ee3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>Tangerine Red specified <a href=""https://www.dorotape.co.uk/Item/D-View-Micro-Perforated-Vinyl"" target=""_blank""><font color=""#d7328a""><b>D-View Micro Perforated Vinyl</a></b></font>, chosen for its:</p>
+
+<ul><li><b>One-way vision properties</b> - privacy from the outside while keeping interiors bright</li>
+<li><b>Stategic light transmission</b> - the micro-perforation pattern allows natural daylight to pass through</li>
+<li><b>Smooth, uniform print surface</b> - delivering sharp printed detail across large panes</li>
+<li><b>Strong but removable adhesive</b> - ideal for active campus buildings</li></ul>
+
+<p>On one section featuring unusually wide window frames, Tangerine Red also infilled the frames — a technique we frequently use for this type of installation. This provided a cleaner, uninterrupted visual finish, maintaining design integrity and improving the overall aesthetic when viewed from outside.</p>
+
+<h3 style=color:#d7328a;"">Testimonial<span style=""color:#009ee3; font-weight:bold; font-size: 1.5em;"">.</span></h3>
+
+<p>“The graphics look fantastic across all three sites. Light levels remained perfect for the students and staff, and the privacy solution worked exactly as intended. The infill detailing gave the whole installation a really polished finish.”<br>
+ <b><i>Graphic Dept University of Northampton</i></b></p>
+
+<p>“Working with Dorotape has always been a pleasure. We already knew which product to select, as we have used this material for many years, and with Paul supporting us on this project, we knew it would make the job a whole lot easier.”<br>
+ <b><i>Jess & Steve, Tangerine Red</i></b></p>
+
+<h3 style=color:#d7328a;"">How can we help you<span style=""color:#009ee3; font-weight:bold; font-size: 1.25em;"">?</span></h3>
+
+<p>Feeling inspired? If you have a project in mind that could benefit from our expert advice, just <a href=""https://www.dorotape.co.uk/Contact-Us"" target=""_blank""><font color=""#d7328a""><b>contact us</b></font></a> or drop us an <a href=""mailto:sales@dorotape.co.uk""><font color=""#d7328a""><b>email</b></font></a>. We're always happy to help.</p>
+
+</div>
+</body>","10","0","0","","EL300, Aslan, Etch, etched, glass","","A","admin, superuser","","0","","1",""
 "Study-Van-Hage-Ice-Palace","Van Hage Ice Palace","DEFAULT","<head>
 <meta name=""viewport"" content=""width=device-width, initial-scale=1"">
 <style>

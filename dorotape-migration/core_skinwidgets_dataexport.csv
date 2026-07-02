@@ -38,7 +38,16 @@ LE16 9NP<br><br>
 
 </div>
 
-","DEFAULT"
+<a href=""https://www.ncsc.gov.uk/cyberessentials/overview"" target=""_blank"">
+  <img 
+    style=""padding: 20px 0;"" 
+    src=""skins/CUSTOM-2023/media/Cyber-Essentials-Logo.png"" 
+    alt=""visit the Gov Cyber Essentials website"" 
+    width=""165"" 
+    height=""70""
+    class=""responsive""
+  >
+</a>","DEFAULT"
 "Contact-Footer","Contact Us","1","FOOTERNEW","kwidget_content","kicon_widget-companyinfo","10","<div id=""kcontact_foot"" class=""kgridbox"">
 
 <p class=""ktxt_popreg"">Need our expert advice?</p>
@@ -163,7 +172,7 @@ div.message {border-style: solid; border-radius: 20px; margin: 20px 0px 0px 0px;
      <a href=""https://www.aslanfolien.de/en/index.html"" target=""_blank""><img style= ""padding: 20px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/ASLAN_Platinum_Distributor_2026.png"" alt=""visit ASLAN website"" class=""kimgnice"">
   </div></a>
 <div class=""kfoot_column"">
-    <a href=""http://www.shopdisplay.org/"" target=""_blank""><img style= ""padding: 40px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/SDEA logo MEMBER CMYK W.png"" alt=""visit SDEA website"" class=""kimgnice"">
+    <a href=""http://www.shopdisplay.org/"" target=""_blank""><img style= ""padding: 40px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/SDEA-Logo-2026.png"" alt=""visit SDEA website"" class=""kimgnice"">
   </div></a>
     <div class=""kfoot_column"">
     <a href=""https://uksigns.org/"" target=""_blank""><img style= ""padding: 20px 0px 20px 0px"" src=""skins/CUSTOM-2023/media/BSGA_Logo.png"" alt=""visit BSGA website"" class=""kimgnice"">
@@ -248,6 +257,23 @@ div.message {border-style: dashed; border-radius: 10px; font-size:18px; border-w
 ","DEFAULT"
 "SC_Social_Media","Let's get social","0","HEADER","kwidget_content","kicon_widget-social","5","<?php return $this->include_file('core','skinwidget_social.php'); ?>","CRAFTSTICK"
 "SEARCH-NEW","Search doro","1","HEADERNEW","kwidget_iconcollapsed","kicon_widget-search","10","<?php return $this->include_file('ecom','skinwidget_minisearch.php'); ?>",""
+"Special-Hours-Message","Special Hours Message","1","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
+div.title {border-radius: 2px; background-color: #009ee3; font-size:20px; margin: 10px 0px 0px 0px; padding: 10px; border-width: 20px; color: #ffffff;}
+
+div.message {border-style: solid; border-radius: 20px; margin: 20px 0px 0px 0px; padding: 10px 0px 10px 0px; font-size:22px; border-width: 10px; color: #009ee3;}
+
+</style>
+
+
+
+<div class=""message"" align=""center""><img style=""width: 60px; height: 60px; float: right;"" alt=""world cup football"" src=""skins/CUSTOM-2023/media/WCF.png""</img><img style=""width: 60px; height: 60px; float: left;"" alt=""world cup football"" src=""skins/CUSTOM-2023/media/WCF.png""</img><b>Our office and warehouse will be closing from 4.30pm today so we can cheer on the England football team!<br>
+We will be open again from 8.30am tomorrow</b>
+</div>
+
+
+
+
+","DEFAULT"
 "Xmas_Message","Bank Holiday Message","0","LOCATION","kwidget_content","kicon_widget-bannermain","10","<style>
 div.title {border-radius: 2px; background-color: #009ee3; font-size:28px; margin: 20px 0px 0px 0px; padding: 20px; border-width: 24px; color: #ffffff;}
 
