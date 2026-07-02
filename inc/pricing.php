@@ -31,9 +31,15 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 		return;
 	}
 	// Guard against infinite recursion from nested WC recalculations.
-	if ( did_action( 'woocommerce_before_calculate_totals' ) >= 2 ) {
+	// A re-entrancy flag rather than did_action(): totals legitimately
+	// recalculate more than once per request (each add-to-cart, block cart),
+	// and a fire-count guard skips repricing for lines added after the
+	// second calculation.
+	static $running = false;
+	if ( $running ) {
 		return;
 	}
+	$running = true;
 
 	$customer_discount = dorotape_get_customer_discount( get_current_user_id() );
 
@@ -59,6 +65,8 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 
 		$product->set_price( round( $price, wc_get_price_decimals() ) );
 	}
+
+	$running = false;
 }
 add_action( 'woocommerce_before_calculate_totals', 'dorotape_dynamic_pricing', 20, 1 );
 

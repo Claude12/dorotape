@@ -304,11 +304,42 @@
 			.on( 'reset_data',      function ()               { resetVariation(); } );
 	}
 
+	/* ── Header product search ──────────────────────────────────────────── */
+	function initHeaderSearch() {
+		const wrap = document.getElementById( 'dt-header-search' );
+		if ( ! wrap ) return;
+
+		const toggle = wrap.querySelector( '.dt-header-search__toggle' );
+		const input  = wrap.querySelector( '.dt-header-search__input' );
+
+		function setOpen( open ) {
+			wrap.classList.toggle( 'dt-header-search--open', open );
+			toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+			if ( open ) input.focus();
+		}
+
+		toggle.addEventListener( 'click', function () {
+			setOpen( ! wrap.classList.contains( 'dt-header-search--open' ) );
+		} );
+
+		document.addEventListener( 'click', function ( e ) {
+			if ( ! wrap.contains( e.target ) ) setOpen( false );
+		} );
+
+		wrap.addEventListener( 'keydown', function ( e ) {
+			if ( 'Escape' === e.key ) {
+				setOpen( false );
+				toggle.focus();
+			}
+		} );
+	}
+
 	/* ── Boot ───────────────────────────────────────────────────────────── */
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initDropdownNav();
 		initTierTable();
 		initVariationPriceSwap();
+		initHeaderSearch();
 	} );
 
 }() );

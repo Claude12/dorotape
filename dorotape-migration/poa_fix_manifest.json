@@ -1,0 +1,552 @@
+[
+ {
+  "offer_id": "Aqueous_Vinyl",
+  "sku": "104",
+  "prodnum": "104",
+  "name": "Self-adhesive Matte Vinyl",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Select Size of Roll",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Aqueous_Vinyl-sz01",
+    "label": "610mm x 30m Roll",
+    "price": 62.9,
+    "tiers": ""
+   },
+   {
+    "sku": "Aqueous_Vinyl-sz02",
+    "label": "914mm x 30m Roll",
+    "price": 90.9,
+    "tiers": ""
+   },
+   {
+    "sku": "Aqueous_Vinyl-sz03",
+    "label": "1067mm x 30m Roll",
+    "price": 105.2,
+    "tiers": ""
+   },
+   {
+    "sku": "Aqueous_Vinyl-sz04",
+    "label": "1118mm x 30m Roll",
+    "price": 122.9,
+    "tiers": ""
+   },
+   {
+    "sku": "Aqueous_Vinyl-sz05",
+    "label": "1270mm x 30m Roll",
+    "price": 125.4,
+    "tiers": ""
+   },
+   {
+    "sku": "Aqueous_Vinyl-sz06",
+    "label": "1520mm x 30m Roll",
+    "price": 153.6,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Aslan-Glassline-Colour-Selectors",
+  "sku": "COLSELGLASSLINE",
+  "prodnum": "COLSELGLASSLINE",
+  "name": "ASLAN Glassline Series Colour Selectors",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Aslan",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Aslan-Glassline-Colour-Cards",
+    "label": "Aslan Glassline 2 Page A4 Colour Card",
+    "price": 1.5,
+    "tiers": ""
+   },
+   {
+    "sku": "Aslan-Glassline-Pocket-Swatch",
+    "label": "Aslan Glassline Colour Pocket Swatch",
+    "price": 5.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Aslan-MetalEffect-Colour-Selectors",
+  "sku": "COLSELMETALEFFECT",
+  "prodnum": "COLSELMETALEFFECT",
+  "name": "ASLAN MetalEffect Series Colour Selectors",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Aslan",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Aslan-MetalEffect-Colour-Cards",
+    "label": "Aslan MetalEffect 3 Page A4 Colour Card",
+    "price": 1.5,
+    "tiers": ""
+   },
+   {
+    "sku": "Aslan-MetalEffect-Pocket-Swatch",
+    "label": "Aslan MetalEffect Colour Pocket Swatch",
+    "price": 5.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "M8_Bright_Yellow",
+  "sku": "Cover Styl' M87",
+  "prodnum": "Cover Styl' M87",
+  "name": "M8 Bright Yellow",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Cover_Styl",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Size / Format",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "M8_Bright_Yellow-sz01",
+    "label": "part roll - price per mtr at 1220mm",
+    "price": 19.0,
+    "tiers": ""
+   },
+   {
+    "sku": "M8_Bright_Yellow-sz02",
+    "label": "full roll - 1220mm x 50 mtr",
+    "price": 855.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Mutoh_Plotter_Blade",
+  "sku": "V500V / MSC500V",
+  "prodnum": "V500V / MSC500V",
+  "name": "Mutoh Plotter Cutting Blades",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Choose blade type",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Mutoh_Plotter_Blade-sz01",
+    "label": "MSC 500V :: Sprung blade",
+    "price": 13.55,
+    "tiers": ""
+   },
+   {
+    "sku": "Mutoh_Plotter_Blade-sz02",
+    "label": "V500V :: Plain blade",
+    "price": 13.55,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Ri-Mark-Event-Colour-Selector",
+  "sku": "COLSELEVENT",
+  "prodnum": "COLSELEVENT",
+  "name": "Ri-Mark Event Series Colour Selectors",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Ritrama",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Ri-Mark-Event-Colour-Cards",
+    "label": "Ri-Mark Event Series 2 Page A4 Colour Card",
+    "price": 2.5,
+    "tiers": ""
+   },
+   {
+    "sku": "Ri-Mark-Event-Colour-Pocket-Swatch",
+    "label": "Ri-Mark Event Series Colour Pocket Swatch",
+    "price": 5.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Ri-Mark-Optima-Colour-Selectors",
+  "sku": "COLSELOPTIMA",
+  "prodnum": "COLSELOPTIMA",
+  "name": "Ri-Mark Optima Series Colour Selectors",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Ritrama",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Ri-Mark-Optima-Colour-Cards",
+    "label": "Ri-Mark Optima Series 2 Page A4 Colour Card",
+    "price": 2.5,
+    "tiers": ""
+   },
+   {
+    "sku": "Ri-Mark-Optima-Colour-Pocket-Swatch",
+    "label": "Ri-Mark Optima Series Colour Pocket Swatch",
+    "price": 5.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Ri-Mark-Platinum-Colour-Selectors",
+  "sku": "COLSELPLATINUM",
+  "prodnum": "COLSELPLATINUM",
+  "name": "Ri-Mark Platinum Series Colour Selectors",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "Ritrama",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Ri-Mark-Platinum-Colour-Cards",
+    "label": "Ri-Mark Platinum Series 2 Page A4 Colour Card",
+    "price": 2.5,
+    "tiers": ""
+   },
+   {
+    "sku": "Ri-Mark-Platinum-Colour-Pocket-Swatch",
+    "label": "Ri-Mark Platinum Series Colour Pocket Swatch",
+    "price": 5.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "SALE_Digital_Print_Media",
+  "sku": "DPM",
+  "prodnum": "DPM",
+  "name": "Digital Print Media for Eco-Solvent, UV & Latex Inks",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "SALE_Digital_Print_Film_Enviroprint_1370",
+    "label": "1370mm x 50m Matt White Digital Print Film for Eco Solvent, UV & Latex Inks - PVC FREE",
+    "price": 95.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Digital_Print_Vinyl_DFP33_1370",
+    "label": "1370mm x 25m Print N Go Floor Graphic Vinyl for Eco-Solvent, UV & Latex Inks - R9 Slip Resistance",
+    "price": 155.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "SALE_Digital_Print_Vinyl",
+  "sku": "DPMAQ",
+  "prodnum": "DPMAQ",
+  "name": "Digital Print Media for Aqueous Inks",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "SALE_Digital_Print_Fabric_Digi-Fab_610",
+    "label": "610mm x 30m White Digital Print Self-Adhesive Fabric for Aqueous Inks",
+    "price": 36.5,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Digital_Print_Vinyl_SAV150G_1520",
+    "label": "1520mm x 30m Gloss White Digital Print Vinyl for Aqueous Inks",
+    "price": 65.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Digital_Print_Vinyl_SAV150M_1118",
+    "label": "1118mm x 30m Matt White Digital Print Vinyl for Aqueous Inks",
+    "price": 45.0,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "SALE_HTV",
+  "sku": "HTV",
+  "prodnum": "HTV",
+  "name": "HTV - Heat Transfer Vinyl",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "SALE_7550",
+    "label": "Yellow Flock HTV for heat pressing onto Cotton / Polyester 500mm",
+    "price": 3.9,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_ST492",
+    "label": "Gold Star-Flex HTV for heat pressing onto Cotton / Polyester 500mm",
+    "price": 2.8,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "SALE_Lustre_Laminate",
+  "sku": "LF",
+  "prodnum": "LF",
+  "name": "Laminating Films",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "SALE_ENVIRO_LAM_MATT_1370",
+    "label": "1370mm x 50m Matt PP Laminating Film - 25 micron",
+    "price": 75.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Laminate_Boss_Gloss_1300",
+    "label": "1300mm x 100m Gloss PVC Laminating Film - 100 micron",
+    "price": 85.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Laminate_Essential_Floor_1300",
+    "label": "1300mm x 50m Textured PVC Laminating Film - 125 micron",
+    "price": 85.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Laminate_Essential_Floor_880",
+    "label": "880mm x 50m Textured PVC Laminating Film - 125 micron",
+    "price": 60.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_Laminate_Essential_Gloss_1520",
+    "label": "1520mm x 50m Gloss PVC Laminating Film - 80 micron",
+    "price": 55.5,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "SALE_Signmaking_Films",
+  "sku": "SMVF",
+  "prodnum": "SMVF",
+  "name": "Signmaking Vinyl and Films",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Option",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "SALE_7667_1220",
+    "label": "Ritrama Azurite Gemstone Cast Sign Vinyl 1220mm x 5m",
+    "price": 48.5,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_FF550_1010",
+    "label": "ASLAN Whiteboard / Ferrous Film 1010mm x 12m",
+    "price": 220.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_FF550_1370_2",
+    "label": "ASLAN Whiteboard / Ferrous Film 1370mm x 2m",
+    "price": 30.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_FF550_1370_3",
+    "label": "ASLAN Whiteboard / Ferrous Film 1370mm x 3m",
+    "price": 45.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_SC436_1260",
+    "label": "Ritrama Gloss Wine Red Polymeric Sign Vinyl 1260mm x 10m",
+    "price": 25.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_SC447_1260",
+    "label": "Ritrama Gloss Nut Brown Polymeric Sign Vinyl 1260mm x 10m",
+    "price": 25.0,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_SW2P",
+    "label": "Swing Board with Poster Panel",
+    "price": 45.5,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_WBL995_1370",
+    "label": "ASLAN Whiteboard Vinyl Easy Apply 1370mm x 5m",
+    "price": 50.25,
+    "tiers": ""
+   },
+   {
+    "sku": "SALE_WBL998_1370",
+    "label": "ASLAN Whiteboard Vinyl Easy Apply 1370mm x 5m PVC FREE",
+    "price": 52.75,
+    "tiers": ""
+   }
+  ]
+ },
+ {
+  "offer_id": "Summa_Plotter_Blade",
+  "sku": "SD",
+  "prodnum": "SD",
+  "name": "Summa Plotter Cutting Blades",
+  "short_desc": "",
+  "long_desc": "",
+  "manufacturer": "DEFAULT",
+  "categories": [],
+  "image": "",
+  "seourl": "",
+  "cutsize": false,
+  "type": "variable",
+  "regular_price": 0.0,
+  "price_tiers": "",
+  "attribute": "Choose blade type",
+  "update_existing": true,
+  "variations": [
+   {
+    "sku": "Summa_Plotter_Blade-sz01",
+    "label": "SD 450V :: Drag Vinyl blade :: \u00a313.55",
+    "price": 13.55,
+    "tiers": ""
+   },
+   {
+    "sku": "Summa_Plotter_Blade-sz02",
+    "label": "SD 750F :: For Flock blade :: \u00a313.55",
+    "price": 13.55,
+    "tiers": ""
+   },
+   {
+    "sku": "Summa_Plotter_Blade-sz03",
+    "label": "SD 750R :: For Rubber Sandblast Film",
+    "price": 15.6,
+    "tiers": ""
+   },
+   {
+    "sku": "Summa_Plotter_Blade-sz04",
+    "label": "SNV :: Tangential Vinyl Blade",
+    "price": 16.75,
+    "tiers": ""
+   }
+  ]
+ }
+]

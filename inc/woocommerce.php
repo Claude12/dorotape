@@ -479,3 +479,161 @@ add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
 
 	return $tabs;
 } );
+
+// ─── Grouped variation dropdown ───────────────────────────────────────────────
+
+/**
+ * Tidy a Kryptronic option-group prefix into an optgroup label.
+ * "or 1220mm wide here" → "1220mm wide", "Select here for 1520mm wide" →
+ * "1520mm wide". Unrecognised prefixes pass through unchanged.
+ *
+ * @param string $prefix
+ * @return string
+ */
+function dorotape_optgroup_label( string $prefix ): string {
+	$prefix = preg_replace( '/^or\s+/i', '', trim( $prefix ) );
+	$prefix = preg_replace( '/^select here for\s+/i', '', $prefix );
+	$prefix = preg_replace( '/\s+here$/i', '', $prefix );
+	return ucfirst( trim( $prefix ) );
+}
+
+/**
+ * Rebuild long variation dropdowns with <optgroup> sections.
+ *
+ * Migrated products flatten several Kryptronic option groups into one
+ * attribute whose labels keep the group prefix: "or 1220mm wide here — part
+ * roll - price per metre". With 8–19 such options (Rainbow Silver 7901,
+ * F-Sign Platinum) the flat select is hard to scan. This splits each label
+ * on the em-dash into group → option and emits optgroups; labels without a
+ * prefix are listed first. Selects with fewer than two groups are untouched.
+ */
+add_filter( 'woocommerce_dropdown_variation_attribute_options_html', function ( string $html, array $args ): string {
+	$options   = $args['options'];
+	$product   = $args['product'];
+	$attribute = $args['attribute'];
+
+	if ( empty( $options ) || ! $product instanceof WC_Product || count( $options ) < 4 ) {
+		return $html;
+	}
+
+	// slug => display label, preserving term order for taxonomy attributes.
+	$choices = array();
+	if ( taxonomy_exists( $attribute ) ) {
+		foreach ( wc_get_product_terms( $product->get_id(), $attribute, array( 'fields' => 'all' ) ) as $term ) {
+			if ( in_array( $term->slug, $options, true ) ) {
+				$choices[ $term->slug ] = $term->name;
+			}
+		}
+		// Fall back to raw slugs for values without a term.
+		foreach ( $options as $slug ) {
+			if ( ! isset( $choices[ $slug ] ) ) {
+				$choices[ $slug ] = $slug;
+			}
+		}
+	} else {
+		foreach ( $options as $option ) {
+			$choices[ $option ] = $option;
+		}
+	}
+
+	// Split "group — option" labels. \x{2014} = em dash.
+	$grouped   = array(); // group label => [slug => option label]
+	$ungrouped = array();
+	foreach ( $choices as $slug => $label ) {
+		$parts = preg_split( '/\s+\x{2014}\s+/u', $label, 2 );
+		if ( 2 === count( $parts ) ) {
+			$grouped[ dorotape_optgroup_label( $parts[0] ) ][ $slug ] = trim( $parts[1] );
+		} else {
+			$ungrouped[ $slug ] = $label;
+		}
+	}
+
+	if ( count( $grouped ) < 2 ) {
+		return $html; // Nothing worth grouping.
+	}
+
+	$name     = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
+	$id       = $args['id'] ? $args['id'] : sanitize_title( $attribute );
+	$class    = $args['class'];
+	$selected = $args['selected'];
+
+	$show_option_none      = (bool) $args['show_option_none'];
+	$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' );
+
+	$out = '<select id="' . esc_attr( $id ) . '" class="' . esc_attr( $class ) . '" name="' . esc_attr( $name ) . '" '
+		. 'data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '" '
+		. 'data-show_option_none="' . ( $show_option_none ? 'yes' : 'no' ) . '">';
+	$out .= '<option value="">' . esc_html( $show_option_none_text ) . '</option>';
+
+	$render_option = static function ( string $slug, string $label ) use ( $selected ): string {
+		return '<option value="' . esc_attr( $slug ) . '" '
+			. selected( $selected, $slug, false ) . '>'
+			. esc_html( $label ) . '</option>';
+	};
+
+	foreach ( $ungrouped as $slug => $label ) {
+		$out .= $render_option( $slug, $label );
+	}
+	foreach ( $grouped as $group_label => $group_options ) {
+		$out .= '<optgroup label="' . esc_attr( $group_label ) . '">';
+		foreach ( $group_options as $slug => $label ) {
+			$out .= $render_option( $slug, $label );
+		}
+		$out .= '</optgroup>';
+	}
+
+	$out .= '</select>';
+	return $out;
+}, 10, 2 );
+
+// ─── Product search includes SKUs ─────────────────────────────────────────────
+
+/**
+ * Frontend product searches also match SKU / item number.
+ *
+ * Trade customers search by item number (900E, HOOKB20, 13117) as they did on
+ * the old site. WordPress search only scans title/content, so extend the WHERE
+ * with an EXISTS on _sku meta — matching the product's own SKU or any of its
+ * variations' SKUs (variation match surfaces the parent product).
+ */
+add_filter( 'posts_search', function ( string $search, WP_Query $query ): string {
+	global $wpdb;
+
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() || '' === $search ) {
+		return $search;
+	}
+	if ( 'product' !== $query->get( 'post_type' ) ) {
+		return $search;
+	}
+
+	$term = $query->get( 's' );
+	if ( '' === trim( (string) $term ) ) {
+		return $search;
+	}
+	$like = '%' . $wpdb->esc_like( trim( $term ) ) . '%';
+
+	$sku_clause = $wpdb->prepare(
+		" OR EXISTS (
+			SELECT 1 FROM {$wpdb->postmeta} skum
+			JOIN {$wpdb->posts} skup ON skup.ID = skum.post_id
+			WHERE skum.meta_key = '_sku' AND skum.meta_value LIKE %s
+			AND ( skup.ID = {$wpdb->posts}.ID OR skup.post_parent = {$wpdb->posts}.ID )
+		) ",
+		$like
+	);
+
+	// Splice the SKU clause into WP's search-terms block so it ORs with the
+	// combined title/excerpt/content conditions. The block is followed by an
+	// " AND (posts.post_password = '')" clause — cut there, not at the end,
+	// or the OR would land inside the password check.
+	$pw_marker = " AND ({$wpdb->posts}.post_password";
+	$pw_pos    = strpos( $search, $pw_marker );
+	$head      = false === $pw_pos ? $search : substr( $search, 0, $pw_pos );
+	$tail      = false === $pw_pos ? '' : substr( $search, $pw_pos );
+
+	$pos = strrpos( $head, ')' );
+	if ( false === $pos ) {
+		return $search;
+	}
+	return substr( $head, 0, $pos ) . $sku_clause . substr( $head, $pos ) . $tail;
+}, 10, 2 );

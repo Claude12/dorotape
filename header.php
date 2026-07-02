@@ -59,5 +59,26 @@
 				?>
 			</nav><!-- #secondary-navigation -->
 
+			<div class="dt-header-search" id="dt-header-search">
+				<button type="button" class="dt-header-search__toggle"
+					aria-expanded="false" aria-controls="dt-header-search-form"
+					aria-label="<?php esc_attr_e( 'Search products', 'dorotape' ); ?>">
+					<svg class="dt-header-search__icon" viewBox="0 0 24 24" width="20" height="20"
+						fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+						<circle cx="11" cy="11" r="7"></circle>
+						<line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+					</svg>
+				</button>
+				<form id="dt-header-search-form" class="dt-header-search__form" role="search" method="get"
+					action="<?php echo esc_url( home_url( '/' ) ); ?>">
+					<label class="screen-reader-text" for="dt-header-search-input"><?php esc_html_e( 'Search products', 'dorotape' ); ?></label>
+					<input id="dt-header-search-input" class="dt-header-search__input" type="search" name="s"
+						value="<?php echo esc_attr( get_search_query() ); ?>"
+						placeholder="<?php esc_attr_e( 'Search products…', 'dorotape' ); ?>" autocomplete="off">
+					<input type="hidden" name="post_type" value="product">
+					<button type="submit" class="dt-header-search__submit"><?php esc_html_e( 'Search', 'dorotape' ); ?></button>
+				</form>
+			</div><!-- .dt-header-search -->
+
 		</div><!-- .header-inner -->
 	</header><!-- #masthead -->
