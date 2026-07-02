@@ -26,6 +26,32 @@ function dorotape_is_poa( WC_Product $product ): bool {
 	return '1' === get_post_meta( $id, '_price_poa', true );
 }
 
+// ─── Admin toggle (Product data → Advanced) ───────────────────────────────────
+
+/**
+ * Checkbox so shop managers can mark any product as POA from the CMS.
+ * Sits alongside the "Cut sizes box" toggle. Stored as _price_poa='1',
+ * the same key the migration set.
+ */
+add_action( 'woocommerce_product_options_advanced', function (): void {
+	woocommerce_wp_checkbox(
+		array(
+			'id'          => '_price_poa',
+			'cbvalue'     => '1', // matches the migrated meta value
+			'label'       => __( 'Price on Application', 'dorotape' ),
+			'description' => __( 'Hide prices and replace add-to-cart with the POA enquiry form (chosen under WooCommerce → Settings → Products).', 'dorotape' ),
+		)
+	);
+} );
+
+add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $product ): void {
+	if ( isset( $_POST['_price_poa'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+		$product->update_meta_data( '_price_poa', '1' );
+	} else {
+		$product->delete_meta_data( '_price_poa' );
+	}
+} );
+
 // ─── Price display ────────────────────────────────────────────────────────────
 
 add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $product ): string {
