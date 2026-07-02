@@ -47,11 +47,22 @@ function dorotape_woocommerce_widgets_init() {
 }
 add_action( 'widgets_init', 'dorotape_woocommerce_widgets_init' );
 
-// Swap the default WooCommerce sidebar for our shop sidebar
+// Swap the default WooCommerce sidebar for our shop sidebar.
+// The theme has no sidebar column on shop pages, so widgets render after the
+// grid — wrap them in a "Refine by" panel that scaffold.css lays out in columns.
 function dorotape_woocommerce_sidebar() {
-	if ( is_active_sidebar( 'sidebar-shop' ) ) {
-		dynamic_sidebar( 'sidebar-shop' );
+	// Archives only — the refine panel is meaningless on single product pages.
+	if ( ! is_shop() && ! is_product_taxonomy() ) {
+		return;
 	}
+	if ( ! is_active_sidebar( 'sidebar-shop' ) ) {
+		return;
+	}
+	echo '<aside class="dt-shop-refine" aria-label="' . esc_attr__( 'Product filters', 'dorotape' ) . '">';
+	echo '<h2 class="dt-shop-refine__heading">' . esc_html__( 'Refine by', 'dorotape' ) . '</h2>';
+	echo '<div class="dt-shop-refine__grid">';
+	dynamic_sidebar( 'sidebar-shop' );
+	echo '</div></aside>';
 }
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
 add_action( 'woocommerce_sidebar', 'dorotape_woocommerce_sidebar', 10 );
@@ -637,3 +648,162 @@ add_filter( 'posts_search', function ( string $search, WP_Query $query ): string
 	}
 	return substr( $head, 0, $pos ) . $sku_clause . substr( $head, $pos ) . $tail;
 }, 10, 2 );
+
+// ─── Category filter bar ──────────────────────────────────────────────────────
+
+/**
+ * Attributes offered in the top-of-grid filter bar, in display order.
+ * Matches the old site's bar: Adhesive Properties | Colour Filter | Finish.
+ */
+function dorotape_filter_bar_attributes(): array {
+	return array(
+		'adhesive-type' => __( 'Adhesive Properties', 'dorotape' ),
+		'colour-family' => __( 'Colour', 'dorotape' ),
+		'finish'        => __( 'Finish', 'dorotape' ),
+	);
+}
+
+/**
+ * Terms of one attribute that products in the current category actually use.
+ * On the main shop page (no term context) all used terms are returned.
+ *
+ * @param string $attribute Attribute slug without the pa_ prefix.
+ * @return array Term objects.
+ */
+function dorotape_filter_bar_terms( string $attribute ): array {
+	global $wpdb;
+	$taxonomy = 'pa_' . $attribute;
+
+	if ( is_product_taxonomy() ) {
+		$term = get_queried_object();
+		if ( ! $term instanceof WP_Term ) {
+			return array();
+		}
+		// Current category + all descendants.
+		$cat_ids   = get_term_children( $term->term_id, $term->taxonomy );
+		$cat_ids[] = $term->term_id;
+		$tt_ids    = $wpdb->get_col(
+			"SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy}
+			 WHERE term_id IN (" . implode( ',', array_map( 'intval', $cat_ids ) ) . ')'
+		);
+		if ( ! $tt_ids ) {
+			return array();
+		}
+		$term_ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT tt2.term_id
+			 FROM {$wpdb->term_relationships} tr1
+			 JOIN {$wpdb->term_relationships} tr2 ON tr1.object_id = tr2.object_id
+			 JOIN {$wpdb->term_taxonomy} tt2 ON tr2.term_taxonomy_id = tt2.term_taxonomy_id AND tt2.taxonomy = %s
+			 JOIN {$wpdb->posts} p ON p.ID = tr1.object_id AND p.post_type = 'product' AND p.post_status = 'publish'
+			 WHERE tr1.term_taxonomy_id IN (" . implode( ',', array_map( 'intval', $tt_ids ) ) . ')',
+			$taxonomy
+		) );
+		if ( ! $term_ids ) {
+			return array();
+		}
+		$terms = get_terms( array(
+			'taxonomy'   => $taxonomy,
+			'include'    => array_map( 'intval', $term_ids ),
+			'hide_empty' => false,
+			'orderby'    => 'name',
+		) );
+	} else {
+		$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => true, 'orderby' => 'name' ) );
+	}
+
+	return is_wp_error( $terms ) ? array() : $terms;
+}
+
+/**
+ * Render the filter bar above the product grid on shop/category pages.
+ *
+ * Uses WooCommerce's native layered-nav URL parameters (filter_<attribute>),
+ * so filtering is handled entirely by core — this is presentation only.
+ * Selects auto-submit via scaffold.js; the Apply button is the no-JS fallback.
+ */
+function dorotape_render_filter_bar(): void {
+	// The shop page and non-leaf categories display subcategory tiles, not a
+	// product grid (see the *_archive_display overrides above) — the filters
+	// act on products, so only leaf categories get the bar.
+	if ( ! is_product_taxonomy() ) {
+		return;
+	}
+	$queried = get_queried_object();
+	if ( ! $queried instanceof WP_Term ) {
+		return;
+	}
+	$children = get_terms( array(
+		'taxonomy'   => $queried->taxonomy,
+		'parent'     => $queried->term_id,
+		'hide_empty' => true,
+		'fields'     => 'ids',
+	) );
+	if ( ! empty( $children ) && ! is_wp_error( $children ) ) {
+		return;
+	}
+
+	$dropdowns = array();
+	$active    = false;
+	foreach ( dorotape_filter_bar_attributes() as $attribute => $label ) {
+		$terms = dorotape_filter_bar_terms( $attribute );
+		if ( count( $terms ) < 2 ) {
+			continue; // Nothing to filter on in this category.
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$selected = isset( $_GET[ 'filter_' . $attribute ] )
+			? wc_clean( wp_unslash( $_GET[ 'filter_' . $attribute ] ) )
+			: '';
+		if ( $selected ) {
+			$active = true;
+		}
+		$dropdowns[] = array(
+			'attribute' => $attribute,
+			'label'     => $label,
+			'terms'     => $terms,
+			'selected'  => $selected,
+		);
+	}
+	if ( ! $dropdowns ) {
+		return;
+	}
+
+	$base_url = is_shop()
+		? wc_get_page_permalink( 'shop' )
+		: get_term_link( get_queried_object() );
+	if ( is_wp_error( $base_url ) ) {
+		return;
+	}
+
+	echo '<form class="dt-filter-bar" method="get" action="' . esc_url( $base_url ) . '">';
+	echo '<span class="dt-filter-bar__title">' . esc_html__( 'Filter:', 'dorotape' ) . '</span>';
+
+	foreach ( $dropdowns as $d ) {
+		echo '<label class="dt-filter-bar__field">';
+		echo '<span class="dt-filter-bar__label">' . esc_html( $d['label'] ) . '</span>';
+		echo '<select class="dt-filter-bar__select" name="filter_' . esc_attr( $d['attribute'] ) . '">';
+		echo '<option value="">' . esc_html__( 'All', 'dorotape' ) . '</option>';
+		foreach ( $d['terms'] as $term ) {
+			echo '<option value="' . esc_attr( $term->slug ) . '" ' . selected( $d['selected'], $term->slug, false ) . '>'
+				. esc_html( $term->name ) . '</option>';
+		}
+		echo '</select>';
+		echo '</label>';
+	}
+
+	// Preserve sort order across filter submissions.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! empty( $_GET['orderby'] ) ) {
+		echo '<input type="hidden" name="orderby" value="'
+			. esc_attr( wc_clean( wp_unslash( $_GET['orderby'] ) ) ) . '">'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
+	echo '<button type="submit" class="dt-filter-bar__submit">' . esc_html__( 'Apply', 'dorotape' ) . '</button>';
+	if ( $active ) {
+		echo '<a class="dt-filter-bar__clear" href="' . esc_url( $base_url ) . '">'
+			. esc_html__( 'Clear filters', 'dorotape' ) . '</a>';
+	}
+	echo '</form>';
+}
+add_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
+// Also render when a filter combination matches nothing, so it can be undone.
+add_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
