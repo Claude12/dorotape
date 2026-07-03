@@ -20,6 +20,7 @@
 - Flag format: start your response with ⚠️ FLAGGED: and explain what and why before proceeding
 - Never commit unless I explicitly say "commit this" or "commit"
 - Always make sure the commit message summarise what has been done
+- Never modify git remote URLs
 
 ## Git rules
 - Never switch to or push directly to main or production branches
