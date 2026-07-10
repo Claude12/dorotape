@@ -228,9 +228,9 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 			$max_saving
 		) ),
 		esc_html( sprintf(
-			/* translators: 1: minimum quantity, 2: attribute label e.g. "Size / Width" */
-			__( 'Order %1$dm or more — select a %2$s below to see full pricing', 'dorotape' ),
-			$min_qty_for,
+			/* translators: 1: minimum quantity + unit suffix e.g. "25m"/"10", 2: attribute label e.g. "Size / Width" */
+			__( 'Order %1$s or more — select a %2$s below to see full pricing', 'dorotape' ),
+			$min_qty_for . rtrim( dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) )['qty_suffix'], '+' ),
 			$attr_label
 		) )
 	);
@@ -268,21 +268,23 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	} );
 
 	$base_price = (float) $product->get_regular_price();
+	$unit       = dorotape_price_unit( $post->ID );
+	$u          = dorotape_unit_strings( $unit );
 
-	echo '<div class="dt-tier-pricing">';
+	echo '<div class="dt-tier-pricing" data-unit="' . esc_attr( $unit ) . '">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html( $u['header'] ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
 
-	// First row: standard price (1m+). data-min="0" = no tier active.
-	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
-	echo '<td>1m+</td>';
-	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	// First row: standard price. data-min="0" = no tier active.
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
+	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>—</td>';
 	echo '</tr>';
 
@@ -294,15 +296,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		}
 		$saving = $base_price > 0 ? round( ( ( $base_price - $tier_price ) / $base_price ) * 100 ) : 0;
 
-		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
-		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
-		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
+		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '—' ) . '</td>';
 		echo '</tr>';
 	}
 
 	echo '</tbody></table>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
 }, 15 );
 
@@ -395,29 +397,31 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	$init_id = ( $url_var && isset( $variation_tiers[ $url_var->get_id() ] ) )
 		? $url_var->get_id()
 		: (int) array_key_first( $variation_tiers );
-	$init_var = $var_objects[ $init_id ];
 
 	$init_tiers = $variation_tiers[ $init_id ]['tiers'];
 	$base_price = $variation_tiers[ $init_id ]['base_price'];
+	$unit       = dorotape_price_unit( $product->get_id() );
+	$u          = dorotape_unit_strings( $unit );
 
 	usort( $init_tiers, static function ( array $a, array $b ): int {
 		return (int) $a['min_qty'] - (int) $b['min_qty'];
 	} );
 
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
+		. ' data-unit="' . esc_attr( $unit ) . '"'
 		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html( $u['header'] ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
 
-	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
-	echo '<td>1m+</td>';
-	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
+	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>&mdash;</td>';
 	echo '</tr>';
 
@@ -430,15 +434,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		$saving = $base_price > 0
 			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
 			: 0;
-		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
-		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
-		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
+		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&mdash;' ) . '</td>';
 		echo '</tr>';
 	}
 
 	echo '</tbody></table>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
 }, 15 );
 

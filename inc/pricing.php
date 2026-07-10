@@ -19,6 +19,87 @@
  * @package dorotape
  */
 
+// ─── Pricing unit ─────────────────────────────────────────────────────────────
+
+/**
+ * The unit a product is sold and tier-priced in: 'metre' (default), 'roll',
+ * or 'item'. Stored as _dt_price_unit post meta (parent product only) and
+ * CMS-managed via Product data → Advanced. Vinyl sold by the metre keeps the
+ * historical default; roll goods (Hook & Loop) and accessories override it so
+ * tier tables and discount labels stop saying "per metre".
+ *
+ * @param int $product_id Parent product ID (variations resolve to parent).
+ * @return string 'metre' | 'roll' | 'item'
+ */
+function dorotape_price_unit( int $product_id ): string {
+	$parent = wp_get_post_parent_id( $product_id );
+	$unit   = get_post_meta( $parent ? $parent : $product_id, '_dt_price_unit', true );
+	return in_array( $unit, array( 'roll', 'item' ), true ) ? $unit : 'metre';
+}
+
+/**
+ * Display strings for a pricing unit.
+ *
+ * @param string $unit 'metre' | 'roll' | 'item'
+ * @return array {header, suffix, qty_suffix, note}
+ */
+function dorotape_unit_strings( string $unit ): array {
+	switch ( $unit ) {
+		case 'roll':
+			return array(
+				'header'     => __( 'Price per roll', 'dorotape' ),
+				'suffix'     => '', // £9.90 reads fine without /roll
+				'qty_suffix' => '+',
+				'note'       => __( 'Quantity discounts apply automatically based on the number of rolls ordered.', 'dorotape' ),
+			);
+		case 'item':
+			return array(
+				'header'     => __( 'Price each', 'dorotape' ),
+				'suffix'     => '',
+				'qty_suffix' => '+',
+				'note'       => __( 'Quantity discounts apply automatically based on the quantity ordered.', 'dorotape' ),
+			);
+		default:
+			return array(
+				'header'     => __( 'Price per metre', 'dorotape' ),
+				'suffix'     => '/m',
+				'qty_suffix' => 'm+',
+				'note'       => __( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ),
+			);
+	}
+}
+
+// ─── Admin field (Product data → Advanced) ────────────────────────────────────
+
+add_action( 'woocommerce_product_options_advanced', function (): void {
+	global $post;
+	woocommerce_wp_select(
+		array(
+			'id'          => '_dt_price_unit',
+			'label'       => __( 'Sold per', 'dorotape' ),
+			'value'       => dorotape_price_unit( $post->ID ),
+			'options'     => array(
+				'metre' => __( 'Metre (length entered as quantity)', 'dorotape' ),
+				'roll'  => __( 'Roll', 'dorotape' ),
+				'item'  => __( 'Item / each', 'dorotape' ),
+			),
+			'description' => __( 'Controls the wording of the quantity pricing table and discount labels ("per metre" vs "per roll").', 'dorotape' ),
+		)
+	);
+} );
+
+add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $product ): void {
+	if ( ! isset( $_POST['_dt_price_unit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+		return;
+	}
+	$unit = wc_clean( wp_unslash( $_POST['_dt_price_unit'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( in_array( $unit, array( 'roll', 'item' ), true ) ) {
+		$product->update_meta_data( '_dt_price_unit', $unit );
+	} else {
+		$product->delete_meta_data( '_dt_price_unit' ); // metre = default
+	}
+} );
+
 // ─── Price Calculation ────────────────────────────────────────────────────────
 
 /**
@@ -251,7 +332,8 @@ function dorotape_cart_item_display_meta( array $item_data, array $cart_item ): 
 		$saving_pct = ( $base_price > 0 )
 			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
 			: 0;
-		$label = (int) $tier['min_qty'] . 'm+ rate';
+		$unit  = dorotape_unit_strings( dorotape_price_unit( (int) $product_id ) );
+		$label = (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate';
 		if ( $saving_pct > 0 ) {
 			$label .= ' · save ' . $saving_pct . '%';
 		}
@@ -299,7 +381,8 @@ function dorotape_save_order_item_meta(
 		$saving_pct = ( $base_price > 0 )
 			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
 			: 0;
-		$label = (int) $tier['min_qty'] . 'm+ rate';
+		$unit  = dorotape_unit_strings( dorotape_price_unit( (int) $product_id ) );
+		$label = (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate';
 		if ( $saving_pct > 0 ) {
 			$label .= ' · save ' . $saving_pct . '%';
 		}

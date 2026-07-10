@@ -78,14 +78,17 @@
 		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
 		function getQty() { return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1; }
 
-		// Collect tiers from DOM rows (only min_qty needed for highlighting).
+		// Collect tiers from DOM rows (min_qty + unit price via data attributes).
 		var currentTiers = tiersFromTable( table );
-		highlightActiveTier( currentTiers, getQty() );
+
+		function refresh() {
+			var active = highlightActiveTier( currentTiers, getQty() );
+			updateDisplayedPrice( active, table );
+		}
+		refresh();
 
 		if ( qtyInput ) {
-			qtyInput.addEventListener( 'input', function () {
-				highlightActiveTier( currentTiers, getQty() );
-			} );
+			qtyInput.addEventListener( 'input', refresh );
 		}
 
 		// Variable products only: swap prices when a variation is selected.
@@ -116,36 +119,58 @@
 			if ( ! varData || ! varData.tiers || ! varData.tiers.length ) return;
 			rebuildTbody( table, varData.tiers, varData.base_price || 0 );
 			currentTiers = tiersFromTable( table );
-			highlightActiveTier( currentTiers, getQty() );
+			refresh();
+		} );
+
+		// WooCommerce renders .woocommerce-variation-price after this event —
+		// re-apply so a pre-entered tier quantity is reflected immediately.
+		jQuery( variationsForm ).on( 'show_variation', function () {
+			setTimeout( refresh, 0 );
 		} );
 	}
 
-	/* Build a minimal tier list from the data-min attributes in a rendered table. */
+	/* Pricing unit of the table's product: 'metre' | 'roll' | 'item'. */
+	function tableUnit( table ) {
+		var container = table.closest( '.dt-tier-pricing' );
+		return ( container && container.dataset.unit ) || 'metre';
+	}
+
+	function formatPrice( price ) {
+		var sym      = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.currencySymbol )
+			? dorotapeProduct.currencySymbol : '£';
+		var decimals = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.priceDecimals != null )
+			? dorotapeProduct.priceDecimals : 2;
+		return sym + price.toFixed( decimals );
+	}
+
+	/* Build the tier list from data attributes in a rendered table (incl. the
+	 * base row at data-min="0", whose data-price is the standard unit price). */
 	function tiersFromTable( table ) {
 		var tiers = [];
 		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
-			var min = parseInt( row.dataset.min, 10 );
-			if ( min > 0 ) tiers.push( { min_qty: min } );
+			tiers.push( {
+				min_qty: parseInt( row.dataset.min, 10 ) || 0,
+				price:   parseFloat( row.dataset.price ) || 0,
+			} );
 		} );
 		return tiers;
 	}
 
 	/* Replace the tbody rows with updated prices, preserving the thead. */
 	function rebuildTbody( table, tiers, basePrice ) {
-		var sym      = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.currencySymbol )
-			? dorotapeProduct.currencySymbol : '£';
-		var decimals = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.priceDecimals != null )
-			? dorotapeProduct.priceDecimals : 2;
+		var unit      = tableUnit( table );
+		var suffix    = 'metre' === unit ? '/m' : '';
+		var qtySuffix = 'metre' === unit ? 'm+' : '+';
 
-		function fmt( price ) { return sym + price.toFixed( decimals ) + '/m'; }
+		function fmt( price ) { return formatPrice( price ) + suffix; }
 
 		var tbody = table.querySelector( 'tbody' );
 		if ( ! tbody ) return;
 
 		var html = '';
 
-		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">'
-			+ '<td>1m+</td>'
+		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' + basePrice + '">'
+			+ '<td>1' + qtySuffix + '</td>'
 			+ '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&mdash;' ) + '</td>'
 			+ '<td>&mdash;</td>'
 			+ '</tr>';
@@ -155,8 +180,8 @@
 			var saving = basePrice > 0
 				? Math.round( ( ( basePrice - tier.tier_price ) / basePrice ) * 100 )
 				: 0;
-			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '">'
-				+ '<td>' + escapeHtml( tier.min_qty + 'm+' ) + '</td>'
+			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '" data-price="' + tier.tier_price + '">'
+				+ '<td>' + escapeHtml( tier.min_qty + qtySuffix ) + '</td>'
 				+ '<td>' + fmt( tier.tier_price ) + '</td>'
 				+ '<td>' + ( saving > 0 ? saving + '% off' : '&mdash;' ) + '</td>'
 				+ '</tr>';
@@ -165,10 +190,11 @@
 		tbody.innerHTML = html;
 	}
 
-	/* Highlight the active tier row based on the current quantity. */
+	/* Highlight the active tier row; returns { min, price } for the active row
+	 * (min 0 = standard price, no tier). */
 	function highlightActiveTier( tiers, qty ) {
 		const table = document.querySelector( '.dt-tier-pricing__table' );
-		if ( ! table ) return;
+		if ( ! table ) return { min: 0, price: 0 };
 
 		const sorted = tiers
 			.filter( function ( t ) { return t.min_qty > 1; } )
@@ -185,6 +211,50 @@
 		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
 			row.classList.toggle( 'dt-tier-active', parseInt( row.dataset.min, 10 ) === activeMin );
 		} );
+
+		var price = 0;
+		tiers.forEach( function ( t ) {
+			if ( t.min_qty === activeMin ) price = t.price;
+		} );
+		return { min: activeMin, price: price };
+	}
+
+	/* ── Live price: the on-screen price reflects the active tier ────────
+	 *
+	 * Simple products update the summary price; variable products update the
+	 * per-variation price WooCommerce renders after selection. The original
+	 * markup is restored whenever the quantity drops back to the base tier.
+	 * ──────────────────────────────────────────────────────────────────── */
+	var dtPrice = { target: null, original: '' };
+
+	function updateDisplayedPrice( active, table ) {
+		if ( dtPrice.target && ! document.contains( dtPrice.target ) ) {
+			dtPrice.target = null; // variation price re-rendered — re-capture
+		}
+
+		var isVariable = !! document.querySelector( 'form.variations_form' );
+		var target = isVariable
+			? document.querySelector( '.woocommerce-variation-price .price' )
+			: document.querySelector( '.product .summary .price' );
+		if ( ! target ) return;
+
+		if ( dtPrice.target !== target ) {
+			dtPrice.target   = target;
+			dtPrice.original = target.innerHTML;
+		}
+
+		if ( active.min === 0 || active.price <= 0 ) {
+			target.innerHTML = dtPrice.original;
+			return;
+		}
+
+		var unit      = tableUnit( table );
+		var suffix    = 'metre' === unit ? '/m' : '';
+		var qtySuffix = 'metre' === unit ? 'm' : '';
+		target.innerHTML = '<span class="woocommerce-Price-amount amount">'
+			+ escapeHtml( formatPrice( active.price ) + suffix ) + '</span> '
+			+ '<span class="dt-price-tier-note">'
+			+ escapeHtml( active.min + qtySuffix + '+ price' ) + '</span>';
 	}
 
 	function escapeHtml( str ) {
