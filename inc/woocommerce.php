@@ -175,6 +175,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
 		return;
 	}
+	// Quick-add products show per-option tier notes in their own table.
+	if ( function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $product ) ) {
+		return;
+	}
 
 	// Scan all variations to find the best saving % and the qualifying min qty.
 	$max_saving  = 0;
@@ -182,6 +186,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	foreach ( $product->get_children() as $var_id ) {
 		$var_obj = wc_get_product( (int) $var_id );
 		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		// No qty-break nudge for options this customer buys at a Sage role price.
+		if ( dorotape_user_has_role_price( $var_obj ) ) {
 			continue;
 		}
 		$base = (float) $var_obj->get_regular_price();
@@ -251,6 +259,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	// Variable products show a price range (£11–£22) natively; tier pricing is
 	// per-variation and complex to display before a variation is selected.
 	if ( $product->is_type( 'variable' ) ) {
+		return;
+	}
+	// Sage price-list customers pay their role price flat — no qty breaks.
+	if ( dorotape_user_has_role_price( $product ) ) {
 		return;
 	}
 
@@ -357,6 +369,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
 		return;
 	}
+	// Quick-add products have no variation dropdown to drive this table.
+	if ( function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $product ) ) {
+		return;
+	}
 
 	// Build the tier map for all variations, loading each object once.
 	// Includes base_price so JS never has to rely on display_regular_price parsing.
@@ -372,6 +388,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		}
 		$var_obj = wc_get_product( (int) $var_id );
 		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		// Sage price-list customers pay their role price flat — no tier rows.
+		if ( dorotape_user_has_role_price( $var_obj ) ) {
 			continue;
 		}
 		$var_objects[ (int) $var_id ]  = $var_obj;
@@ -811,3 +831,36 @@ function dorotape_render_filter_bar(): void {
 add_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
 // Also render when a filter combination matches nothing, so it can be undone.
 add_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
+
+// ─── Variable product "From" price ────────────────────────────────────────────
+
+/**
+ * Show variable products as "From £5.77 per metre" instead of the jarring
+ * full range ("£5.77 – £635.00") the client flagged. The unit text is added
+ * only when _dt_price_unit is explicitly set on the product — products that
+ * haven't declared their unit get a plain "From £X" rather than a guess.
+ */
+add_filter( 'woocommerce_variable_price_html', function ( string $price, WC_Product_Variable $product ): string {
+	$min = $product->get_variation_price( 'min', true );
+	$max = $product->get_variation_price( 'max', true );
+	if ( '' === $min || $min >= $max ) {
+		return $price; // single price — WooCommerce's default is fine
+	}
+
+	$unit_meta = get_post_meta( $product->get_id(), '_dt_price_unit', true );
+	$unit_text = '';
+	if ( 'metre' === $unit_meta ) {
+		$unit_text = __( ' per metre', 'dorotape' );
+	} elseif ( 'roll' === $unit_meta ) {
+		$unit_text = __( ' per roll', 'dorotape' );
+	} elseif ( 'item' === $unit_meta ) {
+		$unit_text = __( ' each', 'dorotape' );
+	}
+
+	return sprintf(
+		/* translators: 1: minimum price, 2: unit text e.g. " per metre" */
+		esc_html__( 'From %1$s%2$s', 'dorotape' ),
+		wc_price( $min ),
+		esc_html( $unit_text )
+	);
+}, 10, 2 );

@@ -5,7 +5,19 @@
  * @package dorotape
  */
 
-define( 'DOROTAPE_VERSION', '1.0.0' );
+define( 'DOROTAPE_VERSION', '1.0.4' );
+
+/**
+ * Cache-buster for a theme asset: the file's own last-modified time. Editing
+ * scaffold.js/scaffold.css (or any enqueued asset) then invalidates browser
+ * caches on the next request automatically — no need to remember to bump
+ * DOROTAPE_VERSION, which is how a fixed quick-add bug once still looked
+ * "not working" from a stale cached copy.
+ */
+function dorotape_asset_version( string $relative_path ): string {
+	$path = get_template_directory() . $relative_path;
+	return file_exists( $path ) ? (string) filemtime( $path ) : DOROTAPE_VERSION;
+}
 
 function dorotape_setup() {
 	load_theme_textdomain( 'dorotape', get_template_directory() . '/languages' );
@@ -66,24 +78,24 @@ function dorotape_content_width() {
 add_action( 'after_setup_theme', 'dorotape_content_width', 0 );
 
 function dorotape_scripts() {
-	wp_enqueue_style( 'dorotape-style', get_stylesheet_uri(), array(), DOROTAPE_VERSION );
+	wp_enqueue_style( 'dorotape-style', get_stylesheet_uri(), array(), dorotape_asset_version( '/style.css' ) );
 
 	// TEMP Sprint 1 scaffold styles — remove when real design system lands.
 	wp_enqueue_style(
 		'dorotape-scaffold',
 		get_template_directory_uri() . '/css/scaffold.css',
 		array( 'dorotape-style' ),
-		DOROTAPE_VERSION
+		dorotape_asset_version( '/css/scaffold.css' )
 	);
 
-	wp_enqueue_script( 'dorotape-navigation', get_template_directory_uri() . '/js/navigation.js', array(), DOROTAPE_VERSION, true );
+	wp_enqueue_script( 'dorotape-navigation', get_template_directory_uri() . '/js/navigation.js', array(), dorotape_asset_version( '/js/navigation.js' ), true );
 
 	// TEMP Sprint 1 scaffold JS — remove when real frontend lands.
 	wp_enqueue_script(
 		'dorotape-scaffold',
 		get_template_directory_uri() . '/js/scaffold.js',
 		array( 'dorotape-navigation', 'jquery' ),
-		DOROTAPE_VERSION,
+		dorotape_asset_version( '/js/scaffold.js' ),
 		true
 	);
 }
@@ -121,3 +133,4 @@ require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
 require get_template_directory() . '/inc/poa.php';
 require get_template_directory() . '/inc/cutsize.php';
+require get_template_directory() . '/inc/quickadd.php';

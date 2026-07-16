@@ -100,6 +100,29 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 	}
 } );
 
+// ─── Role-based pricing (Woosage / Sage price lists) ─────────────────────────
+
+/**
+ * True when the current user has a Sage price-list (role-based) price for
+ * this product. Role prices are written by Woosage as _v_rbp_role_{role}
+ * meta (Rymera Simple Role Based Pricing) and REPLACE the website price —
+ * quantity-break tiers and website discounts must not stack on top.
+ *
+ * @param WC_Product $product Product or variation as priced in the cart.
+ * @return bool
+ */
+function dorotape_user_has_role_price( WC_Product $product ): bool {
+	if ( ! is_user_logged_in() ) {
+		return false;
+	}
+	foreach ( (array) wp_get_current_user()->roles as $role ) {
+		if ( is_numeric( $product->get_meta( '_v_rbp_role_' . $role ) ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 // ─── Price Calculation ────────────────────────────────────────────────────────
 
 /**
@@ -130,6 +153,12 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 		$base_price = (float) $product->get_regular_price();
 
 		if ( $base_price <= 0 ) {
+			continue;
+		}
+
+		// Sage price-list customers: the role price replaces the website
+		// price outright — never stack tiers or website discount on it.
+		if ( dorotape_user_has_role_price( $product ) ) {
 			continue;
 		}
 
