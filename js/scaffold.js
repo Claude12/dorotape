@@ -78,14 +78,17 @@
 		const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
 		function getQty() { return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1; }
 
-		// Collect tiers from DOM rows (only min_qty needed for highlighting).
+		// Collect tiers from DOM rows (min_qty + unit price via data attributes).
 		var currentTiers = tiersFromTable( table );
-		highlightActiveTier( currentTiers, getQty() );
+
+		function refresh() {
+			var active = highlightActiveTier( currentTiers, getQty() );
+			updateDisplayedPrice( active, table );
+		}
+		refresh();
 
 		if ( qtyInput ) {
-			qtyInput.addEventListener( 'input', function () {
-				highlightActiveTier( currentTiers, getQty() );
-			} );
+			qtyInput.addEventListener( 'input', refresh );
 		}
 
 		// Variable products only: swap prices when a variation is selected.
@@ -116,36 +119,60 @@
 			if ( ! varData || ! varData.tiers || ! varData.tiers.length ) return;
 			rebuildTbody( table, varData.tiers, varData.base_price || 0 );
 			currentTiers = tiersFromTable( table );
-			highlightActiveTier( currentTiers, getQty() );
+			refresh();
+		} );
+
+		// Re-apply after variation events. The second, delayed call runs after
+		// initVariationPriceSwap's 110 ms price rewrite so the badge and dim
+		// class reflect the final on-screen price.
+		jQuery( variationsForm ).on( 'show_variation reset_data', function () {
+			setTimeout( refresh, 0 );
+			setTimeout( refresh, 160 );
 		} );
 	}
 
-	/* Build a minimal tier list from the data-min attributes in a rendered table. */
+	/* Pricing unit of the table's product: 'metre' | 'roll' | 'item'. */
+	function tableUnit( table ) {
+		var container = table.closest( '.dt-tier-pricing' );
+		return ( container && container.dataset.unit ) || 'metre';
+	}
+
+	function formatPrice( price ) {
+		var sym      = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.currencySymbol )
+			? dorotapeProduct.currencySymbol : '£';
+		var decimals = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.priceDecimals != null )
+			? dorotapeProduct.priceDecimals : 2;
+		return sym + price.toFixed( decimals );
+	}
+
+	/* Build the tier list from data attributes in a rendered table (incl. the
+	 * base row at data-min="0", whose data-price is the standard unit price). */
 	function tiersFromTable( table ) {
 		var tiers = [];
 		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
-			var min = parseInt( row.dataset.min, 10 );
-			if ( min > 0 ) tiers.push( { min_qty: min } );
+			tiers.push( {
+				min_qty: parseInt( row.dataset.min, 10 ) || 0,
+				price:   parseFloat( row.dataset.price ) || 0,
+			} );
 		} );
 		return tiers;
 	}
 
 	/* Replace the tbody rows with updated prices, preserving the thead. */
 	function rebuildTbody( table, tiers, basePrice ) {
-		var sym      = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.currencySymbol )
-			? dorotapeProduct.currencySymbol : '£';
-		var decimals = ( typeof dorotapeProduct !== 'undefined' && dorotapeProduct.priceDecimals != null )
-			? dorotapeProduct.priceDecimals : 2;
+		var unit      = tableUnit( table );
+		var suffix    = 'metre' === unit ? '/m' : '';
+		var qtySuffix = 'metre' === unit ? 'm+' : '+';
 
-		function fmt( price ) { return sym + price.toFixed( decimals ) + '/m'; }
+		function fmt( price ) { return formatPrice( price ) + suffix; }
 
 		var tbody = table.querySelector( 'tbody' );
 		if ( ! tbody ) return;
 
 		var html = '';
 
-		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">'
-			+ '<td>1m+</td>'
+		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' + basePrice + '">'
+			+ '<td>1' + qtySuffix + '</td>'
 			+ '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&mdash;' ) + '</td>'
 			+ '<td>&mdash;</td>'
 			+ '</tr>';
@@ -155,8 +182,8 @@
 			var saving = basePrice > 0
 				? Math.round( ( ( basePrice - tier.tier_price ) / basePrice ) * 100 )
 				: 0;
-			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '">'
-				+ '<td>' + escapeHtml( tier.min_qty + 'm+' ) + '</td>'
+			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '" data-price="' + tier.tier_price + '">'
+				+ '<td>' + escapeHtml( tier.min_qty + qtySuffix ) + '</td>'
 				+ '<td>' + fmt( tier.tier_price ) + '</td>'
 				+ '<td>' + ( saving > 0 ? saving + '% off' : '&mdash;' ) + '</td>'
 				+ '</tr>';
@@ -165,10 +192,11 @@
 		tbody.innerHTML = html;
 	}
 
-	/* Highlight the active tier row based on the current quantity. */
+	/* Highlight the active tier row; returns { min, price } for the active row
+	 * (min 0 = standard price, no tier). */
 	function highlightActiveTier( tiers, qty ) {
 		const table = document.querySelector( '.dt-tier-pricing__table' );
-		if ( ! table ) return;
+		if ( ! table ) return { min: 0, price: 0 };
 
 		const sorted = tiers
 			.filter( function ( t ) { return t.min_qty > 1; } )
@@ -185,6 +213,65 @@
 		table.querySelectorAll( 'tr[data-min]' ).forEach( function ( row ) {
 			row.classList.toggle( 'dt-tier-active', parseInt( row.dataset.min, 10 ) === activeMin );
 		} );
+
+		var price = 0;
+		tiers.forEach( function ( t ) {
+			if ( t.min_qty === activeMin ) price = t.price;
+		} );
+		return { min: activeMin, price: price };
+	}
+
+	/* ── Live price: the on-screen price reflects the active tier ────────
+	 *
+	 * The visible price is rewritten in place with the active tier price and
+	 * restored when the quantity drops back to the base tier. On variable
+	 * products initVariationPriceSwap() rewrites the same element after every
+	 * variation change — it invalidates dtLivePrice.original when it does, so
+	 * the next refresh re-captures the fresh variation price as the baseline
+	 * (the two show_variation refresh timers straddle its 110 ms rewrite).
+	 * ──────────────────────────────────────────────────────────────────── */
+	var dtLivePrice = { el: null, original: null };
+
+	function updateDisplayedPrice( active, table ) {
+		var variationsForm = document.querySelector( 'form.variations_form' );
+		var target = variationsForm
+			? ( document.querySelector( '.entry-summary > p.price' )
+				|| document.querySelector( '.product .summary .price' ) )
+			: document.querySelector( '.product .summary .price' );
+		if ( ! target ) return;
+
+		if ( dtLivePrice.el !== target ) {
+			dtLivePrice.el       = target;
+			dtLivePrice.original = null;
+		}
+
+		// Variable products: only act on a concrete selected variation — the
+		// range price ("£2.55 – £256") has no meaningful tier price.
+		var varSelected = true;
+		if ( variationsForm ) {
+			var varIdInput = variationsForm.querySelector( 'input.variation_id, input[name="variation_id"]' );
+			varSelected = !! ( varIdInput && parseInt( varIdInput.value, 10 ) );
+		}
+
+		if ( ! varSelected || active.min === 0 || active.price <= 0 ) {
+			if ( dtLivePrice.original !== null ) {
+				target.innerHTML     = dtLivePrice.original;
+				dtLivePrice.original = null;
+			}
+			return;
+		}
+
+		if ( dtLivePrice.original === null ) {
+			dtLivePrice.original = target.innerHTML;
+		}
+
+		var unit      = tableUnit( table );
+		var suffix    = 'metre' === unit ? '/m' : '';
+		var qtySuffix = 'metre' === unit ? 'm' : '';
+		target.innerHTML = '<span class="woocommerce-Price-amount amount">'
+			+ escapeHtml( formatPrice( active.price ) + suffix ) + '</span> '
+			+ '<span class="dt-live-price__note">'
+			+ escapeHtml( 'your ' + active.min + qtySuffix + '+ price' ) + '</span>';
 	}
 
 	function escapeHtml( str ) {
@@ -240,9 +327,11 @@
 			if ( discountHint ) discountHint.classList.add( 'dt-hint-out' );
 
 			swapTimer = setTimeout( function () {
-				// Swap price content mid-fade.
+				// Swap price content mid-fade. This is now the baseline price —
+				// invalidate the live-tier capture so its next refresh re-reads it.
 				if ( variation && variation.price_html ) {
 					rangePrice.innerHTML = variation.price_html;
+					dtLivePrice.original = null;
 				}
 				rangePrice.classList.remove( 'dt-price-fading' );
 
@@ -284,7 +373,8 @@
 			// Crossfade the price back to the range.
 			rangePrice.classList.add( 'dt-price-fading' );
 			setTimeout( function () {
-				rangePrice.innerHTML = originalHTML;
+				rangePrice.innerHTML     = originalHTML;
+				dtLivePrice.original     = null; // baseline is the range again
 				rangePrice.classList.remove( 'dt-price-fading' );
 			}, 100 );
 
@@ -334,6 +424,268 @@
 		} );
 	}
 
+	/* ── Cut size rows: one table row-group per *cut pattern*, not per roll —
+	 * a pattern is one or more cut sizes plus how many of the ordered rolls
+	 * get it, so a qty-100 order doesn't need a 100-row table. Pattern
+	 * quantities are validated live to add up to the order quantity, and each
+	 * pattern's cuts are validated as a group against the roll's width. ──── */
+	function initCutRows() {
+		const box = document.getElementById( 'dt_cutsize' );
+		if ( ! box ) return;
+
+		const body       = box.querySelector( '.dt-cutsize__body' );
+		const maxNote    = box.querySelector( '.dt-cutsize__max' );
+		const allocNote  = box.querySelector( '.dt-cutsize__alloc' );
+		const addGroupBtn = box.querySelector( '.dt-cutsize__addgroup' );
+		const form       = box.closest( 'form.cart' );
+		if ( ! body || ! form ) return;
+
+		var widthMap = {};
+		try { widthMap = JSON.parse( box.dataset.maxWidths || '{}' ); } catch ( e ) {}
+		var currentMax = parseInt( box.dataset.maxWidth, 10 ) || 0;
+
+		function toMm( size, unit ) {
+			if ( 'cm' === unit ) return size * 10;
+			if ( 'in' === unit ) return size * 25.4;
+			return size;
+		}
+
+		function getQty() {
+			const input = form.querySelector( '.quantity input[type="number"], input.qty' );
+			return input ? Math.max( 1, parseInt( input.value, 10 ) || 1 ) : 1;
+		}
+
+		// Every future row/qty-cell is built from the initial PHP-rendered
+		// row's own markup, so translated placeholders/aria-labels carry over
+		// untouched. The qty cell is captured and detached separately from the
+		// rest of the row: it belongs to the *group*, not to any one row, and
+		// render() moves the same node (never recreates it) onto whichever
+		// row is currently first in its group, so an in-progress qty edit is
+		// never reset mid-keystroke by an unrelated add/remove elsewhere.
+		const firstRow  = body.querySelector( '.dt-cutsize__row' );
+		const qtyCellTpl = firstRow.querySelector( '.dt-cutsize__qty-cell' ).outerHTML;
+		const rowCellsTpl = Array.prototype.slice.call( firstRow.children )
+			.filter( function ( cell ) { return ! cell.classList.contains( 'dt-cutsize__qty-cell' ); } )
+			.map( function ( cell ) { return cell.outerHTML; } )
+			.join( '' );
+		const firstQtyCell = firstRow.querySelector( '.dt-cutsize__qty-cell' );
+		firstQtyCell.remove();
+
+		function newRow() {
+			var tr = document.createElement( 'tr' );
+			tr.className = 'dt-cutsize__row';
+			tr.innerHTML = rowCellsTpl;
+			tr.querySelectorAll( '.dt-cutsize__size' ).forEach( function ( input ) { input.value = ''; } );
+			tr.querySelectorAll( '.dt-cutsize__row-error' ).forEach( function ( span ) { span.textContent = ''; } );
+			return tr;
+		}
+
+		function newQtyCell( value ) {
+			var wrap = document.createElement( 'tbody' );
+			wrap.innerHTML = '<tr>' + qtyCellTpl + '</tr>';
+			var cell = wrap.querySelector( '.dt-cutsize__qty-cell' );
+			cell.querySelector( '.dt-cutsize__qty' ).value = value;
+			return cell;
+		}
+
+		// groups[g] = { qty: <td>, rows: [<tr>, ...] }, in on-screen order.
+		var groups = [ { qty: firstQtyCell, rows: [ firstRow ] } ];
+
+		function render() {
+			groups.forEach( function ( group ) {
+				group.rows.forEach( function ( tr ) { body.appendChild( tr ); } ); // re-attaches or reorders in place
+				if ( group.rows[ 0 ].firstElementChild !== group.qty ) {
+					group.rows[ 0 ].insertBefore( group.qty, group.rows[ 0 ].firstChild );
+				}
+				group.qty.setAttribute( 'rowspan', String( group.rows.length ) );
+			} );
+			groups.forEach( function ( group, g ) {
+				var qtyInput = group.qty.querySelector( '.dt-cutsize__qty' );
+				if ( qtyInput ) qtyInput.name = 'dt_cut_qty[' + g + ']';
+				group.rows.forEach( function ( tr, c ) {
+					var size = tr.querySelector( '.dt-cutsize__size' );
+					var unit = tr.querySelector( '.dt-cutsize__unit' );
+					if ( size ) size.name = 'dt_cut_rows[' + g + '][' + c + '][size]';
+					if ( unit ) unit.name = 'dt_cut_rows[' + g + '][' + c + '][unit]';
+				} );
+			} );
+			box.classList.toggle( 'dt-cutsize--multi', groups.length > 1 );
+			validateAll();
+		}
+
+		function validateGroup( rows ) {
+			var sum = 0, any = false;
+			rows.forEach( function ( tr ) {
+				var size = parseFloat( tr.querySelector( '.dt-cutsize__size' ).value ) || 0;
+				var unit = tr.querySelector( '.dt-cutsize__unit' ).value;
+				if ( size > 0 ) { any = true; sum += toMm( size, unit ); }
+			} );
+			var invalid = any && currentMax > 0 && sum > currentMax;
+			rows.forEach( function ( tr, idx ) {
+				tr.classList.toggle( 'dt-cutsize__row--invalid', invalid );
+				var error = tr.querySelector( '.dt-cutsize__row-error' );
+				if ( ! error ) return;
+				error.textContent = ( invalid && idx === rows.length - 1 )
+					? 'Cuts add up to ' + ( Math.round( sum * 10 ) / 10 ) + 'mm — wider than the roll (' + currentMax + 'mm)'
+					: '';
+			} );
+			return ! invalid;
+		}
+
+		function validateAll() {
+			var ok = true;
+			groups.forEach( function ( group ) { if ( ! validateGroup( group.rows ) ) ok = false; } );
+
+			var allocated = 0;
+			groups.forEach( function ( group ) {
+				allocated += parseInt( group.qty.querySelector( '.dt-cutsize__qty' ).value, 10 ) || 0;
+			} );
+			var total   = getQty();
+			var matches = allocated === total;
+			if ( allocNote ) {
+				allocNote.classList.toggle( 'dt-cutsize__alloc--bad', ! matches );
+				allocNote.textContent = matches
+					? ''
+					: 'Cut pattern quantities add up to ' + allocated + ' of ' + total + ' ordered — please adjust so they match.';
+			}
+			if ( ! matches ) ok = false;
+
+			const submit = form.querySelector( 'button[type="submit"], .single_add_to_cart_button' );
+			if ( submit ) submit.disabled = ! ok;
+			return ok;
+		}
+
+		function syncSingleGroupQty() {
+			if ( groups.length === 1 ) {
+				groups[ 0 ].qty.querySelector( '.dt-cutsize__qty' ).value = getQty();
+			}
+		}
+
+		body.addEventListener( 'input', validateAll );
+		body.addEventListener( 'change', validateAll );
+
+		body.addEventListener( 'click', function ( e ) {
+			const addBtn = e.target.closest( '.dt-cutsize__addcut' );
+			if ( addBtn ) {
+				const tr    = addBtn.closest( 'tr' );
+				const group = groups.find( function ( g ) { return -1 !== g.rows.indexOf( tr ); } );
+				if ( group ) {
+					group.rows.push( newRow() );
+					render();
+				}
+				return;
+			}
+			const removeBtn = e.target.closest( '.dt-cutsize__remove' );
+			if ( removeBtn ) {
+				const row   = removeBtn.closest( 'tr' );
+				const group = groups.find( function ( g ) { return -1 !== g.rows.indexOf( row ); } );
+				if ( ! group ) return;
+				if ( group.rows.length > 1 ) {
+					group.rows = group.rows.filter( function ( tr ) { return tr !== row; } );
+					row.remove();
+					render();
+				} else {
+					// Only cut in this pattern: clear it, the pattern's row always stays.
+					row.querySelector( '.dt-cutsize__size' ).value = '';
+					validateAll();
+				}
+				return;
+			}
+			const removeGroupBtn = e.target.closest( '.dt-cutsize__removegroup' );
+			if ( removeGroupBtn ) {
+				if ( groups.length <= 1 ) return; // always keep at least one pattern
+				const cell = removeGroupBtn.closest( '.dt-cutsize__qty-cell' );
+				const idx  = groups.findIndex( function ( g ) { return g.qty === cell; } );
+				if ( idx === -1 ) return;
+				groups[ idx ].rows.forEach( function ( tr ) { tr.remove(); } );
+				groups.splice( idx, 1 );
+				render();
+			}
+		} );
+
+		if ( addGroupBtn ) {
+			addGroupBtn.addEventListener( 'click', function () {
+				var allocated = 0;
+				groups.forEach( function ( group ) {
+					allocated += parseInt( group.qty.querySelector( '.dt-cutsize__qty' ).value, 10 ) || 0;
+				} );
+				var remaining = Math.max( 1, getQty() - allocated );
+				groups.push( { qty: newQtyCell( remaining ), rows: [ newRow() ] } );
+				render();
+			} );
+		}
+
+		const qtyInput = form.querySelector( '.quantity input[type="number"], input.qty' );
+		if ( qtyInput ) {
+			qtyInput.addEventListener( 'input', function () { syncSingleGroupQty(); validateAll(); } );
+			qtyInput.addEventListener( 'change', function () { syncSingleGroupQty(); validateAll(); } );
+		}
+
+		// Variable products: max width follows the selected variation, and
+		// WooCommerce may itself rewrite the qty input's value on variation change.
+		const variationsForm = document.querySelector( 'form.variations_form' );
+		if ( variationsForm && Object.keys( widthMap ).length ) {
+			const varIdInput = variationsForm.querySelector( 'input.variation_id, input[name="variation_id"]' );
+			if ( varIdInput && typeof jQuery !== 'undefined' ) {
+				jQuery( varIdInput ).on( 'change', function () {
+					const vid = parseInt( this.value, 10 );
+					currentMax = ( vid && widthMap[ vid ] ) ? parseInt( widthMap[ vid ], 10 ) : 0;
+					if ( maxNote ) {
+						if ( currentMax > 0 ) {
+							maxNote.style.display = '';
+							maxNote.innerHTML = 'Maximum cut width: <strong>' + currentMax + 'mm</strong>.';
+						} else {
+							maxNote.style.display = 'none';
+						}
+					}
+					validateAll();
+				} );
+			}
+			jQuery( variationsForm ).on( 'show_variation reset_data', function () {
+				setTimeout( function () { syncSingleGroupQty(); validateAll(); }, 0 );
+			} );
+		}
+
+		// Initial sync: the default single pattern starts allocated to the
+		// qty field's actual starting value (it may not be 1 if the product
+		// has a minimum purchase quantity).
+		syncSingleGroupQty();
+		render();
+	}
+
+	/* ── Quick-add table: price cell tracks the qty typed in its own row ──── */
+	function initQuickAdd() {
+		document.querySelectorAll( '.dt-quickadd__table' ).forEach( function ( table ) {
+			table.querySelectorAll( 'tbody tr' ).forEach( function ( row ) {
+				var priceCell = row.querySelector( '.dt-quickadd__price-cell' );
+				var qtyInput  = row.querySelector( '.dt-quickadd__qty-input' );
+				var priceEl   = priceCell ? priceCell.querySelector( '.dt-quickadd__price' ) : null;
+				if ( ! priceCell || ! qtyInput || ! priceEl ) return;
+
+				var base = parseFloat( priceCell.dataset.base ) || 0;
+				var tiers = [];
+				try { tiers = JSON.parse( priceCell.dataset.tiers || '[]' ); } catch ( e ) {}
+				if ( ! tiers.length ) return; // flat price row, nothing to swap
+
+				var sorted = tiers
+					.map( function ( t ) { return { min_qty: parseInt( t.min_qty, 10 ), tier_price: parseFloat( t.tier_price ) }; } )
+					.sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
+
+				function refresh() {
+					var qty    = parseInt( qtyInput.value, 10 ) || 0;
+					var active = base;
+					for ( var i = 0; i < sorted.length; i++ ) {
+						if ( qty >= sorted[ i ].min_qty ) { active = sorted[ i ].tier_price; break; }
+					}
+					priceEl.innerHTML = '<span class="woocommerce-Price-amount amount">'
+						+ escapeHtml( formatPrice( active ) ) + '</span>';
+				}
+				refresh();
+				qtyInput.addEventListener( 'input', refresh );
+			} );
+		} );
+	}
+
 	/* ── Category filter bar: auto-apply on change ──────────────────────── */
 	function initFilterBar() {
 		const bar = document.querySelector( '.dt-filter-bar' );
@@ -351,6 +703,8 @@
 		initVariationPriceSwap();
 		initHeaderSearch();
 		initFilterBar();
+		initCutRows();
+		initQuickAdd();
 	} );
 
 }() );

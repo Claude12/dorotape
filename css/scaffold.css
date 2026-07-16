@@ -1715,3 +1715,233 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 @media (max-width: 640px) {
 	.dt-shop-refine__grid { grid-template-columns: 1fr; }
 }
+
+/* ── Live tier price ──────────────────────────────────────────────────────
+   The on-screen price is rewritten in place with the active tier price;
+   this note sits inline beside it. */
+.dt-live-price__note {
+	font-size: .55em;
+	font-weight: 600;
+	color: var(--dt-success);
+	background: rgba(39, 103, 73, .08);
+	padding: 3px 8px;
+	border-radius: var(--dt-radius);
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+/* ── Cut size rows (one row-group per cut pattern, table layout) ─────────── */
+
+.dt-cutsize__table-wrap { overflow-x: auto; }
+
+.dt-cutsize__table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.dt-cutsize__table th,
+.dt-cutsize__table td {
+	padding: 6px 8px;
+	text-align: left;
+	vertical-align: top;
+}
+
+.dt-cutsize__table thead th {
+	font-size: .78rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .02em;
+	color: var(--dt-mid);
+	border-bottom: 1px solid var(--dt-border);
+	padding-bottom: 8px;
+}
+
+.dt-cutsize__qty-col { width: 90px; }
+.dt-cutsize__action-col { width: 76px; }
+
+.dt-cutsize__qty-cell {
+	border-right: 1px solid var(--dt-border);
+	white-space: nowrap;
+	padding-top: 10px;
+}
+
+.dt-cutsize__qty {
+	width: 64px;
+	padding: 8px 10px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font: inherit;
+	font-weight: 600;
+	color: var(--dt-text);
+}
+
+.dt-cutsize__removegroup {
+	display: none;
+	width: 28px;
+	height: 28px;
+	margin-left: 6px;
+	padding: 0;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-white);
+	color: var(--dt-mid);
+	font-size: 1rem;
+	line-height: 1;
+	cursor: pointer;
+	vertical-align: middle;
+}
+
+.dt-cutsize__removegroup:hover { color: var(--dt-error); border-color: var(--dt-error); }
+
+/* Only worth removing a pattern when there's more than one on screen. */
+.dt-cutsize--multi .dt-cutsize__removegroup { display: inline-block; }
+
+.dt-cutsize__body tr.dt-cutsize__row:not(:last-child) td,
+.dt-cutsize__body tr.dt-cutsize__row:not(:last-child) th {
+	border-bottom: 1px solid var(--dt-border);
+}
+
+.dt-cutsize__size {
+	width: 100px;
+	padding: 8px 10px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font: inherit;
+}
+
+.dt-cutsize__unit {
+	padding: 8px 10px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-white);
+	font: inherit;
+}
+
+.dt-cutsize__actions {
+	display: flex;
+	gap: 6px;
+	white-space: nowrap;
+}
+
+.dt-cutsize__addcut,
+.dt-cutsize__remove {
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-white);
+	color: var(--dt-mid);
+	font-size: 1.1rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.dt-cutsize__addcut:hover { color: var(--dt-blue); border-color: var(--dt-blue); }
+.dt-cutsize__remove:hover { color: var(--dt-error); border-color: var(--dt-error); }
+
+.dt-cutsize__row--invalid .dt-cutsize__size {
+	border-color: var(--dt-error);
+	box-shadow: 0 0 0 2px rgba(155, 28, 28, .15);
+}
+
+.dt-cutsize__row-error {
+	display: block;
+	font-size: .8rem;
+	color: var(--dt-error);
+	font-weight: 600;
+	margin-top: 4px;
+}
+
+.dt-cutsize__footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+.dt-cutsize__addgroup {
+	padding: 8px 14px;
+	border: 1px dashed var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-white);
+	color: var(--dt-blue);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.dt-cutsize__addgroup:hover { border-color: var(--dt-blue); background: rgba(35, 91, 156, .06); }
+
+.dt-cutsize__alloc {
+	margin: 0;
+	font-size: .85rem;
+	font-weight: 600;
+	color: var(--dt-success);
+}
+
+.dt-cutsize__alloc:empty { display: none; }
+.dt-cutsize__alloc.dt-cutsize__alloc--bad { color: var(--dt-error); }
+
+@media (max-width: 480px) {
+	.dt-cutsize__qty-col { width: 64px; }
+	.dt-cutsize__size { width: 80px; }
+}
+
+/* ── Quick add table (Hook & Loop) ───────────────────────────────────────── */
+
+.dt-quickadd { margin: 16px 0; }
+
+.dt-quickadd__table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 14px;
+}
+
+.dt-quickadd__table th {
+	text-align: left;
+	font-size: .8rem;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--dt-mid);
+	border-bottom: 2px solid var(--dt-border);
+	padding: 8px 10px;
+}
+
+.dt-quickadd__table td {
+	padding: 12px 10px;
+	border-bottom: 1px solid var(--dt-border);
+	vertical-align: middle;
+}
+
+.dt-quickadd__sku {
+	display: block;
+	font-weight: 700;
+	color: var(--dt-text);
+}
+
+.dt-quickadd__label {
+	display: block;
+	font-size: .85rem;
+	color: var(--dt-mid);
+}
+
+.dt-quickadd__tier {
+	display: block;
+	font-size: .78rem;
+	font-weight: 600;
+	color: var(--dt-success);
+}
+
+.dt-quickadd__qty-col { width: 90px; text-align: center; }
+
+.dt-quickadd__qty-col input {
+	width: 72px;
+	padding: 8px;
+	text-align: center;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font: inherit;
+}

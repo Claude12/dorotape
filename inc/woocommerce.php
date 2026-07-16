@@ -175,6 +175,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
 		return;
 	}
+	// Quick-add products show per-option tier notes in their own table.
+	if ( function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $product ) ) {
+		return;
+	}
 
 	// Scan all variations to find the best saving % and the qualifying min qty.
 	$max_saving  = 0;
@@ -182,6 +186,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	foreach ( $product->get_children() as $var_id ) {
 		$var_obj = wc_get_product( (int) $var_id );
 		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		// No qty-break nudge for options this customer buys at a Sage role price.
+		if ( dorotape_user_has_role_price( $var_obj ) ) {
 			continue;
 		}
 		$base = (float) $var_obj->get_regular_price();
@@ -228,9 +236,9 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 			$max_saving
 		) ),
 		esc_html( sprintf(
-			/* translators: 1: minimum quantity, 2: attribute label e.g. "Size / Width" */
-			__( 'Order %1$dm or more — select a %2$s below to see full pricing', 'dorotape' ),
-			$min_qty_for,
+			/* translators: 1: minimum quantity + unit suffix e.g. "25m"/"10", 2: attribute label e.g. "Size / Width" */
+			__( 'Order %1$s or more — select a %2$s below to see full pricing', 'dorotape' ),
+			$min_qty_for . rtrim( dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) )['qty_suffix'], '+' ),
 			$attr_label
 		) )
 	);
@@ -253,6 +261,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( $product->is_type( 'variable' ) ) {
 		return;
 	}
+	// Sage price-list customers pay their role price flat — no qty breaks.
+	if ( dorotape_user_has_role_price( $product ) ) {
+		return;
+	}
 
 	$tiers = dorotape_parse_legacy_tiers( $post->ID );
 	// Strip the base-rate row (min_qty=1) — we render that explicitly.
@@ -268,21 +280,23 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	} );
 
 	$base_price = (float) $product->get_regular_price();
+	$unit       = dorotape_price_unit( $post->ID );
+	$u          = dorotape_unit_strings( $unit );
 
-	echo '<div class="dt-tier-pricing">';
+	echo '<div class="dt-tier-pricing" data-unit="' . esc_attr( $unit ) . '">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html( $u['header'] ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
 
-	// First row: standard price (1m+). data-min="0" = no tier active.
-	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
-	echo '<td>1m+</td>';
-	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	// First row: standard price. data-min="0" = no tier active.
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
+	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>—</td>';
 	echo '</tr>';
 
@@ -294,15 +308,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		}
 		$saving = $base_price > 0 ? round( ( ( $base_price - $tier_price ) / $base_price ) * 100 ) : 0;
 
-		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
-		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
-		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
+		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '—' ) . '</td>';
 		echo '</tr>';
 	}
 
 	echo '</tbody></table>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
 }, 15 );
 
@@ -355,6 +369,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
 		return;
 	}
+	// Quick-add products have no variation dropdown to drive this table.
+	if ( function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $product ) ) {
+		return;
+	}
 
 	// Build the tier map for all variations, loading each object once.
 	// Includes base_price so JS never has to rely on display_regular_price parsing.
@@ -370,6 +388,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		}
 		$var_obj = wc_get_product( (int) $var_id );
 		if ( ! $var_obj instanceof WC_Product_Variation ) {
+			continue;
+		}
+		// Sage price-list customers pay their role price flat — no tier rows.
+		if ( dorotape_user_has_role_price( $var_obj ) ) {
 			continue;
 		}
 		$var_objects[ (int) $var_id ]  = $var_obj;
@@ -395,29 +417,31 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	$init_id = ( $url_var && isset( $variation_tiers[ $url_var->get_id() ] ) )
 		? $url_var->get_id()
 		: (int) array_key_first( $variation_tiers );
-	$init_var = $var_objects[ $init_id ];
 
 	$init_tiers = $variation_tiers[ $init_id ]['tiers'];
 	$base_price = $variation_tiers[ $init_id ]['base_price'];
+	$unit       = dorotape_price_unit( $product->get_id() );
+	$u          = dorotape_unit_strings( $unit );
 
 	usort( $init_tiers, static function ( array $a, array $b ): int {
 		return (int) $a['min_qty'] - (int) $b['min_qty'];
 	} );
 
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
+		. ' data-unit="' . esc_attr( $unit ) . '"'
 		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
 	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html__( 'Price per metre', 'dorotape' ) . '</th>';
+	echo '<th>' . esc_html( $u['header'] ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
 
-	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0">';
-	echo '<td>1m+</td>';
-	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . '/m</td>';
+	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
+	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>&mdash;</td>';
 	echo '</tr>';
 
@@ -430,15 +454,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		$saving = $base_price > 0
 			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
 			: 0;
-		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '">';
-		echo '<td>' . esc_html( $min_qty . 'm+' ) . '</td>';
-		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . '/m</td>';
+		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
+		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
+		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&mdash;' ) . '</td>';
 		echo '</tr>';
 	}
 
 	echo '</tbody></table>';
-	echo '<p class="dt-tier-pricing__note">' . esc_html__( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ) . '</p>';
+	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
 }, 15 );
 
@@ -807,3 +831,36 @@ function dorotape_render_filter_bar(): void {
 add_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
 // Also render when a filter combination matches nothing, so it can be undone.
 add_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
+
+// ─── Variable product "From" price ────────────────────────────────────────────
+
+/**
+ * Show variable products as "From £5.77 per metre" instead of the jarring
+ * full range ("£5.77 – £635.00") the client flagged. The unit text is added
+ * only when _dt_price_unit is explicitly set on the product — products that
+ * haven't declared their unit get a plain "From £X" rather than a guess.
+ */
+add_filter( 'woocommerce_variable_price_html', function ( string $price, WC_Product_Variable $product ): string {
+	$min = $product->get_variation_price( 'min', true );
+	$max = $product->get_variation_price( 'max', true );
+	if ( '' === $min || $min >= $max ) {
+		return $price; // single price — WooCommerce's default is fine
+	}
+
+	$unit_meta = get_post_meta( $product->get_id(), '_dt_price_unit', true );
+	$unit_text = '';
+	if ( 'metre' === $unit_meta ) {
+		$unit_text = __( ' per metre', 'dorotape' );
+	} elseif ( 'roll' === $unit_meta ) {
+		$unit_text = __( ' per roll', 'dorotape' );
+	} elseif ( 'item' === $unit_meta ) {
+		$unit_text = __( ' each', 'dorotape' );
+	}
+
+	return sprintf(
+		/* translators: 1: minimum price, 2: unit text e.g. " per metre" */
+		esc_html__( 'From %1$s%2$s', 'dorotape' ),
+		wc_price( $min ),
+		esc_html( $unit_text )
+	);
+}, 10, 2 );
