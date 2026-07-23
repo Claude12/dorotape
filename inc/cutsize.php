@@ -155,8 +155,12 @@ function dorotape_cutsize_posted_patterns(): array {
  * as a table, modelled on a courier parcel form (client request). Replaces
  * the old free-text box. data-max-width / data-max-widths let scaffold.js
  * validate each pattern's cuts against the roll width.
+ *
+ * Hooked after the quantity input (woocommerce_before_add_to_cart_button
+ * fires before it in both simple.php and variation-add-to-cart-button.php)
+ * so the box sits below the quantity box, above the Add to basket button.
  */
-add_action( 'woocommerce_before_add_to_cart_button', function (): void {
+add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 	global $product;
 	if ( ! $product instanceof WC_Product || ! dorotape_has_cutsize( $product ) ) {
 		return;

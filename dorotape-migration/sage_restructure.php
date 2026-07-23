@@ -217,8 +217,34 @@ foreach ( $parent_ids as $pid ) {
 		continue;
 	}
 
-	$base   = preg_replace( "/^Cover\s*Styl'?\s*/i", '', (string) $parent->get_sku() );
-	$family = dt_family_codes( $base, $skus, $sage );
+	$base = preg_replace( "/^Cover\s*Styl'?\s*/i", '', (string) $parent->get_sku() );
+	// VinylEfx: website SKUs use inconsistent S/E/EK prefixes that don't map to
+	// Sage's bare-numeric code prefixes, and several bases (e.g. 3101) have a
+	// same-priced 500mm Sage code alongside the real 610mm one, which the
+	// generic prefix + price-match logic can't disambiguate. Michael supplied
+	// the exact code list per family by email; using it directly (rather than
+	// widening the prefix/price matching generally, which risks false matches
+	// elsewhere in the catalogue) is the safer fix.
+	static $vinylefx_family_override = array(
+		'E3101' => array( '3101D1220', '3101D610' ),
+		'S6502' => array( '65021220', '6502610' ),
+		'S6562' => array( '65621220', '6562610' ),
+		'S6501' => array( '65011370', '65011220', '6501610' ),
+		'S4402' => array( '4402610' ),
+		'3102'  => array( '31021370', '31021220', '3102610' ),
+		'S3162' => array( '31621220', '3162610' ),
+		'3101'  => array( '31011370', '31011220', '3101610' ),
+		'EK301' => array( 'K301D610' ),
+		'E6502' => array( '6502D1220', '6502D610' ),
+		'E6501' => array( '6501D1220', '6501D610' ),
+		'E4402' => array( '4402D610' ),
+		'E3102' => array( '3102D1220', '3102D610' ),
+	);
+	if ( isset( $vinylefx_family_override[ $base ] ) ) {
+		$family = array_intersect_key( $sage, array_flip( $vinylefx_family_override[ $base ] ) );
+	} else {
+		$family = dt_family_codes( $base, $skus, $sage );
+	}
 	if ( ! $family ) {
 		$plans['MANUAL'][ $pid ] = array( 'why' => 'no family codes for base "' . $base . '"', 'name' => $parent->get_name() );
 		continue;
