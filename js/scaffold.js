@@ -82,8 +82,9 @@
 		var currentTiers = tiersFromTable( table );
 
 		function refresh() {
-			var active = highlightActiveTier( currentTiers, getQty() );
-			updateDisplayedPrice( active, table );
+			var qty    = getQty();
+			var active = highlightActiveTier( currentTiers, qty );
+			updateDisplayedPrice( active, table, qty );
 		}
 		refresh();
 
@@ -221,18 +222,23 @@
 		return { min: activeMin, price: price };
 	}
 
-	/* ── Live price: the on-screen price reflects the active tier ────────
+	/* ── Live price: the on-screen price shows the running line total ────
 	 *
-	 * The visible price is rewritten in place with the active tier price and
-	 * restored when the quantity drops back to the base tier. On variable
-	 * products initVariationPriceSwap() rewrites the same element after every
-	 * variation change — it invalidates dtLivePrice.original when it does, so
-	 * the next refresh re-captures the fresh variation price as the baseline
-	 * (the two show_variation refresh timers straddle its 110 ms rewrite).
+	 * The visible price is rewritten in place to the total for the quantity
+	 * entered (qty × the effective unit price) — e.g. 5m of F-Sign Platinum at
+	 * £3.01/m reads £15.05, not £3.01. The effective unit price is the active
+	 * quantity-break tier when one applies, otherwise the standard base price,
+	 * so the total also reflects any discount the quantity has unlocked. At
+	 * qty 1 the single unit price is correct, so the original markup is left
+	 * untouched. On variable products initVariationPriceSwap() rewrites the
+	 * same element after every variation change — it invalidates
+	 * dtLivePrice.original when it does, so the next refresh re-captures the
+	 * fresh variation price as the baseline (the two show_variation refresh
+	 * timers straddle its 110 ms rewrite).
 	 * ──────────────────────────────────────────────────────────────────── */
 	var dtLivePrice = { el: null, original: null };
 
-	function updateDisplayedPrice( active, table ) {
+	function updateDisplayedPrice( active, table, qty ) {
 		var variationsForm = document.querySelector( 'form.variations_form' );
 		var target = variationsForm
 			? ( document.querySelector( '.entry-summary > p.price' )
@@ -246,14 +252,22 @@
 		}
 
 		// Variable products: only act on a concrete selected variation — the
-		// range price ("£2.55 – £256") has no meaningful tier price.
+		// range price ("£2.55 – £256") has no single unit price to total.
 		var varSelected = true;
 		if ( variationsForm ) {
 			var varIdInput = variationsForm.querySelector( 'input.variation_id, input[name="variation_id"]' );
 			varSelected = !! ( varIdInput && parseInt( varIdInput.value, 10 ) );
 		}
 
-		if ( ! varSelected || active.min === 0 || active.price <= 0 ) {
+		// Effective unit price: the active tier price when a break applies,
+		// otherwise the standard base price from the data-min="0" row.
+		var baseRow   = table.querySelector( 'tr[data-min="0"]' );
+		var basePrice = baseRow ? ( parseFloat( baseRow.dataset.price ) || 0 ) : 0;
+		var unitPrice = active.price > 0 ? active.price : basePrice;
+
+		// qty 1 (or no valid unit price / unselected variation): the single
+		// price WooCommerce already shows is correct — restore and bail.
+		if ( ! varSelected || unitPrice <= 0 || qty <= 1 ) {
 			if ( dtLivePrice.original !== null ) {
 				target.innerHTML     = dtLivePrice.original;
 				dtLivePrice.original = null;
@@ -265,13 +279,29 @@
 			dtLivePrice.original = target.innerHTML;
 		}
 
-		var unit      = tableUnit( table );
-		var suffix    = 'metre' === unit ? '/m' : '';
-		var qtySuffix = 'metre' === unit ? 'm' : '';
+		var unit  = tableUnit( table );
+		var total = qty * unitPrice;
+
+		var qtyStr, unitStr;
+		if ( 'metre' === unit ) {
+			qtyStr  = qty + 'm';
+			unitStr = formatPrice( unitPrice ) + '/m';
+		} else if ( 'roll' === unit ) {
+			qtyStr  = qty + ( 1 === qty ? ' roll' : ' rolls' );
+			unitStr = formatPrice( unitPrice );
+		} else {
+			qtyStr  = String( qty );
+			unitStr = formatPrice( unitPrice );
+		}
+
+		var breakdown = qtyStr + ' × ' + unitStr;
+		if ( active.min > 0 ) {
+			breakdown += ' · your ' + active.min + ( 'metre' === unit ? 'm' : '' ) + '+ price';
+		}
+
 		target.innerHTML = '<span class="woocommerce-Price-amount amount">'
-			+ escapeHtml( formatPrice( active.price ) + suffix ) + '</span> '
-			+ '<span class="dt-live-price__note">'
-			+ escapeHtml( 'your ' + active.min + qtySuffix + '+ price' ) + '</span>';
+			+ escapeHtml( formatPrice( total ) ) + '</span> '
+			+ '<span class="dt-live-price__note">' + escapeHtml( breakdown ) + '</span>';
 	}
 
 	function escapeHtml( str ) {
@@ -653,36 +683,56 @@
 		render();
 	}
 
-	/* ── Quick-add table: price cell tracks the qty typed in its own row ──── */
+	/* ── Quick-add table: all rows share one combined qty for tier lookup ──
+	   (Hook & Loop: 5 Hook + 5 Loop unlocks the 10+ rate for both rows),
+	   while each row keeps its own base price and tier price scale. ──── */
 	function initQuickAdd() {
 		document.querySelectorAll( '.dt-quickadd__table' ).forEach( function ( table ) {
+			var rows = [];
+
 			table.querySelectorAll( 'tbody tr' ).forEach( function ( row ) {
 				var priceCell = row.querySelector( '.dt-quickadd__price-cell' );
 				var qtyInput  = row.querySelector( '.dt-quickadd__qty-input' );
 				var priceEl   = priceCell ? priceCell.querySelector( '.dt-quickadd__price' ) : null;
 				if ( ! priceCell || ! qtyInput || ! priceEl ) return;
 
-				var base = parseFloat( priceCell.dataset.base ) || 0;
 				var tiers = [];
 				try { tiers = JSON.parse( priceCell.dataset.tiers || '[]' ); } catch ( e ) {}
-				if ( ! tiers.length ) return; // flat price row, nothing to swap
 
-				var sorted = tiers
-					.map( function ( t ) { return { min_qty: parseInt( t.min_qty, 10 ), tier_price: parseFloat( t.tier_price ) }; } )
-					.sort( function ( a, b ) { return b.min_qty - a.min_qty; } );
-
-				function refresh() {
-					var qty    = parseInt( qtyInput.value, 10 ) || 0;
-					var active = base;
-					for ( var i = 0; i < sorted.length; i++ ) {
-						if ( qty >= sorted[ i ].min_qty ) { active = sorted[ i ].tier_price; break; }
-					}
-					priceEl.innerHTML = '<span class="woocommerce-Price-amount amount">'
-						+ escapeHtml( formatPrice( active ) ) + '</span>';
-				}
-				refresh();
-				qtyInput.addEventListener( 'input', refresh );
+				rows.push( {
+					qtyInput: qtyInput,
+					priceEl:  priceEl,
+					base:     parseFloat( priceCell.dataset.base ) || 0,
+					tiers:    tiers
+						.map( function ( t ) { return { min_qty: parseInt( t.min_qty, 10 ), tier_price: parseFloat( t.tier_price ) }; } )
+						.sort( function ( a, b ) { return b.min_qty - a.min_qty; } ),
+				} );
 			} );
+			if ( ! rows.length ) return;
+
+			function combinedQty() {
+				var total = 0;
+				rows.forEach( function ( r ) {
+					if ( r.tiers.length ) total += parseInt( r.qtyInput.value, 10 ) || 0;
+				} );
+				return total;
+			}
+
+			function refreshAll() {
+				var qty = combinedQty();
+				rows.forEach( function ( r ) {
+					if ( ! r.tiers.length ) return; // flat price row, nothing to swap
+					var active = r.base;
+					for ( var i = 0; i < r.tiers.length; i++ ) {
+						if ( qty >= r.tiers[ i ].min_qty ) { active = r.tiers[ i ].tier_price; break; }
+					}
+					r.priceEl.innerHTML = '<span class="woocommerce-Price-amount amount">'
+						+ escapeHtml( formatPrice( active ) ) + '</span>';
+				} );
+			}
+
+			rows.forEach( function ( r ) { r.qtyInput.addEventListener( 'input', refreshAll ); } );
+			refreshAll();
 		} );
 	}
 

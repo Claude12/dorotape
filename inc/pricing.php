@@ -64,7 +64,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price per metre', 'dorotape' ),
 				'suffix'     => '/m',
 				'qty_suffix' => 'm+',
-				'note'       => __( 'Quantity discounts apply automatically. Enter your required length in the quantity field.', 'dorotape' ),
+				'note'       => __( 'Quantity discounts apply automatically. Enter your required length in the quantity field. Material is supplied as a continuous length.', 'dorotape' ),
 			);
 	}
 }
@@ -99,6 +99,77 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 		$product->delete_meta_data( '_dt_price_unit' ); // metre = default
 	}
 } );
+
+// ─── Quantity input step ──────────────────────────────────────────────────────
+
+/**
+ * Optional quantity-input increment for products the customer should order in
+ * batches of N (e.g. ASLAN DFP07 UltraTack — 5m/10m at a time) rather than
+ * one at a time. Stored as _dt_qty_step post meta (parent product only,
+ * variations resolve to parent); '1' or empty means the default WooCommerce
+ * per-unit stepping.
+ */
+add_action( 'woocommerce_product_options_advanced', function (): void {
+	global $post;
+	woocommerce_wp_select(
+		array(
+			'id'          => '_dt_qty_step',
+			'label'       => __( 'Quantity step', 'dorotape' ),
+			'value'       => get_post_meta( $post->ID, '_dt_qty_step', true ) ?: '1',
+			'options'     => array(
+				'1'  => __( 'None (order any quantity)', 'dorotape' ),
+				'5'  => __( 'Jumps of 5', 'dorotape' ),
+				'10' => __( 'Jumps of 10', 'dorotape' ),
+			),
+			'description' => __( 'Forces the quantity box on the product page to increment in steps (e.g. 5, 10, 15...) instead of one at a time.', 'dorotape' ),
+		)
+	);
+} );
+
+add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $product ): void {
+	if ( ! isset( $_POST['_dt_qty_step'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+		return;
+	}
+	$step = wc_clean( wp_unslash( $_POST['_dt_qty_step'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( in_array( $step, array( '5', '10' ), true ) ) {
+		$product->update_meta_data( '_dt_qty_step', $step );
+	} else {
+		$product->delete_meta_data( '_dt_qty_step' ); // '1' = default, nothing to store
+	}
+} );
+
+/**
+ * Resolve a product/variation's quantity step, parent meta wins.
+ *
+ * @param WC_Product $product
+ * @return int
+ */
+function dorotape_qty_step( WC_Product $product ): int {
+	$id   = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
+	$step = (int) get_post_meta( $id, '_dt_qty_step', true );
+	return $step > 1 ? $step : 1;
+}
+
+add_filter( 'woocommerce_quantity_input_step', function ( $step, $product ) {
+	return $product instanceof WC_Product ? dorotape_qty_step( $product ) : $step;
+}, 10, 2 );
+
+/**
+ * Start the quantity box at the step value (5, 10...) rather than 1, so the
+ * default input is already a valid multiple of the step.
+ */
+add_filter( 'woocommerce_quantity_input_args', function ( array $args, $product ) {
+	if ( $product instanceof WC_Product ) {
+		$step = dorotape_qty_step( $product );
+		if ( $step > 1 ) {
+			$args['min_value'] = max( (int) $args['min_value'], $step );
+			if ( empty( $_POST['quantity'] ) && (int) $args['input_value'] < $step ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- display default only.
+				$args['input_value'] = $step;
+			}
+		}
+	}
+	return $args;
+}, 10, 2 );
 
 // ─── Role-based pricing (Woosage / Sage price lists) ─────────────────────────
 
@@ -147,6 +218,20 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 
 	$customer_discount = dorotape_get_customer_discount( get_current_user_id() );
 
+	// Quick-add products (Hook & Loop) share one combined quantity across all
+	// their rows for picking a tier — 5 Hook + 5 Loop unlocks the 10+ rate for
+	// both — even though each row keeps its own SKU, price, and cart line.
+	$combined_qty = array(); // parent product_id => total qty across its rows
+	foreach ( $cart->get_cart() as $item ) {
+		// dorotape_is_quick_add() checks is_type('variable'), so it must be
+		// given the parent product — $item['data'] here is the variation.
+		$parent = wc_get_product( $item['product_id'] );
+		if ( $parent && function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $parent ) ) {
+			$pid                   = $item['product_id'];
+			$combined_qty[ $pid ] = ( $combined_qty[ $pid ] ?? 0 ) + (int) $item['quantity'];
+		}
+	}
+
 	foreach ( $cart->get_cart() as $cart_item ) {
 		$product    = $cart_item['data'];
 		$product_id = $cart_item['product_id'];
@@ -167,7 +252,9 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 			? (int) $cart_item['variation_id']
 			: $product_id;
 
-		$price = dorotape_get_tier_price( (int) $cart_item['quantity'], $lookup_id, $base_price );
+		$qty = isset( $combined_qty[ $product_id ] ) ? $combined_qty[ $product_id ] : (int) $cart_item['quantity'];
+
+		$price = dorotape_get_tier_price( $qty, $lookup_id, $base_price );
 
 		if ( $customer_discount > 0 ) {
 			$price *= ( 1 - ( $customer_discount / 100 ) );
@@ -235,7 +322,31 @@ function dorotape_read_acf_flat_tiers( int $product_id ): array {
 }
 
 /**
- * Parse _price_tiers post meta into a tier array.
+ * Parse _price_tiers post meta into a tier array, falling back to the parent
+ * product's tiers when a variation has none of its own.
+ *
+ * Some variations (e.g. Poli Print 800, Orajet 3268) were never given their
+ * own _price_tiers, which used to mean no tiers at all for that variation —
+ * the pricing table silently didn't render and the price never updated with
+ * quantity. Since tiers are near-always shared across a product's variations,
+ * falling back to the parent's tiers keeps the table (and live price update)
+ * working instead of quietly disappearing.
+ *
+ * @param int $product_id Variation ID or product ID.
+ * @return array Array of arrays with 'min_qty' and 'tier_price' keys.
+ */
+function dorotape_parse_legacy_tiers( int $product_id ): array {
+	$tiers = dorotape_parse_legacy_tiers_own( $product_id );
+	if ( ! empty( $tiers ) ) {
+		return $tiers;
+	}
+
+	$parent_id = wp_get_post_parent_id( $product_id );
+	return $parent_id ? dorotape_parse_legacy_tiers_own( $parent_id ) : array();
+}
+
+/**
+ * Parse _price_tiers post meta for a single post, no parent fallback.
  *
  * Meta format: "1-24:11.00;25:9.90" — each segment is "min[-max]:price".
  * Falls back to the flat ACF meta recovery path for the ~118 products whose
@@ -244,7 +355,7 @@ function dorotape_read_acf_flat_tiers( int $product_id ): array {
  * @param int $product_id Variation ID or product ID.
  * @return array Array of arrays with 'min_qty' and 'tier_price' keys.
  */
-function dorotape_parse_legacy_tiers( int $product_id ): array {
+function dorotape_parse_legacy_tiers_own( int $product_id ): array {
 	$raw = get_post_meta( $product_id, '_price_tiers', true );
 
 	if ( ! $raw || ! is_string( $raw ) || str_starts_with( $raw, 'field_' ) ) {
