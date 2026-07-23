@@ -1935,6 +1935,20 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	color: var(--dt-success);
 }
 
+.dt-quickadd__line {
+	display: block;
+	margin-top: 4px;
+	font-size: .8rem;
+	font-weight: 600;
+	color: var(--dt-text);
+}
+
+.dt-quickadd__line--discount {
+	color: var(--dt-success);
+}
+
+.dt-quickadd__line[hidden] { display: none; }
+
 .dt-quickadd__qty-col { width: 90px; text-align: center; }
 
 .dt-quickadd__qty-col input {

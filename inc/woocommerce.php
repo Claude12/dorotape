@@ -466,6 +466,52 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</div>';
 }, 15 );
 
+/**
+ * Emit a hidden data source so the live running total works on products that
+ * have NO quantity-break tiers — e.g. Poli-Print 800 and other by-the-roll /
+ * by-the-metre lines that show a single price. The tier tables above already
+ * carry unit + base price for products WITH discounts; this covers the rest.
+ *
+ * Carries the pricing unit and the base unit price(s): a single data-base for
+ * simple products, or a {variationId: price} map for variable products. The JS
+ * reads this when there is no "Quantity Pricing" table on the page.
+ *
+ * Scoped to metre/roll products — 'item' (sold each) is deliberately excluded,
+ * so plain accessories keep showing a single price.
+ */
+add_action( 'woocommerce_single_product_summary', function (): void {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+	// Quick-add products (Hook & Loop) drive their own combined-qty table.
+	if ( function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $product ) ) {
+		return;
+	}
+	$unit = dorotape_price_unit( $product->get_id() );
+	if ( 'item' === $unit ) {
+		return;
+	}
+
+	$attrs = ' data-unit="' . esc_attr( $unit ) . '"';
+
+	if ( $product->is_type( 'variable' ) ) {
+		$prices = array();
+		foreach ( $product->get_children() as $var_id ) {
+			$var = wc_get_product( (int) $var_id );
+			if ( $var instanceof WC_Product && '' !== $var->get_price() ) {
+				// Clean fixed-decimal string (avoids float noise like 57.3999… in the JSON).
+				$prices[ (int) $var_id ] = wc_format_decimal( $var->get_price(), wc_get_price_decimals() );
+			}
+		}
+		$attrs .= ' data-variation-prices="' . esc_attr( (string) wp_json_encode( $prices ) ) . '"';
+	} else {
+		$attrs .= ' data-base="' . esc_attr( wc_format_decimal( $product->get_price(), wc_get_price_decimals() ) ) . '"';
+	}
+
+	echo '<div id="dt_live_price" hidden' . $attrs . '></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped above.
+}, 16 );
+
 
 // ─── Custom product tabs (from Kryptronic tabonecontent / tabtwocontent) ─────
 

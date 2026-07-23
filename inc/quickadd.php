@@ -128,7 +128,7 @@ function dorotape_quick_add_form(): void {
 	<form class="dt-quickadd" method="post" action="<?php echo esc_url( get_permalink( $product->get_id() ) ); ?>">
 		<?php wp_nonce_field( 'dt_quick_add_' . $product->get_id(), 'dt_quick_add_nonce' ); ?>
 		<input type="hidden" name="dt_quick_add" value="<?php echo esc_attr( $product->get_id() ); ?>">
-		<table class="dt-quickadd__table">
+		<table class="dt-quickadd__table" data-unit="<?php echo esc_attr( dorotape_price_unit( $product->get_id() ) ); ?>">
 			<thead>
 				<tr>
 					<th><?php esc_html_e( 'Option', 'dorotape' ); ?></th>
@@ -150,6 +150,7 @@ function dorotape_quick_add_form(): void {
 							<?php if ( $row['tier'] ) : ?>
 								<span class="dt-quickadd__tier"><?php echo esc_html( $row['tier'] ); ?></span>
 							<?php endif; ?>
+							<span class="dt-quickadd__line" hidden></span>
 						</td>
 						<td class="dt-quickadd__qty-col">
 							<input type="number" name="dt_qty[<?php echo esc_attr( $row['id'] ); ?>]"
