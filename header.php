@@ -69,15 +69,33 @@
 						<line x1="16.5" y1="16.5" x2="21" y2="21"></line>
 					</svg>
 				</button>
-				<form id="dt-header-search-form" class="dt-header-search__form" role="search" method="get"
-					action="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<label class="screen-reader-text" for="dt-header-search-input"><?php esc_html_e( 'Search products', 'dorotape' ); ?></label>
-					<input id="dt-header-search-input" class="dt-header-search__input" type="search" name="s"
-						value="<?php echo esc_attr( get_search_query() ); ?>"
-						placeholder="<?php esc_attr_e( 'Search products…', 'dorotape' ); ?>" autocomplete="off">
-					<input type="hidden" name="post_type" value="product">
-					<button type="submit" class="dt-header-search__submit"><?php esc_html_e( 'Search', 'dorotape' ); ?></button>
-				</form>
+				<div id="dt-header-search-form" class="dt-header-search__form">
+					<?php
+					// Client: the old box only searched on submit — "not showing matches
+					// as a predictive and narrowing list". FiboSearch (the plugin they
+					// installed) does the live suggestions, so the theme hands the whole
+					// control over to it rather than trying to reproduce them.
+					//
+					// The fallback below only runs if the plugin is deactivated or the
+					// shortcode is renamed; without it the header would lose its search
+					// entirely and silently.
+					if ( shortcode_exists( 'fibosearch' ) ) {
+						echo do_shortcode( '[fibosearch]' );
+					} else {
+						?>
+						<form class="dt-header-search__fallback" role="search" method="get"
+							action="<?php echo esc_url( home_url( '/' ) ); ?>">
+							<label class="screen-reader-text" for="dt-header-search-input"><?php esc_html_e( 'Search products', 'dorotape' ); ?></label>
+							<input id="dt-header-search-input" class="dt-header-search__input" type="search" name="s"
+								value="<?php echo esc_attr( get_search_query() ); ?>"
+								placeholder="<?php esc_attr_e( 'Search products…', 'dorotape' ); ?>" autocomplete="off">
+							<input type="hidden" name="post_type" value="product">
+							<button type="submit" class="dt-header-search__submit"><?php esc_html_e( 'Search', 'dorotape' ); ?></button>
+						</form>
+						<?php
+					}
+					?>
+				</div>
 			</div><!-- .dt-header-search -->
 
 		</div><!-- .header-inner -->

@@ -48,8 +48,9 @@ function dorotape_unit_strings( string $unit ): array {
 		case 'roll':
 			return array(
 				'header'     => __( 'Price per roll', 'dorotape' ),
-				'suffix'     => '', // £9.90 reads fine without /roll
+				'suffix'     => '/roll', // client request: mirror the metre products' /m
 				'qty_suffix' => '+',
+				'total'      => __( 'Total rolls', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically based on the number of rolls ordered.', 'dorotape' ),
 			);
 		case 'item':
@@ -57,6 +58,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price each', 'dorotape' ),
 				'suffix'     => '',
 				'qty_suffix' => '+',
+				'total'      => __( 'Total quantity', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically based on the quantity ordered.', 'dorotape' ),
 			);
 		default:
@@ -64,6 +66,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price per metre', 'dorotape' ),
 				'suffix'     => '/m',
 				'qty_suffix' => 'm+',
+				'total'      => __( 'Total metres', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically. Enter your required length in the quantity field. Material is supplied as a continuous length.', 'dorotape' ),
 			);
 	}
@@ -159,17 +162,201 @@ add_filter( 'woocommerce_quantity_input_step', function ( $step, $product ) {
  * default input is already a valid multiple of the step.
  */
 add_filter( 'woocommerce_quantity_input_args', function ( array $args, $product ) {
-	if ( $product instanceof WC_Product ) {
-		$step = dorotape_qty_step( $product );
-		if ( $step > 1 ) {
-			$args['min_value'] = max( (int) $args['min_value'], $step );
-			if ( empty( $_POST['quantity'] ) && (int) $args['input_value'] < $step ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- display default only.
-				$args['input_value'] = $step;
-			}
-		}
+	if ( ! $product instanceof WC_Product ) {
+		return $args;
 	}
+	$step = dorotape_qty_step( $product );
+	if ( $step <= 1 ) {
+		return $args;
+	}
+
+	// Not every caller passes the full quantity-input arg set. woocommerce_
+	// quantity_input() (the product page) supplies min_value/max_value/step/
+	// input_value, but the Store API's QuantityLimits — which drives the cart
+	// block and every /wc/store/v1/cart response — applies this same filter to
+	// a three-key array with no input_value. Reading it blindly emitted a PHP
+	// warning straight into the JSON body, breaking the cart response on any
+	// stepped product. So touch each key only if the caller provided it.
+	if ( isset( $args['min_value'] ) ) {
+		$args['min_value'] = max( (int) $args['min_value'], $step );
+	} else {
+		$args['min_value'] = $step;
+	}
+
+	if ( isset( $args['input_value'] )
+		&& empty( $_POST['quantity'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- display default only.
+		&& (int) $args['input_value'] < $step ) {
+		$args['input_value'] = $step;
+	}
+
 	return $args;
 }, 10, 2 );
+
+/**
+ * Keep the step honest on variable products.
+ *
+ * The server renders the quantity box with min=step (above), but when the
+ * customer picks a variation WooCommerce's own add-to-cart-variation.js
+ * overwrites it: `.attr( 'min', variation.min_qty )` — and min_qty comes
+ * straight from get_min_purchase_quantity(), which is 1. The step attribute
+ * survives, so the browser then treats valid values as min + n×step: 1, 6,
+ * 11, 16... which is exactly the "jumps from 5 to 6 then 11, 16" the client
+ * reported. Publishing the step as the variation's min_qty keeps the two in
+ * sync so the sequence stays 5, 10, 15 (or 10, 20, 30).
+ *
+ * @param array                $data      Variation data passed to the JS.
+ * @param WC_Product_Variable  $parent    Parent product.
+ * @param WC_Product_Variation $variation The variation.
+ * @return array
+ */
+add_filter( 'woocommerce_available_variation', function ( $data, $parent, $variation ) {
+	if ( $variation instanceof WC_Product ) {
+		$step = dorotape_qty_step( $variation );
+		if ( $step > 1 ) {
+			$data['min_qty'] = max( (int) $data['min_qty'], $step );
+		}
+	}
+	return $data;
+}, 10, 3 );
+
+/**
+ * Locked quantity box with explicit +/- controls on stepped products.
+ *
+ * The step attribute alone only binds the browser's own spinner arrows, so a
+ * customer could still type 7 on a product sold in 5s — "this will definitely
+ * cause us issues so can this be adjusted please". Correcting the value after
+ * the fact was rejected as too soft: the decision is that an invalid quantity
+ * should not be enterable at all.
+ *
+ * So the box becomes read-only and gains a pair of buttons that move it by
+ * exactly one step. The buttons are rendered here on the single-product page,
+ * where the global product is available, and the "sold in multiples of" note
+ * with them. Readonly is set by scaffold.js rather than here, deliberately: the
+ * buttons only work with scripts running, and a box locked with no working
+ * buttons would be worse than a typable one. With scripts off the field stays
+ * typable and the add-to-cart check below is what refuses a bad quantity.
+ *
+ * These two hooks pass no product, so they fall back to the global — which the
+ * cart page does not set for its line items. scaffold.js injects the missing
+ * buttons there before it locks anything, so the cart box is never stranded.
+ *
+ * Note this does NOT use WooCommerce's own $readonly template flag: that flag
+ * also drops the step, min and inputmode attributes, which the tier table and
+ * the variation price swap both read.
+ *
+ * @return WC_Product|null The product being rendered, or null off a product page.
+ */
+function dorotape_stepped_qty_product(): ?WC_Product {
+	global $product;
+	return $product instanceof WC_Product ? $product : null;
+}
+
+add_action( 'woocommerce_before_quantity_input_field', function (): void {
+	$product = dorotape_stepped_qty_product();
+	if ( ! $product || dorotape_qty_step( $product ) <= 1 ) {
+		return;
+	}
+	printf(
+		'<button type="button" class="dt-qty-step dt-qty-step--down" data-dt-qty="down" aria-label="%s" tabindex="-1">&minus;</button>',
+		esc_attr__( 'Decrease quantity', 'dorotape' )
+	);
+} );
+
+add_action( 'woocommerce_after_quantity_input_field', function (): void {
+	$product = dorotape_stepped_qty_product();
+	if ( ! $product || dorotape_qty_step( $product ) <= 1 ) {
+		return;
+	}
+	$step = dorotape_qty_step( $product );
+	printf(
+		'<button type="button" class="dt-qty-step dt-qty-step--up" data-dt-qty="up" aria-label="%s" tabindex="-1">+</button>',
+		esc_attr__( 'Increase quantity', 'dorotape' )
+	);
+	printf(
+		'<span class="dt-qty-step__note">%s</span>',
+		esc_html(
+			sprintf(
+				/* translators: %d: quantity step */
+				__( 'Sold in multiples of %d', 'dorotape' ),
+				$step
+			)
+		)
+	);
+} );
+
+/**
+ * Mark the quantity wrapper so the CSS and JS can find a stepped box.
+ *
+ * woocommerce_quantity_input_classes applies to the input itself, which is all
+ * the JS needs — the wrapper is styled off :has() in scaffold.css.
+ */
+add_filter( 'woocommerce_quantity_input_classes', function ( $classes, $product ) {
+	if ( $product instanceof WC_Product && dorotape_qty_step( $product ) > 1 ) {
+		$classes[] = 'dt-qty--stepped';
+	}
+	return $classes;
+}, 10, 2 );
+
+/**
+ * Lock the quantity box on the basket page too.
+ *
+ * The basket is the WooCommerce Cart *block*, which is React drawing itself
+ * from the Store API — none of the PHP above reaches it, so the theme's own
+ * buttons and readonly flag never applied there and a customer could type 7 on
+ * the basket page even though the product page refused it.
+ *
+ * The block already reads multiple_of from the Store API (it comes from the
+ * step filter above, so it is already correct) and steps its +/- buttons by it.
+ * Its input renders readOnly={! editable} while leaving those buttons live, so
+ * turning editable off gives the basket exactly the product page's behaviour:
+ * a locked box moved only by the arrows.
+ *
+ * @param bool       $editable
+ * @param WC_Product $product
+ * @return bool
+ */
+add_filter( 'woocommerce_store_api_product_quantity_editable', function ( $editable, $product ) {
+	if ( $product instanceof WC_Product && dorotape_qty_step( $product ) > 1 ) {
+		return false;
+	}
+	return $editable;
+}, 10, 2 );
+
+/**
+ * Server-side backstop for the quantity step.
+ *
+ * The step/min attributes only bind the browser's +/- buttons — a customer can
+ * still type any number straight into the box (client request: "did you know
+ * it is still possible to manually enter any number into this box?"). Reject
+ * anything that isn't a whole multiple of the step and say what the nearest
+ * valid quantities are, so a mistyped 7 can't reach the warehouse as an order
+ * we can't cut. scaffold.js snaps the box on the way out too; this catches
+ * everything else (JS off, direct POST, saved links).
+ */
+add_filter( 'woocommerce_add_to_cart_validation', function ( $passed, $product_id, $quantity, $variation_id = 0 ) {
+	$product = wc_get_product( $variation_id ? $variation_id : $product_id );
+	if ( ! $product instanceof WC_Product ) {
+		return $passed;
+	}
+	$step = dorotape_qty_step( $product );
+	$qty  = (int) $quantity;
+	if ( $step > 1 && $qty > 0 && 0 !== $qty % $step ) {
+		$lower = max( $step, (int) floor( $qty / $step ) * $step );
+		$upper = $lower + $step;
+		wc_add_notice(
+			sprintf(
+				/* translators: 1: step, 2: nearest lower valid quantity, 3: nearest higher valid quantity */
+				esc_html__( 'This product is ordered in multiples of %1$d. Please choose %2$d or %3$d.', 'dorotape' ),
+				$step,
+				$lower,
+				$upper
+			),
+			'error'
+		);
+		return false;
+	}
+	return $passed;
+}, 5, 4 );
 
 // ─── Role-based pricing (Woosage / Sage price lists) ─────────────────────────
 
@@ -218,19 +405,7 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 
 	$customer_discount = dorotape_get_customer_discount( get_current_user_id() );
 
-	// Quick-add products (Hook & Loop) share one combined quantity across all
-	// their rows for picking a tier — 5 Hook + 5 Loop unlocks the 10+ rate for
-	// both — even though each row keeps its own SKU, price, and cart line.
-	$combined_qty = array(); // parent product_id => total qty across its rows
-	foreach ( $cart->get_cart() as $item ) {
-		// dorotape_is_quick_add() checks is_type('variable'), so it must be
-		// given the parent product — $item['data'] here is the variation.
-		$parent = wc_get_product( $item['product_id'] );
-		if ( $parent && function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $parent ) ) {
-			$pid                   = $item['product_id'];
-			$combined_qty[ $pid ] = ( $combined_qty[ $pid ] ?? 0 ) + (int) $item['quantity'];
-		}
-	}
+	$combined_qty = dorotape_combined_quick_add_qty( $cart );
 
 	foreach ( $cart->get_cart() as $cart_item ) {
 		$product    = $cart_item['data'];
@@ -450,6 +625,56 @@ function dorotape_find_applied_tier( int $qty, int $product_id ): ?array {
 // ─── Cart Item Meta ───────────────────────────────────────────────────────────
 
 /**
+ * Total quantity per quick-add parent, across all of its cart lines.
+ *
+ * Quick-add products (Hook & Loop) share one combined quantity for picking a
+ * tier — 5 Hook + 5 Loop unlocks the 10+ rate for both — even though each row
+ * keeps its own SKU, price, and cart line.
+ *
+ * @param WC_Cart|null $cart
+ * @return array<int,int> parent product_id => combined quantity
+ */
+function dorotape_combined_quick_add_qty( $cart = null ): array {
+	$cart = $cart instanceof WC_Cart ? $cart : ( function_exists( 'WC' ) ? WC()->cart : null );
+	if ( ! $cart instanceof WC_Cart ) {
+		return array();
+	}
+
+	$combined = array();
+	foreach ( $cart->get_cart() as $item ) {
+		// dorotape_is_quick_add() checks is_type('variable'), so it must be
+		// given the parent product — $item['data'] here is the variation.
+		$parent = wc_get_product( $item['product_id'] );
+		if ( $parent && function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $parent ) ) {
+			$pid              = (int) $item['product_id'];
+			$combined[ $pid ] = ( $combined[ $pid ] ?? 0 ) + (int) $item['quantity'];
+		}
+	}
+	return $combined;
+}
+
+/**
+ * The quantity a cart line's tier should be resolved against.
+ *
+ * For everything except quick-add this is simply the line quantity. For a
+ * quick-add row it is the combined quantity across the product's rows, which
+ * is what dorotape_dynamic_pricing() charges on. Both the cart label and the
+ * saved order meta must use this, or a line bought at the 10+ rate gets
+ * labelled "1+ rate" — wrong on screen, and wrong in the order record that
+ * syncs to Sage.
+ *
+ * @param array $cart_item
+ * @return int
+ */
+function dorotape_tier_qty_for_line( array $cart_item ): int {
+	$qty        = (int) ( $cart_item['quantity'] ?? 1 );
+	$product_id = (int) ( $cart_item['product_id'] ?? 0 );
+	$combined   = dorotape_combined_quick_add_qty();
+
+	return $combined[ $product_id ] ?? $qty;
+}
+
+/**
  * Display the active quantity-tier discount label in cart, checkout, and emails.
  *
  * @param array $item_data Existing display meta.
@@ -462,7 +687,7 @@ function dorotape_cart_item_display_meta( array $item_data, array $cart_item ): 
 		? (int) $cart_item['variation_id']
 		: $product_id;
 
-	$qty  = (int) ( $cart_item['quantity'] ?? 1 );
+	$qty  = dorotape_tier_qty_for_line( $cart_item );
 	$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
 	if ( $tier ) {
@@ -511,7 +736,7 @@ function dorotape_save_order_item_meta(
 		return;
 	}
 
-	$qty  = (int) ( $values['quantity'] ?? 1 );
+	$qty  = dorotape_tier_qty_for_line( $values );
 	$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
 	if ( $tier ) {

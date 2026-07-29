@@ -184,7 +184,8 @@
 	/* Replace the tbody rows with updated prices, preserving the thead. */
 	function rebuildTbody( table, tiers, basePrice ) {
 		var unit      = tableUnit( table );
-		var suffix    = 'metre' === unit ? '/m' : '';
+		// Mirrors dorotape_unit_strings() in inc/pricing.php — keep in step.
+		var suffix    = 'metre' === unit ? '/m' : ( 'roll' === unit ? '/roll' : '' );
 		var qtySuffix = 'metre' === unit ? 'm+' : '+';
 
 		function fmt( price ) { return formatPrice( price ) + suffix; }
@@ -459,12 +460,23 @@
 		if ( ! wrap ) return;
 
 		const toggle = wrap.querySelector( '.dt-header-search__toggle' );
-		const input  = wrap.querySelector( '.dt-header-search__input' );
+		if ( ! toggle ) return;
+
+		// The field itself is now FiboSearch's, which renders .dss-search-input.
+		// Looked up on open rather than at boot: the plugin builds its markup from
+		// its own script, so the input may not exist yet when this runs. The
+		// theme's own fallback field is still matched, for when the plugin is off.
+		function field() {
+			return wrap.querySelector( '.dgwt-wcas-search-input, .dt-header-search__input' );
+		}
 
 		function setOpen( open ) {
 			wrap.classList.toggle( 'dt-header-search--open', open );
 			toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
-			if ( open ) input.focus();
+			if ( open ) {
+				const input = field();
+				if ( input ) input.focus();
+			}
 		}
 
 		toggle.addEventListener( 'click', function () {
@@ -472,11 +484,21 @@
 		} );
 
 		document.addEventListener( 'click', function ( e ) {
+			// FiboSearch renders its suggestions in a wrapper appended to <body>,
+			// so a click on a result is "outside" the header — closing on it would
+			// tear the panel down mid-click.
+			if ( e.target.closest && e.target.closest( '.dgwt-wcas-suggestions-wrapp, .dgwt-wcas-details-wrapp' ) ) {
+				return;
+			}
 			if ( ! wrap.contains( e.target ) ) setOpen( false );
 		} );
 
 		wrap.addEventListener( 'keydown', function ( e ) {
 			if ( 'Escape' === e.key ) {
+				// First Escape belongs to FiboSearch, to dismiss its suggestions.
+				// Only close the header panel once nothing is showing.
+				const suggestions = document.querySelector( '.dgwt-wcas-suggestions-wrapp' );
+				if ( suggestions && suggestions.offsetParent !== null ) return;
 				setOpen( false );
 				toggle.focus();
 			}
@@ -502,6 +524,29 @@
 		var widthMap = {};
 		try { widthMap = JSON.parse( box.dataset.maxWidths || '{}' ); } catch ( e ) {}
 		var currentMax = parseInt( box.dataset.maxWidth, 10 ) || 0;
+
+		/* Most customers take the roll uncut, so the cut form starts collapsed
+		   behind "Do you need your rolls cutting?" and only those who need it
+		   open it. Collapsed is also the safe default for validation: with no
+		   sizes entered the server treats the add as a normal single line. */
+		const toggle = box.querySelector( '.dt-cutsize__toggle' );
+		const panel  = box.querySelector( '.dt-cutsize__panel' );
+		if ( toggle && panel ) {
+			toggle.addEventListener( 'click', function () {
+				const open = 'true' === toggle.getAttribute( 'aria-expanded' );
+				toggle.setAttribute( 'aria-expanded', open ? 'false' : 'true' );
+				panel.hidden = open;
+				box.classList.toggle( 'dt-cutsize--open', ! open );
+				const icon = toggle.querySelector( '.dt-cutsize__toggle-icon' );
+				if ( icon ) icon.textContent = open ? '+' : '−';
+				// Clearing on close keeps the visible state and what gets posted
+				// in step: a collapsed panel must never submit stale cut sizes.
+				if ( open ) {
+					panel.querySelectorAll( '.dt-cutsize__size' ).forEach( function ( i ) { i.value = ''; } );
+					validateAll();
+				}
+			} );
+		}
 
 		function toMm( size, unit ) {
 			if ( 'cm' === unit ) return size * 10;
@@ -576,8 +621,10 @@
 			var sum = 0, any = false;
 			rows.forEach( function ( tr ) {
 				var size = parseFloat( tr.querySelector( '.dt-cutsize__size' ).value ) || 0;
-				var unit = tr.querySelector( '.dt-cutsize__unit' ).value;
-				if ( size > 0 ) { any = true; sum += toMm( size, unit ); }
+				// Cuts are entered in mm only; the unit select is kept optional
+				// here so any legacy markup still resolves rather than throwing.
+				var unitEl = tr.querySelector( '.dt-cutsize__unit' );
+				if ( size > 0 ) { any = true; sum += toMm( size, unitEl ? unitEl.value : 'mm' ); }
 			} );
 			var invalid = any && currentMax > 0 && sum > currentMax;
 			rows.forEach( function ( tr, idx ) {
@@ -700,9 +747,11 @@
 					validateAll();
 				} );
 			}
-			jQuery( variationsForm ).on( 'show_variation reset_data', function () {
-				setTimeout( function () { syncSingleGroupQty(); validateAll(); }, 0 );
-			} );
+			if ( typeof jQuery !== 'undefined' ) {
+				jQuery( variationsForm ).on( 'show_variation reset_data', function () {
+					setTimeout( function () { syncSingleGroupQty(); validateAll(); }, 0 );
+				} );
+			}
 		}
 
 		// Initial sync: the default single pattern starts allocated to the
@@ -726,6 +775,24 @@
 			var summaryEl    = table.closest( '.summary, .entry-summary' );
 			var summaryPrice = null;
 			var summaryOrig  = null;
+
+			// Mix-and-match prompt (rendered by inc/quickadd.php when the product
+			// has a combined-quantity break) and its live "N more to go" counter.
+			var form    = table.closest( '.dt-quickadd' );
+			var mixEl   = form ? form.querySelector( '.dt-quickadd__mix' ) : null;
+			var mixLive = mixEl ? mixEl.querySelector( '.dt-quickadd__mix-live' ) : null;
+			var mixMin  = mixEl ? ( parseInt( mixEl.dataset.mixMin, 10 ) || 0 ) : 0;
+			if ( ! mixMin ) mixLive = null;
+
+			// Combined-quantity box beside the headline price (inc/quickadd.php).
+			// It is a mirror of the grid, so it lives or dies with the grid.
+			var totalBox     = summaryEl ? summaryEl.querySelector( '.dt-quickadd-total' ) : null;
+			var totalInput   = totalBox ? totalBox.querySelector( '.dt-quickadd-total__input' ) : null;
+			// The box is just the number now — the rule and the "N more to go"
+			// line are stated once above the grid rather than in both places.
+			if ( totalBox && ! mixMin ) {
+				mixMin = parseInt( totalBox.dataset.mixMin, 10 ) || 0;
+			}
 			if ( summaryEl ) {
 				var priceEls = summaryEl.querySelectorAll( '.price' );
 				for ( var p = 0; p < priceEls.length; p++ ) {
@@ -768,6 +835,9 @@
 				// Track whether all rows land on one shared rate, and whether a
 				// discount is currently active — used to drive the summary price.
 				var commonActive = null, mixed = false, anyDiscount = false;
+				// Running order value: the sum of the rows' own line totals, so a
+				// mixed basket (7 black + 3 white) still totals correctly.
+				var lineTotal = 0;
 
 				rows.forEach( function ( r ) {
 					var rowQty = parseInt( r.qtyInput.value, 10 ) || 0;
@@ -785,8 +855,15 @@
 					}
 
 					if ( discounted ) anyDiscount = true;
-					if ( commonActive === null ) commonActive = active;
-					else if ( Math.abs( commonActive - active ) > 0.001 ) mixed = true;
+					if ( rowQty >= 1 && active > 0 ) lineTotal += rowQty * active;
+
+					// Rows with nothing in them don't count towards "one shared
+					// rate" — an empty row's rate is not part of what's being bought,
+					// and letting it vote turns an unmixed order into a mixed one.
+					if ( rowQty >= 1 ) {
+						if ( commonActive === null ) commonActive = active;
+						else if ( Math.abs( commonActive - active ) > 0.001 ) mixed = true;
+					}
 
 					// Per-unit price cell reflects the active (possibly discounted) rate.
 					if ( r.tiers.length ) {
@@ -807,14 +884,58 @@
 					}
 				} );
 
-				// Mirror the shared discounted rate into the headline price, but
-				// only when every row agrees on it (a single price can't stand in
-				// for a mix). Restore WooCommerce's original markup otherwise.
+				// How many more to reach the break, in plain words. Shown twice:
+				// beside the headline price where people look for a quantity box,
+				// and again in the grid where they are actually typing.
+				var progress = '';
+				var hit      = qty >= mixMin;
+				if ( qty > 0 ) {
+					progress = hit
+						? qty + ' in total — discount applied.'
+						: qty + ' so far — ' + ( mixMin - qty ) + ' more to unlock the discount.';
+				}
+
+				if ( mixLive ) {
+					mixLive.textContent = progress;
+					mixLive.classList.toggle( 'dt-quickadd__mix-live--hit', !! progress && hit );
+				}
+
+				// Combined-quantity box next to the price: a running mirror of the
+				// grid, so the page keeps the quantity box every other product has.
+				if ( totalInput ) {
+					totalInput.value = qty;
+					totalInput.classList.toggle( 'dt-quickadd-total__input--hit', qty > 0 && hit );
+				}
+
+				// Headline price: the running total for what's in the grid, in the
+				// same shape updateDisplayedPrice() gives every other product —
+				// big total, then "N rolls × £X/roll" underneath. Michael: the
+				// price under the title has to move with the quantity here too.
+				//
+				// The rate alone used to go here, so the headline sat at £9.90
+				// until the 10th roll and then jumped to £8.91 — it never moved
+				// with the quantity, which is exactly what he was reporting.
+				//
+				// Below 2 rolls there is no total to add up (1 × the rate IS the
+				// rate), so WooCommerce's own markup is restored — again matching
+				// the other products, which leave qty 1 alone.
 				if ( summaryPrice ) {
-					if ( anyDiscount && ! mixed && commonActive > 0 ) {
+					if ( qty > 1 && lineTotal > 0 ) {
 						if ( summaryOrig === null ) summaryOrig = summaryPrice.innerHTML;
+
+						// A mixed grid has no single rate to quote, so the breakdown
+						// falls back to the quantity alone. Both Hook & Loop colours
+						// share a rate, so in practice this reads "10 rolls × £8.91/roll".
+						var note = mixed
+							? qty + ( 1 === qty ? ' roll' : ' rolls' ) + ' in total'
+							: priceBreakdown( qty, commonActive, unit );
+						if ( anyDiscount && ! mixed && mixMin > 0 ) {
+							note += ' · your ' + mixMin + '+ price';
+						}
+
 						summaryPrice.innerHTML = '<span class="woocommerce-Price-amount amount">'
-							+ escapeHtml( formatPrice( commonActive ) ) + '</span>';
+							+ escapeHtml( formatPrice( lineTotal ) ) + '</span> '
+							+ '<span class="dt-live-price__note">' + escapeHtml( note ) + '</span>';
 					} else if ( summaryOrig !== null ) {
 						summaryPrice.innerHTML = summaryOrig;
 						summaryOrig = null;
@@ -837,15 +958,185 @@
 		} );
 	}
 
+	/* ── Quantity step: keep typed values on the step ────────────────────
+	 *
+	 * The step attribute only governs the +/- buttons — the box itself will
+	 * happily accept a typed 7 on a product sold in 5s, which the warehouse
+	 * can't fulfil. Snap to the nearest valid multiple when the customer
+	 * leaves the field (not while typing, or "15" would be rewritten the
+	 * moment the "1" lands). PHP re-checks this on add-to-cart regardless.
+	 */
+	function initQtyStep() {
+		function stepOf( input ) {
+			return parseInt( input.getAttribute( 'step' ), 10 ) || 1;
+		}
+		function minOf( input, step ) {
+			return parseInt( input.getAttribute( 'min' ), 10 ) || step;
+		}
+		function maxOf( input ) {
+			var max = parseInt( input.getAttribute( 'max' ), 10 );
+			return ( ! isNaN( max ) && max > 0 ) ? max : 0;
+		}
+
+		function commit( input, value ) {
+			if ( String( value ) === input.value ) return;
+			input.value = value;
+			input.dispatchEvent( new Event( 'input',  { bubbles: true } ) );
+			input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+		}
+
+		// Snap to the nearest valid multiple. Still needed even with the box
+		// locked: WooCommerce rewrites min (and therefore the valid sequence)
+		// when a variation is chosen, which can strand the current value.
+		function snap( input ) {
+			var step = stepOf( input );
+			if ( step <= 1 ) return;
+			var min = minOf( input, step );
+			var val = parseInt( input.value, 10 );
+			if ( isNaN( val ) || val < min ) { val = min; }
+
+			// Ties round up: on a step of 5, 7.5 → 10 is the friendlier default.
+			var snapped = Math.round( val / step ) * step;
+			if ( snapped < min ) snapped = min;
+
+			var max = maxOf( input );
+			if ( max && snapped > max ) snapped = Math.floor( max / step ) * step;
+
+			commit( input, snapped );
+		}
+
+		function nudge( input, direction ) {
+			var step = stepOf( input );
+			if ( step <= 1 ) return;
+			var min  = minOf( input, step );
+			var max  = maxOf( input );
+			var val  = parseInt( input.value, 10 );
+			if ( isNaN( val ) ) val = min;
+
+			var next = val + ( direction * step );
+			if ( next < min ) next = min;
+			if ( max && next > max ) next = Math.floor( max / step ) * step;
+
+			commit( input, next );
+		}
+
+		function isStepped( input ) {
+			return !! input && stepOf( input ) > 1;
+		}
+
+		function button( direction, label, glyph ) {
+			var el = document.createElement( 'button' );
+			el.type = 'button';
+			el.className = 'dt-qty-step dt-qty-step--' + direction;
+			el.setAttribute( 'data-dt-qty', direction );
+			el.setAttribute( 'aria-label', label );
+			el.tabIndex = -1;
+			el.innerHTML = glyph;
+			return el;
+		}
+
+		// PHP renders the buttons on the single-product page, where it has the
+		// product in hand. The cart page's quantity boxes go through the same
+		// step filter but WooCommerce gives the before/after hooks no product
+		// context there, so the markup arrives without them — and a locked box
+		// with no buttons is worse than a typable one. Fill the gap here.
+		function addButtons( input ) {
+			var wrap = input.closest( '.quantity' );
+			if ( ! wrap || wrap.querySelector( '[data-dt-qty]' ) ) return;
+			wrap.insertBefore( button( 'down', 'Decrease quantity', '&minus;' ), input );
+			if ( input.nextSibling ) {
+				wrap.insertBefore( button( 'up', 'Increase quantity', '+' ), input.nextSibling );
+			} else {
+				wrap.appendChild( button( 'up', 'Increase quantity', '+' ) );
+			}
+		}
+
+		// Lock every stepped box, so an invalid quantity cannot be typed at all.
+		// Readonly is set here rather than in PHP on purpose: the buttons only
+		// work with scripts running, so with scripts off the field stays typable
+		// and the PHP add-to-cart check is what refuses a bad quantity.
+		function lock( scope ) {
+			( scope || document ).querySelectorAll(
+				'.quantity input[type="number"], .quantity input.qty'
+			).forEach( function ( input ) {
+				if ( ! isStepped( input ) ) {
+					input.removeAttribute( 'readonly' );
+					return;
+				}
+				addButtons( input );
+				input.setAttribute( 'readonly', 'readonly' );
+				snap( input );
+			} );
+		}
+
+		// Delegated, because WooCommerce's add-to-cart-variation.js rewrites the
+		// quantity box's attributes (and can replace the surrounding markup)
+		// every time a variation is picked. Listeners bound directly to the
+		// input at load would quietly stop applying after the first change.
+		document.addEventListener( 'click', function ( e ) {
+			var button = e.target.closest ? e.target.closest( '[data-dt-qty]' ) : null;
+			if ( ! button ) return;
+			var wrap  = button.closest( '.quantity' );
+			var input = wrap ? wrap.querySelector( 'input[type="number"], input.qty' ) : null;
+			if ( ! input ) return;
+			e.preventDefault();
+			nudge( input, 'up' === button.dataset.dtQty ? 1 : -1 );
+		} );
+
+		document.addEventListener( 'blur', function ( e ) {
+			if ( isStepped( e.target ) ) snap( e.target );
+		}, true );
+
+		document.addEventListener( 'submit', function ( e ) {
+			if ( ! e.target.matches || ! e.target.matches( 'form.cart' ) ) return;
+			var input = e.target.querySelector( '.quantity input[type="number"], input.qty' );
+			if ( isStepped( input ) ) snap( input );
+		}, true );
+
+		lock();
+
+		if ( typeof jQuery === 'undefined' ) return;
+
+		// Re-lock after a variation swap: the step can differ per variation, and
+		// WooCommerce restores its own attributes when it shows one.
+		var variationsForm = document.querySelector( '.variations_form' );
+		if ( variationsForm ) {
+			jQuery( variationsForm ).on( 'show_variation reset_data', function () {
+				window.setTimeout( function () { lock( variationsForm ); }, 0 );
+			} );
+		}
+
+		// And after the cart redraws itself, which replaces the quantity boxes
+		// wholesale along with the buttons and the readonly flag.
+		jQuery( document.body ).on( 'updated_wc_div updated_cart_totals wc_fragments_refreshed', function () {
+			lock();
+		} );
+	}
+
 	/* ── Boot ───────────────────────────────────────────────────────────── */
+
+	// Each feature starts independently. Run bare, a throw in any one of these
+	// takes down every later one — which is how a fault in the cut-to-size panel
+	// could silently disable the quantity lock on the same page.
 	document.addEventListener( 'DOMContentLoaded', function () {
-		initDropdownNav();
-		initTierTable();
-		initVariationPriceSwap();
-		initHeaderSearch();
-		initFilterBar();
-		initCutRows();
-		initQuickAdd();
+		[
+			initDropdownNav,
+			initTierTable,
+			initVariationPriceSwap,
+			initHeaderSearch,
+			initFilterBar,
+			initCutRows,
+			initQuickAdd,
+			initQtyStep
+		].forEach( function ( init ) {
+			try {
+				init();
+			} catch ( e ) {
+				if ( window.console && window.console.error ) {
+					window.console.error( 'dorotape: ' + init.name + ' failed', e );
+				}
+			}
+		} );
 	} );
 
 }() );
