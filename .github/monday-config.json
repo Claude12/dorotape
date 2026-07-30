@@ -1,8 +1,13 @@
 {
   "__README": "Committed config for monday-sync.js. NOT secret - only MONDAY_TOKEN is a secret. Replace every REPLACE_ME once the board exists, then run: node .github/scripts/monday-sync.js check",
 
+  "__columnTypes": "Each column must be the TYPE listed below, not just exist - check verifies this. ref=Text, status=Status, branch=Text, pr=Link, commit=Text, deployedAt=Date (enable time). The three nulls are optional extras: give them ids only if you add those columns, otherwise leave null and they are skipped.",
+
+  "__boardSetup": "The Status column needs all 8 labels spelled exactly as in 'labels' below - 'In progress' is lowercase p. The token's user must have a MEMBER seat on the board; a viewer seat reads fine and fails every write.",
+
   "boardId": "REPLACE_ME",
   "apiVersion": "2025-01",
+  "timezone": "Europe/London",
 
   "columns": {
     "ref": "REPLACE_ME",
