@@ -1,11 +1,22 @@
 name: Deploy on version bump
 
+# Deploys dev when the Version line in style.css changes on main.
+#
+# This workflow owns exactly one job: getting code onto dev. It does not talk to
+# monday. It publishes a small "deploy-outcome" artifact saying what it did, and
+# monday-tracking.yml reads that afterwards via workflow_run. Keeping the split
+# means a monday outage, a bad token or a broken column id cannot turn a working
+# deploy red.
+
 on:
   push:
     branches:
       - main
     paths:
       - 'style.css'
+
+permissions:
+  contents: read
 
 jobs:
   check-version-and-deploy:
@@ -15,21 +26,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
-          fetch-depth: 2
+          # Full history: the tracking workflow walks deployed-dev..HEAD to find
+          # every ticket in this deploy, and a shallow clone cannot do that.
+          fetch-depth: 0
 
       - name: Check if version bumped
         id: version_check
         run: |
-          PREV=$(git show HEAD~1:style.css | grep "^Version:" | awk '{print $2}')
-          CURR=$(grep "^Version:" style.css | awk '{print $2}')
-          echo "Previous: $PREV → Current: $CURR"
-          if [ "$PREV" != "$CURR" ]; then
-            echo "bumped=true" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          # github.event.before is the real previous tip of main. HEAD~1 is only
+          # the same thing when the push was a single commit or a merge commit -
+          # it silently misses the bump when several commits land at once.
+          PREV_REV="${{ github.event.before }}"
+          if ! git rev-parse --verify --quiet "${PREV_REV}^{commit}" >/dev/null 2>&1; then
+            echo "before-ref ${PREV_REV} unavailable (force push or first push); using HEAD~1"
+            PREV_REV="HEAD~1"
+          fi
+
+          PREV=$(git show "${PREV_REV}:style.css" 2>/dev/null | grep -m1 '^Version:' | awk '{print $2}' || true)
+          CURR=$(grep -m1 '^Version:' style.css | awk '{print $2}' || true)
+
+          if [ -z "${CURR}" ]; then
+            echo "::error::No 'Version:' line found in style.css. The theme header format changed - deploy gating is broken until this is fixed."
+            exit 1
+          fi
+
+          echo "Previous: ${PREV:-<none>} -> Current: ${CURR}"
+          echo "version=${CURR}" >> "$GITHUB_OUTPUT"
+          echo "prev_version=${PREV:-}" >> "$GITHUB_OUTPUT"
+
+          if [ "${PREV:-}" != "${CURR}" ]; then
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
           else
-            echo "bumped=false" >> $GITHUB_OUTPUT
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Deploy via SSH
+        id: deploy
         if: steps.version_check.outputs.bumped == 'true'
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -38,4 +72,40 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            set -e
             git -C ~/www/dorotape.altitude-dev.digital/public_html/wp-content/themes/dorotape pull dorotape main
+
+      # workflow_run hands the next workflow a conclusion, not step outputs. Without
+      # this file, "succeeded and deployed" and "succeeded but the version was not
+      # bumped" look identical downstream - and every push to main would mark
+      # tickets Deployed.
+      - name: Record outcome
+        if: always()
+        run: |
+          if [ "${{ steps.version_check.outcome }}" != "success" ]; then
+            OUTCOME=failed
+          elif [ "${{ steps.version_check.outputs.bumped }}" != "true" ]; then
+            OUTCOME=skipped
+          elif [ "${{ steps.deploy.outcome }}" = "success" ]; then
+            OUTCOME=deployed
+          else
+            OUTCOME=failed
+          fi
+
+          mkdir -p deploy-outcome
+          {
+            echo "outcome=${OUTCOME}"
+            echo "sha=${{ github.sha }}"
+            echo "version=${{ steps.version_check.outputs.version }}"
+          } > deploy-outcome/outcome.env
+
+          echo "Deploy outcome: ${OUTCOME}"
+          cat deploy-outcome/outcome.env >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-outcome
+          path: deploy-outcome/outcome.env
+          retention-days: 7

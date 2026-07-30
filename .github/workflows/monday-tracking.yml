@@ -1,0 +1,184 @@
+name: monday tracking
+
+# Writes pipeline state into the monday dev board. Nothing here can affect a
+# deploy: the deploy runs in deploy.yml and this workflow only ever reacts to it
+# afterwards, via workflow_run.
+#
+# Until .github/monday-config.json has real board ids and MONDAY_TOKEN exists,
+# every job here logs "SKIP" and exits 0 rather than failing. Wiring the board up
+# is what switches it on - nothing in this file needs to change.
+#
+# You set Completed by hand. No job in this workflow ever writes that label.
+
+on:
+  create:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+  workflow_run:
+    workflows: ["Deploy on version bump"]
+    types: [completed]
+
+permissions:
+  contents: write      # move the deployed-dev marker tag
+  actions: read        # read the deploy run's outcome artifact
+  pull-requests: read
+
+# Serialise monday writes. Two runs racing on the deployed-dev tag would make
+# the "everything since the last deploy" range wrong for one of them.
+concurrency:
+  group: monday-tracking
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------- branch push
+  branch-created:
+    if: github.event_name == 'create' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Mark In progress
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+        run: |
+          node .github/scripts/monday-sync.js branch-created \
+            --branch "${{ github.event.ref }}"
+
+  # ------------------------------------------------------------ pull requests
+  pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # A draft PR is not up for review yet, so it should not move the ticket.
+      - name: Mark Code review
+        if: |
+          github.event.action != 'closed' &&
+          github.event.pull_request.draft == false
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+        run: |
+          node .github/scripts/monday-sync.js pr-opened \
+            --branch "${{ github.event.pull_request.head.ref }}" \
+            --pr-url "${{ github.event.pull_request.html_url }}"
+
+      # Closed-without-merge deliberately does nothing: the ticket is still live
+      # work, and silently moving it would lose that.
+      - name: Mark Merged
+        if: |
+          github.event.action == 'closed' &&
+          github.event.pull_request.merged == true
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+        run: |
+          node .github/scripts/monday-sync.js pr-merged \
+            --branch "${{ github.event.pull_request.head.ref }}" \
+            --pr-url "${{ github.event.pull_request.html_url }}"
+
+  # ----------------------------------------------------------------- deploy
+  deploy-tracking:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      # workflow_run's github.sha is the default branch head, NOT the commit that
+      # deployed. Everything downstream depends on pinning to head_sha here.
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download deploy outcome
+        id: fetch_outcome
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-outcome
+          path: deploy-outcome
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve what the deploy actually did
+        id: outcome
+        run: |
+          set -euo pipefail
+          CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+
+          if [ -f deploy-outcome/outcome.env ]; then
+            # shellcheck disable=SC1091
+            . deploy-outcome/outcome.env
+            echo "Artifact says: outcome=${outcome} sha=${sha}"
+          elif [ "$CONCLUSION" = "failure" ]; then
+            # Died before it could write the file - a failure is still a failure.
+            outcome=failed
+            sha="${{ github.event.workflow_run.head_sha }}"
+            echo "No artifact and the run failed; treating as a failed deploy."
+          else
+            # Cannot confirm anything shipped. Marking tickets Deployed on a guess
+            # is worse than staying quiet, so stay quiet.
+            outcome=unknown
+            sha="${{ github.event.workflow_run.head_sha }}"
+            echo "::warning::No outcome artifact and conclusion was '${CONCLUSION}'. Not touching the board."
+          fi
+
+          echo "outcome=${outcome}" >> "$GITHUB_OUTPUT"
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
+      # Every ticket merged since the last successful dev deploy, not just the
+      # one that happened to bump the version.
+      - name: Collect tickets in this deploy
+        id: refs
+        if: steps.outcome.outputs.outcome == 'deployed' || steps.outcome.outputs.outcome == 'failed'
+        run: |
+          set -euo pipefail
+          # No "|| true" on purpose: if the range cannot be computed, this step
+          # fails, and the write and tag-advance steps below skip with it. Better
+          # to report nothing and retry next deploy than to move the marker past
+          # tickets that were never recorded.
+          REFS=$(node .github/scripts/monday-sync.js refs-from-range \
+                   --from deployed-dev \
+                   --to "${{ steps.outcome.outputs.sha }}" | tr '\n' ' ' | xargs)
+          echo "Tickets in range: ${REFS:-<none>}"
+          echo "refs=${REFS}" >> "$GITHUB_OUTPUT"
+
+      - name: Mark Deployed to dev
+        if: steps.outcome.outputs.outcome == 'deployed' && steps.refs.outputs.refs != ''
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+        run: |
+          node .github/scripts/monday-sync.js deployed \
+            --refs "${{ steps.refs.outputs.refs }}" \
+            --commit "${{ steps.outcome.outputs.sha }}" \
+            --run-url "${{ github.event.workflow_run.html_url }}"
+
+      - name: Mark Blocked - deploy failed
+        if: steps.outcome.outputs.outcome == 'failed' && steps.refs.outputs.refs != ''
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+        run: |
+          node .github/scripts/monday-sync.js blocked \
+            --refs "${{ steps.refs.outputs.refs }}" \
+            --stage deploy \
+            --run-url "${{ github.event.workflow_run.html_url }}"
+
+      # Advance the marker only after monday agrees. If the write failed, the tag
+      # stays put and the next deploy re-reports this range rather than losing it.
+      - name: Advance deployed-dev marker
+        if: success() && steps.outcome.outputs.outcome == 'deployed'
+        run: |
+          set -euo pipefail
+          git tag -f deployed-dev "${{ steps.outcome.outputs.sha }}"
+          git push -f origin refs/tags/deployed-dev
+          echo "deployed-dev now at ${{ steps.outcome.outputs.sha }}"

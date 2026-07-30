@@ -31,6 +31,14 @@
  *   0 success, 1 failure. This script is allowed to fail loudly: it runs in a
  *   separate workflow from deploy.yml, so a non-zero exit here can never fail a
  *   deploy. That is the whole reason for the workflow_run split.
+ *
+ *   Two cases exit 0 without writing anything, deliberately, because they are
+ *   "nothing to do here" rather than "something broke":
+ *     - the config still has REPLACE_ME placeholders, or MONDAY_TOKEN is unset
+ *       (tracking not wired up yet)
+ *     - the branch carries no DR ref (chore/*, dependabot/*, ...)
+ *   "check" is the exception: it fails loudly on an unconfigured board, since
+ *   telling you the board is fine when it is not is the one thing it must never do.
  */
 
 const fs = require('node:fs');
@@ -39,6 +47,26 @@ const { execFileSync } = require('node:child_process');
 
 const API_URL = 'https://api.monday.com/v2';
 const DEFAULT_CONFIG = path.join(__dirname, '..', 'monday-config.json');
+
+/**
+ * What each configured column must actually BE on the board.
+ *
+ * This exists because a column id that resolves is not the same as a column
+ * that accepts what we write to it. A Text column called "Deployed" will pass
+ * an existence check and then reject {date, time} on the first real deploy.
+ * The whole value of "check" is that a green run means the next deploy works.
+ */
+const EXPECTED_COLUMN_TYPES = {
+  ref:           { types: ['text'],           writes: 'plain text, e.g. "DR-7"' },
+  status:        { types: ['status'],         writes: 'a status label' },
+  branch:        { types: ['text'],           writes: 'plain text, the branch name' },
+  pr:            { types: ['link'],           writes: '{url, text} - must be a Link column' },
+  commit:        { types: ['text'],           writes: 'plain text, the short SHA' },
+  deployedAt:    { types: ['date'],           writes: '{date, time} - must be a Date column' },
+  deployResult:  { types: ['status'],         writes: 'a status label' },
+  checksResult:  { types: ['status'],         writes: 'a status label' },
+  lastRun:       { types: ['link'],           writes: '{url, text} - must be a Link column' },
+};
 
 /* ------------------------------------------------------------------ *
  * arg parsing
@@ -83,7 +111,7 @@ function log(message) {
  * config
  * ------------------------------------------------------------------ */
 
-function loadConfig(configPath) {
+function loadConfig(configPath, strict) {
   const resolved = path.resolve(configPath);
   if (!fs.existsSync(resolved)) fail(`Config not found at ${resolved}`);
 
@@ -100,10 +128,15 @@ function loadConfig(configPath) {
     if (value === 'REPLACE_ME') placeholders.push(`columns.${key}`);
   }
   if (placeholders.length) {
-    fail(
+    const message =
       `Config still contains placeholders: ${placeholders.join(', ')}\n` +
-      `       Fill these in from the board, then re-run "check".`
-    );
+      `       Fill these in from the board, then re-run "check".`;
+    // "check" is being asked "is the board ready?" - it must answer no, loudly.
+    // Everything else is running inside CI on a repo that simply is not wired
+    // up yet, and must not paint the Actions tab red for that.
+    if (strict) fail(message);
+    cfg.__unconfigured = message;
+    return cfg;
   }
 
   // Column IDs are interpolated into GraphQL, so constrain them.
@@ -337,19 +370,28 @@ function extractRefs(cfg, text) {
   return [...found];
 }
 
+/**
+ * Ref for a branch, or null if the branch simply is not tracked.
+ *
+ * Returns null rather than failing: chore/*, dependabot/* and main itself carry
+ * no DR ref, and a red X on every one of those pushes trains you to ignore the
+ * Actions tab - which costs you the one signal that matters when a real deploy
+ * breaks. Two refs on one branch is still a hard failure: that is ambiguous
+ * intent, not absent intent.
+ */
 function refFromBranch(cfg, branch) {
   const refs = extractRefs(cfg, branch);
-  if (refs.length === 0) {
-    fail(
-      `Branch "${branch}" contains no DR ref. Expected something matching ` +
-      `${cfg.refPattern} - e.g. feature/DR-1-fix-nav or DR-1-fix-nav. ` +
-      `Nothing to track; not an error worth failing a build over if this is intentional.`
-    );
-  }
+  if (refs.length === 0) return null;
   if (refs.length > 1) {
     fail(`Branch "${branch}" contains multiple DR refs (${refs.join(', ')}). Refusing to guess.`);
   }
   return refs[0];
+}
+
+/** Shared exit for the "nothing to track here" case. */
+function skipUntracked(branch) {
+  log(`SKIP  Branch "${branch}" carries no DR ref - nothing to track.`);
+  process.exit(0);
 }
 
 function refsFromList(value) {
@@ -358,20 +400,37 @@ function refsFromList(value) {
   )];
 }
 
-/** Refs mentioned in commit subjects across a range - the multi-ticket deploy case. */
+function revExists(rev) {
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', `${rev}^{commit}`], {
+      stdio: 'ignore',
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Refs mentioned across a commit range - the multi-ticket deploy case.
+ *
+ * If `from` does not resolve, this reports only `to` instead of failing. That
+ * is exactly the first-deploy case: the deployed-dev marker does not exist yet,
+ * and reporting the one commit we know shipped beats reporting nothing.
+ */
 function refsFromRange(cfg, from, to) {
+  const range = revExists(from) ? `${from}..${to}` : `${to}~1..${to}`;
+  if (!revExists(from)) {
+    console.error(`NOTE  "${from}" not found - first deploy? Reporting ${to} only.`);
+  }
   let out;
   try {
-    out = execFileSync('git', ['log', '--format=%s%n%b', `${from}..${to}`], {
+    out = execFileSync('git', ['log', '--format=%s%n%b', range], {
       encoding: 'utf8',
       maxBuffer: 20 * 1024 * 1024,
     });
   } catch (err) {
-    fail(
-      `git log ${from}..${to} failed: ${err.message}\n` +
-      `       If the "deployed-dev" tag does not exist yet this is expected on the ` +
-      `first run - fall back to HEAD only.`
-    );
+    fail(`git log ${range} failed: ${err.message}`);
   }
   return extractRefs(cfg, out);
 }
@@ -379,6 +438,24 @@ function refsFromRange(cfg, from, to) {
 /* ------------------------------------------------------------------ *
  * value builders
  * ------------------------------------------------------------------ */
+
+/**
+ * Build the column_values payload from logical column names.
+ *
+ * Takes [key, value] pairs keyed by the names in config.columns, not raw ids,
+ * and drops any pair whose column is unconfigured (null). Building the object
+ * with computed keys directly would turn every unconfigured column into the
+ * literal key "null" - and three of them would collide into one.
+ */
+function columnValues(cfg, pairs) {
+  const out = {};
+  for (const [key, value] of pairs) {
+    const colId = cfg.columns[key];
+    if (!colId || value === undefined || value === null) continue;
+    out[colId] = value;
+  }
+  return out;
+}
 
 function statusValue(label) {
   // Always by label, never by index, and never with create_labels_if_missing:
@@ -390,10 +467,31 @@ function linkValue(url, text) {
   return { url, text: text || url };
 }
 
+/**
+ * Date column payload. UTC on purpose: monday stores date-column times in UTC
+ * and converts to the account timezone for display, so sending local time here
+ * would double-shift it. Verify this on the first real deploy - if the board
+ * shows the wrong hour, this is the line to look at.
+ */
 function nowDateValue() {
-  const d = new Date();
-  const iso = d.toISOString();
-  return { date: iso.slice(0, 10), time: iso.slice(11, 19) }; // UTC
+  const iso = new Date().toISOString();
+  return { date: iso.slice(0, 10), time: iso.slice(11, 19) };
+}
+
+/**
+ * Human-readable timestamp for update bodies. Unlike the date column there is
+ * no conversion happening to a comment, so it says which zone it is in.
+ */
+function localStamp(cfg) {
+  const tz = cfg.timezone || 'Europe/London';
+  try {
+    const s = new Intl.DateTimeFormat('en-GB', {
+      timeZone: tz, dateStyle: 'medium', timeStyle: 'short', hourCycle: 'h23',
+    }).format(new Date());
+    return `${s} (${tz})`;
+  } catch {
+    return `${new Date().toISOString().slice(0, 19).replace('T', ' ')} (UTC)`;
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -421,8 +519,33 @@ async function cmdCheck(cfg) {
     if (!col) {
       log(`  X  ${key.padEnd(14)} ${id}  NOT FOUND ON BOARD`);
       problems += 1;
-    } else {
-      log(`  ok ${key.padEnd(14)} ${id}  "${col.title}" (${col.type})`);
+      continue;
+    }
+
+    // Existence is not enough - the column has to accept what we write to it.
+    const expected = EXPECTED_COLUMN_TYPES[key];
+    if (expected && !expected.types.includes(col.type)) {
+      log(
+        `  X  ${key.padEnd(14)} ${id}  "${col.title}" is type "${col.type}", ` +
+        `expected ${expected.types.map((t) => `"${t}"`).join(' or ')}\n` +
+        `     ${''.padEnd(14)} this column receives ${expected.writes}`
+      );
+      problems += 1;
+      continue;
+    }
+    log(`  ok ${key.padEnd(14)} ${id}  "${col.title}" (${col.type})`);
+  }
+
+  // A Date column with time switched off silently drops the time half.
+  const dateColId = cfg.columns.deployedAt;
+  const dateCol = dateColId ? byId.get(dateColId) : null;
+  if (dateCol && dateCol.type === 'date') {
+    let hasTime = true;
+    try {
+      hasTime = JSON.parse(dateCol.settings_str || '{}').time !== false;
+    } catch { /* settings unreadable - not worth failing over */ }
+    if (!hasTime) {
+      log(`  !  deployedAt     time appears disabled; only the date will show.`);
     }
   }
 
@@ -517,11 +640,12 @@ async function applyToRefs(cfg, refs, dryRun, build) {
 async function cmdBranchCreated(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
   const ref = refFromBranch(cfg, branch);
+  if (!ref) skipUntracked(branch);
   await applyToRefs(cfg, [ref], dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.inProgress),
-      [cfg.columns.branch]: branch,
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.inProgress)],
+      ['branch', branch],
+    ]),
   }));
 }
 
@@ -529,12 +653,13 @@ async function cmdPrOpened(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
   const prUrl = require_(flags, 'pr-url');
   const ref = refFromBranch(cfg, branch);
+  if (!ref) skipUntracked(branch);
   await applyToRefs(cfg, [ref], dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.codeReview),
-      [cfg.columns.branch]: branch,
-      [cfg.columns.pr]: linkValue(prUrl, 'PR'),
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.codeReview)],
+      ['branch', branch],
+      ['pr', linkValue(prUrl, 'PR')],
+    ]),
   }));
 }
 
@@ -542,11 +667,12 @@ async function cmdPrMerged(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
   const prUrl = require_(flags, 'pr-url');
   const ref = refFromBranch(cfg, branch);
+  if (!ref) skipUntracked(branch);
   await applyToRefs(cfg, [ref], dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.merged),
-      [cfg.columns.pr]: linkValue(prUrl, 'PR'),
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.merged)],
+      ['pr', linkValue(prUrl, 'PR')],
+    ]),
     comment:
       'Merged to main. Not deployed yet - dev deploys only run when the ' +
       'Version line in style.css is bumped.',
@@ -560,24 +686,20 @@ async function cmdDeployed(cfg, flags, dryRun) {
   const short = commit.slice(0, 7);
 
   await applyToRefs(cfg, refs, dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.deployedToDev),
-      [cfg.columns.commit]: short,
-      [cfg.columns.deployedAt]: nowDateValue(),
-      [cfg.columns.deployResult]: cfg.columns.deployResult
-        ? statusValue(cfg.deployResultLabels.success)
-        : null,
-      [cfg.columns.checksResult]: cfg.columns.checksResult
-        ? statusValue(cfg.checksResultLabels.notRun)
-        : null,
-      [cfg.columns.lastRun]: cfg.columns.lastRun ? linkValue(runUrl, 'Run log') : null,
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.deployedToDev)],
+      ['commit', short],
+      ['deployedAt', nowDateValue()],
+      ['deployResult', statusValue(cfg.deployResultLabels.success)],
+      ['checksResult', statusValue(cfg.checksResultLabels.notRun)],
+      ['lastRun', linkValue(runUrl, 'Run log')],
+    ]),
     comment:
-      `Deployed to dev at commit ${short}.\n` +
+      `Deployed to dev at commit ${short} on ${localStamp(cfg)}.\n` +
       `Dev: ${cfg.devUrl}\n` +
-      `Run log: ${runUrl}\n\n` +
+      `Run log: ${runUrl}` +
       (refs.length > 1
-        ? `This deploy shipped ${refs.length} tickets together: ${refs.join(', ')}.`
+        ? `\n\nThis deploy shipped ${refs.length} tickets together: ${refs.join(', ')}.`
         : ''),
   }));
 }
@@ -588,13 +710,11 @@ async function cmdChecksPassed(cfg, flags, dryRun) {
   const summary = typeof flags.summary === 'string' ? flags.summary : '';
 
   await applyToRefs(cfg, refs, dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.qa),
-      [cfg.columns.checksResult]: cfg.columns.checksResult
-        ? statusValue(cfg.checksResultLabels.passed)
-        : null,
-      [cfg.columns.lastRun]: cfg.columns.lastRun ? linkValue(runUrl, 'Run log') : null,
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.qa)],
+      ['checksResult', statusValue(cfg.checksResultLabels.passed)],
+      ['lastRun', linkValue(runUrl, 'Run log')],
+    ]),
     comment:
       `Automated checks passed on dev. Ready for your manual QA.\n` +
       `Dev: ${cfg.devUrl}\n` +
@@ -627,16 +747,16 @@ async function cmdBlocked(cfg, flags, dryRun) {
       `Run log: ${runUrl}` + (detail ? `\n\n${detail}` : '');
 
   await applyToRefs(cfg, refs, dryRun, () => ({
-    values: {
-      [cfg.columns.status]: statusValue(cfg.labels.blocked),
-      [cfg.columns.deployResult]: cfg.columns.deployResult
-        ? statusValue(deployFailed ? cfg.deployResultLabels.failed : cfg.deployResultLabels.success)
-        : null,
-      [cfg.columns.checksResult]: cfg.columns.checksResult
-        ? statusValue(deployFailed ? cfg.checksResultLabels.notRun : cfg.checksResultLabels.failed)
-        : null,
-      [cfg.columns.lastRun]: cfg.columns.lastRun ? linkValue(runUrl, 'Run log') : null,
-    },
+    values: columnValues(cfg, [
+      ['status', statusValue(cfg.labels.blocked)],
+      ['deployResult', statusValue(
+        deployFailed ? cfg.deployResultLabels.failed : cfg.deployResultLabels.success
+      )],
+      ['checksResult', statusValue(
+        deployFailed ? cfg.checksResultLabels.notRun : cfg.checksResultLabels.failed
+      )],
+      ['lastRun', linkValue(runUrl, 'Run log')],
+    ]),
     comment,
   }));
 }
@@ -677,7 +797,27 @@ async function main() {
     process.exit(command ? 0 : 1);
   }
 
-  const cfg = loadConfig(typeof flags.config === 'string' ? flags.config : DEFAULT_CONFIG);
+  // "check" is the readiness probe, so it alone treats an unconfigured board
+  // as a failure. Every other command is running unattended in CI.
+  const strict = command === 'check';
+  const cfg = loadConfig(typeof flags.config === 'string' ? flags.config : DEFAULT_CONFIG, strict);
+
+  // refs-from-range only reads git and config.refPattern - it never touches
+  // monday, and the workflow calls it before deciding whether there is anything
+  // to report. Gating it on board readiness would break that ordering.
+  if (command !== 'refs-from-range') {
+    if (cfg.__unconfigured) {
+      log(`SKIP  ${cfg.__unconfigured}`);
+      log('Tracking is not wired up yet - nothing written, exiting 0.');
+      process.exit(0);
+    }
+    if (!process.env.MONDAY_TOKEN) {
+      if (strict) fail('MONDAY_TOKEN is not set');
+      log('SKIP  MONDAY_TOKEN is not set - nothing written, exiting 0.');
+      process.exit(0);
+    }
+  }
+
   const dryRun = flags['dry-run'] === true;
   if (dryRun) log('DRY RUN - no mutations will be sent\n');
 
