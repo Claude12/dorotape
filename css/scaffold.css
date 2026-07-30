@@ -715,6 +715,58 @@ form.cart {
 	text-align: center;
 }
 
+/* Stepped quantities: the box is locked and only the buttons move it, so an
+   off-step quantity can never be typed on a product sold in fives or tens. */
+.quantity:has(.dt-qty-step) {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0;
+}
+
+.dt-qty-step {
+	width: 34px;
+	height: 38px;
+	flex: 0 0 auto;
+	border: 1px solid var(--dt-border);
+	background: var(--dt-bg);
+	color: var(--dt-text);
+	font-size: 1.1rem;
+	line-height: 1;
+	cursor: pointer;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.dt-qty-step--down { border-radius: var(--dt-radius) 0 0 var(--dt-radius); border-right: none; }
+.dt-qty-step--up   { border-radius: 0 var(--dt-radius) var(--dt-radius) 0; border-left: none; }
+
+.dt-qty-step:hover { background: var(--dt-border); }
+
+.quantity input[type="number"].dt-qty--stepped {
+	border-radius: 0;
+	height: 38px;
+	/* The value is button-driven, so the browser's own spinner would offer a
+	   second, unstepped way in on some platforms. */
+	-moz-appearance: textfield;
+	appearance: textfield;
+	cursor: default;
+}
+
+.quantity input[type="number"].dt-qty--stepped::-webkit-outer-spin-button,
+.quantity input[type="number"].dt-qty--stepped::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Sits outside the button group, on its own line under the control. */
+.dt-qty-step__note {
+	flex: 0 0 100%;
+	margin-top: .35rem;
+	font-size: .78rem;
+	color: var(--dt-mid);
+}
+
 .single_add_to_cart_button,
 .button.alt {
 	background: var(--dt-accent);
@@ -985,6 +1037,71 @@ form.variations_form.cart {
 	text-align: left;
 }
 .woocommerce-product-attributes th { color: var(--dt-mid); font-weight: 500; width: 35%; }
+
+/* ── Custom product tabs (Kryptronic tabonecontent / tabtwocontent) ────────── */
+/*
+ * These tabs hold plain <table id="data"> markup — the Colour References grid
+ * (Pantone / RAL / Avery / Mactac / Oracal / Metamark) on the F-Sign Platinum
+ * range, and the heat-press / aftercare grids elsewhere. On the old site they
+ * were styled by a <style> block sitting inside the tab content itself, whose
+ * selectors were bare `table` and `th, td` — global, so it also restyled the
+ * Additional Information table and anything else on the page. The import
+ * (correctly) dropped that block, which left these tables completely unstyled:
+ * left-aligned, ragged column widths, no cell separation. That is the client's
+ * "the colour refs are not aligned on the F-Sign Platinum pages".
+ *
+ * So reproduce the intended look here instead, scoped to .dt-product-tab where
+ * it cannot leak. Cell width is min-width, not width, so six columns scroll
+ * inside the tab on a phone rather than forcing the page sideways.
+ */
+.dt-product-tab { overflow-x: auto; }
+
+.dt-product-tab table {
+	margin: 0 auto;
+	border-collapse: collapse;
+}
+
+.dt-product-tab th,
+.dt-product-tab td {
+	min-width: 160px;
+	height: 30px;
+	padding: 5px;
+	font-size: 14px;
+	text-align: center;
+	vertical-align: middle;
+	/* White gutters between cells, matching the old site: the separation is
+	   made by border colour against the blue fill, not by a visible rule. */
+	background: var(--dt-blue);
+	color: var(--dt-white);
+	border-left: 5px solid var(--dt-white);
+	border-right: 5px solid var(--dt-white);
+	border-bottom: 5px solid var(--dt-white);
+}
+
+.dt-product-tab th { font-weight: 600; }
+
+/* Tick / cross glyphs in the aftercare grids carry inline `color: white`,
+   which only reads against the blue fill above — keep them sized with it. */
+.dt-product-tab td sup { font-size: .7em; }
+
+/*
+ * Datasheet / fire-certificate / colour-selector icon links. The imported
+ * markup puts the <a><img> pairs directly inside a <ul> with no <li>, so they
+ * inherit the list's indent and sit out of line with the copy above them.
+ * Strip the list chrome when a list has no real items and lay the icons out
+ * as a row.
+ */
+.woocommerce-Tabs-panel ul:not(:has(> li)) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1rem;
+	align-items: center;
+	margin: .5rem 0;
+	padding-left: 0;
+	list-style: none;
+}
+.woocommerce-Tabs-panel ul:not(:has(> li)) br { display: none; }
+.woocommerce-Tabs-panel ul:not(:has(> li)) img { display: block; max-width: 100%; height: auto; }
 
 /* ── Quantity / tier pricing table ──────────────────────────────────────────── */
 .dt-tier-pricing {
@@ -1423,6 +1540,59 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 	border-radius: var(--dt-radius);
 }
 
+/* Collapsed by default — the roll is supplied uncut unless asked otherwise. */
+.dt-cutsize__toggle {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 0;
+	background: none;
+	border: 0;
+	font: inherit;
+	font-weight: 600;
+	color: var(--dt-text);
+	text-align: left;
+	cursor: pointer;
+}
+
+.dt-cutsize__toggle:hover .dt-cutsize__toggle-text { text-decoration: underline; }
+
+.dt-cutsize__toggle:focus-visible {
+	outline: 2px solid var(--dt-accent, currentColor);
+	outline-offset: 3px;
+}
+
+.dt-cutsize__toggle-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 22px;
+	height: 22px;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	font-size: 1rem;
+	line-height: 1;
+	color: var(--dt-mid);
+}
+
+.dt-cutsize__toggle-hint {
+	margin-left: auto;
+	font-size: .8rem;
+	font-weight: 500;
+	color: var(--dt-mid);
+}
+
+.dt-cutsize__panel { margin-top: 12px; }
+.dt-cutsize__panel[hidden] { display: none; }
+
+.dt-cutsize__unit-suffix {
+	margin-left: 6px;
+	font-size: .85rem;
+	color: var(--dt-mid);
+}
+
 .dt-cutsize__label {
 	display: block;
 	font-weight: 600;
@@ -1526,6 +1696,23 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 
 .dt-header-search__submit:hover {
 	background: var(--dt-accent-dk);
+}
+
+/* FiboSearch inside the header panel. The plugin brings its own field, button
+   and results styling; all the theme has to do is let it fill the panel and
+   make sure its results float above the sticky header. */
+.dt-header-search__form .dgwt-wcas-search-wrapp {
+	flex: 1;
+	min-width: 0;
+	max-width: none;
+	margin: 0;
+}
+
+/* The results list is appended to <body>, so it escapes the panel's stacking
+   context and has to clear the header on its own. */
+.dgwt-wcas-suggestions-wrapp,
+.dgwt-wcas-details-wrapp {
+	z-index: 1000;
 }
 
 /* ── Category filter bar (Adhesive / Colour / Finish above the grid) ────── */
@@ -1948,6 +2135,67 @@ input[type="submit"]:hover { background: var(--dt-mid); text-decoration: none; c
 }
 
 .dt-quickadd__line[hidden] { display: none; }
+
+/* Mix-and-match prompt above the quick-add table. */
+.dt-quickadd__mix {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 10px;
+	margin: 0 0 10px;
+	padding: 9px 12px;
+	background: rgba(39, 103, 73, .08);
+	border-radius: var(--dt-radius);
+	font-size: .88rem;
+}
+
+.dt-quickadd__mix-lead { font-weight: 600; color: var(--dt-text); }
+
+.dt-quickadd__mix-live { color: var(--dt-mid); }
+
+.dt-quickadd__mix-live--hit { color: var(--dt-success); font-weight: 600; }
+
+/* Combined-quantity box beside the headline price. Deliberately styled like the
+   standard quantity box on every other product, because that is the whole point
+   of it — the quick-add grid had removed the control people look for. */
+.dt-quickadd-total { margin: 0 0 1rem; }
+
+.dt-quickadd-total__row {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+}
+
+.dt-quickadd-total__label {
+	font-size: .9rem;
+	font-weight: 600;
+	color: var(--dt-text);
+}
+
+.dt-quickadd-total__input {
+	width: 70px;
+	padding: .55rem .5rem;
+	border: 1px solid var(--dt-border);
+	border-radius: var(--dt-radius);
+	background: var(--dt-bg);
+	font: inherit;
+	font-size: .9rem;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	color: var(--dt-text);
+	cursor: default;
+}
+
+.dt-quickadd-total__input--hit {
+	border-color: var(--dt-success);
+	color: var(--dt-success);
+	font-weight: 700;
+}
+
+/* The Total rolls box carried a copy of the mix-and-match rule and the running
+   "N more to go" line, both of which also appear above the grid — the same two
+   sentences twice on one screen. The copies here were removed, so the rules that
+   styled them (.dt-quickadd-total__note / __progress) went with them. */
 
 .dt-quickadd__qty-col { width: 90px; text-align: center; }
 

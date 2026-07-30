@@ -59,16 +59,78 @@ add_action( 'woocommerce_before_single_product_summary', function (): void {
 		return;
 	}
 	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+	add_action( 'woocommerce_single_product_summary', 'dorotape_quick_add_total', 11 );
 	add_action( 'woocommerce_single_product_summary', 'dorotape_quick_add_form', 30 );
 }, 5 );
 
 /**
- * One row per variation: option name, price (with any quantity-break note),
- * quantity box. One button adds every row with qty > 0 as separate lines.
+ * Combined-quantity box next to the headline price.
+ *
+ * Client: "is it possible to show the quantity box so people are aware that they
+ * can mix and match to get the 10 roll discount?" Every other product on the
+ * site has a quantity box beside its price; the quick-add layout replaced it
+ * with per-option boxes down in the grid, so the page lost the one control
+ * people look for — and with it any hint that hook and loop are counted
+ * together.
+ *
+ * This puts a box back in the expected place. It is a running total, not an
+ * input: the real quantities are still the per-option ones, and a single number
+ * here could not say how it splits between them. So it is read-only, filled in
+ * by scaffold.js as the grid is used. It carries no name attribute and so posts
+ * nothing.
+ *
+ * Just the label and the number. The mix-and-match rule and the progress towards
+ * the break belong to the grid, above dorotape_quick_add_form()'s table — they
+ * were stated here as well and read as duplication on screen.
+ *
+ * Rendered at priority 11, immediately after woocommerce_template_single_price.
  */
-function dorotape_quick_add_form(): void {
+function dorotape_quick_add_total(): void {
 	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
 
+	$mix = dorotape_quick_add_mix( dorotape_quick_add_rows( $product ) );
+	if ( $mix['min'] < 2 || $mix['price'] <= 0 ) {
+		return; // No combined break to work towards — the box would say nothing.
+	}
+
+	$strings = function_exists( 'dorotape_unit_strings' )
+		? dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) )
+		: array();
+	$label = $strings['total'] ?? __( 'Total quantity', 'dorotape' );
+	?>
+	<div class="dt-quickadd-total" data-mix-min="<?php echo esc_attr( $mix['min'] ); ?>">
+		<div class="dt-quickadd-total__row">
+			<label class="dt-quickadd-total__label" for="dt-quickadd-total">
+				<?php echo esc_html( $label ); ?>
+			</label>
+			<input type="text" id="dt-quickadd-total" class="dt-quickadd-total__input"
+				value="0" readonly tabindex="-1" inputmode="none">
+		</div>
+		<?php
+		// The mix-and-match rule and the running "N more to go" line are NOT
+		// repeated here. They are stated once, immediately above the grid, where
+		// the customer is actually typing — carrying them here as well put the
+		// same two sentences on screen twice within a few hundred pixels.
+		?>
+	</div>
+	<?php
+}
+
+/**
+ * Build the quick-add rows for a product: one per purchasable variation.
+ *
+ * Split out of the form so the combined-total box above the grid can be built
+ * from exactly the same data — it needs the tier breaks to know what the target
+ * quantity is, and two independent readings of that would be a bug waiting to
+ * happen.
+ *
+ * @param WC_Product $product
+ * @return array<int, array{id:int,sku:string,label:string,price:float,tier:string,tiers:array}>
+ */
+function dorotape_quick_add_rows( WC_Product $product ): array {
 	$rows = array();
 	foreach ( $product->get_children() as $vid ) {
 		$var = wc_get_product( $vid );
@@ -121,13 +183,71 @@ function dorotape_quick_add_form(): void {
 			'tiers' => $tiers,
 		);
 	}
+	return $rows;
+}
+
+/**
+ * The combined-quantity discount break across all rows, if there is one.
+ *
+ * The discount tier is picked on the COMBINED quantity across every row (5 hook
+ * + 5 loop = the 10-roll rate), which isn't obvious from a table of separate
+ * lines. The lowest break across the rows is the one to aim a customer at.
+ *
+ * @param array $rows Rows from dorotape_quick_add_rows().
+ * @return array{min:int,price:float} min of 0 when no break applies.
+ */
+function dorotape_quick_add_mix( array $rows ): array {
+	$min   = 0;
+	$price = 0.0;
+	foreach ( $rows as $row ) {
+		foreach ( $row['tiers'] as $tier ) {
+			if ( 0 === $min || (int) $tier['min_qty'] < $min ) {
+				$min   = (int) $tier['min_qty'];
+				$price = (float) $tier['tier_price'];
+			}
+		}
+	}
+	return array( 'min' => $min, 'price' => $price );
+}
+
+/**
+ * One row per variation: option name, price (with any quantity-break note),
+ * quantity box. One button adds every row with qty > 0 as separate lines.
+ */
+function dorotape_quick_add_form(): void {
+	global $product;
+
+	$rows = dorotape_quick_add_rows( $product );
 	if ( ! $rows ) {
 		return;
 	}
+
+	$mix       = dorotape_quick_add_mix( $rows );
+	$mix_min   = $mix['min'];
+	$mix_price = $mix['price'];
 	?>
 	<form class="dt-quickadd" method="post" action="<?php echo esc_url( get_permalink( $product->get_id() ) ); ?>">
 		<?php wp_nonce_field( 'dt_quick_add_' . $product->get_id(), 'dt_quick_add_nonce' ); ?>
 		<input type="hidden" name="dt_quick_add" value="<?php echo esc_attr( $product->get_id() ); ?>">
+		<?php if ( $mix_min > 1 && $mix_price > 0 ) : ?>
+			<p class="dt-quickadd__mix" data-mix-min="<?php echo esc_attr( $mix_min ); ?>">
+				<span class="dt-quickadd__mix-lead">
+					<?php
+					printf(
+						/* translators: 1: combined quantity needed, 2: discounted unit price */
+						esc_html__( 'Mix and match: any %1$d in total gets them all at %2$s each.', 'dorotape' ),
+						(int) $mix_min,
+						esc_html( wp_strip_all_tags( wc_price( $mix_price ) ) )
+					);
+					?>
+				</span>
+				<?php // The page's one live region. It used to sit on the copy of
+					// this line beside the Total rolls box, which was silent to
+					// avoid a double announcement; that copy is gone, so the
+					// announcement belongs here. ?>
+				<span class="dt-quickadd__mix-live" aria-live="polite"></span>
+			</p>
+		<?php endif; ?>
 		<table class="dt-quickadd__table" data-unit="<?php echo esc_attr( dorotape_price_unit( $product->get_id() ) ); ?>">
 			<thead>
 				<tr>

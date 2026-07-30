@@ -122,7 +122,13 @@ function dorotape_cutsize_posted_patterns(): array {
 		$cuts = array();
 		foreach ( array_slice( $group, 0, 20, true ) as $row ) {
 			$size = isset( $row['size'] ) ? (float) $row['size'] : 0;
-			$unit = isset( $row['unit'] ) && in_array( $row['unit'], array( 'mm', 'cm', 'in' ), true ) ? $row['unit'] : 'mm';
+			// Cuts are millimetres, full stop — client request: "can we remove all
+			// cm & inch options so only mm is used". The form no longer offers a
+			// unit, so any posted one is either a stale cached page or forged; in
+			// both cases honouring it would put a "60cm" note on a picking list
+			// that the rest of the system reads as mm. Ignore it and treat the
+			// number as mm, which is exactly what the field now asks for.
+			$unit = 'mm';
 			if ( $size > 0 ) {
 				$cuts[] = array(
 					'size' => $size,
@@ -184,7 +190,12 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 	<div class="dt-cutsize" id="dt_cutsize"
 		<?php echo $max_width ? 'data-max-width="' . esc_attr( $max_width ) . '"' : ''; ?>
 		<?php echo $width_json ? "data-max-widths='" . esc_attr( $width_json ) . "'" : ''; ?>>
-		<span class="dt-cutsize__label"><?php esc_html_e( 'Cut sizes (optional)', 'dorotape' ); ?></span>
+		<button type="button" class="dt-cutsize__toggle" aria-expanded="false" aria-controls="dt_cutsize_panel">
+			<span class="dt-cutsize__toggle-icon" aria-hidden="true">+</span>
+			<span class="dt-cutsize__toggle-text"><?php esc_html_e( 'Do you need your rolls cutting?', 'dorotape' ); ?></span>
+			<span class="dt-cutsize__toggle-hint"><?php esc_html_e( 'Optional', 'dorotape' ); ?></span>
+		</button>
+		<div class="dt-cutsize__panel" id="dt_cutsize_panel" hidden>
 		<p class="dt-cutsize__hint">
 			<?php esc_html_e( 'Set how many rolls need each cut pattern below — the quantities must add up to your total order quantity. Add another cut within a pattern if a roll needs splitting into more than one length.', 'dorotape' ); ?>
 			<span class="dt-cutsize__max" style="<?php echo $max_width ? '' : 'display:none'; ?>">
@@ -199,8 +210,7 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 				<thead>
 					<tr>
 						<th class="dt-cutsize__qty-col"><?php esc_html_e( 'Qty', 'dorotape' ); ?></th>
-						<th><?php esc_html_e( 'Cut size', 'dorotape' ); ?></th>
-						<th><?php esc_html_e( 'Unit', 'dorotape' ); ?></th>
+						<th><?php esc_html_e( 'Cut size (mm)', 'dorotape' ); ?></th>
 						<th class="dt-cutsize__action-col"><span class="screen-reader-text"><?php esc_html_e( 'Actions', 'dorotape' ); ?></span></th>
 					</tr>
 				</thead>
@@ -214,16 +224,10 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 						</td>
 						<td>
 							<input type="number" class="dt-cutsize__size" name="dt_cut_rows[0][0][size]"
-								min="1" step="0.1" placeholder="<?php esc_attr_e( 'Size', 'dorotape' ); ?>"
-								aria-label="<?php esc_attr_e( 'Cut size', 'dorotape' ); ?>">
+								min="1" step="1" placeholder="<?php esc_attr_e( 'Size in mm', 'dorotape' ); ?>"
+								aria-label="<?php esc_attr_e( 'Cut size in millimetres', 'dorotape' ); ?>">
+							<span class="dt-cutsize__unit-suffix" aria-hidden="true">mm</span>
 							<span class="dt-cutsize__row-error" role="alert"></span>
-						</td>
-						<td>
-							<select class="dt-cutsize__unit" name="dt_cut_rows[0][0][unit]" aria-label="<?php esc_attr_e( 'Unit', 'dorotape' ); ?>">
-								<option value="mm">mm</option>
-								<option value="cm">cm</option>
-								<option value="in"><?php esc_html_e( 'inches', 'dorotape' ); ?></option>
-							</select>
 						</td>
 						<td class="dt-cutsize__actions">
 							<button type="button" class="dt-cutsize__addcut" aria-label="<?php esc_attr_e( 'Add another cut to this pattern', 'dorotape' ); ?>">+</button>
@@ -237,6 +241,7 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 			<button type="button" class="dt-cutsize__addgroup"><?php esc_html_e( '+ Add another cut pattern', 'dorotape' ); ?></button>
 			<p class="dt-cutsize__alloc" aria-live="polite"></p>
 		</div>
+		</div><!-- .dt-cutsize__panel -->
 	</div>
 	<?php
 } );
@@ -258,6 +263,14 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
  * recurse back into this callback.
  */
 add_filter( 'woocommerce_add_to_cart_validation', function ( bool $passed, int $product_id, $quantity, $variation_id = 0 ): bool {
+	// An earlier validator already rejected this add (e.g. the quantity-step
+	// check in pricing.php, which runs at priority 5). This callback adds cart
+	// lines itself, so it must not run on a failed add or it would quietly
+	// basket the very quantity that was just refused.
+	if ( ! $passed ) {
+		return false;
+	}
+
 	$parent = wc_get_product( $product_id );
 	if ( ! $parent || ! dorotape_has_cutsize( $parent ) ) {
 		return $passed;
@@ -335,7 +348,7 @@ add_filter( 'woocommerce_add_to_cart_validation', function ( bool $passed, int $
 		}
 		$parts = array();
 		foreach ( $pattern['cuts'] as $cut ) {
-			// Drop trailing zeros: 500mm, 22.5cm, 12in
+			// Drop trailing zeros: 500mm, 22.5mm
 			$parts[] = rtrim( rtrim( number_format( $cut['size'], 1, '.', '' ), '0' ), '.' ) . $cut['unit'];
 		}
 		$cart_item_data = array(

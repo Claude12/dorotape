@@ -293,9 +293,11 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</tr></thead>';
 	echo '<tbody>';
 
-	// First row: standard price. data-min="0" = no tier active.
+	// First row: standard price. data-min="0" = no tier active. The label shows
+	// the quantity step rather than 1 where one applies — Ri-Jet C50 steps in
+	// 5s, so "1m+" would advertise a quantity the quantity box refuses.
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
-	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>—</td>';
 	echo '</tr>';
@@ -439,8 +441,9 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</tr></thead>';
 	echo '<tbody>';
 
+	// Base-rate label follows the quantity step, as in the simple-product table.
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
-	echo '<td>' . esc_html( '1' . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>&mdash;</td>';
 	echo '</tr>';
@@ -561,6 +564,145 @@ add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
 	return $tabs;
 } );
 
+// ─── Imported description tidy-up ─────────────────────────────────────────────
+
+/**
+ * Strip the document-wrapper tags the Kryptronic descriptions were authored
+ * with. Around 860 products still carry a full <html><head>…<body> skeleton
+ * inside post_content. Browsers discard the tags themselves, but wpautop wraps
+ * each stray one in a paragraph first, so the page ends up with empty <p>
+ * elements — a blank gap above the first line of copy and another below the
+ * datasheet icons.
+ *
+ * Done at render time, at priority 9 so it runs before wpautop (10) and there
+ * is nothing left for wpautop to wrap. The original post_content is untouched,
+ * so this is fully reversible and needs no data migration.
+ *
+ * <style> is deliberately left in place: several descriptions rely on the
+ * `.responsive` rule it defines to size the manufacturer logo.
+ *
+ * @param string $content
+ * @return string
+ */
+function dorotape_strip_document_wrapper( string $content ): string {
+	// Cheap bail-out for the majority of descriptions, which carry none of
+	// these. <title> is tested too: 51 products came through the import with a
+	// bare <title> and no surrounding skeleton, and a guard that only looked
+	// for <html>/<body> skipped them, leaving the title behind.
+	if ( false === stripos( $content, '<html' )
+		&& false === stripos( $content, '<body' )
+		&& false === stripos( $content, '<title' )
+		&& false === stripos( $content, '<head' ) ) {
+		return $content;
+	}
+	// <title> is hidden by the UA stylesheet rather than dropped, so remove it
+	// with its text or it lingers as invisible content in the description.
+	$content = preg_replace( '#<title\b[^>]*>.*?</title>#is', '', $content );
+	return (string) preg_replace( '#</?(?:html|head|body)\b[^>]*>#i', '', (string) $content );
+}
+
+add_filter( 'the_content', 'dorotape_strip_document_wrapper', 9 );
+add_filter( 'woocommerce_short_description', 'dorotape_strip_document_wrapper', 9 );
+
+/**
+ * Drop empty paragraphs left behind by wpautop.
+ *
+ * Removing the document wrapper above stops wpautop manufacturing paragraphs
+ * around stray tags, but the imported descriptions have a second source of the
+ * same symptom: the icon rows are <ul> elements holding bare <a><img> pairs
+ * with no <li>, and the blank line after the closing </ul> still becomes an
+ * empty <p>. On screen that is an unexplained gap in the middle of the copy —
+ * the very thing the wrapper strip was meant to clear.
+ *
+ * Runs at priority 11, i.e. after wpautop (10), because these paragraphs do
+ * not exist until wpautop has run. Only genuinely empty ones go: whitespace
+ * and &nbsp; only, never a paragraph with content.
+ *
+ * @param string $content
+ * @return string
+ */
+function dorotape_strip_empty_paragraphs( string $content ): string {
+	return (string) preg_replace( '#<p>(?:\s|&nbsp;|<br\s*/?>)*</p>#i', '', $content );
+}
+
+add_filter( 'the_content', 'dorotape_strip_empty_paragraphs', 11 );
+add_filter( 'woocommerce_short_description', 'dorotape_strip_empty_paragraphs', 11 );
+
+// ─── Size options sorted narrow → wide ────────────────────────────────────────
+
+/**
+ * Build a numeric sort key from every integer in a term name.
+ *
+ * "760mm x 5m" -> [760, 5]; "1220mm AirFlow" -> [1220]. Comparing the lists
+ * element by element is what makes "760mm x 5m" precede "760mm x 50m" — a
+ * plain string sort puts "50m" first because it compares "0" against "m".
+ *
+ * @param string $name
+ * @return int[]
+ */
+function dorotape_size_sort_key( string $name ): array {
+	preg_match_all( '/\d+/', $name, $m );
+	return array_map( 'intval', $m[0] );
+}
+
+/**
+ * Sort width / roll-size attribute options narrow → wide.
+ *
+ * Client request: "arrange the size in a narrow to wide i.e 500 / 760 / 1372 /
+ * 1600". These attributes are set to menu_order, so ordering comes from an
+ * 'order' term meta — but terms are shared across the whole catalogue while
+ * that meta records a position within one product. The value space is reused
+ * (610mm=1, 1220mm=2 for most ranges) and has collisions, e.g. "1220mm" and
+ * "610mm AirFlow" both sit at 2, so F-Sign Platinum's four widths come out in
+ * an arbitrary order. Repointing a shared term to fix one product silently
+ * reorders the other 180-odd that use it.
+ *
+ * Sorting on the sizes themselves sidesteps that entirely: it is computed per
+ * request from the names, so it cannot collide and cannot leak between
+ * products. Applied only when every option in the set starts with a digit —
+ * that is what makes it a list of sizes rather than of finishes or colours,
+ * which keep their curated order.
+ *
+ * @param array  $terms
+ * @param int    $product_id
+ * @param string $taxonomy
+ * @return array
+ */
+add_filter( 'woocommerce_get_product_terms', function ( $terms, $product_id, $taxonomy ) {
+	if ( ! is_array( $terms ) || count( $terms ) < 2 ) {
+		return $terms;
+	}
+
+	$names = array();
+	foreach ( $terms as $term ) {
+		if ( $term instanceof WP_Term ) {
+			$names[] = $term->name;
+		} elseif ( is_string( $term ) ) {
+			$names[] = $term;
+		} else {
+			return $terms; // ids or some other shape — nothing to sort on.
+		}
+	}
+
+	foreach ( $names as $name ) {
+		if ( ! preg_match( '/^\s*\d/', $name ) ) {
+			return $terms;
+		}
+	}
+
+	usort(
+		$terms,
+		function ( $a, $b ) {
+			$a_name = $a instanceof WP_Term ? $a->name : (string) $a;
+			$b_name = $b instanceof WP_Term ? $b->name : (string) $b;
+			$cmp    = dorotape_size_sort_key( $a_name ) <=> dorotape_size_sort_key( $b_name );
+			return 0 !== $cmp ? $cmp : strcasecmp( $a_name, $b_name );
+		}
+	);
+
+	return $terms;
+}, 10, 3 );
+
 // ─── Grouped variation dropdown ───────────────────────────────────────────────
 
 /**
@@ -670,12 +812,57 @@ add_filter( 'woocommerce_dropdown_variation_attribute_options_html', function ( 
 // ─── Product search includes SKUs ─────────────────────────────────────────────
 
 /**
+ * Product IDs whose own SKU, or any of whose variations' SKUs, match $like.
+ *
+ * $like is a ready-made LIKE pattern, already run through esc_like.
+ *
+ * Resolved as its own query and handed back as an ID list rather than expressed
+ * as an EXISTS against the search's WHERE. A SKU search is a leading-wildcard
+ * LIKE, which no index can serve, so as a correlated subquery MySQL re-runs it
+ * for every candidate row — measured at 17 seconds on this catalogue. Pulled out
+ * like this it is one indexed pass over the ~2,000 _sku rows instead: a few
+ * milliseconds, and the result is reusable by both callers below.
+ *
+ * The cap exists because a one- or two-character term matches a large share of
+ * the catalogue. Suggestion lists show a handful of rows, so a truncated list
+ * costs nothing visible, while an uncapped IN() would be pasted into the query.
+ */
+function dorotape_sku_match_product_ids( string $like, int $limit = 200 ): array {
+	global $wpdb;
+	static $cache = array();
+
+	$key = $like . '|' . $limit;
+	if ( isset( $cache[ $key ] ) ) {
+		return $cache[ $key ];
+	}
+
+	// A variation match surfaces its parent — that is the page worth linking to.
+	$ids = $wpdb->get_col(
+		$wpdb->prepare(
+			"SELECT DISTINCT CASE WHEN p.post_type = 'product_variation' THEN p.post_parent ELSE p.ID END
+			FROM {$wpdb->postmeta} m
+			INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id
+			WHERE m.meta_key = '_sku'
+			AND m.meta_value LIKE %s
+			AND p.post_type IN ( 'product', 'product_variation' )
+			AND p.post_status = 'publish'
+			LIMIT %d",
+			$like,
+			$limit
+		)
+	);
+
+	$cache[ $key ] = array_values( array_filter( array_map( 'intval', (array) $ids ) ) );
+	return $cache[ $key ];
+}
+
+/**
  * Frontend product searches also match SKU / item number.
  *
  * Trade customers search by item number (900E, HOOKB20, 13117) as they did on
  * the old site. WordPress search only scans title/content, so extend the WHERE
- * with an EXISTS on _sku meta — matching the product's own SKU or any of its
- * variations' SKUs (variation match surfaces the parent product).
+ * with the matching product IDs — the product's own SKU or any of its
+ * variations' SKUs (a variation match surfaces the parent product).
  */
 add_filter( 'posts_search', function ( string $search, WP_Query $query ): string {
 	global $wpdb;
@@ -693,15 +880,13 @@ add_filter( 'posts_search', function ( string $search, WP_Query $query ): string
 	}
 	$like = '%' . $wpdb->esc_like( trim( $term ) ) . '%';
 
-	$sku_clause = $wpdb->prepare(
-		" OR EXISTS (
-			SELECT 1 FROM {$wpdb->postmeta} skum
-			JOIN {$wpdb->posts} skup ON skup.ID = skum.post_id
-			WHERE skum.meta_key = '_sku' AND skum.meta_value LIKE %s
-			AND ( skup.ID = {$wpdb->posts}.ID OR skup.post_parent = {$wpdb->posts}.ID )
-		) ",
-		$like
-	);
+	$ids = dorotape_sku_match_product_ids( $like );
+	if ( empty( $ids ) ) {
+		return $search;
+	}
+
+	// Safe to interpolate: every element came back through intval().
+	$sku_clause = " OR {$wpdb->posts}.ID IN (" . implode( ',', $ids ) . ') ';
 
 	// Splice the SKU clause into WP's search-terms block so it ORs with the
 	// combined title/excerpt/content conditions. The block is followed by an
@@ -717,6 +902,40 @@ add_filter( 'posts_search', function ( string $search, WP_Query $query ): string
 		return $search;
 	}
 	return substr( $head, 0, $pos ) . $sku_clause . substr( $head, $pos ) . $tail;
+}, 10, 2 );
+
+/**
+ * The same SKU matching for FiboSearch's live suggestions.
+ *
+ * The filter above only reaches the results page — the header's predictive
+ * dropdown is FiboSearch running its own query, so typing a code got no
+ * suggestions even though pressing Enter found the product. Client: trade
+ * customers search by item number.
+ *
+ * FiboSearch has a "Search in SKU" setting of its own, deliberately left off:
+ * free-version SKU search matches only the product's own _sku, and roughly half
+ * this catalogue's Sage codes (1,017 of them) live on variations, which it
+ * treats as a paid feature. Doing it here covers both in one clause, keeps the
+ * dropdown and the results page agreeing on what a code matches, and means
+ * nothing has to be configured per environment.
+ *
+ * $like arrives pre-escaped and already wildcarded by the plugin (unwrapped when
+ * its exact-match mode is on), so it is passed straight through.
+ */
+add_filter( 'dgwt/wcas/native/search_query/search_or', function ( $search, $like ) {
+	global $wpdb;
+
+	if ( ! is_string( $like ) || '' === $like ) {
+		return $search;
+	}
+
+	$ids = dorotape_sku_match_product_ids( $like );
+	if ( empty( $ids ) ) {
+		return $search;
+	}
+
+	// Safe to interpolate: every element came back through intval().
+	return $search . " OR {$wpdb->posts}.ID IN (" . implode( ',', $ids ) . ') ';
 }, 10, 2 );
 
 // ─── Category filter bar ──────────────────────────────────────────────────────
