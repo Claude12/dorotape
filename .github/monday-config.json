@@ -1,0 +1,45 @@
+{
+  "__README": "Committed config for monday-sync.js. NOT secret - only MONDAY_TOKEN is a secret. Replace every REPLACE_ME once the board exists, then run: node .github/scripts/monday-sync.js check",
+
+  "boardId": "REPLACE_ME",
+  "apiVersion": "2025-01",
+
+  "columns": {
+    "ref": "REPLACE_ME",
+    "status": "REPLACE_ME",
+    "branch": "REPLACE_ME",
+    "pr": "REPLACE_ME",
+    "commit": "REPLACE_ME",
+    "deployedAt": "REPLACE_ME",
+
+    "deployResult": null,
+    "checksResult": null,
+    "lastRun": null
+  },
+
+  "labels": {
+    "backlog": "Backlog",
+    "inProgress": "In progress",
+    "codeReview": "Code review",
+    "merged": "Merged",
+    "deployedToDev": "Deployed to dev",
+    "qa": "QA",
+    "blocked": "Blocked",
+    "completed": "Completed"
+  },
+
+  "deployResultLabels": {
+    "success": "Success",
+    "failed": "Failed"
+  },
+
+  "checksResultLabels": {
+    "passed": "Passed",
+    "failed": "Failed",
+    "notRun": "Not run"
+  },
+
+  "refPattern": "\\bDR-(\\d+)\\b",
+  "devUrl": "https://dorotape.altitude-dev.digital/",
+  "maxItemPages": 20
+}
