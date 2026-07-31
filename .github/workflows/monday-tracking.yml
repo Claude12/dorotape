@@ -210,6 +210,19 @@ jobs:
         with:
           node-version: '20'
 
+      # No fallback URL on purpose. A default here would mean a copy of this repo
+      # with DEV_SITE_URL unset checks the ORIGINAL project's site and writes
+      # "checks passed" to the new project's board - green, and meaningless.
+      - name: Require a site to check
+        env:
+          SITE_URL: ${{ vars.DEV_SITE_URL }}
+        run: |
+          if [ -z "${SITE_URL}" ]; then
+            echo "::error::Repository variable DEV_SITE_URL is not set. It must be the full URL of the dev site, e.g. https://example.dev - note it is a VARIABLE, not a secret."
+            exit 1
+          fi
+          echo "Checking: ${SITE_URL}"
+
       - name: Install
         working-directory: tests
         run: npm ci
@@ -225,7 +238,7 @@ jobs:
         continue-on-error: true
         working-directory: tests
         env:
-          SITE_URL: ${{ vars.DEV_SITE_URL || 'https://dorotape.altitude-dev.digital' }}
+          SITE_URL: ${{ vars.DEV_SITE_URL }}
         run: npm test
 
       - name: Summarise
