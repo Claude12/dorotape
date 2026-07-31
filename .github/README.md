@@ -308,18 +308,32 @@ Every ref named gets the same status, the same PR link and the same comment, at
 every stage — branch push, PR opened, merge. They ship together, so there is
 nothing to decide between them.
 
-Deploys and checks work off a commit *range* rather than a branch name, so a
-ref only reaches those if it appears in a commit message or PR title in
-`deployed-dev..HEAD`. **A branch name alone is not enough to get a ticket into
-a deploy.** Put the refs in the commit subject as well:
+Deploys and checks work off a commit *range* rather than a branch name: every
+commit subject in `deployed-dev..HEAD` is scanned. On a **merge commit** merge
+this needs no thought, because GitHub writes the branch name into the merge
+commit subject and that is scanned like any other:
+
+```
+Merge pull request #19 from Claude12/feature/DR-7-final-test-2
+```
+
+so `DR-7` reaches the deploy even when not one commit on the branch mentions it.
+
+**Squash and rebase merges lose that.** A squash subject is the PR title, and a
+rebase leaves no merge commit at all — either way the branch name is gone. If
+you use those, the ref has to be in the PR title or a commit subject:
 
 ```
 bugfix: DR-6 DR-7 restore footer copyright contrast
 ```
 
-Get this wrong and nothing turns red — `refs` comes back empty, the site-check
-job is skipped by its `if:`, and the tickets sit in their previous state while
-the run goes green. Check with `refs-from-range` before bumping the version.
+Get this wrong and nothing turns red — `refs` comes back empty, the write and
+site-check jobs are skipped by their `if:`, and the tickets sit in their
+previous state while the run goes green. The workflow raises a `::warning::` on
+the run when a range ships commits but yields no refs, which is the only place
+this surfaces; the `deployed-dev` marker still advances past them, so a missed
+deploy is not re-examined on the next one. To check ahead of time, run
+`refs-from-range` before bumping the version.
 
 ### How the number is worked out
 
@@ -496,7 +510,7 @@ Some details that are load-bearing:
 | Progress job logs SKIP every night | `columns.size` is `null` — see step 7 |
 | Bar stale for weeks, no runs listed | GitHub disabled the schedule after 60 quiet days. Push anything, or use Run workflow |
 | Progress never reaches 100% | Abandoned tickets are still in the denominator — set them to `Cancelled`, or add that label if the board has not got one |
-| Deploy went green, tickets never moved | No ref in any commit message in `deployed-dev..HEAD` — a branch name alone does not count. Confirm with `refs-from-range` |
+| Deploy went green, tickets never moved | No ref in the range. Look for the `no DR ref was found` warning on the run. Merge commits carry the branch name; squash and rebase do not, so the ref must be in the PR title or a commit subject. Confirm with `refs-from-range` |
 | Stuck at 99% with `x of x points` done | A ticket has no Size. The bar is held back on purpose until it gets one; the line under the bar names the count |
 | Two progress items on the board | Something starts with the same name. The script refuses to guess; delete the extra |
 | Board description never updates | `progress.boardDescription` is `false`. `check` prints which surfaces are on |

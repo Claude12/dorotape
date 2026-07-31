@@ -217,7 +217,9 @@ jobs:
           # the deploy reports nothing, nothing fails, and the marker is then
           # planted at HEAD, hiding every ticket behind it. Survivable once, but
           # only if you know it happened.
+          HAVE_MARKER=1
           if ! git rev-parse --verify --quiet 'deployed-dev^{commit}' >/dev/null; then
+            HAVE_MARKER=0
             echo "::warning::No deployed-dev marker yet, so only ${{ steps.outcome.outputs.sha }} was examined and tickets merged before it will NOT be reported. The marker is about to be planted here. To report them, push the deployed-dev tag at the commit before those merges and deploy again."
           fi
 
@@ -226,6 +228,19 @@ jobs:
                    --to "${{ steps.outcome.outputs.sha }}" | tr '\n' ' ' | xargs)
           echo "Tickets in range: ${REFS:-<none>}"
           echo "refs=${REFS}" >> "$GITHUB_OUTPUT"
+
+          # Empty refs is the pipeline's only silent failure: every step below is
+          # gated on refs != '', so they all skip and the run still goes green.
+          # A range that shipped real commits but named no ticket is nearly always
+          # a mistake - a squash or rebase merge that dropped the branch name, or
+          # a commit subject written without one. Say so on the run itself; there
+          # is no other moment where anyone would notice.
+          if [ "$HAVE_MARKER" = "1" ] && [ -z "$REFS" ]; then
+            COUNT=$(git rev-list --count 'deployed-dev..${{ steps.outcome.outputs.sha }}')
+            if [ "$COUNT" -gt 0 ]; then
+              echo "::warning::Deploy shipped $COUNT commit(s) but no DR ref was found in any of them, so no ticket was updated. Check the commit subjects in deployed-dev..${{ steps.outcome.outputs.sha }} - a squash or rebase merge drops the branch name, so the ref has to be in the subject itself. The deployed-dev marker still advances, so these commits will not be re-examined on the next deploy."
+            fi
+          fi
 
       - name: Mark Deployed to dev
         if: steps.outcome.outputs.outcome == 'deployed' && steps.refs.outputs.refs != ''
