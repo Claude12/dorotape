@@ -61,7 +61,12 @@ jobs:
     if: github.event_name == 'create' && github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
+      # Full history so the branch's own commits can be read for refs. A branch
+      # pushed with commits already on it is the normal case, and a shallow
+      # clone cannot see past the tip.
       - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -73,20 +78,31 @@ jobs:
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
           BRANCH: ${{ github.event.ref }}
+          BASE: origin/${{ github.event.repository.default_branch }}
         run: |
-          node .github/scripts/monday-sync.js branch-created --branch "$BRANCH"
+          node .github/scripts/monday-sync.js branch-created \
+            --branch "$BRANCH" --commits-from "$BASE"
 
   # ------------------------------------------------------------ pull requests
   pull-request:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      # Full history so the PR's commit messages can be read for refs - a ref
+      # added in a commit after the branch was named is the common case.
       - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       # A draft PR is not up for review yet, so it should not move the ticket.
+      #
+      # PR_TITLE and PR_BODY are attacker-controlled on a fork PR and go in
+      # through the environment for the same reason branch names do. They are
+      # only ever scanned for the ref pattern, never executed.
       - name: Mark Code review
         if: |
           github.event.action != 'closed' &&
@@ -97,10 +113,14 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           node .github/scripts/monday-sync.js pr-opened \
             --branch "$BRANCH" --pr-url "$PR_URL" \
-            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR"
+            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR" \
+            --title "$PR_TITLE" --text "$PR_BODY" --commits-from "$BASE"
 
       # Closed-without-merge deliberately does nothing: the ticket is still live
       # work, and silently moving it would lose that.
@@ -114,10 +134,14 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           node .github/scripts/monday-sync.js pr-merged \
             --branch "$BRANCH" --pr-url "$PR_URL" \
-            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR"
+            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR" \
+            --title "$PR_TITLE" --text "$PR_BODY" --commits-from "$BASE"
 
   # ----------------------------------------------------------------- deploy
   deploy-tracking:
