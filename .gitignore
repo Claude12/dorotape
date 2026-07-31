@@ -13,8 +13,12 @@ dist/
 *.min.css
 
 # Environment and secrets
+# Deploying is a git pull inside public_html, so anything committed here is a
+# file served from the webroot. Keep it that way.
 .env
 .env.*
+# The template carries names and comments, never values.
+!.env.example
 
 # Editor
 .vscode/

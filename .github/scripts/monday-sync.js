@@ -10,8 +10,15 @@
  * Zero npm dependencies. Requires Node 18+ for global fetch (CI should use Node 20).
  * CommonJS deliberately: the repo's package.json has no "type": "module".
  *
- * Config:  .github/monday-config.json   (committed, not secret)
+ * Config:  .github/monday-config.json   (committed, not secret) - describes the
+ *          BOARD: its id, column ids, labels and ticket prefix.
  * Secret:  MONDAY_TOKEN                 (integration user's personal API token)
+ * Var:     DEV_SITE_URL                 (dev site, for the links in comments)
+ *
+ * Anything pointing at an environment is an environment variable, never
+ * committed config, so that a copy of this repo for another project cannot
+ * inherit the previous project's URLs. Running by hand, both can come from a
+ * gitignored .env at the repo root - see .env.example.
  *
  * Commands
  *   check                                     Validate token, board, column IDs and every label
@@ -47,6 +54,60 @@ const { execFileSync } = require('node:child_process');
 
 const API_URL = 'https://api.monday.com/v2';
 const DEFAULT_CONFIG = path.join(__dirname, '..', 'monday-config.json');
+
+/**
+ * Load a gitignored .env from the repo root, for running this by hand.
+ *
+ * Real environment variables always win, so this can never quietly override
+ * what CI passed in - in Actions the file does not exist at all, and the
+ * secrets and variables configured there are the only source.
+ *
+ * Deliberately dependency-free: this script runs in CI with no npm install.
+ */
+function loadDotEnv() {
+  const file = path.join(__dirname, '..', '..', '.env');
+  if (!fs.existsSync(file)) return;
+
+  for (const raw of fs.readFileSync(file, 'utf8').split('\n')) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+
+    const key = line.slice(0, eq).trim().replace(/^export\s+/, '');
+    if (!key || key in process.env) continue;
+
+    let value = line.slice(eq + 1).trim();
+    if (/^(".*"|'.*')$/s.test(value)) value = value.slice(1, -1);
+    process.env[key] = value;
+  }
+}
+loadDotEnv();
+
+/**
+ * The dev site URL, for the links in monday comments.
+ *
+ * A repo variable rather than committed config, because it points at an
+ * environment: a copy of this repo made for another project must not inherit
+ * the previous project's URL. Missing is not fatal here - the link is a
+ * convenience, and losing it should not stop a ticket being updated - so warn
+ * and drop the line rather than failing a write that is otherwise correct.
+ */
+function devUrl() {
+  const url = process.env.DEV_SITE_URL;
+  if (!url) {
+    console.error('NOTE  DEV_SITE_URL is not set; omitting the dev link from the comment.');
+    return null;
+  }
+  return url.replace(/\/$/, '');
+}
+
+/** A "Dev: <url>" line, or nothing at all when the URL is unknown. */
+const devLine = () => {
+  const url = devUrl();
+  return url ? `Dev: ${url}\n` : '';
+};
 
 /**
  * What each configured column must actually BE on the board.
@@ -823,7 +884,7 @@ async function cmdDeployed(cfg, flags, dryRun) {
     ]),
     comment:
       `Deployed to dev at commit ${short} on ${localStamp(cfg)}.\n` +
-      `Dev: ${cfg.devUrl}\n` +
+      devLine() +
       `Run log: ${runUrl}` +
       (refs.length > 1
         ? `\n\nThis deploy shipped ${refs.length} tickets together: ${refs.join(', ')}.`
@@ -844,7 +905,7 @@ async function cmdChecksPassed(cfg, flags, dryRun) {
     ]),
     comment:
       `Automated checks passed on dev. Ready for your manual QA.\n` +
-      `Dev: ${cfg.devUrl}\n` +
+      devLine() +
       `Run log: ${runUrl}` +
       (summary ? `\n\n${summary}` : ''),
   }));
@@ -870,7 +931,7 @@ async function cmdBlocked(cfg, flags, dryRun) {
       `Run log: ${runUrl}` + (detail ? `\n\n${detail}` : '')
     : `BLOCKED - deploy to dev SUCCEEDED, but automated checks FAILED. ` +
       `The new code IS live on dev and may be broken.\n` +
-      `Dev: ${cfg.devUrl}\n` +
+      devLine() +
       `Run log: ${runUrl}` + (detail ? `\n\n${detail}` : '');
 
   await applyToRefs(cfg, refs, dryRun, () => ({

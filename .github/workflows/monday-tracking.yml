@@ -23,6 +23,13 @@ permissions:
   actions: read        # read the deploy run's outcome artifact
   pull-requests: read
 
+# Set once for every job: the comments monday-sync writes link to the dev site,
+# and the site check needs to know what to check. A repo variable rather than
+# committed config, so a copy of this repo for another project cannot inherit
+# the previous project's URL.
+env:
+  DEV_SITE_URL: ${{ vars.DEV_SITE_URL }}
+
 # Serialise monday writes. Two runs racing on the deployed-dev tag would make
 # the "everything since the last deploy" range wrong for one of them.
 concurrency:
@@ -214,14 +221,12 @@ jobs:
       # with DEV_SITE_URL unset checks the ORIGINAL project's site and writes
       # "checks passed" to the new project's board - green, and meaningless.
       - name: Require a site to check
-        env:
-          SITE_URL: ${{ vars.DEV_SITE_URL }}
         run: |
-          if [ -z "${SITE_URL}" ]; then
+          if [ -z "${DEV_SITE_URL}" ]; then
             echo "::error::Repository variable DEV_SITE_URL is not set. It must be the full URL of the dev site, e.g. https://example.dev - note it is a VARIABLE, not a secret."
             exit 1
           fi
-          echo "Checking: ${SITE_URL}"
+          echo "Checking: ${DEV_SITE_URL}"
 
       - name: Install
         working-directory: tests
@@ -237,8 +242,8 @@ jobs:
         id: check
         continue-on-error: true
         working-directory: tests
-        env:
-          SITE_URL: ${{ vars.DEV_SITE_URL }}
+        # No SITE_URL here: discover.js falls back to DEV_SITE_URL, which the
+        # workflow already sets. Two names for one value is how they drift apart.
         run: npm test
 
       - name: Summarise

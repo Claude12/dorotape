@@ -28,12 +28,17 @@
  * squared off. 3162 also gains a 760mm size the product does not currently
  * carry, again because his table lists it.
  *
- * Renaming changes the slug, so WordPress stores the old one in _wp_old_slug and
- * core's wp_old_slug_redirect() 301s the old URL to the new one. That is why the
- * slug is changed through wp_update_post rather than by writing post_name
- * directly — a direct write would skip the _wp_old_slug bookkeeping and turn
- * every existing link into a 404. There is no redirect plugin active to fall
- * back on.
+ * NO REDIRECTS DURING THE DEV PHASE (Claudius, 30 Jul 2026). Renaming a slug makes
+ * WordPress record the previous one in _wp_old_slug, and core's
+ * wp_old_slug_redirect() then 301s the old URL to the new one — automatically, with
+ * no plugin involved. That is unwanted here: redirects are an SEO decision to be
+ * taken later, against the Kryptronic URLs customers actually have indexed, not the
+ * interim WordPress ones. So this script deletes _wp_old_slug on both products after
+ * renaming them.
+ *
+ * Consequence, and it is deliberate: /product/d-jet-100-4-year-digital-vinyl/ now
+ * returns 404 rather than redirecting. Restore by removing the cleanup below and
+ * re-running, or by re-inserting the meta.
  *
  * Description edits are text-only. No src or href on either product contains
  * "D-Jet" (checked before writing this), and the datasheet PDFs are already
@@ -345,6 +350,19 @@ foreach ( $config as $pid => $cfg ) {
 	} else {
 		printf( "  [dry]   would rename: %s\n", implode( ', ', array_keys( $needs ) ) );
 		printf( "          title -> %s\n          slug  -> %s\n", $cfg['title'], $cfg['slug'] );
+	}
+
+	// Drop the redirect bookkeeping wp_update_post just created. Unconditional on
+	// apply rather than tied to $needs, so a replay onto an environment where an
+	// earlier version of this script already renamed the product still clears it.
+	if ( $apply ) {
+		$stale = get_post_meta( $pid, '_wp_old_slug', false );
+		if ( $stale ) {
+			delete_post_meta( $pid, '_wp_old_slug' );
+			printf( "  [write] removed %d redirect record(s): %s\n", count( $stale ), implode( ', ', $stale ) );
+		}
+	} elseif ( get_post_meta( $pid, '_wp_old_slug', false ) ) {
+		printf( "  [dry]   would remove redirect record(s): %s\n", implode( ', ', get_post_meta( $pid, '_wp_old_slug', false ) ) );
 	}
 
 	if ( $apply ) {

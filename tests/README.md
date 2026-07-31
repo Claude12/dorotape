@@ -54,11 +54,13 @@ SITE_URL=https://example.test npm test      # against anything else
 npm run report                              # open the HTML report
 ```
 
-Which site it checks: `SITE_URL` if set, otherwise `devUrl` from
-[`../.github/monday-config.json`](../.github/monday-config.json). There is no
-final fallback — with neither set it stops and says so, rather than quietly
-checking whichever site was hardcoded last. Setting this up on a new project is
-[`.github/SETUP.md`](../.github/SETUP.md).
+Which site it checks: `SITE_URL` if set, otherwise `DEV_SITE_URL` — from a
+gitignored `.env` at the theme root locally (copy [`../.env.example`](../.env.example)),
+or the repository variable in CI. There is no final fallback: with neither set
+it stops and names them, rather than quietly checking whichever site was
+hardcoded last. That matters most for a copy of this suite on a new project,
+where a default would mean checking the *previous* client's site and reporting a
+confident green. Full setup: [`.github/README.md`](../.github/README.md).
 
 `npm test` runs `discover.js` first (as `pretest`), which writes
 `.artifacts/plan.json`: the URLs to check and which product to buy.

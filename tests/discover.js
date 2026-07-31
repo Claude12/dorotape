@@ -15,26 +15,50 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Which site to check.
+ * Load a gitignored .env from the repo root, for running this by hand.
  *
- * SITE_URL wins. Otherwise fall back to devUrl in the project's own monday
- * config - which is per-project and committed, so this stays convenient locally
- * without hardcoding any one site into the test suite. There is deliberately no
- * final default: a copy of this suite with neither set should say so, not
- * quietly check somebody else's site.
+ * Real environment variables always win, so this cannot override what CI
+ * passed in - in Actions the file does not exist and the repo's configured
+ * variables are the only source. Dependency-free on purpose: this runs as a
+ * pretest step, before anything can rely on a dotenv package being installed.
+ */
+function loadDotEnv() {
+  const file = path.join(__dirname, '..', '.env');
+  if (!fs.existsSync(file)) return;
+
+  for (const raw of fs.readFileSync(file, 'utf8').split('\n')) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+
+    const key = line.slice(0, eq).trim().replace(/^export\s+/, '');
+    if (!key || key in process.env) continue;
+
+    let value = line.slice(eq + 1).trim();
+    if (/^(".*"|'.*')$/s.test(value)) value = value.slice(1, -1);
+    process.env[key] = value;
+  }
+}
+loadDotEnv();
+
+/**
+ * Which site to check. SITE_URL first, then DEV_SITE_URL.
+ *
+ * There is deliberately no committed default. Both are environment variables
+ * precisely so that a copy of this suite cannot inherit a previous project's
+ * site and report a confident green about somebody else's pages.
  */
 function resolveSite() {
-  if (process.env.SITE_URL) return process.env.SITE_URL;
-
-  try {
-    const cfg = require(path.join(__dirname, '..', '.github', 'monday-config.json'));
-    if (cfg.devUrl) return cfg.devUrl;
-  } catch { /* no config here - fall through to the error below */ }
+  const url = process.env.SITE_URL || process.env.DEV_SITE_URL;
+  if (url) return url;
 
   console.error(
-    'No site to check.\n' +
-    '  Set SITE_URL, e.g. SITE_URL=https://example.dev npm test\n' +
-    '  or set "devUrl" in .github/monday-config.json.'
+    'No site to check. Set one of:\n' +
+    '  SITE_URL=https://example.dev npm test\n' +
+    '  DEV_SITE_URL in a .env at the repo root (see .env.example)\n' +
+    '  the DEV_SITE_URL repository variable, in CI'
   );
   process.exit(1);
 }

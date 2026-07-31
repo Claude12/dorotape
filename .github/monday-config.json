@@ -38,6 +38,6 @@
     "notRun": "Not run"
   },
   "refPattern": "\\bDR-(\\d+)\\b",
-  "devUrl": "https://dorotape.altitude-dev.digital/",
+  "__devUrl": "The dev site URL is NOT here. It is the DEV_SITE_URL repo variable (or a gitignored .env locally), because it points at an environment - a copy of this repo for another project must not inherit the old URL. This file describes the board only.",
   "maxItemPages": 20
 }

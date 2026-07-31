@@ -1,70 +1,117 @@
-[![Build Status](https://travis-ci.org/Automattic/_s.svg?branch=master)](https://travis-ci.org/Automattic/_s)
+# Dorotape
 
-_s
-===
+Custom WooCommerce theme for [dorotape.co.uk](https://dorotape.co.uk) —
+self-adhesive films and wrapping solutions. Built by Altitude Marketing.
 
-Hi. I'm a starter theme called `_s`, or `underscores`, if you like. I'm a theme meant for hacking so don't use me as a Parent Theme. Instead try turning me into the next, most awesome, WordPress theme out there. That's what I'm here for.
+Built on [Underscores (`_s`)](https://underscores.me/): classic PHP templates,
+ACF PRO, Classic Editor, no page builder and no Gutenberg. The stylesheet is
+hand-written, not compiled — see [Build step](#build-step) before you go looking
+for one.
 
-My ultra-minimal CSS might make me look like theme tartare but that means less stuff to get in your way when you're designing your awesome theme. Here are some of the other more interesting things you'll find here:
+---
 
-* A modern workflow with a pre-made command-line interface to turn your project into a more pleasant experience.
-* A just right amount of lean, well-commented, modern, HTML5 templates.
-* A custom header implementation in `inc/custom-header.php`. Just add the code snippet found in the comments of `inc/custom-header.php` to your `header.php` template.
-* Custom template tags in `inc/template-tags.php` that keep your templates clean and neat and prevent code duplication.
-* Some small tweaks in `inc/template-functions.php` that can improve your theming experience.
-* A script at `js/navigation.js` that makes your menu a toggled dropdown on small screens (like your phone), ready for CSS artistry. It's enqueued in `functions.php`.
-* 2 sample layouts in `sass/layouts/` made using CSS Grid for a sidebar on either side of your content. Just uncomment the layout of your choice in `sass/style.scss`.
-Note: `.no-sidebar` styles are automatically loaded.
-* Smartly organized starter CSS in `style.css` that will help you to quickly get your design off the ground.
-* Full support for `WooCommerce plugin` integration with hooks in `inc/woocommerce.php`, styling override woocommerce.css with product gallery features (zoom, swipe, lightbox) enabled.
-* Licensed under GPLv2 or later. :) Use it to make something cool.
+## Layout
 
-Installation
----------------
+| Path | |
+| --- | --- |
+| `*.php` (root) | `_s` template hierarchy — `header.php`, `footer.php`, `single.php`, `archive.php`, `page.php`, `search.php`, `404.php` |
+| `template-parts/` | reusable template fragments |
+| `inc/` | all theme logic, each file `require`d from `functions.php` |
+| `acf-json/` | ACF field groups, synced to disk |
+| `css/`, `js/` | `scaffold.css` and `scaffold.js` — the bulk of the front end |
+| `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
+| `dorotape-migration/` | one-off scripts and data from the Kryptronic migration |
+| `tests/` | automated site checks — [tests/README.md](tests/README.md) |
+| `.github/` | deploy and monday board pipeline — [.github/README.md](.github/README.md) |
+| `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
 
-### Requirements
+### `inc/`
 
-`_s` requires the following dependencies:
+| File | |
+| --- | --- |
+| `setup.php` | theme supports, menus, enqueues |
+| `cleanup.php` | strips WordPress defaults |
+| `admin.php` | admin-side tweaks |
+| `woocommerce.php` | all Woo integration — via hooks, not template overrides |
+| `pricing.php` | price calculation |
+| `poa.php` | price-on-application products |
+| `cutsize.php` | cut-to-size ordering |
+| `quickadd.php` | quick add to cart |
+| `template-tags.php`, `template-functions.php` | `_s` stock, extended |
 
-- [Node.js](https://nodejs.org/)
-- [Composer](https://getcomposer.org/)
+WooCommerce is customised through hooks in `inc/woocommerce.php`. There is no
+`woocommerce/` override directory in the theme, and adding one is a decision to
+make deliberately rather than by accident.
 
-### Quick Start
+## Local development
 
-Clone or download this repository, change its name to something else (like, say, `megatherium-is-awesome`), and then you'll need to do a six-step find and replace on the name in all the templates.
+The theme lives at:
 
-1. Search for `'_s'` (inside single quotations) to capture the text domain and replace with: `'megatherium-is-awesome'`.
-2. Search for `_s_` to capture all the functions names and replace with: `megatherium_is_awesome_`.
-3. Search for `Text Domain: _s` in `style.css` and replace with: `Text Domain: megatherium-is-awesome`.
-4. Search for <code>&nbsp;_s</code> (with a space before it) to capture DocBlocks and replace with: <code>&nbsp;Megatherium_is_Awesome</code>.
-5. Search for `_s-` to capture prefixed handles and replace with: `megatherium-is-awesome-`.
-6. Search for `_S_` (in uppercase) to capture constants and replace with: `MEGATHERIUM_IS_AWESOME_`.
-
-Then, update the stylesheet header in `style.css`, the links in `footer.php` with your own information and rename `_s.pot` from `languages` folder to use the theme's slug. Next, update or delete this readme.
-
-### Setup
-
-To start using all the tools that come with `_s`  you need to install the necessary Node.js and Composer dependencies :
-
-```sh
-$ composer install
-$ npm install
+```
+/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape
 ```
 
-### Available CLI commands
+Edit and refresh. There is nothing to run.
 
-`_s` comes packed with CLI commands tailored for WordPress theme development :
+### Build step
 
-- `composer lint:wpcs` : checks all PHP files against [PHP Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/).
-- `composer lint:php` : checks all PHP files for syntax errors.
-- `composer make-pot` : generates a .pot file in the `languages/` directory.
-- `npm run compile:css` : compiles SASS files to css.
-- `npm run compile:rtl` : generates an RTL stylesheet.
-- `npm run watch` : watches all SASS files and recompiles them to css when they change.
-- `npm run lint:scss` : checks all SASS files against [CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/).
-- `npm run lint:js` : checks all JavaScript files against [JavaScript Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/).
-- `npm run bundle` : generates a .zip archive for distribution, excluding development and system files.
+There isn't one, despite appearances. `package.json` is stock `_s` and its
+`watch` / `compile:css` scripts point at a `sass/` directory **that does not
+exist in this repo**. They also depend on node-sass 7, which will not install on
+current Node. `style.css` and `css/scaffold.css` are edited directly.
 
-Now you're ready to go! The next step is easy to say, but harder to do: make an awesome WordPress theme. :)
+`tests/` deliberately has its own `package.json` for exactly this reason — so
+the check suite installs without dragging in the dead `_s` toolchain.
 
-Good luck!
+## Deploying
+
+Dev deploys itself when the `Version:` line in `style.css` changes on `main`:
+
+```
+push to main (style.css) → Deploy on version bump → git pull on the dev server
+                                                  → monday tracking → site checks
+```
+
+**Bumping the version is the deploy button.** Change that line only when you
+mean to ship. `.cursorrules` reserves it for the project owner.
+
+Production is manual and stays that way.
+
+After a deploy lands, [tests/](tests/) runs against dev — pages load clean, no
+JS errors, no new accessibility violations, sane markup, and a product still
+reaches checkout. Pass moves the tickets to QA; fail moves them to Blocked with
+a comment stating whether the code actually reached dev, because "the deploy
+broke" and "the deploy worked and the site is broken" need different reactions.
+
+Setting all of this up on another project: [.github/README.md](.github/README.md).
+Nothing in it is specific to this site — every value that points at an
+environment is a GitHub variable, so a copy cannot inherit this project's URL or
+server path.
+
+## Two things worth knowing
+
+**Everything tracked here is served from the webroot.** Deploy is `git pull`
+inside `public_html`, so any committed file is reachable over HTTP unless
+something stops it. `tests/` ships an `.htaccess` denying access for that
+reason. `dorotape-migration/` does not have one, and it holds 108 CSV exports
+of the client's old CMS — worth addressing.
+
+**`.cursorrules` describes a structure this repo does not have.** It specifies
+`/templates`, `/partials`, `/assets/js`, `/assets/scss`, `/assets/css`; the repo
+actually uses `template-parts/`, `js/`, `css/` and no SCSS at all. Treat its
+conventions (BEM, PHP typing, flag-before-creating) as live, and its paths as
+aspirational until someone reconciles them.
+
+## Conventions
+
+See [.cursorrules](.cursorrules). The short version: BEM for all new selectors,
+`js-` prefixed hooks that are never styled, `is-`/`has-` for state, vanilla JS,
+`strict_types=1` and full type hints in PHP, theme-slug prefixes on every
+function and hook, no hardcoded URLs, no debug code committed.
+
+Commits follow conventional prefixes: `feature` / `bugfix` / `style` /
+`refactor` / `chore`.
+
+## Licence
+
+Proprietary. See [LICENSE](LICENSE).
