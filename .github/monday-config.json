@@ -44,6 +44,7 @@
   "__progress": "Drives the weighted progress bar. It is written to two places, each switched off independently: boardDescription (false to skip) is the text box under the board title - always on screen, notifies nobody, holds no history; itemName (empty string to skip) is a row on the board, so its updates reach people's feeds and stack up as a record of every change. Keep both unless one is noise for this project. weights maps Size labels to points - the gaps are deliberate and near-Fibonacci, so nobody argues over a 3 versus a 4 and an XL reads as eight small jobs rather than 'a bit more than L'. doneLabels and onDevLabels are reported as SEPARATE figures, never added together: Completed is set by hand after sign-off, so counting only that shows a build at 20% when most of it is finished and waiting on QA, while counting dev as done tells a client something is finished that nobody has checked. excludedLabels takes abandoned work out of the denominator; without it the bar can never reach 100%, because a cancelled ticket keeps its Size forever. Cancelled was added to this board's Status column on 2026-07-31 and sits at index 9.",
   "progress": {
     "itemName": "▸ Project progress",
+    "groupName": "Progress",
     "boardDescription": true,
     "weights": { "S": 1, "M": 2, "L": 5, "XL": 8 },
     "doneLabels": ["Completed"],

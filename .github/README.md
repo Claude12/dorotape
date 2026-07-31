@@ -233,9 +233,20 @@ is kept out of its own totals — matched on that name — so an emptied `itemNa
 leaves the old row on the board being counted as an ordinary unsized ticket.
 Delete the row when you turn it off.
 
-The first real run creates the item at the bottom of the board. **Drag it to the
-top once** — monday adds new items at the bottom and the script never moves it.
-From then on the pipeline renames it in place.
+The item goes in its own group at the top of the board, named by
+`progress.groupName` (`"Progress"` here). The first run creates that group above
+every existing one and puts the item straight into it; from then on the pipeline
+renames the item in place, and moves it back if someone drags it into the ticket
+list.
+
+That group is not decoration. **monday has no mutation that reorders an item
+within a group** — `create_item` takes `relative_to`, `move_item_to_group` moves
+between groups, and nothing repositions an existing row. A group is the only way
+to pin the bar above the tickets. It also reads better: the bar is not a ticket
+and should not sit in a list of them.
+
+Set `groupName` to `""` and the item lands wherever monday puts it, which is the
+bottom.
 
 Neither surface is rewritten when nothing has changed, so a nightly run on a
 quiet week is silent. The comparison deliberately ignores the "Recalculated …"

@@ -390,6 +390,7 @@ async function fetchBoardColumns(cfg) {
          id
          name
          description
+         groups { id title position }
          columns { id title type settings_str }
        }
      }`,
@@ -449,6 +450,7 @@ async function fetchAllRefItems(cfg, extraCols = []) {
              items {
                id
                name
+               group { id }
                column_values(ids: [${idList}]) { id text }
              }
            }
@@ -466,6 +468,7 @@ async function fetchAllRefItems(cfg, extraCols = []) {
       items.push({
         id: item.id,
         name: item.name || '',
+        groupId: (item.group || {}).id || null,
         ref: (cols[refCol] || '').trim(),
         cols,
       });
@@ -585,17 +588,88 @@ async function setBoardDescription(cfg, text, dryRun) {
   log(`  updated the board description`);
 }
 
-async function createItem(cfg, name, dryRun) {
+/**
+ * Find, or create at the top of the board, the group the progress item lives in.
+ *
+ * There is no mutation that repositions an existing item - create_item takes
+ * relative_to, and move_item_to_group moves between groups, but nothing reorders
+ * within one. A group is therefore the only way to pin the bar above the
+ * tickets, and it reads better anyway: the bar is not a ticket and should not
+ * sit in a list of them.
+ *
+ * Returns null when groupName is unset, which leaves the item wherever monday
+ * puts it - the bottom.
+ */
+async function ensureProgressGroup(cfg, board, dryRun) {
+  const title = String((cfg.progress || {}).groupName || '').trim();
+  if (!title) return null;
+
+  const groups = board.groups || [];
+  const existing = groups.find((g) => g.title === title);
+  if (existing) return existing.id;
+
   if (dryRun) {
-    log(`  DRY-RUN  create item "${name}"`);
+    log(`  DRY-RUN  create group "${title}" at the top of the board`);
+    return null;
+  }
+
+  // Position is a float, so "above everything" means before the lowest one.
+  // A board with no groups at all cannot take relative_to, hence the two forms.
+  const first = [...groups].sort((a, b) => parseFloat(a.position) - parseFloat(b.position))[0];
+  const data = await gql(
+    cfg,
+    first
+      ? `mutation ($boardId: ID!, $title: String!, $relativeTo: String!) {
+           create_group(
+             board_id: $boardId, group_name: $title,
+             relative_to: $relativeTo, position_relative_method: before_at
+           ) { id }
+         }`
+      : `mutation ($boardId: ID!, $title: String!) {
+           create_group(board_id: $boardId, group_name: $title) { id }
+         }`,
+    first
+      ? { boardId: String(cfg.boardId), title, relativeTo: String(first.id) }
+      : { boardId: String(cfg.boardId), title }
+  );
+  const id = ((data || {}).create_group || {}).id;
+  if (!id) throw new Error('monday accepted create_group but returned no id');
+  log(`  created group "${title}" at the top of the board`);
+  return id;
+}
+
+async function moveItemToGroup(cfg, itemId, groupId, dryRun) {
+  if (dryRun) {
+    log(`  DRY-RUN  move item ${itemId} into group ${groupId}`);
+    return;
+  }
+  await gql(
+    cfg,
+    `mutation ($itemId: ID!, $groupId: String!) {
+       move_item_to_group(item_id: $itemId, group_id: $groupId) { id }
+     }`,
+    { itemId: String(itemId), groupId: String(groupId) }
+  );
+  log(`  moved item ${itemId} into the progress group`);
+}
+
+async function createItem(cfg, name, dryRun, groupId = null) {
+  if (dryRun) {
+    log(`  DRY-RUN  create item "${name}"${groupId ? ` in group ${groupId}` : ''}`);
     return null;
   }
   const data = await gql(
     cfg,
-    `mutation ($boardId: ID!, $name: String!) {
-       create_item(board_id: $boardId, item_name: $name) { id }
-     }`,
-    { boardId: String(cfg.boardId), name }
+    groupId
+      ? `mutation ($boardId: ID!, $name: String!, $groupId: String!) {
+           create_item(board_id: $boardId, item_name: $name, group_id: $groupId) { id }
+         }`
+      : `mutation ($boardId: ID!, $name: String!) {
+           create_item(board_id: $boardId, item_name: $name) { id }
+         }`,
+    groupId
+      ? { boardId: String(cfg.boardId), name, groupId: String(groupId) }
+      : { boardId: String(cfg.boardId), name }
   );
   const id = ((data || {}).create_item || {}).id;
   if (!id) throw new Error('monday accepted create_item but returned no id');
@@ -1596,18 +1670,22 @@ async function cmdProgress(cfg, flags, dryRun) {
   if (prefix) {
     let target = found[0] || null;
     let created = false;
+    const groupId = await ensureProgressGroup(cfg, board, dryRun);
 
     if (!target) {
       log(`No item starting with "${prefix}" on the board yet, creating it.`);
-      const id = await createItem(cfg, name, dryRun);
+      const id = await createItem(cfg, name, dryRun, groupId);
       if (!id) {
         log(`  DRY-RUN  comment on it:\n${indent(body)}`);
         target = null;
       } else {
         target = { id, name };
         created = true;
-        log('  monday adds new items at the bottom. Drag it to the top once.');
       }
+    } else if (groupId && target.groupId && target.groupId !== groupId) {
+      // Self-healing rather than a one-off: someone dragging the bar into the
+      // ticket list is the likely cause, and it should not stay there.
+      await moveItemToGroup(cfg, target.id, groupId, dryRun);
     }
 
     if (target) {
