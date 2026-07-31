@@ -62,6 +62,21 @@ jobs:
             echo "bumped=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Nothing about this repo's own paths is baked into the workflow, so the
+      # same file works on the next project. An unset variable stops the deploy
+      # here with a name to fix, rather than running `git -C "" pull` on the
+      # server and leaving you to work out what happened.
+      - name: Require a deploy target
+        if: steps.version_check.outputs.bumped == 'true'
+        env:
+          THEME_PATH: ${{ vars.DEV_THEME_PATH }}
+        run: |
+          if [ -z "${THEME_PATH}" ]; then
+            echo "::error::Repository variable DEV_THEME_PATH is not set. It is the absolute path to the theme's git working copy on the dev server, e.g. ~/www/example.dev/public_html/wp-content/themes/mytheme"
+            exit 1
+          fi
+          echo "Deploy target: ${THEME_PATH}"
+
       - name: Deploy via SSH
         id: deploy
         if: steps.version_check.outputs.bumped == 'true'
@@ -71,9 +86,16 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          # envs passes these into the remote shell, so the values are never
+          # spliced into the script text.
+          envs: THEME_PATH,GIT_REMOTE,GIT_BRANCH
           script: |
             set -e
-            git -C ~/www/dorotape.altitude-dev.digital/public_html/wp-content/themes/dorotape pull dorotape main
+            git -C "$THEME_PATH" pull "$GIT_REMOTE" "$GIT_BRANCH"
+        env:
+          THEME_PATH: ${{ vars.DEV_THEME_PATH }}
+          GIT_REMOTE: ${{ vars.DEV_GIT_REMOTE || 'origin' }}
+          GIT_BRANCH: ${{ vars.DEV_GIT_BRANCH || 'main' }}
 
       # workflow_run hands the next workflow a conclusion, not step outputs. Without
       # this file, "succeeded and deployed" and "succeeded but the version was not

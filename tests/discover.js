@@ -14,7 +14,32 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE = (process.env.SITE_URL || 'https://dorotape.altitude-dev.digital').replace(/\/$/, '');
+/**
+ * Which site to check.
+ *
+ * SITE_URL wins. Otherwise fall back to devUrl in the project's own monday
+ * config - which is per-project and committed, so this stays convenient locally
+ * without hardcoding any one site into the test suite. There is deliberately no
+ * final default: a copy of this suite with neither set should say so, not
+ * quietly check somebody else's site.
+ */
+function resolveSite() {
+  if (process.env.SITE_URL) return process.env.SITE_URL;
+
+  try {
+    const cfg = require(path.join(__dirname, '..', '.github', 'monday-config.json'));
+    if (cfg.devUrl) return cfg.devUrl;
+  } catch { /* no config here - fall through to the error below */ }
+
+  console.error(
+    'No site to check.\n' +
+    '  Set SITE_URL, e.g. SITE_URL=https://example.dev npm test\n' +
+    '  or set "devUrl" in .github/monday-config.json.'
+  );
+  process.exit(1);
+}
+
+const SITE = resolveSite().replace(/\/$/, '');
 const SAMPLE = Number(process.env.SAMPLE_SIZE || 24);
 const OUT = path.join(__dirname, '.artifacts', 'plan.json');
 
