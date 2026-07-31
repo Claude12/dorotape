@@ -55,6 +55,11 @@ ssh user@devserver 'git -C /path/to/theme remote -v'
 
 Duplicate the board *structure only* — you do not want the old tickets.
 
+Name it **`<Project> Dev Tracker`** — `Dorotape Dev Tracker`, `Acme Dev Tracker`.
+They then sort together in monday and read as pipeline boards rather than client
+work. Nothing in the code reads the board *name*, only `boardId`, so renaming a
+board can never break the pipeline.
+
 Then rediscover the ids, because **every column id changes when a board is
 duplicated**. `text_mm5sds27` on one board is not `text_mm5sds27` on another,
 and nothing warns you: writes go to the old board or fail with a shrug.
