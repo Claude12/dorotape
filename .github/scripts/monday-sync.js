@@ -694,6 +694,24 @@ async function cmdCheck(cfg) {
         problems += 1;
       }
     }
+
+    // monday uses index 5 as a status column's empty slot. An item with no
+    // status set reports whatever label occupies index 5, so putting a real
+    // label there makes every untouched ticket silently claim that state -
+    // a brand new ticket reading "QA" with nobody having done anything.
+    // Verified on this board: with "QA" at index 5, an item with value=null
+    // returned text="QA"; after freeing index 5 the same item returned null.
+    try {
+      const labelsByIndex = JSON.parse(col.settings_str || '{}').labels || {};
+      if (labelsByIndex['5']) {
+        log(
+          `  X  ${colKey}: "${labelsByIndex['5']}" sits at index 5, monday's empty slot - ` +
+          `every item with no status set will read as "${labelsByIndex['5']}".\n` +
+          `     Rebuild the column with index 5 left unlabelled.`
+        );
+        problems += 1;
+      }
+    } catch { /* settings already reported unparseable above */ }
   }
 
   const items = await fetchAllRefItems(cfg);
