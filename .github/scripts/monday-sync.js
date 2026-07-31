@@ -23,8 +23,8 @@
  * Commands
  *   check                                     Validate token, board, column IDs and every label
  *   branch-created --branch <name>            -> In progress
- *   pr-opened      --branch <name> --pr-url <url>   -> Code review
- *   pr-merged      --branch <name> --pr-url <url>   -> Merged
+ *   pr-opened      --branch <name> --pr-url <url> [--pr-number <n>] [--pr-author <login>]  -> Code review
+ *   pr-merged      --branch <name> --pr-url <url> [--pr-number <n>] [--pr-author <login>]  -> Merged
  *   deployed       --refs <list> --commit <sha> --run-url <url>   -> Deployed to dev
  *   checks-passed  --refs <list> --run-url <url> [--summary <text>] -> QA
  *   blocked        --refs <list> --stage deploy|checks --run-url <url> [--detail <text>] -> Blocked
@@ -621,6 +621,19 @@ function linkValue(url, text) {
 }
 
 /**
+ * Label for the PR link column: "PR #14 by someone".
+ *
+ * Number and author are both optional - a Link column with the bare word "PR"
+ * is still a working link, and a run that cannot supply them should degrade to
+ * that rather than fail or write the string "undefined" onto a client's board.
+ */
+function prLabel(number, author) {
+  const num = String(number || '').replace(/^#/, '').trim();
+  const who = String(author || '').trim();
+  return `PR${num ? ` #${num}` : ''}${who ? ` by ${who}` : ''}`;
+}
+
+/**
  * Date column payload. UTC on purpose: monday stores date-column times in UTC
  * and converts to the account timezone for display, so sending local time here
  * would double-shift it. Verify this on the first real deploy - if the board
@@ -846,7 +859,7 @@ async function cmdPrOpened(cfg, flags, dryRun) {
     values: columnValues(cfg, [
       ['status', statusValue(cfg.labels.codeReview)],
       ['branch', branch],
-      ['pr', linkValue(prUrl, 'PR')],
+      ['pr', linkValue(prUrl, prLabel(flags['pr-number'], flags['pr-author']))],
     ]),
   }));
 }
@@ -859,7 +872,7 @@ async function cmdPrMerged(cfg, flags, dryRun) {
   await applyToRefs(cfg, [ref], dryRun, () => ({
     values: columnValues(cfg, [
       ['status', statusValue(cfg.labels.merged)],
-      ['pr', linkValue(prUrl, 'PR')],
+      ['pr', linkValue(prUrl, prLabel(flags['pr-number'], flags['pr-author']))],
     ]),
     comment:
       'Merged to main. Not deployed yet - dev deploys only run when the ' +

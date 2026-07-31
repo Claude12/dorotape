@@ -47,12 +47,15 @@ jobs:
         with:
           node-version: '20'
 
+      # Branch names go in through the environment, never interpolated into the
+      # run: block. A branch may legally be named with backticks or $(...), and
+      # ${{ }} pastes it into the shell as source text, not as a string.
       - name: Mark In progress
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          BRANCH: ${{ github.event.ref }}
         run: |
-          node .github/scripts/monday-sync.js branch-created \
-            --branch "${{ github.event.ref }}"
+          node .github/scripts/monday-sync.js branch-created --branch "$BRANCH"
 
   # ------------------------------------------------------------ pull requests
   pull-request:
@@ -71,10 +74,14 @@ jobs:
           github.event.pull_request.draft == false
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           node .github/scripts/monday-sync.js pr-opened \
-            --branch "${{ github.event.pull_request.head.ref }}" \
-            --pr-url "${{ github.event.pull_request.html_url }}"
+            --branch "$BRANCH" --pr-url "$PR_URL" \
+            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR"
 
       # Closed-without-merge deliberately does nothing: the ticket is still live
       # work, and silently moving it would lose that.
@@ -84,10 +91,14 @@ jobs:
           github.event.pull_request.merged == true
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           node .github/scripts/monday-sync.js pr-merged \
-            --branch "${{ github.event.pull_request.head.ref }}" \
-            --pr-url "${{ github.event.pull_request.html_url }}"
+            --branch "$BRANCH" --pr-url "$PR_URL" \
+            --pr-number "$PR_NUMBER" --pr-author "$PR_AUTHOR"
 
   # ----------------------------------------------------------------- deploy
   deploy-tracking:

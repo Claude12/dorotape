@@ -200,8 +200,8 @@ All of these need `MONDAY_TOKEN`, from `.env` or the environment.
 node .github/scripts/monday-sync.js check                       # validate config against the board
 node .github/scripts/monday-sync.js discover --board <id>       # print column ids for a board
 node .github/scripts/monday-sync.js branch-created --branch <name>
-node .github/scripts/monday-sync.js pr-opened   --branch <name> --pr-url <url>
-node .github/scripts/monday-sync.js pr-merged   --branch <name> --pr-url <url>
+node .github/scripts/monday-sync.js pr-opened   --branch <name> --pr-url <url> [--pr-number <n>] [--pr-author <login>]
+node .github/scripts/monday-sync.js pr-merged   --branch <name> --pr-url <url> [--pr-number <n>] [--pr-author <login>]
 node .github/scripts/monday-sync.js deployed    --refs "AC-1 AC-2" --commit <sha> --run-url <url>
 node .github/scripts/monday-sync.js checks-passed --refs "AC-1" --run-url <url> --summary "..."
 node .github/scripts/monday-sync.js blocked     --refs "AC-1" --stage deploy|checks --run-url <url>

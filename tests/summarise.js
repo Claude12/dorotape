@@ -4,9 +4,16 @@
 /**
  * Turn a Playwright run into a few lines for the monday comment.
  *
- * Whoever reads the ticket should know what broke without opening the run log,
- * so this leads with the failures. It prints nothing useful if the run did not
- * produce results.json - that is itself worth saying rather than hiding.
+ * Leads with a checklist of what was checked, one row per suite, so the ticket
+ * says what was covered and not merely that a number went green. Then, if
+ * anything failed, what broke - whoever reads the ticket should not have to
+ * open the run log to find that out.
+ *
+ * One row per suite rather than per test on purpose: 52 lines of "/about/ ok"
+ * is not a checklist anybody reads. The counts carry the detail.
+ *
+ * Prints nothing useful if the run produced no results.json - which is itself
+ * worth saying rather than hiding.
  */
 
 const path = require('path');
@@ -14,6 +21,10 @@ const path = require('path');
 const RESULTS = path.join(__dirname, '.artifacts', 'results.json');
 const MAX_LISTED = 8;
 const ANSI = new RegExp(String.fromCharCode(27) + '\\[[0-9;]*m', 'g');
+
+// Unicode rather than "[x]" because a monday update is plain text - there is no
+// markdown pass to turn brackets into anything, so the box has to already be one.
+const BOX = { passed: '☑', failed: '☒', skipped: '☐' };
 
 let report;
 try {
@@ -24,12 +35,30 @@ try {
 }
 
 const failures = [];
+const groups = new Map(); // suite title -> tallies, in report order
 
-(function walk(suite, file) {
+function tally(title) {
+  if (!groups.has(title)) groups.set(title, { passed: 0, failed: 0, skipped: 0 });
+  return groups.get(title);
+}
+
+(function walk(suite, file, title) {
   const where = suite.file || file;
+  // The file-level suite carries the filename; the describe() inside it carries
+  // the readable title. Prefer the latter, and fall back so a spec with no
+  // describe() still lands under something recognisable.
+  const label = suite.title && suite.title !== path.basename(where || '')
+    ? suite.title
+    : title || path.basename(where || '', '.spec.js');
+
   for (const spec of suite.specs || []) {
-    if (spec.ok) continue;
+    const counts = tally(label);
+
     for (const t of spec.tests || []) {
+      if (t.status === 'skipped') { counts.skipped++; continue; }
+      if (spec.ok) { counts.passed++; continue; }
+      counts.failed++;
+
       const last = (t.results || []).slice(-1)[0] || {};
       // The specs put the useful part first and a blank line before Playwright's
       // own expect() diff, so stop at the blank line and skip the diff entirely.
@@ -46,18 +75,32 @@ const failures = [];
       });
     }
   }
-  (suite.suites || []).forEach((s) => walk(s, where));
+
+  (suite.suites || []).forEach((s) => walk(s, where, label));
 })({ suites: report.suites || [] });
 
 const stats = report.stats || {};
 const total = (stats.expected || 0) + (stats.unexpected || 0) + (stats.skipped || 0);
 
+// Checklist first, on both outcomes. On a red run it shows what still held,
+// which is most of the value - "markup broke, the shop journey did not" is a
+// different morning from "something went red".
+const width = Math.max(0, ...[...groups.keys()].map((k) => k.length));
+
+for (const [name, c] of groups) {
+  const ran = c.passed + c.failed;
+  const state = c.failed ? 'failed' : ran === 0 ? 'skipped' : 'passed';
+  const count = ran === 0 ? 'skipped' : `${c.passed}/${ran}`;
+  const note = c.skipped && ran ? ` (${c.skipped} skipped)` : '';
+  console.log(`${BOX[state]} ${name.padEnd(width)}  ${count}${note}`);
+}
+
 if (!failures.length) {
-  console.log(`${total} checks passed in ${Math.round((stats.duration || 0) / 1000)}s.`);
+  console.log(`\n${total} checks passed in ${Math.round((stats.duration || 0) / 1000)}s.`);
   process.exit(0);
 }
 
-console.log(`${failures.length} of ${total} checks failed:`);
+console.log(`\n${failures.length} of ${total} checks failed:`);
 for (const f of failures.slice(0, MAX_LISTED)) {
   console.log(`- [${f.check}] ${f.title}: ${f.message}`);
 }
