@@ -271,12 +271,21 @@ Three consequences worth knowing before you show it to anyone:
   warning rather than an error — naming a label the board does not have excludes
   nothing, which is harmless.
 
-  Adding it is the one step that stays manual. There is no monday mutation for
-  adding a label to an existing Status column, so it has to go in through the
-  UI, which means monday chooses the index and **may put it at 5**. Add it, then
-  run `check` immediately: if it landed at 5, delete it before anyone uses it —
-  nothing is lost while the label is still unused, and everything is lost if
-  every unset ticket starts reading as Cancelled.
+  There is no mutation that adds a label to an existing Status column —
+  `change_column_metadata` has no `labels` property, only `title` and
+  `description`. The one API route is `create_labels_if_missing: true` on a
+  write to a real item, and it does not let you name the index.
+
+  **Measured, not assumed: monday appends past the highest index rather than
+  filling a gap.** Probed on a throwaway board whose Status column had 0–4 and
+  6–8 taken and 5 free; the new label went to 9. So the index-5 hazard does not
+  apply here, and the label can be added by writing `Cancelled` to any item and
+  clearing it again. Do it on the progress item — it is excluded from the totals
+  by name before its status is ever read, so nothing it briefly carries can move
+  the bar.
+
+  Run `check` afterwards anyway. It reads the stored indexes back, and it costs
+  a second to confirm what a future monday release might change.
 
 Everything above is config, in `monday-config.json` under `progress` — the
 weights, which labels count as done, which count as on-dev, which are excluded,
@@ -402,7 +411,7 @@ Some details that are load-bearing:
 | Deploy never triggers | The `Version:` line in `style.css` did not change on `main` |
 | Progress job logs SKIP every night | `columns.size` is `null` — see step 7 |
 | Bar stale for weeks, no runs listed | GitHub disabled the schedule after 60 quiet days. Push anything, or use Run workflow |
-| Progress never reaches 100% | Abandoned tickets are still in the denominator — add a `Cancelled` label |
+| Progress never reaches 100% | Abandoned tickets are still in the denominator — set them to `Cancelled`, or add that label if the board has not got one |
 | Two progress items on the board | Something starts with the same name. The script refuses to guess; delete the extra |
 | Board description never updates | `progress.boardDescription` is `false`. `check` prints which surfaces are on |
 | Board description wiped something you wrote by hand | It is rewritten in full every run. Put standing notes on a pinned item, not there |
