@@ -28,6 +28,8 @@
  *   deployed       --refs <list> --commit <sha> --run-url <url>   -> Deployed to dev
  *   checks-passed  --refs <list> --run-url <url> [--summary <text>] -> QA
  *   blocked        --refs <list> --stage deploy|checks --run-url <url> [--detail <text>] -> Blocked
+ *   setup-progress                            Create the Size and Weight columns on the board
+ *   progress       [--force]                  Recalculate the weighted progress bar
  *   refs-from-range --from <rev> --to <rev>   Print DR refs found in a commit range
  *
  * Global flags
@@ -127,6 +129,10 @@ const EXPECTED_COLUMN_TYPES = {
   deployResult:  { types: ['status'],         writes: 'a status label' },
   checksResult:  { types: ['status'],         writes: 'a status label' },
   lastRun:       { types: ['link'],           writes: '{url, text} - must be a Link column' },
+  size:          { types: ['status'],         writes: 'a size label, e.g. "M"' },
+  // monday renamed this type from "numeric" to "numbers"; boards built at
+  // different times report different strings for the same column.
+  weight:        { types: ['numbers', 'numeric'], writes: 'a number derived from Size' },
 };
 
 /* ------------------------------------------------------------------ *
@@ -321,32 +327,48 @@ async function cmdDiscover(cfg, flags) {
   // Best-effort mapping by type and title. Anything it cannot place is left as
   // REPLACE_ME rather than guessed - a wrong id here writes to the wrong column.
   const wants = [
-    ['ref',        'text',   /\b(ref|ticket|key|id)\b/i],
-    ['status',     'status', /status|state|stage/i],
-    ['branch',     'text',   /branch/i],
-    ['pr',         'link',   /\b(pr|pull)/i],
-    ['commit',     'text',   /commit|sha/i],
-    ['deployedAt', 'date',   /deploy|shipped|released/i],
+    ['ref',        ['text'],                 /\b(ref|ticket|key|id)\b/i],
+    ['status',     ['status'],               /status|state|stage/i],
+    ['branch',     ['text'],                 /branch/i],
+    ['pr',         ['link'],                 /\b(pr|pull)/i],
+    ['commit',     ['text'],                 /commit|sha/i],
+    ['deployedAt', ['date'],                 /deploy|shipped|released/i],
+    ['size',       ['status'],               /\bsize\b/i],
+    ['weight',     ['numbers', 'numeric'],   /weight|points|pts/i],
   ];
+
+  // size and weight only drive the progress bar, and everything else works
+  // without them - so an unmatched one becomes null ("configured off") rather
+  // than REPLACE_ME, which would stop the whole script until someone noticed.
+  // Left as null rather than REPLACE_ME when discovery cannot find them: a board
+  // is allowed not to have these. size/weight only drive the progress bar, and
+  // branch/commit only mirror detail the PR link already leads to.
+  const OPTIONAL = new Set(['size', 'weight', 'branch', 'commit']);
 
   const guessed = {};
   const used = new Set();
-  for (const [key, type, titleRe] of wants) {
-    const byBoth = board.columns.find(
-      (c) => c.type === type && titleRe.test(c.title) && !used.has(c.id)
-    );
-    const onlyType = board.columns.filter((c) => c.type === type && !used.has(c.id));
+  for (const [key, types, titleRe] of wants) {
+    const isType = (c) => types.includes(c.type) && !used.has(c.id);
+    const byBoth = board.columns.find((c) => isType(c) && titleRe.test(c.title));
+    const onlyType = board.columns.filter(isType);
     const pick = byBoth || (onlyType.length === 1 ? onlyType[0] : null);
     if (pick) {
       guessed[key] = pick.id;
       used.add(pick.id);
     } else {
-      guessed[key] = 'REPLACE_ME';
+      guessed[key] = OPTIONAL.has(key) ? null : 'REPLACE_ME';
     }
   }
 
   log('\nSuggested "columns" block - CHECK the titles above before pasting:');
   log(JSON.stringify({ boardId: String(boardId), columns: guessed }, null, 2));
+
+  const off = Object.entries(guessed).filter(([, v]) => v === null);
+  if (off.length) {
+    log(`\n${off.map(([k]) => k).join(', ')} came back null - the board has no such column.`);
+    log('That only turns the progress bar off; everything else works. Add the columns');
+    log('and re-run this if you want it.');
+  }
 
   const unresolved = Object.entries(guessed).filter(([, v]) => v === 'REPLACE_ME');
   if (unresolved.length) {
@@ -367,6 +389,7 @@ async function fetchBoardColumns(cfg) {
        boards(ids: [$boardId]) {
          id
          name
+         description
          columns { id title type settings_str }
        }
      }`,
@@ -390,9 +413,19 @@ async function fetchBoardColumns(cfg) {
  * DR-1, and we must see all matches to detect duplicate refs rather than
  * silently taking the first. Fine for a per-project dev board; if this board
  * ever holds thousands of items, swap in a server-side exact rule.
+ *
+ * `extraCols` asks for more columns in the same pass - "progress" needs status,
+ * size and weight for every item, and pulling them here costs no extra requests.
+ * Unconfigured (null) ids are dropped, so callers can pass optional columns
+ * without checking first. Every value arrives as `cols[columnId]`, a string.
  */
-async function fetchAllRefItems(cfg) {
+async function fetchAllRefItems(cfg, extraCols = []) {
   const refCol = cfg.columns.ref;
+  // Ids are constrained to [A-Za-z0-9_] by loadConfig, which is what makes them
+  // safe to interpolate into the query. Deduped so a caller passing a column we
+  // already fetch cannot produce a duplicate id in the list.
+  const wanted = [...new Set([refCol, ...extraCols].filter(Boolean))];
+  const idList = wanted.map((id) => `"${id}"`).join(', ');
   const items = [];
   let cursor = null;
   let page = 0;
@@ -416,7 +449,7 @@ async function fetchAllRefItems(cfg) {
              items {
                id
                name
-               column_values(ids: ["${refCol}"]) { id text }
+               column_values(ids: [${idList}]) { id text }
              }
            }
          }
@@ -428,11 +461,13 @@ async function fetchAllRefItems(cfg) {
     if (!boardsPage) throw new Error(`Board ${cfg.boardId} returned no items_page`);
 
     for (const item of boardsPage.items || []) {
-      const cv = (item.column_values || [])[0];
+      const cols = {};
+      for (const cv of item.column_values || []) cols[cv.id] = cv.text || '';
       items.push({
         id: item.id,
-        name: item.name,
-        ref: cv && cv.text ? cv.text.trim() : '',
+        name: item.name || '',
+        ref: (cols[refCol] || '').trim(),
+        cols,
       });
     }
     cursor = boardsPage.cursor;
@@ -500,6 +535,72 @@ async function addUpdate(cfg, itemId, body, dryRun) {
     { itemId: String(itemId), body }
   );
   log(`  commented on item ${itemId}`);
+}
+
+/**
+ * Rename an item.
+ *
+ * monday has no rename mutation - the item's title is addressed as the
+ * pseudo-column "name" through the ordinary column-values mutation. It is not
+ * listed among the board's columns, so it never appears in "discover" and is
+ * not something "check" can validate.
+ */
+async function renameItem(cfg, itemId, name, dryRun) {
+  if (dryRun) {
+    log(`  DRY-RUN  rename item ${itemId} to "${name}"`);
+    return;
+  }
+  await gql(
+    cfg,
+    `mutation ($boardId: ID!, $itemId: ID!, $vals: JSON!) {
+       change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $vals) { id }
+     }`,
+    { boardId: String(cfg.boardId), itemId: String(itemId), vals: JSON.stringify({ name }) }
+  );
+  log(`  renamed item ${itemId}`);
+}
+
+/**
+ * Write the board's description - the text box under the board title.
+ *
+ * Verified against the live API: newlines and block-drawing characters survive
+ * a round trip unchanged, so the same plain-text body used for item updates
+ * renders here as written. Note this is the only surface here that is NOT an
+ * item: it notifies nobody and keeps no history, which is exactly why the
+ * progress ITEM still exists alongside it. One is a noticeboard, the other is
+ * a record.
+ */
+async function setBoardDescription(cfg, text, dryRun) {
+  if (dryRun) {
+    log(`  DRY-RUN  set board description:\n${indent(text)}`);
+    return;
+  }
+  await gql(
+    cfg,
+    `mutation ($boardId: ID!, $text: String!) {
+       update_board(board_id: $boardId, board_attribute: description, new_value: $text)
+     }`,
+    { boardId: String(cfg.boardId), text }
+  );
+  log(`  updated the board description`);
+}
+
+async function createItem(cfg, name, dryRun) {
+  if (dryRun) {
+    log(`  DRY-RUN  create item "${name}"`);
+    return null;
+  }
+  const data = await gql(
+    cfg,
+    `mutation ($boardId: ID!, $name: String!) {
+       create_item(board_id: $boardId, item_name: $name) { id }
+     }`,
+    { boardId: String(cfg.boardId), name }
+  );
+  const id = ((data || {}).create_item || {}).id;
+  if (!id) throw new Error('monday accepted create_item but returned no id');
+  log(`  created item ${id}`);
+  return String(id);
 }
 
 function indent(text) {
@@ -664,6 +765,99 @@ function localStamp(cfg) {
  * commands
  * ------------------------------------------------------------------ */
 
+/**
+ * Validate the progress block. Returns a problem count.
+ *
+ * Everything here is a config-vs-board mismatch that produces a plausible-
+ * looking bar rather than an error: a done label that no longer exists on the
+ * status column silently makes progress 0%, and a weight of "5 " (a string)
+ * silently makes it NaN. Both look like data, not bugs.
+ */
+function checkProgressConfig(cfg, byId) {
+  const p = cfg.progress || {};
+  let problems = 0;
+
+  log('\nProgress');
+
+  if (!cfg.columns.size) {
+    log('  -  size column not configured; progress reporting is off and "progress" will skip');
+    return 0;
+  }
+  if (!cfg.columns.weight) {
+    log('  !  weight column not configured; the bar still works, but the board');
+    log('     itself cannot sum or sort by points');
+  }
+
+  const weights = p.weights || {};
+  if (!Object.keys(weights).length) {
+    log('  X  progress.weights is empty - there is nothing to weigh with');
+    problems += 1;
+  }
+  for (const [label, value] of Object.entries(weights)) {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+      log(`  X  progress.weights["${label}"] is ${JSON.stringify(value)}, expected a positive number`);
+      problems += 1;
+    }
+  }
+
+  const hasItem = Boolean(String(p.itemName || '').trim());
+  const hasDescription = p.boardDescription !== false;
+  if (hasItem) log(`  ok itemName      "${p.itemName}"`);
+  else log('  -  itemName is empty, so no progress item is written');
+  log(
+    hasDescription
+      ? '  ok description   the bar is written to the board description too'
+      : '  -  boardDescription is false, so the board description is left alone'
+  );
+  if (!hasItem && !hasDescription) {
+    log('  X  itemName and boardDescription are both off - the bar has nowhere to go');
+    problems += 1;
+  }
+
+  // The three label lists all name labels on the STATUS column, so verify them
+  // against that column rather than trusting the config to agree with itself.
+  const statusCol = cfg.columns.status ? byId.get(cfg.columns.status) : null;
+  let present = [];
+  try {
+    present = Object.values(JSON.parse((statusCol || {}).settings_str || '{}').labels || {});
+  } catch { /* the label check above has already reported this */ }
+
+  for (const key of ['doneLabels', 'onDevLabels']) {
+    const list = p[key] || [];
+    if (!list.length) {
+      log(`  X  progress.${key} is empty`);
+      problems += 1;
+      continue;
+    }
+    for (const label of list) {
+      if (present.includes(label)) {
+        log(`  ok ${key.padEnd(14)} "${label}"`);
+      } else {
+        log(`  X  ${key.padEnd(14)} "${label}" is not a label on the status column`);
+        problems += 1;
+      }
+    }
+  }
+
+  // Excluded is a warning, not an error, on purpose: naming a label the board
+  // does not have yet excludes nothing, which is harmless and self-correcting.
+  // It is also the normal state right after copying this onto a new project.
+  for (const label of p.excludedLabels || []) {
+    if (present.includes(label)) log(`  ok excludedLabels "${label}"`);
+    else log(`  !  excludedLabels "${label}" is not on the status column yet, so nothing is excluded`);
+  }
+
+  // A label in both lists would be counted as done AND as on-dev, which reads
+  // as more than 100% on dev and is impossible to spot from the output.
+  const overlap = (p.doneLabels || []).filter((l) => (p.onDevLabels || []).includes(l));
+  if (overlap.length) {
+    log(`  X  ${overlap.join(', ')} appears in both doneLabels and onDevLabels`);
+    problems += 1;
+  }
+
+  return problems;
+}
+
 async function cmdCheck(cfg) {
   log(`Config:  ${cfg.__path}`);
   log(`Board:   ${cfg.boardId}`);
@@ -737,6 +931,9 @@ async function cmdCheck(cfg) {
     ['status', Object.values(cfg.labels || {})],
     ['deployResult', Object.values(cfg.deployResultLabels || {})],
     ['checksResult', Object.values(cfg.checksResultLabels || {})],
+    // The size labels are the KEYS of progress.weights, not values: the label
+    // on the board is what the weight is looked up by.
+    ['size', Object.keys((cfg.progress || {}).weights || {})],
   ];
 
   log('\nStatus labels');
@@ -788,7 +985,9 @@ async function cmdCheck(cfg) {
     } catch { /* settings already reported unparseable above */ }
   }
 
-  const items = await fetchAllRefItems(cfg);
+  problems += checkProgressConfig(cfg, byId);
+
+  const items = await fetchAllRefItems(cfg, [cfg.columns.size]);
   const seen = new Map();
   for (const item of items) {
     if (!item.ref) continue;
@@ -803,6 +1002,27 @@ async function cmdCheck(cfg) {
     problems += dupes.length;
   } else {
     log('  ok no duplicate Refs');
+  }
+
+  if (cfg.columns.size) {
+    const prefix = String((cfg.progress || {}).itemName || '').trim();
+    const mine = prefix ? items.filter((i) => i.name.startsWith(prefix)) : [];
+    const weights = (cfg.progress || {}).weights || {};
+    const unsized = items.filter(
+      (i) => !mine.includes(i) &&
+        !Object.prototype.hasOwnProperty.call(weights, (i.cols[cfg.columns.size] || '').trim())
+    );
+
+    if (mine.length > 1) {
+      log(`  X  ${mine.length} items start with "${prefix}" - progress cannot pick one`);
+      problems += 1;
+    } else if (mine.length === 1) {
+      log(`  ok progress item ${mine[0].id}`);
+    } else {
+      log(`  -  no progress item yet; "progress" will create one`);
+    }
+    // Not a problem - it is the number the bar exists to make visible.
+    if (unsized.length) log(`  !  ${unsized.length} item(s) have no Size and sit outside the bar`);
   }
 
   log('');
@@ -962,6 +1182,455 @@ async function cmdBlocked(cfg, flags, dryRun) {
   }));
 }
 
+/* ------------------------------------------------------------------ *
+ * progress: board setup
+ * ------------------------------------------------------------------ */
+
+/**
+ * Create the two columns the progress bar needs.
+ *
+ * This exists because of index 5. Adding a Status column through the monday UI
+ * means letting monday choose where each label sits, and a label landing at
+ * index 5 makes every item with no value set report that label - which for a
+ * Size column would silently give unsized tickets a weight. Creating the column
+ * through the API is the only way to state the indexes outright.
+ *
+ * Creates nothing that already exists, so it is safe to re-run.
+ */
+async function cmdSetupProgress(cfg, flags, dryRun) {
+  const p = cfg.progress || {};
+  const weights = p.weights || {};
+  if (!Object.keys(weights).length) fail('progress.weights is empty - nothing to build a Size column from.');
+
+  const sizeTitle = typeof flags['size-title'] === 'string' ? flags['size-title'] : 'Size';
+  const weightTitle = typeof flags['weight-title'] === 'string' ? flags['weight-title'] : 'Weight';
+
+  // Indexes stated explicitly, contiguous from 0, and 5 is left alone. Anything
+  // beyond five sizes would collide with it, which is a reason to have fewer
+  // sizes rather than a reason to use index 5.
+  const sizes = Object.keys(weights);
+  if (sizes.length > 5) {
+    fail(
+      `progress.weights has ${sizes.length} sizes; this can only place 5 without ` +
+      `using index 5, which monday reserves as a status column's empty slot.`
+    );
+  }
+  const labels = {};
+  sizes.forEach((label, i) => { labels[String(i)] = label; });
+
+  const board = await fetchBoardColumns(cfg);
+  log(`Board ${cfg.boardId}: "${board.name}"\n`);
+
+  const found = {};
+  for (const [key, title, type, defaults] of [
+    ['size', sizeTitle, 'status', { labels }],
+    ['weight', weightTitle, 'numbers', null],
+  ]) {
+    const existing = board.columns.find((c) => c.title === title);
+    if (existing) {
+      log(`  ${title}: already exists (${existing.id}, type "${existing.type}") - leaving it alone`);
+      found[key] = existing.id;
+      continue;
+    }
+    if (dryRun) {
+      log(`  DRY-RUN  create ${type} column "${title}"` +
+        (defaults ? ` with labels ${JSON.stringify(labels)}` : ''));
+      found[key] = `<new ${key} id>`;
+      continue;
+    }
+    const data = await gql(
+      cfg,
+      `mutation ($boardId: ID!, $title: String!, $type: ColumnType!, $defaults: JSON) {
+         create_column(board_id: $boardId, title: $title, column_type: $type, defaults: $defaults) {
+           id title type settings_str
+         }
+       }`,
+      {
+        boardId: String(cfg.boardId),
+        title,
+        type,
+        defaults: defaults ? JSON.stringify(defaults) : null,
+      }
+    );
+    const col = (data || {}).create_column;
+    if (!col || !col.id) throw new Error(`monday accepted create_column for "${title}" but returned no id`);
+    found[key] = col.id;
+    log(`  ${title}: created ${col.id} (${col.type})`);
+
+    // Read back what monday actually stored rather than trusting that it took
+    // the indexes we asked for. This is the whole point of the command.
+    if (type === 'status') {
+      let stored = {};
+      try {
+        stored = JSON.parse(col.settings_str || '{}').labels || {};
+      } catch { /* reported as unverified below */ }
+      const at5 = stored['5'];
+      if (at5) {
+        log(`  X  "${at5}" landed at index 5 despite asking otherwise.`);
+        log('     Delete this column and raise it - do NOT start sizing tickets.');
+      } else if (Object.keys(stored).length) {
+        log(`     indexes: ${Object.entries(stored).map(([i, l]) => `${i}=${l}`).join(' ')} (5 free)`);
+      } else {
+        log('     could not read the stored indexes back - run "check" before sizing anything.');
+      }
+    }
+  }
+
+  log('\nPaste into monday-config.json under "columns":');
+  log(`  "size": ${JSON.stringify(found.size)},`);
+  log(`  "weight": ${JSON.stringify(found.weight)}`);
+  log('\nThen: node .github/scripts/monday-sync.js check');
+}
+
+/* ------------------------------------------------------------------ *
+ * progress
+ * ------------------------------------------------------------------ */
+
+/**
+ * Weighted project progress, written back onto the board.
+ *
+ * Counting tickets treats "fix a typo" and "build the Sage price sync" as the
+ * same unit of work, so the bar lurches and nobody believes it. Every ticket
+ * carries a Size, each size is worth some points, and progress is points.
+ *
+ * Two figures, not one, and this is the part worth defending. "Completed" is
+ * set by hand after sign-off, so counting only that would show a build sitting
+ * at 20% while most of it is finished and sitting on dev waiting for someone to
+ * look at it. Counting dev as done would tell a client something is finished
+ * when nobody has checked it. So: no partial credit, and the on-dev figure is
+ * reported alongside rather than folded in.
+ */
+
+const ICON = { done: '✅', onDev: '🔵', blocked: '❌', other: '⬜', unsized: '❔' };
+
+/**
+ * Percentage, rounded, except at the two ends.
+ *
+ * 99.6% is not finished and 0.4% is not nothing, and on a figure a client reads
+ * those two facts are worth more than the half a percent of accuracy given up.
+ */
+function pct(part, whole) {
+  if (!whole) return 0;
+  const rounded = Math.round((part / whole) * 100);
+  if (rounded === 100 && part < whole) return 99;
+  if (rounded === 0 && part > 0) return 1;
+  return rounded;
+}
+
+/**
+ * The bar itself: solid for done, shaded for on-dev, light for the rest.
+ *
+ * A share that is real but tiny gets one cell rather than rounding away to
+ * nothing - a bar showing no progress when there is some is the one output
+ * here that would actively mislead.
+ */
+function bar(donePart, devPart, whole, width) {
+  if (!whole) return '░'.repeat(width);
+  let done = Math.round((donePart / whole) * width);
+  let dev = Math.round((devPart / whole) * width);
+  if (donePart > 0 && done === 0) done = 1;
+  if (devPart > 0 && dev === 0) dev = 1;
+  while (done + dev > width) {
+    if (dev > 1) dev -= 1;
+    else done -= 1;
+  }
+  return '█'.repeat(done) + '▓'.repeat(dev) + '░'.repeat(width - done - dev);
+}
+
+function stageIcon(cfg, label, stats) {
+  const p = cfg.progress || {};
+  if ((p.doneLabels || []).includes(label)) return ICON.done;
+  if ((p.onDevLabels || []).includes(label)) return ICON.onDev;
+  if (label === (cfg.labels || {}).blocked) return ICON.blocked;
+  if (stats && stats.pts === 0 && stats.unsized === stats.count) return ICON.unsized;
+  return ICON.other;
+}
+
+function plural(n, word) {
+  return `${n} ${word}${n === 1 ? '' : 's'}`;
+}
+
+/** The one-line version, which becomes the item's name on the board. */
+function progressName(cfg, s) {
+  const p = cfg.progress || {};
+  if (!s.totalPts) return `${p.itemName} · nothing sized yet`;
+  return (
+    `${p.itemName} ${bar(s.donePts, s.devPts, s.totalPts, 10)} ` +
+    `${pct(s.donePts, s.totalPts)}% · ${s.donePts}/${s.totalPts} pts · ` +
+    `${pct(s.donePts + s.devPts, s.totalPts)}% on dev`
+  );
+}
+
+/** The full version, which becomes an update on that item. */
+function progressBody(cfg, s) {
+  const p = cfg.progress || {};
+  const width = Number(p.barWidth) > 0 ? Number(p.barWidth) : 20;
+  const lines = [];
+
+  if (!s.totalPts) {
+    lines.push('No ticket on this board has a Size yet, so there is nothing to weigh.');
+  } else {
+    lines.push(`${bar(s.donePts, s.devPts, s.totalPts, width)} ${pct(s.donePts, s.totalPts)}%`);
+    lines.push('');
+    lines.push(`${s.donePts} of ${s.totalPts} points signed off as done.`);
+    lines.push(
+      `${s.donePts + s.devPts} of ${s.totalPts} points (${pct(s.donePts + s.devPts, s.totalPts)}%) ` +
+      `are on dev - done, or waiting on manual QA.`
+    );
+  }
+
+  // Said out loud, every time, because a progress bar that quietly leaves work
+  // out is worse than no progress bar. Unsized tickets have no weight, so they
+  // cannot sit anywhere on it, and the finish line moves the day they get one.
+  if (s.unsized) {
+    lines.push(
+      `${plural(s.unsized, 'ticket')} ${s.unsized === 1 ? 'carries' : 'carry'} no Size, ` +
+      `so that work is counted nowhere above.`
+    );
+  }
+  if (s.excluded) {
+    lines.push(`${plural(s.excluded, 'ticket')} excluded (${(p.excludedLabels || []).join(', ')}).`);
+  }
+
+  // No column padding anywhere below: monday renders an update as HTML, so a
+  // run of spaces collapses to one and any alignment is lost in transit.
+  lines.push('', 'By stage');
+  for (const [label, c] of s.stages) {
+    const bits = [plural(c.count, 'ticket')];
+    if (c.pts) bits.unshift(plural(c.pts, 'pt'));
+    if (c.unsized) bits.push(`${c.unsized} unsized`);
+    lines.push(`${stageIcon(cfg, label, c)} ${label} · ${bits.join(', ')}`);
+  }
+
+  if (s.blocked.length) {
+    lines.push('', 'Needs a decision');
+    for (const item of s.blocked) {
+      lines.push(`${ICON.blocked} ${item.ref ? `${item.ref} ` : ''}${item.name}`);
+    }
+  }
+
+  const scale = Object.entries(p.weights || {}).map(([k, v]) => `${k}=${v}`).join(' ');
+  lines.push('', `Sizes: ${scale}. Recalculated ${localStamp(cfg)}.`);
+
+  return lines.join('\n');
+}
+
+/**
+ * Heading for the board description. Derived from itemName rather than being
+ * its own config key - one fewer thing to keep in sync, and the two surfaces
+ * should agree on what this thing is called. Leading marks like the "▸" that
+ * sorts the item to the top are decoration for a row, not for a heading.
+ */
+function progressTitle(cfg) {
+  const raw = String((cfg.progress || {}).itemName || '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+  return raw || 'Project progress';
+}
+
+async function cmdProgress(cfg, flags, dryRun) {
+  const p = cfg.progress || {};
+  const sizeCol = cfg.columns.size;
+  const statusCol = cfg.columns.status;
+  const weightCol = cfg.columns.weight;
+
+  // Same reasoning as the missing-token skip: a repo can carry this pipeline
+  // before the board has a Size column, and a nightly red X for "you have not
+  // set this up yet" is how people learn to ignore the Actions tab.
+  if (!sizeCol) {
+    log('SKIP  columns.size is not configured, so there are no sizes to weigh.');
+    log('      Add a Size status column to the board, run "discover", fill it in.');
+    process.exit(0);
+  }
+  if (!statusCol) fail('columns.status must be configured before progress can be reported.');
+
+  const weights = p.weights || {};
+  if (!Object.keys(weights).length) fail('progress.weights is empty - nothing to weigh with.');
+
+  // Two surfaces, switched independently. The board description is the text box
+  // under the board title - always visible, notifies nobody. The item is a row
+  // like any other, so its updates land in people's feeds and build a history.
+  // Turn either off and the other still carries the bar; turn both off and
+  // there is nothing to write, which is a config mistake rather than a mode.
+  const prefix = String(p.itemName || '').trim();
+  const wantsDescription = p.boardDescription !== false;
+  if (!prefix && !wantsDescription) {
+    fail(
+      'progress.itemName is empty and progress.boardDescription is false, so there ' +
+      'is nowhere to write the bar. Set one of them.'
+    );
+  }
+
+  const doneLabels = new Set(p.doneLabels || []);
+  const devLabels = new Set(p.onDevLabels || []);
+  const excludedLabels = new Set(p.excludedLabels || []);
+
+  // Board order for the breakdown. A Status column stores its labels keyed by
+  // index, and that order is the pipeline order as drawn on the board; any
+  // other order is one we invented.
+  const board = await fetchBoardColumns(cfg);
+  const statusColumn = board.columns.find((c) => c.id === statusCol);
+  const labelOrder = new Map();
+  try {
+    const labels = JSON.parse((statusColumn || {}).settings_str || '{}').labels || {};
+    for (const [index, label] of Object.entries(labels)) labelOrder.set(label, Number(index));
+  } catch { /* unordered output beats no output */ }
+
+  const items = await fetchAllRefItems(cfg, [statusCol, sizeCol, weightCol]);
+
+  const s = {
+    totalPts: 0, donePts: 0, devPts: 0, unsized: 0, excluded: 0,
+    stages: [], blocked: [],
+  };
+  const stages = new Map();
+  const weightFixes = [];
+  const found = [];
+
+  for (const item of items) {
+    // The progress item lives on the board it describes, so it has to be kept
+    // out of its own totals. Matched on a prefix because the rest of the name
+    // is the bar, which changes on every run.
+    // Guarded on prefix being non-empty: "".startsWith("") is true, so an
+    // unset itemName would otherwise swallow every ticket on the board and
+    // report 0 points with a straight face.
+    if (prefix && item.name.startsWith(prefix)) {
+      found.push(item);
+      continue;
+    }
+
+    const status = (item.cols[statusCol] || '').trim();
+    if (excludedLabels.has(status)) {
+      s.excluded += 1;
+      continue;
+    }
+
+    const size = (item.cols[sizeCol] || '').trim();
+    const known = Object.prototype.hasOwnProperty.call(weights, size);
+    const weight = known ? Number(weights[size]) : null;
+
+    const stage = status || '(no status)';
+    if (!stages.has(stage)) stages.set(stage, { pts: 0, count: 0, unsized: 0 });
+    const c = stages.get(stage);
+    c.count += 1;
+
+    if (weight === null) {
+      s.unsized += 1;
+      c.unsized += 1;
+    } else {
+      c.pts += weight;
+      s.totalPts += weight;
+      if (doneLabels.has(status)) s.donePts += weight;
+      else if (devLabels.has(status)) s.devPts += weight;
+    }
+
+    if (status && status === (cfg.labels || {}).blocked) s.blocked.push(item);
+
+    // Weight is derived from Size, never edited by hand - it exists so the
+    // board itself can sum and sort by it, and so the weighting is visible to
+    // whoever reads the board rather than buried in this script.
+    if (weightCol) {
+      const current = (item.cols[weightCol] || '').trim();
+      const wanted = weight === null ? '' : String(weight);
+      if (current !== wanted) weightFixes.push({ item, wanted });
+    }
+  }
+
+  // Before any write: if we cannot tell which item the bar belongs on, stop.
+  // Syncing weights first and failing afterwards would leave the board half
+  // changed for no benefit.
+  if (found.length > 1) {
+    fail(
+      `${found.length} items on this board start with "${prefix}": ` +
+      `${found.map((i) => `${i.id} (${i.name})`).join(', ')}. ` +
+      `Refusing to guess which one is the progress item - delete the extras.`
+    );
+  }
+
+  s.stages = [...stages.entries()].sort((a, b) => {
+    const ai = labelOrder.has(a[0]) ? labelOrder.get(a[0]) : Number.MAX_SAFE_INTEGER;
+    const bi = labelOrder.has(b[0]) ? labelOrder.get(b[0]) : Number.MAX_SAFE_INTEGER;
+    return ai - bi;
+  });
+
+  const name = progressName(cfg, s);
+  const body = progressBody(cfg, s);
+
+  log(body);
+  log('');
+
+  // One mutation per item, sequentially. Fine for a per-project board; if one
+  // ever grows past a few hundred tickets this is the loop that will start
+  // costing monday API complexity budget.
+  //
+  // Failures are collected rather than thrown: Weight is a convenience for
+  // sorting and summing on the board, and losing the bar - the thing this
+  // command exists to produce - because one number would not write is the
+  // wrong trade. The run still ends red, at the bottom, so it is not silent.
+  const weightFailures = [];
+  if (weightFixes.length) {
+    log(`Syncing ${plural(weightFixes.length, 'Weight value')} from Size:`);
+    for (const fix of weightFixes) {
+      try {
+        await setColumns(cfg, fix.item.id, { [weightCol]: fix.wanted }, dryRun);
+      } catch (err) {
+        log(`  FAILED  item ${fix.item.id}: ${err.message}`);
+        weightFailures.push(`${fix.item.id} (${fix.item.name}): ${err.message}`);
+      }
+    }
+  }
+
+  if (wantsDescription) {
+    // Rewritten in full every run rather than appended to. The description is
+    // a statement of where the project is now, not a log - and the board only
+    // stores one, so there is nothing to merge with.
+    const desc = `${progressTitle(cfg)}\n\n${body}`;
+
+    // The stamp in the footer changes every run, so comparing the whole string
+    // would rewrite it nightly for no reason. Compare everything above it.
+    const meat = (t) => String(t || '').split('\nSizes:')[0];
+    if (meat(board.description) === meat(desc) && flags.force !== true) {
+      log('Board description unchanged since the last run; left alone.');
+    } else {
+      await setBoardDescription(cfg, desc, dryRun);
+    }
+  }
+
+  if (prefix) {
+    let target = found[0] || null;
+    let created = false;
+
+    if (!target) {
+      log(`No item starting with "${prefix}" on the board yet, creating it.`);
+      const id = await createItem(cfg, name, dryRun);
+      if (!id) {
+        log(`  DRY-RUN  comment on it:\n${indent(body)}`);
+        target = null;
+      } else {
+        target = { id, name };
+        created = true;
+        log('  monday adds new items at the bottom. Drag it to the top once.');
+      }
+    }
+
+    if (target) {
+      // The name carries the headline figures, so a name that has not changed
+      // means the headline has not changed - and a fresh update every night
+      // saying the same thing is how an item's update feed becomes unreadable.
+      // --force posts regardless.
+      const changed = created || flags.force === true || target.name !== name;
+      if (changed) await addUpdate(cfg, target.id, body, dryRun);
+      else log('Unchanged since the last run; no update posted.');
+
+      if (!created && target.name !== name) await renameItem(cfg, target.id, name, dryRun);
+    }
+  }
+
+  if (weightFailures.length) {
+    console.error(`\n${weightFailures.length} Weight value(s) could not be written:`);
+    for (const f of weightFailures) console.error(`  - ${f}`);
+    console.error('The bar above is still correct - it is computed from Size, not from Weight.');
+    process.exit(1);
+  }
+}
+
 function cmdRefsFromRange(cfg, flags) {
   const from = require_(flags, 'from');
   const to = flags.to && typeof flags.to === 'string' ? flags.to : 'HEAD';
@@ -984,9 +1653,12 @@ monday-sync.js <command> [flags]
   deployed        --refs <list> --commit <sha> --run-url <url>
   checks-passed   --refs <list> --run-url <url> [--summary <text>]
   blocked         --refs <list> --stage deploy|checks --run-url <url> [--detail <text>]
+  setup-progress  [--size-title <t>] [--weight-title <t>]   create the Size and Weight columns
+  progress        [--force]        recalculate the weighted progress bar
   refs-from-range --from <rev> [--to <rev>]
 
   --dry-run           print writes, mutate nothing
+  --force             progress: post an update even if the figures are unchanged
   --config <path>     override .github/monday-config.json
 
   MONDAY_TOKEN must be set.
@@ -994,7 +1666,8 @@ monday-sync.js <command> [flags]
 
 const COMMANDS = new Set([
   'discover', 'check', 'branch-created', 'pr-opened', 'pr-merged',
-  'deployed', 'checks-passed', 'blocked', 'refs-from-range',
+  'deployed', 'checks-passed', 'blocked', 'setup-progress', 'progress',
+  'refs-from-range',
 ]);
 
 async function main() {
@@ -1048,6 +1721,8 @@ async function main() {
     case 'deployed':         await cmdDeployed(cfg, flags, dryRun); break;
     case 'checks-passed':    await cmdChecksPassed(cfg, flags, dryRun); break;
     case 'blocked':          await cmdBlocked(cfg, flags, dryRun); break;
+    case 'setup-progress':   await cmdSetupProgress(cfg, flags, dryRun); break;
+    case 'progress':         await cmdProgress(cfg, flags, dryRun); break;
     case 'refs-from-range':  cmdRefsFromRange(cfg, flags); break;
     default:
       process.stderr.write(`Unknown command "${command}"\n${USAGE}`);

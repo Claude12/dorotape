@@ -70,6 +70,7 @@ Dev deploys itself when the `Version:` line in `style.css` changes on `main`:
 ```
 push to main (style.css) → Deploy on version bump → git pull on the dev server
                                                   → monday tracking → site checks
+                                                  → weighted progress bar
 ```
 
 **Bumping the version is the deploy button.** Change that line only when you
@@ -82,6 +83,13 @@ JS errors, no new accessibility violations, sane markup, and a product still
 reaches checkout. Pass moves the tickets to QA; fail moves them to Blocked with
 a comment stating whether the code actually reached dev, because "the deploy
 broke" and "the deploy worked and the site is broken" need different reactions.
+
+The board also carries a **weighted progress bar** — every ticket has a Size
+(S/M/L/XL), progress is points rather than ticket counts, and it recalculates
+after each deploy and on a weekday schedule. It is written straight onto the
+board, in the description under the board title and on a progress item, so there
+is no separate report to host or keep in sync. Setup is step 7 of
+[.github/README.md](.github/README.md).
 
 Setting all of this up on another project: [.github/README.md](.github/README.md).
 Nothing in it is specific to this site — every value that points at an

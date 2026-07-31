@@ -18,6 +18,25 @@ on:
     workflows: ["Deploy on version bump"]
     types: [completed]
 
+  # Progress has to be recalculated on a clock, not only after a deploy, because
+  # the one input the pipeline cannot observe is Completed - you set that by hand
+  # on the board, and nothing in git happens when you do. Without this the bar
+  # would sit stale for days after a round of sign-offs.
+  #
+  # Two things to know about schedules: they only ever run on the default branch,
+  # and GitHub disables them after 60 days with no commits to the repo. A quiet
+  # project stops reporting progress silently, which is the failure mode to look
+  # for if the bar goes stale.
+  schedule:
+    - cron: '17 5 * * 1-5'   # 05:17 UTC = 07:17 SAST, before anyone starts
+
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Post an update even if the figures have not changed'
+        type: boolean
+        default: false
+
 permissions:
   contents: write      # move the deployed-dev marker tag
   actions: read        # read the deploy run's outcome artifact
@@ -321,3 +340,44 @@ jobs:
         run: |
           node .github/scripts/monday-sync.js blocked \
             --refs "$REFS" --stage checks --run-url "$RUN_URL" --detail "$SUMMARY"
+
+  # ---------------------------------------------------------------- progress
+  # Recalculate the weighted progress bar and write it onto the board.
+  #
+  # Runs last on a deploy, after site-check has moved tickets to QA or Blocked,
+  # so it reports the state this run left behind rather than the state it found.
+  # !cancelled() rather than success(): both jobs above are SKIPPED on a
+  # scheduled run, and a skipped need would otherwise take this job with it.
+  #
+  # Nothing here is on the critical path. It reads the board, does arithmetic
+  # and writes one item - it cannot affect a deploy, and it cannot affect the
+  # ticket writes above, which have already happened by the time it starts.
+  progress:
+    needs: [site-check]
+    if: >-
+      !cancelled() && (
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'workflow_run'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Skips with a message until the board has a Size column, so a project
+      # that has not set this up yet does not collect a nightly red X.
+      - name: Recalculate progress
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          # Empty on every trigger except workflow_dispatch, where "inputs" exists.
+          FORCE: ${{ inputs.force }}
+        run: |
+          set -euo pipefail
+          if [ "${FORCE:-}" = "true" ]; then
+            node .github/scripts/monday-sync.js progress --force
+          else
+            node .github/scripts/monday-sync.js progress
+          fi

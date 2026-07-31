@@ -11,6 +11,9 @@ Version: bumped      → deploy runs → Deployed to dev
 site checks pass     → QA
 site checks fail     → Blocked   (comment says whether the code reached dev)
 deploy fails         → Blocked   (comment says it did not)
+
+after every deploy   ┐
+every weekday 07:17  ┴→ weighted progress bar, written onto the board
 ```
 
 You set **Completed** by hand. Production is manual and stays manual.
@@ -26,7 +29,7 @@ something has been hardcoded that should not have been.
 | Path | |
 | --- | --- |
 | `workflows/deploy.yml` | pulls the theme onto dev when `Version:` changes on `main`. Never talks to monday |
-| `workflows/monday-tracking.yml` | writes ticket state to the board and runs the site checks |
+| `workflows/monday-tracking.yml` | writes ticket state to the board, runs the site checks, recalculates progress |
 | `scripts/monday-sync.js` | all monday API work. No dependencies — plain Node 20 |
 | `monday-config.json` | the board's *shape*: id, column ids, labels, ticket prefix. Committed, not secret |
 | `../tests/` | the site checks — see [tests/README.md](../tests/README.md) |
@@ -71,6 +74,13 @@ Paste the output into `monday-config.json`, then set by hand:
 
 There is deliberately **no site URL in this file**. It describes the board. See
 step 4.
+
+**Any column id may be `null`**, which means "this board does not have that
+column": the write is skipped and `check` reports it as optional rather than
+missing. `size` and `weight` are null until step 7. `branch` and `commit` are
+null on this board on purpose — the PR link already leads to both, so they were
+two columns of developer detail on a board other people read. The pipeline still
+takes `--branch` and `--commit`; it just does not mirror them onto the board.
 
 Then verify, before trusting any of it:
 
@@ -166,6 +176,129 @@ Commit `fixtures/baseline.json`. Expect it to be large.
 
 A branch with no ticket ref is fine — the jobs find nothing and no-op quietly.
 
+## 7. Turn on the progress bar
+
+Optional. Skip it and everything above still works — `progress` logs a SKIP and
+exits 0 until the board has the columns.
+
+```bash
+export MONDAY_TOKEN=...
+node .github/scripts/monday-sync.js setup-progress --dry-run  # see what it will make
+node .github/scripts/monday-sync.js setup-progress            # make it
+# paste the two ids it prints into monday-config.json
+node .github/scripts/monday-sync.js check                     # validates both
+node .github/scripts/monday-sync.js progress --dry-run        # see the figures
+node .github/scripts/monday-sync.js progress                  # write them onto the board
+```
+
+It creates two columns and skips either one that already exists, so it is safe
+to re-run:
+
+| Column | Type | Contents |
+| --- | --- | --- |
+| **Size** | Status | one label per key in `progress.weights` — `S` `M` `L` `XL` |
+| **Weight** | Numbers | left blank; derived from Size on every run |
+
+**Do not add the Size column through the monday UI.** That is the whole reason
+this command exists. The UI gives you no say over which index each label gets,
+and a label landing at index 5 — monday's blank slot — makes every *unsized*
+ticket report that size and quietly earn points for work nobody has done. The
+API lets the indexes be stated outright, so `setup-progress` places them
+contiguously from 0 and then reads back what monday actually stored to confirm
+5 is still free. If it is not, it says so and tells you to delete the column
+before sizing anything.
+
+Five sizes is the ceiling for the same reason; a sixth would have to sit at 5.
+
+### Where the bar is written
+
+Two places, each switched off on its own in `progress`:
+
+| | `progress` key | off with |
+| --- | --- | --- |
+| **Board description** — the text box under the board title | `boardDescription` | `false` |
+| **A progress item** — a row on the board | `itemName` | `""` |
+
+They are not redundant. The description is always on screen and costs nobody a
+notification, which makes it the right home for a number a client glances at.
+The item is a row, so its updates land in people's feeds and stack up into a
+history you can scroll back through — the description keeps no history at all,
+because a board only stores one and every run overwrites it.
+
+Turn both off and `check` fails rather than running silently: a bar with nowhere
+to go is a config mistake, not a mode.
+
+**Clearing `itemName` does not delete the item.** The item is also how the item
+is kept out of its own totals — matched on that name — so an emptied `itemName`
+leaves the old row on the board being counted as an ordinary unsized ticket.
+Delete the row when you turn it off.
+
+The first real run creates the item at the bottom of the board. **Drag it to the
+top once** — monday adds new items at the bottom and the script never moves it.
+From then on the pipeline renames it in place.
+
+Neither surface is rewritten when nothing has changed, so a nightly run on a
+quiet week is silent. The comparison deliberately ignores the "Recalculated …"
+footer, which would otherwise differ every single run and defeat the check.
+
+### How the number is worked out
+
+```
+S = 1    M = 2    L = 5    XL = 8       points
+```
+
+Near-Fibonacci on purpose: nobody argues about whether something is a 3 or a 4,
+and an XL reads as eight small jobs rather than "a bit more than L".
+
+**Two figures are reported, never one, and never added together.** Completed is
+set by hand after sign-off, so counting only that shows a build sitting at 20%
+when most of it is finished and waiting on QA. Counting *Deployed to dev* and
+*QA* as done tells a client something is finished that nobody has checked. So
+the bar reports both — `21% · 10/47 pts · 55% on dev` — and gives no partial
+credit to anything in flight.
+
+Three consequences worth knowing before you show it to anyone:
+
+- **Unsized tickets are counted nowhere.** They have no weight, so they cannot
+  sit anywhere on the bar. The update says how many there are on every run,
+  because a progress bar that quietly leaves work out is worse than none.
+- **The bar can go backwards.** Adding a ticket grows the denominator. That is
+  correct — the finish line did move — which is why the raw `10/47 pts` is shown
+  next to the percentage and not hidden behind it.
+- **Without a Cancelled label the bar can never reach 100%.** Abandoned tickets
+  stay in the denominator forever. `progress.excludedLabels` already lists
+  `Cancelled`, and until that label exists on the board `check` reports it as a
+  warning rather than an error — naming a label the board does not have excludes
+  nothing, which is harmless.
+
+  Adding it is the one step that stays manual. There is no monday mutation for
+  adding a label to an existing Status column, so it has to go in through the
+  UI, which means monday chooses the index and **may put it at 5**. Add it, then
+  run `check` immediately: if it landed at 5, delete it before anyone uses it —
+  nothing is lost while the label is still unused, and everything is lost if
+  every unset ticket starts reading as Cancelled.
+
+Everything above is config, in `monday-config.json` under `progress` — the
+weights, which labels count as done, which count as on-dev, which are excluded,
+the item's name and the bar's width.
+
+### When it recalculates
+
+After every deploy, and on a schedule — `17 5 * * 1-5`, which is 07:17 SAST on
+weekdays. The schedule is not optional decoration: **Completed is set by hand,
+and nothing in git happens when you set it**, so without a clock the bar would
+sit stale for days after a round of sign-offs.
+
+There is also a **Run workflow** button on the monday tracking workflow for
+recalculating on the spot, with a checkbox to post an update even when the
+figures have not moved. Ordinarily an update is only posted when the headline
+figures change, so a nightly run on a quiet board writes nothing.
+
+Two things about GitHub schedules: they only run on the default branch, and
+GitHub **disables them after 60 days with no commits**. A quiet project stops
+reporting progress silently — that is the first thing to check if the bar
+goes stale.
+
 ---
 
 # Configuration, and where each value lives
@@ -205,8 +338,13 @@ node .github/scripts/monday-sync.js pr-merged   --branch <name> --pr-url <url> [
 node .github/scripts/monday-sync.js deployed    --refs "AC-1 AC-2" --commit <sha> --run-url <url>
 node .github/scripts/monday-sync.js checks-passed --refs "AC-1" --run-url <url> --summary "..."
 node .github/scripts/monday-sync.js blocked     --refs "AC-1" --stage deploy|checks --run-url <url>
+node .github/scripts/monday-sync.js setup-progress [--size-title <t>] [--weight-title <t>]
+node .github/scripts/monday-sync.js progress    [--force]
 node .github/scripts/monday-sync.js refs-from-range --from deployed-dev --to HEAD
 ```
+
+`--dry-run` works on all of them and prints every intended write without sending
+one — the fastest way to see what a command would do to a client's board.
 
 `refs-from-range` is how a deploy finds *every* ticket that shipped, not just
 the one that happened to bump the version. On the first ever deploy the
@@ -243,6 +381,10 @@ Some details that are load-bearing:
   command hands those straight to bash.
 - **A closed-but-unmerged PR does nothing.** The ticket is still live work and
   moving it would lose that.
+- **Progress is recomputed from the board every time, never accumulated.** That
+  is what makes it safe for the concurrency group to drop a queued run — the
+  next one produces the same answer from scratch — and it means the bar
+  self-corrects the moment you fix a Size, with no state to reset.
 
 ---
 
@@ -258,6 +400,13 @@ Some details that are load-bearing:
 | Deploy runs, server unchanged | `DEV_GIT_REMOTE` is not `origin` in the server's clone |
 | Site checks fail with `DEV_SITE_URL is not set` | Same — Variables tab, not Secrets |
 | Deploy never triggers | The `Version:` line in `style.css` did not change on `main` |
+| Progress job logs SKIP every night | `columns.size` is `null` — see step 7 |
+| Bar stale for weeks, no runs listed | GitHub disabled the schedule after 60 quiet days. Push anything, or use Run workflow |
+| Progress never reaches 100% | Abandoned tickets are still in the denominator — add a `Cancelled` label |
+| Two progress items on the board | Something starts with the same name. The script refuses to guess; delete the extra |
+| Board description never updates | `progress.boardDescription` is `false`. `check` prints which surfaces are on |
+| Board description wiped something you wrote by hand | It is rewritten in full every run. Put standing notes on a pinned item, not there |
+| Weight column keeps changing back | It is derived from Size and rewritten on every run. Edit Size, not Weight |
 
 Nothing here fails silently on purpose except the missing-token case, which is
 what lets you copy the pipeline in before the board exists.

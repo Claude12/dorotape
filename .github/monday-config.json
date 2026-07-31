@@ -1,6 +1,7 @@
 {
   "__README": "Committed config for monday-sync.js. NOT secret - only MONDAY_TOKEN is a secret. Board 'Dorotape Dev' was created via the API with these exact ids. After ANY change to the board, run: node .github/scripts/monday-sync.js check",
-  "__columnTypes": "Each column must be the TYPE listed here, not merely exist - check verifies this and refuses mismatches. ref=Text, status=Status, branch=Text, pr=Link, commit=Text, deployedAt=Date, deployResult=Status, checksResult=Status, lastRun=Link. Do not point two entries at one column id; check rejects that too, because those writes would overwrite each other.",
+  "__columnTypes": "Each column must be the TYPE listed here, not merely exist - check verifies this and refuses mismatches. ref=Text, status=Status, branch=Text, pr=Link, commit=Text, deployedAt=Date, deployResult=Status, checksResult=Status, lastRun=Link, size=Status, weight=Numbers. Any of them may be null, which means 'this board does not have that column' - the write is skipped and check reports it as optional rather than missing. Do not point two entries at one column id; check rejects that too, because those writes would overwrite each other.",
+  "__branchAndCommit": "Both deleted from this board on 2026-07-31 and set to null here: the PR link already leads to the branch and the commits, so two extra columns of developer detail were noise on a board other people read. The pipeline is unchanged - it still takes --branch and --commit on the command line, it just no longer writes them to the board. Re-add them by creating Text columns and pasting the ids back.",
   "__boardSetup": "Status labels must match 'labels' below exactly - 'In progress' is lowercase p, and a mismatch fails loudly rather than inventing a label. The token's user needs a MEMBER seat; a viewer seat reads fine and fails every write. To rediscover ids: node .github/scripts/monday-sync.js discover --board 18424565446",
   "__statusIndex5": "If you ever rebuild a Status column, leave label index 5 EMPTY. monday treats index 5 as the column's blank slot, so any label sitting there is what every unset item reports - the first build of this board put 'QA' at index 5 and every new ticket read as already in QA while its stored value was still null. check refuses to pass if index 5 is occupied. The index is not visible in the UI; only the API shows it.",
   "boardId": "18424565446",
@@ -10,14 +11,17 @@
   "columns": {
     "ref": "text_mm5sds27",
     "status": "color_mm5sj6qz",
-    "branch": "text_mm5sq152",
+    "branch": null,
     "pr": "link_mm5sfa15",
-    "commit": "text_mm5smkke",
+    "commit": null,
     "deployedAt": "date_mm5s885g",
     "deployResult": "color_mm5s6wd7",
     "checksResult": "color_mm5schd2",
-    "lastRun": "link_mm5s52a"
+    "lastRun": "link_mm5s52a",
+    "size": "color_mm5spmhs",
+    "weight": "numeric_mm5sjzdh"
   },
+  "__size": "Both created by setup-progress on 2026-07-31, which places the Size labels at explicit indexes and leaves 5 free - do NOT add sizes through the monday UI, it chooses the index for you and a label at 5 makes every unsized ticket report that size (see __statusIndex5). Set either to null to turn progress reporting off; the command then skips instead of failing. To rebuild on another board: setup-progress, then paste the ids it prints.",
   "labels": {
     "backlog": "Backlog",
     "inProgress": "In progress",
@@ -36,6 +40,16 @@
     "passed": "Passed",
     "failed": "Failed",
     "notRun": "Not run"
+  },
+  "__progress": "Drives the weighted progress bar. It is written to two places, each switched off independently: boardDescription (false to skip) is the text box under the board title - always on screen, notifies nobody, holds no history; itemName (empty string to skip) is a row on the board, so its updates reach people's feeds and stack up as a record of every change. Keep both unless one is noise for this project. weights maps Size labels to points - the gaps are deliberate and near-Fibonacci, so nobody argues over a 3 versus a 4 and an XL reads as eight small jobs rather than 'a bit more than L'. doneLabels and onDevLabels are reported as SEPARATE figures, never added together: Completed is set by hand after sign-off, so counting only that shows a build at 20% when most of it is finished and waiting on QA, while counting dev as done tells a client something is finished that nobody has checked. Add a Cancelled label to the Status column and the bar can reach 100%; without one, abandoned tickets sit in the denominator forever.",
+  "progress": {
+    "itemName": "▸ Project progress",
+    "boardDescription": true,
+    "weights": { "S": 1, "M": 2, "L": 5, "XL": 8 },
+    "doneLabels": ["Completed"],
+    "onDevLabels": ["Deployed to dev", "QA"],
+    "excludedLabels": ["Cancelled"],
+    "barWidth": 20
   },
   "refPattern": "\\bDR-(\\d+)\\b",
   "__devUrl": "The dev site URL is NOT here. It is the DEV_SITE_URL repo variable (or a gitignored .env locally), because it points at an environment - a copy of this repo for another project must not inherit the old URL. This file describes the board only.",
