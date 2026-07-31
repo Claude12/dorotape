@@ -296,6 +296,31 @@ The third exists because the first only surfaces mid-deploy, which is the worst
 possible moment to discover it. The bar is still written before it exits — a
 duplicate ref is a data problem, not a reason to withhold the progress figure.
 
+### One branch, several tickets
+
+Put as many refs in a branch name as the branch actually closes:
+
+```
+bugfix/DR-6-DR-7-footer-copyright-contrast
+```
+
+Every ref named gets the same status, the same PR link and the same comment, at
+every stage — branch push, PR opened, merge. They ship together, so there is
+nothing to decide between them.
+
+Deploys and checks work off a commit *range* rather than a branch name, so a
+ref only reaches those if it appears in a commit message or PR title in
+`deployed-dev..HEAD`. **A branch name alone is not enough to get a ticket into
+a deploy.** Put the refs in the commit subject as well:
+
+```
+bugfix: DR-6 DR-7 restore footer copyright contrast
+```
+
+Get this wrong and nothing turns red — `refs` comes back empty, the site-check
+job is skipped by its `if:`, and the tickets sit in their previous state while
+the run goes green. Check with `refs-from-range` before bumping the version.
+
 ### How the number is worked out
 
 ```
@@ -471,6 +496,7 @@ Some details that are load-bearing:
 | Progress job logs SKIP every night | `columns.size` is `null` — see step 7 |
 | Bar stale for weeks, no runs listed | GitHub disabled the schedule after 60 quiet days. Push anything, or use Run workflow |
 | Progress never reaches 100% | Abandoned tickets are still in the denominator — set them to `Cancelled`, or add that label if the board has not got one |
+| Deploy went green, tickets never moved | No ref in any commit message in `deployed-dev..HEAD` — a branch name alone does not count. Confirm with `refs-from-range` |
 | Stuck at 99% with `x of x points` done | A ticket has no Size. The bar is held back on purpose until it gets one; the line under the bar names the count |
 | Two progress items on the board | Something starts with the same name. The script refuses to guess; delete the extra |
 | Board description never updates | `progress.boardDescription` is `false`. `check` prints which surfaces are on |

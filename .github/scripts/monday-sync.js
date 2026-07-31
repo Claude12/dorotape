@@ -699,26 +699,108 @@ function extractRefs(cfg, text) {
 }
 
 /**
- * Ref for a branch, or null if the branch simply is not tracked.
+ * Every ref a branch names, or an empty array if the branch is not tracked.
  *
- * Returns null rather than failing: chore/*, dependabot/* and main itself carry
- * no DR ref, and a red X on every one of those pushes trains you to ignore the
+ * Empty rather than failing: chore/*, dependabot/* and main itself carry no DR
+ * ref, and a red X on every one of those pushes trains you to ignore the
  * Actions tab - which costs you the one signal that matters when a real deploy
- * breaks. Two refs on one branch is still a hard failure: that is ambiguous
- * intent, not absent intent.
+ * breaks.
+ *
+ * Several refs on one branch used to be a hard failure on the grounds that it
+ * was ambiguous. It is not: one branch closing two tickets is ordinary, and
+ * there is nothing to guess between them - they all move together, because
+ * they all ship together. That is already how deploys and checks behave, which
+ * take a list of refs and write the same state to each. Refusing here only
+ * forced the work to be split across branches to satisfy the tracker.
  */
-function refFromBranch(cfg, branch) {
-  const refs = extractRefs(cfg, branch);
-  if (refs.length === 0) return null;
-  if (refs.length > 1) {
-    fail(`Branch "${branch}" contains multiple DR refs (${refs.join(', ')}). Refusing to guess.`);
+function refsFromBranch(cfg, branch) {
+  return extractRefs(cfg, branch);
+}
+
+/**
+ * Every ref named anywhere the caller can see - branch name, PR title and body,
+ * and the commit messages on the branch. Union, deduped, first mention first.
+ *
+ * A branch name is a guess made before the work starts, and it is routinely
+ * wrong by the time the work finishes: you branch off for DR-6, then fix DR-7
+ * in passing, or you name the branch after nothing at all. Reading only the
+ * branch name meant the tracker silently disagreed with the code, so refs got
+ * added to commits and never showed up. Deploys have always read commit
+ * messages; this is the branch and PR stages catching up.
+ *
+ * Nothing here is required. A source that is absent, empty, or not a git
+ * checkout contributes nothing and is not an error - which is what lets one
+ * script serve both a workflow with full history and a bare local run.
+ */
+function refsFromSources(cfg, sources) {
+  const found = new Set();
+  for (const text of sources) {
+    if (!text || text === true) continue;
+    for (const ref of extractRefs(cfg, String(text))) found.add(ref);
   }
-  return refs[0];
+  return [...found];
+}
+
+/**
+ * Commit subjects and bodies in `from..HEAD`, or [] if that cannot be read.
+ *
+ * Deliberately quiet where refsFromRange is loud. Its caller is a deploy, where
+ * a missing range means tickets go unreported and you need to know. Here it is
+ * one extra source among several, and a shallow clone - the default for
+ * actions/checkout - is an ordinary condition, not a fault.
+ */
+function refsFromCommitsQuiet(cfg, from) {
+  if (!from || from === true) return [];
+  if (!revExists(from)) {
+    log(`NOTE  "${from}" not in this clone, so commit messages were not scanned for refs.`);
+    return [];
+  }
+  try {
+    const out = execFileSync('git', ['log', '--format=%s%n%b', `${from}..HEAD`], {
+      encoding: 'utf8',
+      maxBuffer: 20 * 1024 * 1024,
+    });
+    return extractRefs(cfg, out);
+  } catch (err) {
+    log(`NOTE  could not read commit messages (${err.message.split('\n')[0]}); using other sources.`);
+    return [];
+  }
+}
+
+/**
+ * Shared by the three branch-driven commands. Reports where each ref came from,
+ * because "why is this ticket moving?" is the question you ask when one moves
+ * that you did not expect.
+ */
+function refsForBranchCommand(cfg, flags) {
+  const branch = flags.branch;
+  const fromBranch = refsFromBranch(cfg, branch);
+  const fromText = refsFromSources(cfg, [flags.title, flags.text]);
+  const fromCommits = refsFromCommitsQuiet(cfg, flags['commits-from']);
+
+  const all = refsFromSources(cfg, [branch, flags.title, flags.text])
+    .concat(fromCommits)
+    .filter((r, i, a) => a.indexOf(r) === i);
+
+  if (all.length) {
+    const origin = (ref) => {
+      const where = [];
+      if (fromBranch.includes(ref)) where.push('branch');
+      if (fromText.includes(ref)) where.push('PR text');
+      if (fromCommits.includes(ref)) where.push('commits');
+      return where.join(' + ');
+    };
+    log(`Refs: ${all.map((r) => `${r} (${origin(r)})`).join(', ')}`);
+  }
+  return all;
 }
 
 /** Shared exit for the "nothing to track here" case. */
 function skipUntracked(branch) {
-  log(`SKIP  Branch "${branch}" carries no DR ref - nothing to track.`);
+  log(
+    `SKIP  No DR ref in the branch name "${branch}", the PR title or body, ` +
+    `or any commit message - nothing to track.`
+  );
   process.exit(0);
 }
 
@@ -1134,9 +1216,9 @@ async function applyToRefs(cfg, refs, dryRun, build) {
 
 async function cmdBranchCreated(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
-  const ref = refFromBranch(cfg, branch);
-  if (!ref) skipUntracked(branch);
-  await applyToRefs(cfg, [ref], dryRun, () => ({
+  const refs = refsForBranchCommand(cfg, flags);
+  if (!refs.length) skipUntracked(branch);
+  await applyToRefs(cfg, refs, dryRun, () => ({
     values: columnValues(cfg, [
       ['status', statusValue(cfg.labels.inProgress)],
       ['branch', branch],
@@ -1147,9 +1229,9 @@ async function cmdBranchCreated(cfg, flags, dryRun) {
 async function cmdPrOpened(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
   const prUrl = require_(flags, 'pr-url');
-  const ref = refFromBranch(cfg, branch);
-  if (!ref) skipUntracked(branch);
-  await applyToRefs(cfg, [ref], dryRun, () => ({
+  const refs = refsForBranchCommand(cfg, flags);
+  if (!refs.length) skipUntracked(branch);
+  await applyToRefs(cfg, refs, dryRun, () => ({
     values: columnValues(cfg, [
       ['status', statusValue(cfg.labels.codeReview)],
       ['branch', branch],
@@ -1161,9 +1243,9 @@ async function cmdPrOpened(cfg, flags, dryRun) {
 async function cmdPrMerged(cfg, flags, dryRun) {
   const branch = require_(flags, 'branch');
   const prUrl = require_(flags, 'pr-url');
-  const ref = refFromBranch(cfg, branch);
-  if (!ref) skipUntracked(branch);
-  await applyToRefs(cfg, [ref], dryRun, () => ({
+  const refs = refsForBranchCommand(cfg, flags);
+  if (!refs.length) skipUntracked(branch);
+  await applyToRefs(cfg, refs, dryRun, () => ({
     values: columnValues(cfg, [
       ['status', statusValue(cfg.labels.merged)],
       ['pr', linkValue(prUrl, prLabel(flags['pr-number'], flags['pr-author']))],
