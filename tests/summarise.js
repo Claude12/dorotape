@@ -22,9 +22,10 @@ const RESULTS = path.join(__dirname, '.artifacts', 'results.json');
 const MAX_LISTED = 8;
 const ANSI = new RegExp(String.fromCharCode(27) + '\\[[0-9;]*m', 'g');
 
-// Unicode rather than "[x]" because a monday update is plain text - there is no
-// markdown pass to turn brackets into anything, so the box has to already be one.
-const BOX = { passed: '☑', failed: '☒', skipped: '☐' };
+// Emoji rather than "[x]" or the ☑/☒ glyphs: a monday update is plain text, so
+// brackets stay brackets, and the dingbat boxes render as thin grey outlines
+// that are hard to tell apart at a glance. These carry colour on their own.
+const BOX = { passed: '✅', failed: '❌', skipped: '⬜' };
 
 let report;
 try {
@@ -85,14 +86,15 @@ const total = (stats.expected || 0) + (stats.unexpected || 0) + (stats.skipped |
 // Checklist first, on both outcomes. On a red run it shows what still held,
 // which is most of the value - "markup broke, the shop journey did not" is a
 // different morning from "something went red".
-const width = Math.max(0, ...[...groups.keys()].map((k) => k.length));
-
+//
+// No column padding: monday renders an update as HTML, so a run of spaces
+// collapses to one and the alignment never survives the trip. Single spaces.
 for (const [name, c] of groups) {
   const ran = c.passed + c.failed;
   const state = c.failed ? 'failed' : ran === 0 ? 'skipped' : 'passed';
   const count = ran === 0 ? 'skipped' : `${c.passed}/${ran}`;
   const note = c.skipped && ran ? ` (${c.skipped} skipped)` : '';
-  console.log(`${BOX[state]} ${name.padEnd(width)}  ${count}${note}`);
+  console.log(`${BOX[state]} ${name} ${count}${note}`);
 }
 
 if (!failures.length) {
