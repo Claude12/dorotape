@@ -316,7 +316,10 @@ Three consequences worth knowing before you show it to anyone:
 
 - **Unsized tickets are counted nowhere.** They have no weight, so they cannot
   sit anywhere on the bar. The update says how many there are on every run,
-  because a progress bar that quietly leaves work out is worse than none.
+  because a progress bar that quietly leaves work out is worse than none. They
+  also hold the figure at 99% even when every *sized* point is done: those
+  tickets are in neither the numerator nor the denominator, so without that
+  clamp the bar reads 100% with work plainly still open.
 - **The bar can go backwards.** Adding a ticket grows the denominator. That is
   correct — the finish line did move — which is why the raw `10/47 pts` is shown
   next to the percentage and not hidden behind it.
@@ -468,6 +471,7 @@ Some details that are load-bearing:
 | Progress job logs SKIP every night | `columns.size` is `null` — see step 7 |
 | Bar stale for weeks, no runs listed | GitHub disabled the schedule after 60 quiet days. Push anything, or use Run workflow |
 | Progress never reaches 100% | Abandoned tickets are still in the denominator — set them to `Cancelled`, or add that label if the board has not got one |
+| Stuck at 99% with `x of x points` done | A ticket has no Size. The bar is held back on purpose until it gets one; the line under the bar names the count |
 | Two progress items on the board | Something starts with the same name. The script refuses to guess; delete the extra |
 | Board description never updates | `progress.boardDescription` is `false`. `check` prints which surfaces are on |
 | Board description wiped something you wrote by hand | It is rewritten in full every run. Put standing notes on a pinned item, not there |

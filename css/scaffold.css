@@ -400,9 +400,12 @@ h6 {
   text-decoration: none;
 }
 
+/* Dimmed with an explicit alpha rather than `opacity`, which multiplies against
+   the footer's own rgba(255,255,255,.75) and dropped this to 2.75:1 - failing
+   WCAG AA on all 17 checked pages. 0.65 over #00466a is 5.2:1. */
 .site-copyright {
   font-size: 0.8rem;
-  opacity: 0.5;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════

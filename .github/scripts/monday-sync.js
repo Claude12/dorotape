@@ -1382,11 +1382,17 @@ const ICON = { done: '✅', onDev: '🔵', blocked: '❌', other: '⬜', unsized
  *
  * 99.6% is not finished and 0.4% is not nothing, and on a figure a client reads
  * those two facts are worth more than the half a percent of accuracy given up.
+ *
+ * `open` says there is outstanding work that is not inside `whole` at all -
+ * in practice, tickets carrying no Size. Without it the bar reads 100% while
+ * unsized work is still open, because those tickets are in neither figure:
+ * part === whole is true and the clamp above never fires. The warning line
+ * further down says so in words, but the number is what gets read.
  */
-function pct(part, whole) {
+function pct(part, whole, open = false) {
   if (!whole) return 0;
   const rounded = Math.round((part / whole) * 100);
-  if (rounded === 100 && part < whole) return 99;
+  if (rounded === 100 && (part < whole || open)) return 99;
   if (rounded === 0 && part > 0) return 1;
   return rounded;
 }
@@ -1396,17 +1402,22 @@ function pct(part, whole) {
  *
  * A share that is real but tiny gets one cell rather than rounding away to
  * nothing - a bar showing no progress when there is some is the one output
- * here that would actively mislead.
+ * here that would actively mislead. The same argument runs the other way at
+ * the top end, so the last cell is held back whenever anything is outstanding:
+ * 199 of 200 points rounds to a full 20 cells otherwise, and a full bar next
+ * to "99%" makes one of the two a liar. `open` is as in pct().
  */
-function bar(donePart, devPart, whole, width) {
+function bar(donePart, devPart, whole, width, open = false) {
   if (!whole) return '░'.repeat(width);
   let done = Math.round((donePart / whole) * width);
   let dev = Math.round((devPart / whole) * width);
   if (donePart > 0 && done === 0) done = 1;
   if (devPart > 0 && dev === 0) dev = 1;
-  while (done + dev > width) {
+  const cap = donePart + devPart < whole || open ? width - 1 : width;
+  while (done + dev > cap) {
     if (dev > 1) dev -= 1;
-    else done -= 1;
+    else if (done > 1) done -= 1;
+    else break; // a width this small has no cell to give; better than repeat(-1)
   }
   return '█'.repeat(done) + '▓'.repeat(dev) + '░'.repeat(width - done - dev);
 }
@@ -1428,10 +1439,11 @@ function plural(n, word) {
 function progressName(cfg, s) {
   const p = cfg.progress || {};
   if (!s.totalPts) return `${p.itemName} · nothing sized yet`;
+  const open = s.unsized > 0;
   return (
-    `${p.itemName} ${bar(s.donePts, s.devPts, s.totalPts, 10)} ` +
-    `${pct(s.donePts, s.totalPts)}% · ${s.donePts}/${s.totalPts} pts · ` +
-    `${pct(s.donePts + s.devPts, s.totalPts)}% on dev`
+    `${p.itemName} ${bar(s.donePts, s.devPts, s.totalPts, 10, open)} ` +
+    `${pct(s.donePts, s.totalPts, open)}% · ${s.donePts}/${s.totalPts} pts · ` +
+    `${pct(s.donePts + s.devPts, s.totalPts, open)}% on dev`
   );
 }
 
@@ -1441,14 +1453,19 @@ function progressBody(cfg, s) {
   const width = Number(p.barWidth) > 0 ? Number(p.barWidth) : 20;
   const lines = [];
 
+  // Unsized tickets sit outside totalPts entirely, so they cannot show on the
+  // bar - but they must still stop it reading as finished. See pct().
+  const open = s.unsized > 0;
+
   if (!s.totalPts) {
     lines.push('No ticket on this board has a Size yet, so there is nothing to weigh.');
   } else {
-    lines.push(`${bar(s.donePts, s.devPts, s.totalPts, width)} ${pct(s.donePts, s.totalPts)}%`);
+    lines.push(`${bar(s.donePts, s.devPts, s.totalPts, width, open)} ${pct(s.donePts, s.totalPts, open)}%`);
     lines.push('');
     lines.push(`${s.donePts} of ${s.totalPts} points signed off as done.`);
     lines.push(
-      `${s.donePts + s.devPts} of ${s.totalPts} points (${pct(s.donePts + s.devPts, s.totalPts)}%) ` +
+      `${s.donePts + s.devPts} of ${s.totalPts} points ` +
+      `(${pct(s.donePts + s.devPts, s.totalPts, open)}%) ` +
       `are on dev - done, or waiting on manual QA.`
     );
   }
@@ -1456,10 +1473,16 @@ function progressBody(cfg, s) {
   // Said out loud, every time, because a progress bar that quietly leaves work
   // out is worse than no progress bar. Unsized tickets have no weight, so they
   // cannot sit anywhere on it, and the finish line moves the day they get one.
+  // When every sized point is done the two figures above read "7 of 7" beside
+  // 99%, which looks like broken arithmetic unless this line says why.
   if (s.unsized) {
+    const holding = s.totalPts > 0 && pct(s.donePts, s.totalPts) === 100;
     lines.push(
       `${plural(s.unsized, 'ticket')} ${s.unsized === 1 ? 'carries' : 'carry'} no Size, ` +
-      `so that work is counted nowhere above.`
+      `so that work is counted nowhere above` +
+      (holding
+        ? `, and the bar stays under 100% until ${s.unsized === 1 ? 'it has' : 'they have'} one.`
+        : '.')
     );
   }
   if (s.excluded) {
