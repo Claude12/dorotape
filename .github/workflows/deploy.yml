@@ -91,6 +91,32 @@ jobs:
           envs: THEME_PATH,GIT_REMOTE,GIT_BRANCH
           script: |
             set -e
+
+            # Expand a leading ~ ourselves. The shell only expands a tilde it
+            # parses as syntax - a literal ~ in the script text. One arriving
+            # inside a variable is just a character, and "$THEME_PATH" would
+            # hand git a directory named "~" that cannot exist. Shared hosts
+            # hand out paths in ~/ form constantly, so handle it rather than
+            # relying on everyone remembering to write it absolute.
+            case "$THEME_PATH" in
+              "~") THEME_PATH="$HOME" ;;
+              "~/"*) THEME_PATH="$HOME/${THEME_PATH#"~/"}" ;;
+            esac
+
+            # Say which of the two things is wrong, rather than letting git
+            # report a bare "not a git repository" for both.
+            if [ ! -d "$THEME_PATH" ]; then
+              echo "No such directory on the server: $THEME_PATH" >&2
+              echo "Check the DEV_THEME_PATH variable." >&2
+              exit 1
+            fi
+            if [ ! -e "$THEME_PATH/.git" ]; then
+              echo "$THEME_PATH exists but is not a git working copy." >&2
+              echo "Deploying is 'git pull' there, so it has to be a clone." >&2
+              exit 1
+            fi
+
+            echo "Pulling $GIT_REMOTE/$GIT_BRANCH into $THEME_PATH"
             git -C "$THEME_PATH" pull "$GIT_REMOTE" "$GIT_BRANCH"
         env:
           THEME_PATH: ${{ vars.DEV_THEME_PATH }}
