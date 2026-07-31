@@ -1,27 +1,23 @@
 {
-  "__README": "Committed config for monday-sync.js. NOT secret - only MONDAY_TOKEN is a secret. Replace every REPLACE_ME once the board exists, then run: node .github/scripts/monday-sync.js check",
-
-  "__columnTypes": "Each column must be the TYPE listed below, not just exist - check verifies this. ref=Text, status=Status, branch=Text, pr=Link, commit=Text, deployedAt=Date (enable time). The three nulls are optional extras: give them ids only if you add those columns, otherwise leave null and they are skipped.",
-
-  "__boardSetup": "The Status column needs all 8 labels spelled exactly as in 'labels' below - 'In progress' is lowercase p. The token's user must have a MEMBER seat on the board; a viewer seat reads fine and fails every write.",
-
-  "boardId": "REPLACE_ME",
+  "__README": "Committed config for monday-sync.js. NOT secret - only MONDAY_TOKEN is a secret. Board 'Dorotape Dev' was created via the API with these exact ids. After ANY change to the board, run: node .github/scripts/monday-sync.js check",
+  "__columnTypes": "Each column must be the TYPE listed here, not merely exist - check verifies this and refuses mismatches. ref=Text, status=Status, branch=Text, pr=Link, commit=Text, deployedAt=Date, deployResult=Status, checksResult=Status, lastRun=Link. Do not point two entries at one column id; check rejects that too, because those writes would overwrite each other.",
+  "__boardSetup": "Status labels must match 'labels' below exactly - 'In progress' is lowercase p, and a mismatch fails loudly rather than inventing a label. The token's user needs a MEMBER seat; a viewer seat reads fine and fails every write. To rediscover ids: node .github/scripts/monday-sync.js discover --board 18424565446",
+  "__statusIndex5": "If you ever rebuild a Status column, leave label index 5 EMPTY. monday treats index 5 as the column's blank slot, so any label sitting there is what every unset item reports - the first build of this board put 'QA' at index 5 and every new ticket read as already in QA while its stored value was still null. check refuses to pass if index 5 is occupied. The index is not visible in the UI; only the API shows it.",
+  "boardId": "18424565446",
   "apiVersion": "2025-01",
-  "timezone": "Europe/London",
-
+  "__timezone": "Only affects the human-readable stamp in comments. The 'Deployed at' COLUMN is always stored in UTC and monday renders it in each viewer's own profile timezone, so set this to match yours (monday profile: Africa/Johannesburg) or the comment and the column will disagree by an hour. Comments always name the zone, so a teammate in another zone can still read them.",
+  "timezone": "Africa/Johannesburg",
   "columns": {
-    "ref": "REPLACE_ME",
-    "status": "REPLACE_ME",
-    "branch": "REPLACE_ME",
-    "pr": "REPLACE_ME",
-    "commit": "REPLACE_ME",
-    "deployedAt": "REPLACE_ME",
-
-    "deployResult": null,
-    "checksResult": null,
-    "lastRun": null
+    "ref": "text_mm5sds27",
+    "status": "color_mm5sj6qz",
+    "branch": "text_mm5sq152",
+    "pr": "link_mm5sfa15",
+    "commit": "text_mm5smkke",
+    "deployedAt": "date_mm5s885g",
+    "deployResult": "color_mm5s6wd7",
+    "checksResult": "color_mm5schd2",
+    "lastRun": "link_mm5s52a"
   },
-
   "labels": {
     "backlog": "Backlog",
     "inProgress": "In progress",
@@ -32,18 +28,15 @@
     "blocked": "Blocked",
     "completed": "Completed"
   },
-
   "deployResultLabels": {
     "success": "Success",
     "failed": "Failed"
   },
-
   "checksResultLabels": {
     "passed": "Passed",
     "failed": "Failed",
     "notRun": "Not run"
   },
-
   "refPattern": "\\bDR-(\\d+)\\b",
   "devUrl": "https://dorotape.altitude-dev.digital/",
   "maxItemPages": 20

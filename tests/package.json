@@ -1,0 +1,16 @@
+{
+  "name": "wp-site-check",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A general WordPress site check: pages load clean, no JS errors, no new accessibility violations, sane markup, and - only if WooCommerce is present - a product reaches checkout. Site-agnostic: point SITE_URL at any WordPress site.",
+  "scripts": {
+    "pretest": "node discover.js",
+    "test": "playwright test",
+    "report": "playwright show-report .artifacts/report",
+    "baseline": "node discover.js && UPDATE_BASELINE=1 playwright test a11y markup --workers=1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1"
+  }
+}

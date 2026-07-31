@@ -204,6 +204,98 @@ async function gql(cfg, query, variables) {
 }
 
 /* ------------------------------------------------------------------ *
+ * discovery
+ * ------------------------------------------------------------------ */
+
+/**
+ * Column ids are API-side identifiers like "text_mkr7k2". They are not the
+ * column titles and they are not visible anywhere in the monday web UI, so
+ * "read them off the board" is not a thing you can actually do. This command
+ * reads them from the API and prints a config block ready to paste in.
+ */
+async function cmdDiscover(cfg, flags) {
+  const boardId = typeof flags.board === 'string'
+    ? flags.board
+    : (cfg.boardId && cfg.boardId !== 'REPLACE_ME' ? cfg.boardId : null);
+
+  if (!boardId) {
+    const data = await gql(
+      cfg,
+      `query {
+         boards(limit: 100, state: active, order_by: created_at) {
+           id name workspace { id name }
+         }
+       }`,
+      {}
+    );
+    const boards = data.boards || [];
+    if (!boards.length) {
+      log('No boards visible to this token. Is the integration user subscribed to the board?');
+      return;
+    }
+    log(`${boards.length} board(s) visible to this token:\n`);
+    for (const b of boards) {
+      const ws = b.workspace ? `${b.workspace.name} (ws ${b.workspace.id})` : 'no workspace';
+      log(`  ${String(b.id).padEnd(14)} ${b.name}`);
+      log(`  ${''.padEnd(14)} ${ws}`);
+    }
+    log('\nRe-run with --board <id> to dump that board\'s column ids.');
+    return;
+  }
+
+  const board = await fetchBoardColumns({ ...cfg, boardId });
+  log(`Board ${boardId}: "${board.name}"\n`);
+  log('Columns');
+  for (const c of board.columns) {
+    log(`  ${String(c.id).padEnd(22)} ${String(c.type).padEnd(10)} "${c.title}"`);
+    if (c.type === 'status') {
+      let labels = [];
+      try {
+        labels = Object.values(JSON.parse(c.settings_str || '{}').labels || {});
+      } catch { /* not worth failing discovery over */ }
+      if (labels.length) log(`  ${''.padEnd(22)} labels: ${labels.join(' | ')}`);
+    }
+  }
+
+  // Best-effort mapping by type and title. Anything it cannot place is left as
+  // REPLACE_ME rather than guessed - a wrong id here writes to the wrong column.
+  const wants = [
+    ['ref',        'text',   /\b(ref|ticket|key|id)\b/i],
+    ['status',     'status', /status|state|stage/i],
+    ['branch',     'text',   /branch/i],
+    ['pr',         'link',   /\b(pr|pull)/i],
+    ['commit',     'text',   /commit|sha/i],
+    ['deployedAt', 'date',   /deploy|shipped|released/i],
+  ];
+
+  const guessed = {};
+  const used = new Set();
+  for (const [key, type, titleRe] of wants) {
+    const byBoth = board.columns.find(
+      (c) => c.type === type && titleRe.test(c.title) && !used.has(c.id)
+    );
+    const onlyType = board.columns.filter((c) => c.type === type && !used.has(c.id));
+    const pick = byBoth || (onlyType.length === 1 ? onlyType[0] : null);
+    if (pick) {
+      guessed[key] = pick.id;
+      used.add(pick.id);
+    } else {
+      guessed[key] = 'REPLACE_ME';
+    }
+  }
+
+  log('\nSuggested "columns" block - CHECK the titles above before pasting:');
+  log(JSON.stringify({ boardId: String(boardId), columns: guessed }, null, 2));
+
+  const unresolved = Object.entries(guessed).filter(([, v]) => v === 'REPLACE_ME');
+  if (unresolved.length) {
+    log(`\n${unresolved.length} column(s) could not be matched: ${unresolved.map(([k]) => k).join(', ')}`);
+    log('Pick them from the list above by hand.');
+  }
+  log('\nThen run: node .github/scripts/monday-sync.js check');
+}
+
+/* ------------------------------------------------------------------ *
  * board reads
  * ------------------------------------------------------------------ */
 
@@ -536,6 +628,23 @@ async function cmdCheck(cfg) {
     log(`  ok ${key.padEnd(14)} ${id}  "${col.title}" (${col.type})`);
   }
 
+  // Two logical columns pointing at one physical column type-check perfectly and
+  // then overwrite each other on every write, last one wins. Copy-paste while
+  // filling in six ids by hand is exactly how this happens.
+  const byColId = new Map();
+  for (const [key, id] of Object.entries(cfg.columns)) {
+    if (id === null) continue;
+    if (!byColId.has(id)) byColId.set(id, []);
+    byColId.get(id).push(key);
+  }
+  for (const [id, keys] of byColId) {
+    if (keys.length > 1) {
+      const title = byId.has(id) ? `"${byId.get(id).title}"` : id;
+      log(`  X  ${keys.join(' + ')} all point at ${title} - they would overwrite each other`);
+      problems += 1;
+    }
+  }
+
   // A Date column with time switched off silently drops the time half.
   const dateColId = cfg.columns.deployedAt;
   const dateCol = dateColId ? byId.get(dateColId) : null;
@@ -585,6 +694,24 @@ async function cmdCheck(cfg) {
         problems += 1;
       }
     }
+
+    // monday uses index 5 as a status column's empty slot. An item with no
+    // status set reports whatever label occupies index 5, so putting a real
+    // label there makes every untouched ticket silently claim that state -
+    // a brand new ticket reading "QA" with nobody having done anything.
+    // Verified on this board: with "QA" at index 5, an item with value=null
+    // returned text="QA"; after freeing index 5 the same item returned null.
+    try {
+      const labelsByIndex = JSON.parse(col.settings_str || '{}').labels || {};
+      if (labelsByIndex['5']) {
+        log(
+          `  X  ${colKey}: "${labelsByIndex['5']}" sits at index 5, monday's empty slot - ` +
+          `every item with no status set will read as "${labelsByIndex['5']}".\n` +
+          `     Rebuild the column with index 5 left unlabelled.`
+        );
+        problems += 1;
+      }
+    } catch { /* settings already reported unparseable above */ }
   }
 
   const items = await fetchAllRefItems(cfg);
@@ -775,6 +902,7 @@ function cmdRefsFromRange(cfg, flags) {
 const USAGE = `
 monday-sync.js <command> [flags]
 
+  discover        [--board <id>]   list boards, or dump one board's column ids
   check
   branch-created  --branch <name>
   pr-opened       --branch <name> --pr-url <url>
@@ -790,11 +918,24 @@ monday-sync.js <command> [flags]
   MONDAY_TOKEN must be set.
 `;
 
+const COMMANDS = new Set([
+  'discover', 'check', 'branch-created', 'pr-opened', 'pr-merged',
+  'deployed', 'checks-passed', 'blocked', 'refs-from-range',
+]);
+
 async function main() {
   const { command, flags } = parseArgs(process.argv);
   if (!command || command === 'help' || flags.help) {
     process.stdout.write(USAGE);
     process.exit(command ? 0 : 1);
+  }
+
+  // Validate the command before the "not configured yet" guards below, or a
+  // typo in a workflow exits 0 and looks like a successful skip until the day
+  // the board is wired up.
+  if (!COMMANDS.has(command)) {
+    process.stderr.write(`Unknown command "${command}"\n${USAGE}`);
+    process.exit(1);
   }
 
   // "check" is the readiness probe, so it alone treats an unconfigured board
@@ -805,23 +946,27 @@ async function main() {
   // refs-from-range only reads git and config.refPattern - it never touches
   // monday, and the workflow calls it before deciding whether there is anything
   // to report. Gating it on board readiness would break that ordering.
-  if (command !== 'refs-from-range') {
-    if (cfg.__unconfigured) {
-      log(`SKIP  ${cfg.__unconfigured}`);
-      log('Tracking is not wired up yet - nothing written, exiting 0.');
-      process.exit(0);
-    }
-    if (!process.env.MONDAY_TOKEN) {
-      if (strict) fail('MONDAY_TOKEN is not set');
-      log('SKIP  MONDAY_TOKEN is not set - nothing written, exiting 0.');
-      process.exit(0);
-    }
+  const needsBoard = command !== 'refs-from-range';
+  // discover is the thing you run to FIND the ids, so requiring them first
+  // would be circular. It needs the token, nothing else.
+  const needsConfig = needsBoard && command !== 'discover';
+
+  if (needsConfig && cfg.__unconfigured) {
+    log(`SKIP  ${cfg.__unconfigured}`);
+    log('Tracking is not wired up yet - nothing written, exiting 0.');
+    process.exit(0);
+  }
+  if (needsBoard && !process.env.MONDAY_TOKEN) {
+    if (strict || command === 'discover') fail('MONDAY_TOKEN is not set');
+    log('SKIP  MONDAY_TOKEN is not set - nothing written, exiting 0.');
+    process.exit(0);
   }
 
   const dryRun = flags['dry-run'] === true;
   if (dryRun) log('DRY RUN - no mutations will be sent\n');
 
   switch (command) {
+    case 'discover':         await cmdDiscover(cfg, flags); break;
     case 'check':            await cmdCheck(cfg); break;
     case 'branch-created':   await cmdBranchCreated(cfg, flags, dryRun); break;
     case 'pr-opened':        await cmdPrOpened(cfg, flags, dryRun); break;
