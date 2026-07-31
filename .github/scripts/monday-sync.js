@@ -628,6 +628,23 @@ async function cmdCheck(cfg) {
     log(`  ok ${key.padEnd(14)} ${id}  "${col.title}" (${col.type})`);
   }
 
+  // Two logical columns pointing at one physical column type-check perfectly and
+  // then overwrite each other on every write, last one wins. Copy-paste while
+  // filling in six ids by hand is exactly how this happens.
+  const byColId = new Map();
+  for (const [key, id] of Object.entries(cfg.columns)) {
+    if (id === null) continue;
+    if (!byColId.has(id)) byColId.set(id, []);
+    byColId.get(id).push(key);
+  }
+  for (const [id, keys] of byColId) {
+    if (keys.length > 1) {
+      const title = byId.has(id) ? `"${byId.get(id).title}"` : id;
+      log(`  X  ${keys.join(' + ')} all point at ${title} - they would overwrite each other`);
+      problems += 1;
+    }
+  }
+
   // A Date column with time switched off silently drops the time half.
   const dateColId = cfg.columns.deployedAt;
   const dateCol = dateColId ? byId.get(dateColId) : null;
