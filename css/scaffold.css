@@ -354,7 +354,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .nav-footer a:hover { color: var(--dt-white); text-decoration: none; }
 
-.site-copyright { font-size: .8rem; }
+.site-copyright { font-size: .8rem; text-decoration: underline; }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
