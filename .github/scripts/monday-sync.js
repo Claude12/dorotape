@@ -1483,6 +1483,11 @@ function progressBody(cfg, s) {
     }
   }
 
+  // Sits above the footer on purpose: the change check compares everything
+  // before "Sizes:", so editing howTo republishes rather than going unnoticed.
+  const howTo = String(p.howTo || '').trim();
+  if (howTo) lines.push('', howTo);
+
   const scale = Object.entries(p.weights || {}).map(([k, v]) => `${k}=${v}`).join(' ');
   lines.push('', `Sizes: ${scale}. Recalculated ${localStamp(cfg)}.`);
 
@@ -1701,12 +1706,87 @@ async function cmdProgress(cfg, flags, dryRun) {
     }
   }
 
+  // Duplicate refs are checked here as well as in "check", because this is the
+  // command that runs on a schedule. resolveRef already refuses to write to an
+  // ambiguous ref, but that only surfaces mid-deploy, which is the worst moment
+  // to find out. Reported after the bar so the bar still gets written.
+  const seen = new Map();
+  for (const item of items) {
+    if (!item.ref || (prefix && item.name.startsWith(prefix))) continue;
+    const key = item.ref.toUpperCase();
+    if (!seen.has(key)) seen.set(key, []);
+    seen.get(key).push(item);
+  }
+  const dupes = [...seen.entries()].filter(([, list]) => list.length > 1);
+
   if (weightFailures.length) {
     console.error(`\n${weightFailures.length} Weight value(s) could not be written:`);
     for (const f of weightFailures) console.error(`  - ${f}`);
     console.error('The bar above is still correct - it is computed from Size, not from Weight.');
-    process.exit(1);
   }
+  if (dupes.length) {
+    console.error(`\n${plural(dupes.length, 'duplicate Ref')} on this board:`);
+    for (const [ref, list] of dupes) {
+      console.error(`  - "${ref}" on ${list.map((i) => `${i.id} (${i.name})`).join(', ')}`);
+    }
+    console.error(
+      'Every deploy touching one of these refs will refuse to write, because the ' +
+      'pipeline will not guess which ticket it means. Fix them on the board.'
+    );
+  }
+  if (weightFailures.length || dupes.length) process.exit(1);
+}
+
+/**
+ * Write the columnHelp text onto the board as column descriptions.
+ *
+ * Columns are the one place on a board that holds standing instructions safely.
+ * The board description is rewritten by every progress run, and an instruction
+ * ITEM would be counted as an unsized ticket and nag forever - a description
+ * hangs off the column header, where the person filling it in is already
+ * looking, and nothing else touches it.
+ */
+async function cmdSetupHelp(cfg, flags, dryRun) {
+  const help = cfg.columnHelp || {};
+  const keys = Object.keys(help);
+  if (!keys.length) {
+    log('SKIP  columnHelp is empty, so there is nothing to write.');
+    process.exit(0);
+  }
+
+  let wrote = 0;
+  let skipped = 0;
+  for (const key of keys) {
+    const colId = cfg.columns[key];
+    const text = String(help[key] || '').trim();
+    if (!colId) {
+      log(`  -  ${key.padEnd(12)} column is not configured on this board, skipped`);
+      skipped += 1;
+      continue;
+    }
+    if (!text) {
+      log(`  -  ${key.padEnd(12)} help text is empty, skipped`);
+      skipped += 1;
+      continue;
+    }
+    if (dryRun) {
+      log(`  DRY-RUN  describe ${key} (${colId}):\n${indent(text)}`);
+      continue;
+    }
+    await gql(
+      cfg,
+      `mutation ($boardId: ID!, $colId: String!, $text: String!) {
+         change_column_metadata(
+           board_id: $boardId, column_id: $colId,
+           column_property: description, value: $text
+         ) { id }
+       }`,
+      { boardId: String(cfg.boardId), colId, text }
+    );
+    log(`  ok ${key.padEnd(12)} described`);
+    wrote += 1;
+  }
+  if (!dryRun) log(`\n${wrote} column(s) described, ${skipped} skipped.`);
 }
 
 function cmdRefsFromRange(cfg, flags) {
@@ -1732,6 +1812,7 @@ monday-sync.js <command> [flags]
   checks-passed   --refs <list> --run-url <url> [--summary <text>]
   blocked         --refs <list> --stage deploy|checks --run-url <url> [--detail <text>]
   setup-progress  [--size-title <t>] [--weight-title <t>]   create the Size and Weight columns
+  setup-help                       write columnHelp onto the board as column descriptions
   progress        [--force]        recalculate the weighted progress bar
   refs-from-range --from <rev> [--to <rev>]
 
@@ -1744,8 +1825,8 @@ monday-sync.js <command> [flags]
 
 const COMMANDS = new Set([
   'discover', 'check', 'branch-created', 'pr-opened', 'pr-merged',
-  'deployed', 'checks-passed', 'blocked', 'setup-progress', 'progress',
-  'refs-from-range',
+  'deployed', 'checks-passed', 'blocked', 'setup-progress', 'setup-help',
+  'progress', 'refs-from-range',
 ]);
 
 async function main() {
@@ -1800,6 +1881,7 @@ async function main() {
     case 'checks-passed':    await cmdChecksPassed(cfg, flags, dryRun); break;
     case 'blocked':          await cmdBlocked(cfg, flags, dryRun); break;
     case 'setup-progress':   await cmdSetupProgress(cfg, flags, dryRun); break;
+    case 'setup-help':       await cmdSetupHelp(cfg, flags, dryRun); break;
     case 'progress':         await cmdProgress(cfg, flags, dryRun); break;
     case 'refs-from-range':  cmdRefsFromRange(cfg, flags); break;
     default:

@@ -257,6 +257,45 @@ Neither surface is rewritten when nothing has changed, so a nightly run on a
 quiet week is silent. The comparison deliberately ignores the "Recalculated …"
 footer, which would otherwise differ every single run and defeat the check.
 
+### Telling people how to use the board
+
+Two things a person has to do by hand — a unique **Ref** and a **Size** — and
+everything else follows. That instruction lives in two places, both written by
+the pipeline so neither can go stale:
+
+```bash
+node .github/scripts/monday-sync.js setup-help
+```
+
+writes `columnHelp` from the config onto the board as **column descriptions**,
+which show on the column header where someone filling that column in is already
+looking. Run it once per board, and again after editing the text — nothing
+applies it automatically, because it is board setup, not something a nightly job
+should be rewriting.
+
+`progress.howTo` puts the same instruction in one line at the foot of the bar,
+which is the first thing on the board.
+
+Columns are the only safe home for standing instructions. The **board
+description is rewritten in full by every progress run**, so anything typed
+there by hand is lost, and an instructions *item* would be counted as an unsized
+ticket and nag about it forever.
+
+### Keeping Refs unique
+
+monday has no unique constraint on a Text column, so uniqueness cannot be
+enforced at entry. It is caught in three places instead:
+
+| | when |
+| --- | --- |
+| `resolveRef` refuses to write and names both items | the moment a deploy or PR event touches an ambiguous ref |
+| `check` reports it as an error | whenever you run it |
+| `progress` reports it and exits 1 | after every deploy, and on the weekday schedule |
+
+The third exists because the first only surfaces mid-deploy, which is the worst
+possible moment to discover it. The bar is still written before it exits — a
+duplicate ref is a data problem, not a reason to withhold the progress figure.
+
 ### How the number is worked out
 
 ```
@@ -364,6 +403,7 @@ node .github/scripts/monday-sync.js deployed    --refs "AC-1 AC-2" --commit <sha
 node .github/scripts/monday-sync.js checks-passed --refs "AC-1" --run-url <url> --summary "..."
 node .github/scripts/monday-sync.js blocked     --refs "AC-1" --stage deploy|checks --run-url <url>
 node .github/scripts/monday-sync.js setup-progress [--size-title <t>] [--weight-title <t>]
+node .github/scripts/monday-sync.js setup-help                  # write columnHelp onto the board
 node .github/scripts/monday-sync.js progress    [--force]
 node .github/scripts/monday-sync.js refs-from-range --from deployed-dev --to HEAD
 ```

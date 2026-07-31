@@ -45,12 +45,21 @@
   "progress": {
     "itemName": "▸ Project progress",
     "groupName": "Progress",
+    "howTo": "New ticket: give it a unique Ref (DR-12) and a Size. Everything else is automatic - status, deploys, checks and this bar all follow the Ref.",
     "boardDescription": true,
     "weights": { "S": 1, "M": 2, "L": 5, "XL": 8 },
     "doneLabels": ["Completed"],
     "onDevLabels": ["Deployed to dev", "QA"],
     "excludedLabels": ["Cancelled"],
     "barWidth": 20
+  },
+  "__columnHelp": "Written onto the board as COLUMN DESCRIPTIONS by: node .github/scripts/monday-sync.js setup-help. Columns are the only safe home for standing instructions on a board - the board description is rewritten by every progress run, and an instructions ITEM would be counted as an unsized ticket and nag forever. A description hangs off the column header, where whoever is filling the column in is already looking. Re-run setup-help after editing; nothing applies it automatically, because it is a one-off board setup step rather than something a nightly job should rewrite. Keys are column names from 'columns' above; a key pointing at a null column is skipped.",
+  "columnHelp": {
+    "ref": "Must be UNIQUE. Format DR-<number>, e.g. DR-12. This is how the pipeline matches branches, PRs and deploys to this ticket - put it in the branch name too, e.g. feature/DR-12-thing. If two tickets share a Ref the pipeline refuses to write to either, rather than guessing.",
+    "size": "Set this on every ticket: S, M, L or XL (1, 2, 5 and 8 points). It is the only thing you have to judge by hand - the progress bar is weighted by it. A ticket with no Size is counted nowhere, so the bar quietly understates the work.",
+    "status": "Set by the pipeline, not by hand - except Completed, which you set after sign-off, and Cancelled, which takes abandoned work out of the progress bar. Everything else follows the branch, PR and deploy automatically.",
+    "deployResult": "Written by the pipeline. Success means the code reached dev. Failed means it did not, and the site is still on the previous version.",
+    "checksResult": "Written by the pipeline after the automated site checks run against dev. Failed here means the code IS live on dev and may be broken - different from a failed deploy."
   },
   "refPattern": "\\bDR-(\\d+)\\b",
   "__devUrl": "The dev site URL is NOT here. It is the DEV_SITE_URL repo variable (or a gitignored .env locally), because it points at an environment - a copy of this repo for another project must not inherit the old URL. This file describes the board only.",
