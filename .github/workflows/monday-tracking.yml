@@ -158,6 +158,15 @@ jobs:
           # fails, and the write and tag-advance steps below skip with it. Better
           # to report nothing and retry next deploy than to move the marker past
           # tickets that were never recorded.
+          # Bootstrap is worth shouting about. With no marker the range collapses
+          # to the single bump commit, which normally carries no ticket ref - so
+          # the deploy reports nothing, nothing fails, and the marker is then
+          # planted at HEAD, hiding every ticket behind it. Survivable once, but
+          # only if you know it happened.
+          if ! git rev-parse --verify --quiet 'deployed-dev^{commit}' >/dev/null; then
+            echo "::warning::No deployed-dev marker yet, so only ${{ steps.outcome.outputs.sha }} was examined and tickets merged before it will NOT be reported. The marker is about to be planted here. To report them, push the deployed-dev tag at the commit before those merges and deploy again."
+          fi
+
           REFS=$(node .github/scripts/monday-sync.js refs-from-range \
                    --from deployed-dev \
                    --to "${{ steps.outcome.outputs.sha }}" | tr '\n' ' ' | xargs)
@@ -184,8 +193,17 @@ jobs:
             --stage deploy \
             --run-url "${{ github.event.workflow_run.html_url }}"
 
-      # Advance the marker only after monday agrees. If the write failed, the tag
-      # stays put and the next deploy re-reports this range rather than losing it.
+      # Advance the marker only after monday agrees. success() covers that: a
+      # failed write makes it false, so the tag stays put and the next deploy
+      # re-reports the range rather than losing it.
+      #
+      # What success() does NOT catch is the first deploy. With no marker the
+      # range collapses to the bump commit alone, that commit carries no ticket
+      # ref, the write SKIPS - which leaves success() true - and the tag is then
+      # planted at HEAD, hiding every ticket behind it for good. Nothing failed,
+      # so nothing complained. The warning in the refs step above is the only
+      # thing standing between that and a silent hole, which is why it is a
+      # ::warning:: and not an echo.
       - name: Advance deployed-dev marker
         if: success() && steps.outcome.outputs.outcome == 'deployed'
         run: |
