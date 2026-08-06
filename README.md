@@ -7,9 +7,30 @@ Built on [Underscores (`_s`)](https://underscores.me/): classic PHP templates,
 ACF PRO, Classic Editor, no page builder. The stylesheet is hand-written, not
 compiled, so see [Build step](#build-step) before you go looking for one.
 
-**One exception to "no Gutenberg": cart and checkout are the WooCommerce
-blocks.** See [Cart and checkout](#cart-and-checkout). It is the single most
-load-bearing fact about this theme and the easiest one to miss.
+**One exception: Cart and Checkout are the WooCommerce blocks.** See
+[Cart and checkout](#cart-and-checkout). It is the single most load-bearing fact
+about this theme and the easiest one to miss.
+
+### Which editor a page gets
+
+Classic for normal pages, blocks for the WooCommerce ones that need them. This
+is enforced in [inc/cleanup.php](inc/cleanup.php), not by a plugin: the block
+editor is off for every post type, and switched back on per post for Cart and
+Checkout only.
+
+| Page | Editor | |
+| --- | --- | --- |
+| Cart, Checkout | blocks | genuinely block built |
+| My account | classic | it is `[woocommerce_my_account]`, a shortcode |
+| Shop | classic | no content, WooCommerce renders it |
+| Wishlist | classic | a YITH shortcode |
+| Privacy Policy, Refund and Returns | classic | unused core boilerplate |
+| anything new | classic | the default |
+
+Four of those pages contain block comments because WordPress wraps a lone
+shortcode in one, or because core created the page. That is not the same as
+being block built, so the rule tests for Woo's cart and checkout blocks rather
+than for any block at all.
 
 ---
 
@@ -70,6 +91,10 @@ to be built:
 - **Third-party plugins that say "adds a checkout field" usually mean classic.**
   Check before trusting one. Woosage's own PO field is exactly this: it ships a
   block-compatible method and the line that would hook it up is commented out.
+
+**My Account is not affected.** It is the `[woocommerce_my_account]` shortcode,
+so the `woocommerce_account_*` hooks, endpoints and template overrides all work
+normally there. The block rules above apply to Cart and Checkout only.
 
 Before building anything that touches checkout, confirm which checkout you are
 building for.
