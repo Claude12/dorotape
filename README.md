@@ -64,6 +64,7 @@ than for any block at all.
 | `quickadd.php` | quick add to cart |
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
+| `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
 | `template-tags.php`, `template-functions.php` | `_s` stock, extended |
 
 WooCommerce is customised through hooks in `inc/woocommerce.php`. There is no
@@ -134,6 +135,18 @@ differs there, or to bring it into line:
 php bin/store-settings.php            # show what differs, change nothing
 php bin/store-settings.php --apply    # write the differences
 ```
+
+`bin/shipping-collection.php` works the same way and covers the one piece of
+shipping configuration the collection journey depends on:
+
+```bash
+php bin/shipping-collection.php           # show the current zones and methods
+php bin/shipping-collection.php --apply   # add Local Pickup if it is missing
+```
+
+It adds a single method and does not design the zone layout, which is a
+commercial decision and its own ticket. If a Local Pickup already exists
+anywhere, it does nothing.
 
 It is not a mirror of every WooCommerce setting, only of the decisions. Anything
 absent from the file is left alone, so an admin changing something else in the UI
