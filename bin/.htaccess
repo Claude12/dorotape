@@ -1,0 +1,15 @@
+# Deploy is `git pull` on the server, so anything tracked here lands inside
+# public_html. Nothing in this folder should be reachable over HTTP - these are
+# scripts that change site settings.
+#
+# Each script also refuses to run outside the CLI, so this file is the second
+# lock rather than the only one.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

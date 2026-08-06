@@ -20,6 +20,7 @@ for one.
 | `acf-json/` | ACF field groups, synced to disk |
 | `css/`, `js/` | `scaffold.css` and `scaffold.js` — the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
+| `bin/` | CLI scripts. `store-settings.php` is the record of the WooCommerce settings this project chose. See [Store settings](#store-settings) |
 | `dorotape-migration/` | one-off scripts and data from the Kryptronic migration |
 | `tests/` | automated site checks — [tests/README.md](tests/README.md) |
 | `.github/` | deploy and monday board pipeline — [.github/README.md](.github/README.md) |
@@ -62,6 +63,28 @@ current Node. `style.css` and `css/scaffold.css` are edited directly.
 
 `tests/` deliberately has its own `package.json` for exactly this reason — so
 the check suite installs without dragging in the dead `_s` toolchain.
+
+## Store settings
+
+WooCommerce keeps its settings in the options table, so they are not in git and a
+deploy does not carry them. Configured by hand they have to be repeated
+identically on local, dev and live.
+
+`bin/store-settings.php` is the record of the ones this project decided on, with
+the reason for each written next to it. Run it on any environment to see what
+differs there, or to bring it into line:
+
+```bash
+php bin/store-settings.php            # show what differs, change nothing
+php bin/store-settings.php --apply    # write the differences
+```
+
+It is not a mirror of every WooCommerce setting, only of the decisions. Anything
+absent from the file is left alone, so an admin changing something else in the UI
+is never overwritten.
+
+CLI only, and `bin/.htaccess` denies the folder over HTTP. Both, because deploy
+puts it inside `public_html`.
 
 ## Deploying
 
