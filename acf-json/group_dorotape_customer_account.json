@@ -72,6 +72,27 @@
 			"allow_in_bindings": 0
 		},
 		{
+			"key": "field_dorotape_pay_on_account_approved",
+			"label": "Approved to Pay on Account",
+			"name": "pay_on_account_approved",
+			"aria-label": "",
+			"type": "true_false",
+			"instructions": "Off by default. When off, the Invoice (pay on account) method is hidden at checkout and refused if requested directly. Only tick this for customers Sage has approved for credit. Maintained by hand until the Sage sync takes it over.",
+			"required": 0,
+			"conditional_logic": 0,
+			"wrapper": {
+				"width": "50",
+				"class": "",
+				"id": ""
+			},
+			"message": "",
+			"default_value": 0,
+			"ui": 1,
+			"ui_on_text": "Approved",
+			"ui_off_text": "Not approved",
+			"allow_in_bindings": 0
+		},
+		{
 			"key": "field_dorotape_discount_rate",
 			"label": "Customer Discount Rate (%)",
 			"name": "customer_discount_rate",
@@ -110,10 +131,10 @@
 	"instruction_placement": "label",
 	"hide_on_screen": "",
 	"active": true,
-	"description": "Sage 50 account linkage and customer-specific pricing. Shown on the admin user edit screen only. Trimmed 2026-06-10 to the fields the Kryptronic data and Sage integration actually use — pay-on-account, VAT-exemption, and notes fields were removed (zero usage on the old site).",
+	"description": "Sage 50 account linkage and customer-specific pricing. Shown on the admin user edit screen only. Trimmed 2026-06-10 to the fields the Kryptronic data and Sage integration actually use: pay-on-account, VAT-exemption and notes fields were removed for zero usage on the old site. pay_on_account_approved was restored 2026-08-06 for DR-11, which is a forward requirement (spec 5.x, only Sage-approved customers may pay on account) rather than migrated data, so zero usage on Kryptronic is not a reason to remove it again. VAT exemption may return the same way under DR-12.",
 	"show_in_rest": 0,
 	"display_title": "",
 	"allow_ai_access": false,
 	"ai_description": "",
-	"modified": 1781136000
+	"modified": 1786060800
 }

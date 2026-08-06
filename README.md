@@ -63,6 +63,7 @@ than for any block at all.
 | `cutsize.php` | cut-to-size ordering |
 | `quickadd.php` | quick add to cart |
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
+| `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
 | `template-tags.php`, `template-functions.php` | `_s` stock, extended |
 
 WooCommerce is customised through hooks in `inc/woocommerce.php`. There is no
