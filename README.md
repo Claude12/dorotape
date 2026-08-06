@@ -4,9 +4,12 @@ Custom WooCommerce theme for [dorotape.co.uk](https://dorotape.co.uk) —
 self-adhesive films and wrapping solutions. Built by Altitude Marketing.
 
 Built on [Underscores (`_s`)](https://underscores.me/): classic PHP templates,
-ACF PRO, Classic Editor, no page builder and no Gutenberg. The stylesheet is
-hand-written, not compiled — see [Build step](#build-step) before you go looking
-for one.
+ACF PRO, Classic Editor, no page builder. The stylesheet is hand-written, not
+compiled, so see [Build step](#build-step) before you go looking for one.
+
+**One exception to "no Gutenberg": cart and checkout are the WooCommerce
+blocks.** See [Cart and checkout](#cart-and-checkout). It is the single most
+load-bearing fact about this theme and the easiest one to miss.
 
 ---
 
@@ -38,11 +41,38 @@ for one.
 | `poa.php` | price-on-application products |
 | `cutsize.php` | cut-to-size ordering |
 | `quickadd.php` | quick add to cart |
+| `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `template-tags.php`, `template-functions.php` | `_s` stock, extended |
 
 WooCommerce is customised through hooks in `inc/woocommerce.php`. There is no
 `woocommerce/` override directory in the theme, and adding one is a decision to
 make deliberately rather than by accident.
+
+## Cart and checkout
+
+Both pages are the **block** versions, not the classic shortcodes. The Checkout
+page content is `<!-- wp:woocommerce/checkout -->`, and the front end is React.
+
+This is not a detail, it is the thing that decides how half of the store work has
+to be built:
+
+- **Classic checkout hooks do not fire.** `woocommerce_after_order_notes`,
+  `woocommerce_checkout_fields`, `woocommerce_before_checkout_form` and the rest
+  of that family produce nothing. Code using them looks correct in review, passes
+  a syntax check, and silently does not exist on the page.
+- **Adding a field means
+  [`woocommerce_register_additional_checkout_field()`](https://developer.woocommerce.com/docs/cart-and-checkout-additional-checkout-fields/)**
+  (WooCommerce 8.9+). `inc/purchase-order.php` is the worked example, including
+  where the value lands in the database and how it reaches Sage.
+- **Registered fields render on the order confirmation page only.** Admin,
+  emails and My Account are yours to add. It is easy to believe a field works
+  because it appeared at checkout and on the thank-you page.
+- **Third-party plugins that say "adds a checkout field" usually mean classic.**
+  Check before trusting one. Woosage's own PO field is exactly this: it ships a
+  block-compatible method and the line that would hook it up is commented out.
+
+Before building anything that touches checkout, confirm which checkout you are
+building for.
 
 ## Local development
 

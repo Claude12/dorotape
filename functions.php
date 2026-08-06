@@ -134,3 +134,4 @@ require get_template_directory() . '/inc/woocommerce.php';
 require get_template_directory() . '/inc/poa.php';
 require get_template_directory() . '/inc/cutsize.php';
 require get_template_directory() . '/inc/quickadd.php';
+require get_template_directory() . '/inc/purchase-order.php';

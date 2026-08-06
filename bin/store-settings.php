@@ -60,6 +60,25 @@ $settings = [
         . 'work. Without the reminder a returning customer sees a blank checkout, '
         . 'registers again, and the duplicate has none of their history or pricing.',
     ],
+
+    // ── DR-9: purchase order numbers ────────────────────────────────────────
+    // The theme owns this field. inc/purchase-order.php has the full reasoning;
+    // the short version is that Invoice Gateway renders its PO field inside its
+    // own payment box, so it exists only for customers paying on account and a
+    // card or BACS order could never carry one. Both of these stay off so there
+    // is exactly one PO field on the site.
+    'igfw_enable_purchase_order_number' => [
+        'no',
+        'Invoice Gateway PO field, superseded by the theme field, which every '
+        . 'payment method gets rather than only pay-on-account. Two fields '
+        . 'collecting one value means half the POs never reach Sage.',
+    ],
+    'igfw_require_purchase_order_number' => [
+        'no',
+        'Moot while the field above is off, but set explicitly so switching that '
+        . 'one on by accident cannot also make a hidden field mandatory and block '
+        . 'checkout.',
+    ],
 ];
 
 /**
@@ -73,6 +92,16 @@ $settings = [
  *  woocommerce_registration_generate_username
  *                                   stays "yes": the form asks for an email and
  *                                   derives the username, which is one less field.
+ *  Woosage settings                 not here. They live inside the single
+ *                                   `woosage_settings` option as an array, not as
+ *                                   one option each, so this file's get/update
+ *                                   pattern does not reach them. The plugin is
+ *                                   also inactive. DR-15 turns it on and must set
+ *                                   use_po_ref_for_customer_order_num on, which is
+ *                                   what puts the PO in Sage's Customer Order No.,
+ *                                   and must leave purchase_order_checkout_field_label
+ *                                   empty, which is what keeps Woosage from adding
+ *                                   a second PO field.
  */
 
 // ── Bootstrap ───────────────────────────────────────────────────────────────
