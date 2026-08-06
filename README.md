@@ -65,6 +65,9 @@ than for any block at all.
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
+| `address-book.php` | saved addresses: storage and the read/write API |
+| `address-book-account.php` | the My Account screen for managing them |
+| `address-book-checkout.php` | picking one at checkout |
 | `template-tags.php`, `template-functions.php` | `_s` stock, extended |
 
 WooCommerce is customised through hooks in `inc/woocommerce.php`. There is no
@@ -100,6 +103,35 @@ normally there. The block rules above apply to Cart and Checkout only.
 
 Before building anything that touches checkout, confirm which checkout you are
 building for.
+
+## The address book
+
+Trade customers deliver to several sites and invoice to a head office, so they
+need more than WooCommerce's one billing and one shipping address.
+
+Built in the theme rather than with a plugin, because the Sage address mapping in
+Stage 3 has to read whatever this stores, and a plugin's internal structure is
+not a contract.
+
+**The storage shape is the part to be careful with.** One user meta key,
+`_dt_address_book`, holds an array keyed by a generated address id. Each entry
+has a `label`, a `type` of `billing` or `shipping`, and WooCommerce's own address
+field names unprefixed, so an entry can be handed straight to `set_billing_*` or
+`set_shipping_*` with no translation layer. Only `label` and `type` are
+guaranteed: the rest of the keys come from
+`WC()->countries->get_address_fields()`, so they follow the store's settings.
+Company is switched off on this site, phone is on for both types. Read the keys
+you find rather than the ones you expect.
+
+The customer's WooCommerce billing and shipping addresses are untouched and stay
+the defaults. "Make default" copies a saved address onto them.
+
+**Known limitation at checkout.** Picking a saved address sets it on the order,
+but the address inputs on the page do not repopulate to match. Changing what the
+visible form shows means JavaScript driving the `wc/store/cart` data store, and
+the theme has no build step. The mitigation is that each option label carries the
+full address, so the customer can see what they picked. Worth revisiting if
+checkout ever gets a bundled script.
 
 ## Local development
 
