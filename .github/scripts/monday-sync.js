@@ -1902,6 +1902,299 @@ function cmdRefsFromRange(cfg, flags) {
 }
 
 /* ------------------------------------------------------------------ *
+ * create-items
+ * ------------------------------------------------------------------ */
+
+/** The labels a status column actually has, or null if it cannot be read. */
+function statusLabelsOf(board, colId) {
+  const col = (board.columns || []).find((c) => c.id === colId);
+  if (!col) return null;
+  try {
+    return Object.values(JSON.parse(col.settings_str || '{}').labels || {});
+  } catch {
+    return null;
+  }
+}
+
+/** Compare item names the way a human would, so case and spacing cannot fool the skip. */
+function nameKey(name) {
+  return String(name).trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+/**
+ * Read and validate a backlog file.
+ *
+ * Everything is checked here, before a single write, because the failure that
+ * matters is the one that happens on ticket 30 of 51 and leaves the board half
+ * seeded. Sizes are validated against progress.weights for the same reason
+ * "check" validates them: an unsized ticket is counted nowhere and quietly
+ * understates the work.
+ */
+function loadBacklog(filePath, weights) {
+  let raw;
+  try {
+    raw = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    fail(`Cannot read backlog file ${filePath}: ${err.message}`);
+  }
+
+  let doc;
+  try {
+    doc = JSON.parse(raw);
+  } catch (err) {
+    fail(`${filePath} is not valid JSON: ${err.message}`);
+  }
+
+  const sizes = Object.keys(weights || {});
+  const groups = Array.isArray(doc) ? doc : doc.groups;
+  if (!Array.isArray(groups) || groups.length === 0) {
+    fail(`${filePath} has no "groups" array. Expected { "groups": [ { "title": ..., "items": [...] } ] }`);
+  }
+
+  const problems = [];
+  const seenNames = new Map();
+  const out = [];
+
+  groups.forEach((group, gi) => {
+    const where = `groups[${gi}]`;
+    const title = String((group || {}).title || '').trim();
+    if (!title) problems.push(`${where}.title is missing or empty`);
+
+    const items = ((group || {}).items) || [];
+    if (!Array.isArray(items) || items.length === 0) {
+      problems.push(`${where} ("${title}") has no items`);
+      return;
+    }
+
+    const cleaned = [];
+    items.forEach((item, ii) => {
+      const at = `${where}.items[${ii}]`;
+      const name = String((item || {}).name || '').trim();
+      const size = String((item || {}).size || '').trim();
+      const notes = String((item || {}).notes || '').trim();
+
+      if (!name) problems.push(`${at}.name is missing or empty`);
+      if (!size) {
+        problems.push(`${at} ("${name}") has no size - one of ${sizes.join(', ')}`);
+      } else if (sizes.length && !sizes.includes(size)) {
+        problems.push(`${at} ("${name}") has size "${size}", which is not in progress.weights (${sizes.join(', ')})`);
+      }
+
+      // Duplicate names across the whole file, not just within a group: the name
+      // is what makes a re-run skip rather than double up, so two items sharing
+      // one means the second can never be created and never be noticed.
+      const key = nameKey(name);
+      if (name && seenNames.has(key)) {
+        problems.push(`${at} ("${name}") repeats the name used at ${seenNames.get(key)}`);
+      } else if (name) {
+        seenNames.set(key, at);
+      }
+
+      cleaned.push({ name, size, notes });
+    });
+
+    out.push({ title, items: cleaned });
+  });
+
+  if (problems.length) {
+    log(`${plural(problems.length, 'problem')} in ${filePath}:`);
+    for (const p of problems) log(`  X  ${p}`);
+    fail('Nothing was written. Fix the file and run again.');
+  }
+
+  return out;
+}
+
+/**
+ * Seed a board from a backlog file: groups, items, refs, sizes and opening notes.
+ *
+ * Idempotent on the item NAME. Refs cannot be the key here because this command
+ * allocates them - it continues from the highest ref already on the board, so
+ * tickets added by hand in the monday UI are never overwritten and never
+ * collide. That does mean renaming a ticket on the board and re-running creates
+ * it again, which is the right way round: a skipped duplicate is a nuisance, an
+ * overwritten ticket loses someone's work.
+ *
+ * Groups are appended below whatever is already there, so the progress bar's
+ * group stays pinned at the top where "progress" put it.
+ */
+async function cmdCreateItems(cfg, flags, dryRun) {
+  const file = typeof flags.file === 'string' ? flags.file : null;
+  if (!file) fail('create-items needs --file <path> - a JSON backlog file. See .github/backlog.json.');
+  const filePath = path.resolve(process.cwd(), file);
+
+  const weights = (cfg.progress || {}).weights || {};
+  const backlog = loadBacklog(filePath, weights);
+  const total = backlog.reduce((n, g) => n + g.items.length, 0);
+  log(`${filePath}\n  ${plural(backlog.length, 'group')}, ${plural(total, 'item')} - file is valid\n`);
+
+  // A dry run is allowed to stop here. Validating the file is the half of this
+  // command worth having offline, and requiring a token to spellcheck JSON
+  // would just mean nobody checks it before the live run.
+  if (!process.env.MONDAY_TOKEN) {
+    log('MONDAY_TOKEN is not set, so the board was not read.');
+    log('Refs, group matching and the already-exists check all need it. Nothing written.');
+    return;
+  }
+
+  const limit = flags.limit === undefined ? null : Number(flags.limit);
+  if (limit !== null && (!Number.isInteger(limit) || limit < 1)) {
+    fail(`--limit must be a positive whole number, got "${flags.limit}"`);
+  }
+
+  const board = await fetchBoardColumns(cfg);
+  log(`Board ${cfg.boardId}: "${board.name}"`);
+
+  // Verify every label BEFORE writing anything. statusValue sends labels by
+  // name and monday rejects one it does not have, so an absent "Backlog" or a
+  // Size column that never got its labels fails on item 1 of 51 - after the
+  // groups have already been created.
+  const statusLabels = statusLabelsOf(board, cfg.columns.status);
+  const openLabel = (cfg.labels || {}).backlog;
+  if (openLabel && statusLabels && !statusLabels.includes(openLabel)) {
+    fail(`The status column has no "${openLabel}" label (it has: ${statusLabels.join(', ')}). Fix labels.backlog in the config, or add the label.`);
+  }
+  const sizeLabels = statusLabelsOf(board, cfg.columns.size);
+  if (cfg.columns.size && sizeLabels) {
+    const missing = [...new Set(backlog.flatMap((g) => g.items.map((i) => i.size)))]
+      .filter((s) => !sizeLabels.includes(s));
+    if (missing.length) {
+      fail(`The Size column has no ${missing.map((s) => `"${s}"`).join(', ')} label (it has: ${sizeLabels.join(', ')}). Run setup-progress first.`);
+    }
+  } else if (!cfg.columns.size) {
+    log('  !  columns.size is not configured - items will be created unsized and counted nowhere in the progress bar.');
+  }
+
+  const existing = await fetchAllRefItems(cfg);
+  const existingNames = new Set(existing.map((i) => nameKey(i.name)));
+
+  // Continue the board's own numbering. The prefix comes from the refs already
+  // there rather than from refPattern, because a regex is not reliably readable
+  // as a literal - and a board with no refs yet has no numbering to continue,
+  // so it has to be told one.
+  let prefix = typeof flags.prefix === 'string' ? flags.prefix.trim() : '';
+  let highest = 0;
+  for (const item of existing) {
+    const m = /^(.*?)(\d+)$/.exec(item.ref.trim());
+    if (!m) continue;
+    const n = Number(m[2]);
+    if (n > highest) {
+      highest = n;
+      if (!prefix) prefix = m[1];
+    }
+  }
+  if (!prefix) {
+    fail('No item on the board has a ref to continue from, so the ref prefix is unknown. Pass --prefix "DR-".');
+  }
+
+  // If the refs this allocates do not match refPattern, every later command
+  // (deployed, checks-passed, blocked) will fail to find these tickets. Better
+  // to know now than on the first deploy.
+  const sample = `${prefix}${highest + 1}`;
+  if (!extractRefs(cfg, sample).length) {
+    fail(`Generated ref "${sample}" does not match refPattern ${cfg.refPattern}. Pass --prefix, or fix the pattern.`);
+  }
+  log(`  refs continue from ${highest ? `${prefix}${highest}` : 'nothing'}, next is ${sample}`);
+  log(`  ${plural(existing.length, 'item')} already on the board\n`);
+
+  let created = 0;
+  let skipped = 0;
+  let stop = false;
+
+  // Groups are created one at a time, each after the previous, so the file's
+  // order survives onto the board. relative_to needs a group that exists, hence
+  // tracking the last one rather than reading positions back.
+  const groups = [...(board.groups || [])].sort((a, b) => parseFloat(a.position) - parseFloat(b.position));
+  let lastGroupId = groups.length ? groups[groups.length - 1].id : null;
+
+  for (const group of backlog) {
+    if (stop) break;
+    log(group.title);
+
+    let groupId = (groups.find((g) => g.title.trim() === group.title) || {}).id || null;
+    if (groupId) {
+      log(`  group already exists (${groupId})`);
+      // Carry on from where this one sits, so a group added on a later run lands
+      // next to its neighbours in the file rather than at the end of the board.
+      lastGroupId = groupId;
+    } else if (dryRun) {
+      log(`  DRY-RUN  create group "${group.title}" at the bottom of the board`);
+      groupId = null;
+    } else {
+      groupId = await createGroupAfter(cfg, group.title, lastGroupId);
+      lastGroupId = groupId;
+    }
+
+    for (const item of group.items) {
+      if (limit !== null && created >= limit) {
+        log(`\n  --limit ${limit} reached, stopping here.`);
+        stop = true;
+        break;
+      }
+      if (existingNames.has(nameKey(item.name))) {
+        log(`  skip  "${item.name}" - already on the board`);
+        skipped += 1;
+        continue;
+      }
+
+      highest += 1;
+      const ref = `${prefix}${highest}`;
+      log(`  ${ref}  ${item.name} [${item.size}]`);
+
+      const itemId = await createItem(cfg, item.name, dryRun, groupId);
+      const values = columnValues(cfg, [
+        ['ref', ref],
+        ['size', statusValue(item.size)],
+        ['status', openLabel ? statusValue(openLabel) : null],
+      ]);
+      await setColumns(cfg, itemId || '<new item>', values, dryRun);
+      if (item.notes) await addUpdate(cfg, itemId || '<new item>', item.notes, dryRun);
+
+      // Claim the name immediately: a file that slipped a duplicate past
+      // validation should still only ever produce one ticket.
+      existingNames.add(nameKey(item.name));
+      created += 1;
+
+      // monday rate-limits by complexity per minute, and this is the one command
+      // that fires a few hundred mutations in a row. A short pause costs a minute
+      // on a full seed and avoids a partial run that has to be reconciled by hand.
+      if (!dryRun) await sleep(250);
+    }
+  }
+
+  log(`\n${dryRun ? 'DRY RUN  ' : ''}${created} created, ${skipped} skipped as already present.`);
+  if (!dryRun && created) log('Next: node .github/scripts/monday-sync.js progress --force');
+}
+
+/** create_group, positioned after an existing group so file order survives. */
+async function createGroupAfter(cfg, title, afterGroupId) {
+  const data = await gql(
+    cfg,
+    afterGroupId
+      ? `mutation ($boardId: ID!, $title: String!, $relativeTo: String!) {
+           create_group(
+             board_id: $boardId, group_name: $title,
+             relative_to: $relativeTo, position_relative_method: after_at
+           ) { id }
+         }`
+      : `mutation ($boardId: ID!, $title: String!) {
+           create_group(board_id: $boardId, group_name: $title) { id }
+         }`,
+    afterGroupId
+      ? { boardId: String(cfg.boardId), title, relativeTo: String(afterGroupId) }
+      : { boardId: String(cfg.boardId), title }
+  );
+  const id = ((data || {}).create_group || {}).id;
+  if (!id) throw new Error(`monday accepted create_group for "${title}" but returned no id`);
+  log(`  created group "${title}" (${id})`);
+  return String(id);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/* ------------------------------------------------------------------ *
  * main
  * ------------------------------------------------------------------ */
 
@@ -1919,19 +2212,24 @@ monday-sync.js <command> [flags]
   setup-progress  [--size-title <t>] [--weight-title <t>]   create the Size and Weight columns
   setup-help                       write columnHelp onto the board as column descriptions
   progress        [--force]        recalculate the weighted progress bar
+  create-items    --file <path> [--limit <n>] [--prefix <text>]
+                                   seed the board from a JSON backlog file
   refs-from-range --from <rev> [--to <rev>]
 
   --dry-run           print writes, mutate nothing
   --force             progress: post an update even if the figures are unchanged
+  --limit <n>         create-items: stop after n new items
+  --prefix <text>     create-items: ref prefix, when the board has none to continue
   --config <path>     override .github/monday-config.json
 
-  MONDAY_TOKEN must be set.
+  MONDAY_TOKEN must be set, except for "create-items --dry-run", which
+  validates the backlog file without reading the board.
 `;
 
 const COMMANDS = new Set([
   'discover', 'check', 'branch-created', 'pr-opened', 'pr-merged',
   'deployed', 'checks-passed', 'blocked', 'setup-progress', 'setup-help',
-  'progress', 'refs-from-range',
+  'progress', 'create-items', 'refs-from-range',
 ]);
 
 async function main() {
@@ -1957,7 +2255,13 @@ async function main() {
   // refs-from-range only reads git and config.refPattern - it never touches
   // monday, and the workflow calls it before deciding whether there is anything
   // to report. Gating it on board readiness would break that ordering.
-  const needsBoard = command !== 'refs-from-range';
+  const dryRun = flags['dry-run'] === true;
+
+  const needsBoard = command !== 'refs-from-range'
+    // A dry-run seed checks the backlog file, which is most of what can go wrong
+    // with it and needs no board at all. Skipping out here would mean the file
+    // could only ever be validated by someone holding a token.
+    && !(command === 'create-items' && dryRun);
   // discover is the thing you run to FIND the ids, so requiring them first
   // would be circular. It needs the token, nothing else.
   const needsConfig = needsBoard && command !== 'discover';
@@ -1973,7 +2277,6 @@ async function main() {
     process.exit(0);
   }
 
-  const dryRun = flags['dry-run'] === true;
   if (dryRun) log('DRY RUN - no mutations will be sent\n');
 
   switch (command) {
@@ -1988,6 +2291,7 @@ async function main() {
     case 'setup-progress':   await cmdSetupProgress(cfg, flags, dryRun); break;
     case 'setup-help':       await cmdSetupHelp(cfg, flags, dryRun); break;
     case 'progress':         await cmdProgress(cfg, flags, dryRun); break;
+    case 'create-items':     await cmdCreateItems(cfg, flags, dryRun); break;
     case 'refs-from-range':  cmdRefsFromRange(cfg, flags); break;
     default:
       process.stderr.write(`Unknown command "${command}"\n${USAGE}`);

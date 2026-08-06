@@ -32,6 +32,7 @@ something has been hardcoded that should not have been.
 | `workflows/monday-tracking.yml` | writes ticket state to the board, runs the site checks, recalculates progress |
 | `scripts/monday-sync.js` | all monday API work. No dependencies — plain Node 20 |
 | `monday-config.json` | the board's *shape*: id, column ids, labels, ticket prefix. Committed, not secret |
+| `backlog.json` | tickets to seed the board with — project content, not pipeline config. See [Seeding the board from a file](#seeding-the-board-from-a-file) |
 | `../tests/` | the site checks — see [tests/README.md](../tests/README.md) |
 | `../.env.example` | template for running the scripts by hand |
 
@@ -281,6 +282,52 @@ description is rewritten in full by every progress run**, so anything typed
 there by hand is lost, and an instructions *item* would be counted as an unsized
 ticket and nag about it forever.
 
+### Seeding the board from a file
+
+Typing fifty tickets into monday by hand is where Refs get duplicated and Sizes
+get left blank, and those are the two things the whole bar depends on. `create-items` writes
+them from a JSON file instead:
+
+```bash
+node .github/scripts/monday-sync.js create-items --file .github/backlog.json --dry-run
+node .github/scripts/monday-sync.js create-items --file .github/backlog.json --limit 3
+node .github/scripts/monday-sync.js create-items --file .github/backlog.json
+```
+
+The file is groups of items, each with a `name`, a `size` from
+`progress.weights`, and `notes` that become the ticket's first update:
+
+```json
+{ "groups": [
+  { "title": "Stage 1: store configuration", "items": [
+    { "name": "Tax rates and VAT display rules", "size": "M", "notes": "Done when …" }
+  ] }
+] }
+```
+
+Refs are **not** in the file. The command continues the board's own numbering
+from the highest ref already on it, so tickets someone added by hand in the
+monday UI are never renumbered or collided with. A board with no refs yet has no
+numbering to continue, and has to be told one with `--prefix "AC-"`.
+
+Re-running is safe. The idempotency key is the item **name**, matched ignoring
+case and spacing, so anything already on the board is skipped and only new
+entries in the file are created. It works the other way round too: renaming a
+ticket on the board and re-running creates it again, which is the harmless
+failure of the two.
+
+Everything is checked before the first write: the JSON, every size against
+`progress.weights`, duplicate names within the file, the `Backlog` and size
+labels actually existing on their columns, and the generated ref matching
+`refPattern`. A seed that is going to fail should fail on ticket 0, not ticket
+30 with the board half full.
+
+`backlog.json` is project *content*, unlike `monday-config.json` which is board
+*shape*. Copying this pipeline to another project means bringing the config and
+writing a new backlog, not carrying this one over.
+
+Afterwards, run `progress --force` so the bar counts the new work.
+
 ### Keeping Refs unique
 
 monday has no unique constraint on a Text column, so uniqueness cannot be
@@ -433,7 +480,9 @@ never quietly override what CI passed in. In Actions it simply does not exist.
 
 # Running the scripts by hand
 
-All of these need `MONDAY_TOKEN`, from `.env` or the environment.
+All of these need `MONDAY_TOKEN`, from `.env` or the environment. The one
+exception is `create-items --dry-run`, which validates the backlog file without
+reading the board, so the file can be checked by someone who has no token.
 
 ```bash
 node .github/scripts/monday-sync.js check                       # validate config against the board
@@ -447,6 +496,7 @@ node .github/scripts/monday-sync.js blocked     --refs "AC-1" --stage deploy|che
 node .github/scripts/monday-sync.js setup-progress [--size-title <t>] [--weight-title <t>]
 node .github/scripts/monday-sync.js setup-help                  # write columnHelp onto the board
 node .github/scripts/monday-sync.js progress    [--force]
+node .github/scripts/monday-sync.js create-items --file .github/backlog.json [--limit <n>] [--prefix <text>]
 node .github/scripts/monday-sync.js refs-from-range --from deployed-dev --to HEAD
 ```
 

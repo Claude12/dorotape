@@ -1,0 +1,316 @@
+{
+  "__README": "Ticket seed for the monday board, read by: node .github/scripts/monday-sync.js create-items. Project CONTENT, not pipeline configuration - monday-config.json describes the board's shape and travels to other projects, this file does not. Groups and items are created in the order below and the command is idempotent: an item whose name already exists on the board is skipped, so re-running after adding entries here creates only the new ones. Refs are allocated by the command from the highest one already on the board, never written here, because a ref hardcoded in a file goes stale the moment someone adds a ticket by hand. Sizes must be one of the labels in monday-config.json progress.weights (S, M, L, XL) - the progress bar is weighted by them and an unsized ticket is counted nowhere.",
+  "__source": "Staged plan agreed 2026-08-06, from the audit of the theme and database against 'Dorotape - Tech Spec (1).pdf' (April 2026). Stage order is a dependency order: Stage 1 makes checkout testable, Stage 2 builds the rules against manual values, Stage 3 proves the Sage pipe. Stages 5 and 6 can run alongside from the moment Stage 1 lands.",
+  "__notes": "The 'notes' on each item is posted as the item's first update. Keep it to what the ticket means by done, plus anything that would otherwise have to be re-derived.",
+
+  "groups": [
+    {
+      "title": "Stage 0: client inputs",
+      "items": [
+        {
+          "name": "Client inputs pack for stages 1 to 4",
+          "size": "S",
+          "notes": "One ticket rather than ten, so the progress bar stays a measure of build work. Chasing only.\n\nNeeded:\n- Delivery tariff: zones, First Class and Eco 3-day rates, free shipping threshold, Scotland / Highlands / islands postcodes (blocks Stage 1 shipping)\n- VAT decisions: which customer classes are exempt, is VAT number validation required, does OSS/IOSS apply (blocks Stage 1 tax and Stage 2 exemption logic)\n- Elavon merchant details plus sandbox credentials (blocks Stage 1 payments)\n- APC account login (blocks Stage 4 courier)\n- Rewards sign-off: plugin purchase, earn and redeem rates, historical points file (blocks Stage 4 rewards)\n- Policy copy: T&Cs, Delivery Information, Returns, Privacy (blocks Stage 1 pages)\n- The last 4 unanswered Sage SKU rows (blocks Stage 3)\n- Decision: order history transfer, start fresh or transform\n- Decision: keep v-role-based-pricing or fold customer pricing into the theme engine\n\nDone when every line above has an answer on record."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 1: store configuration",
+      "items": [
+        {
+          "name": "Tax rates and VAT display rules",
+          "size": "M",
+          "notes": "Tax is switched on in WooCommerce but there are ZERO tax rates in the database, so nothing is currently charged.\n\nSet up standard and any reduced or zero rates, confirm the catalogue is ex-VAT throughout (site prices were verified as ex-VAT during the Sage SKU audit), and settle how prices display in shop, cart and checkout.\n\nDone when a test order shows the correct VAT line for a UK business customer."
+        },
+        {
+          "name": "Shipping zones and delivery methods",
+          "size": "M",
+          "notes": "There are currently ZERO shipping zones and ZERO methods on the site.\n\nBuild: UK mainland, Scottish Highlands and islands, Northern Ireland, Republic of Ireland, rest of world. Methods: First Class (premium), Eco 3-day (discounted), free shipping over the agreed threshold, and Local Pickup.\n\nPostcode-level zones are what tech spec addition 5 (Scotland) asks for.\n\nDone when each zone returns the right rates for a test address, and Local Pickup is selectable."
+        },
+        {
+          "name": "Payment methods enabled and configured",
+          "size": "M",
+          "notes": "Only the default BACS, COD and PayPal option rows exist, none configured. Invoice Gateway is active but its purchase order number and payment terms features are both switched OFF.\n\nEnable and configure BACS, configure Invoice Gateway for pay on account including terms, and stand up Elavon or Stripe in sandbox.\n\nDone when a test order can be paid by each enabled method on dev."
+        },
+        {
+          "name": "Customer registration, login and legacy passwords",
+          "size": "S",
+          "notes": "My Account registration is currently DISABLED and checkout signup is off, which is the opposite of what the spec asks for (customers register directly, no manual approval).\n\nEnable registration, settle guest checkout and password policy, and decide on email verification.\n\nAlso verify the MD5 legacy password fallback with a real migrated customer on staging. 10,242 users were migrated from Kryptronic and this has never been tested. If Kryptronic salted the hashes the fallback is a bulk password reset, which is a decision to take early rather than at launch."
+        },
+        {
+          "name": "Policy and information pages published",
+          "size": "S",
+          "notes": "Current state: Privacy Policy and Refund and Returns are both DRAFT, Terms and Conditions does not exist, Delivery Information does not exist, and the WooCommerce terms page setting is empty.\n\nDone when all four are published, linked in the footer, and the Woo terms page is set (checkout will not show the terms checkbox until it is)."
+        },
+        {
+          "name": "Transactional email setup",
+          "size": "S",
+          "notes": "The from-address is still csachinda@gmail.com and wp-mail-smtp is installed but INACTIVE, so order emails on a live site would come from a personal Gmail address or not arrive at all.\n\nActivate and configure SMTP, set the real from-address and name, brand the WooCommerce email templates.\n\nDone when each WooCommerce email arrives, correctly branded, from the right address."
+        },
+        {
+          "name": "Stock availability and backorder messaging",
+          "size": "S",
+          "notes": "Sage is the source of truth for stock, so _manage_stock is deliberately off on every product and everything reads instock. That model is right, but the spec's low stock alerts and backorder messaging (5.1) do not exist.\n\nDecide the messaging rules for standard, bespoke and one-off products, and the exceptions in spec 5.4 where inventory is held in WooCommerce rather than Sage.\n\nDone when the rules are written down and rendering on the product page."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 2: checkout and account rules",
+      "items": [
+        {
+          "name": "Purchase order number at checkout",
+          "size": "S",
+          "notes": "Custom build in the theme rather than the Checkout Field Editor plugin: it is a field, order meta, an email line and an admin column, and it has to reach Sage anyway.\n\nNote Invoice Gateway already has a PO number feature (currently off). Decide which one owns it before building, not after.\n\nDone when the number is captured, shown in admin and emails, and stored where the Sage sync can read it."
+        },
+        {
+          "name": "Credit limit enforcement at checkout",
+          "size": "M",
+          "notes": "Nothing exists today. The ACF user group holds Sage account number, last sync, customer type and discount rate only, so a credit limit field is part of this ticket.\n\nBuild against manually entered values so it can be finished before the Sage sync is live (Stage 3 fills the same field automatically).\n\nSpec 5.2: orders over the limit either block checkout or flag for admin review. Confirm which before building.\n\nDone when a test account over its limit is handled per the agreed rule, with clear customer messaging."
+        },
+        {
+          "name": "Pay on account eligibility gate",
+          "size": "S",
+          "notes": "Spec: only Sage-approved customers may pay on account. Invoice Gateway currently offers itself to everyone.\n\nGate the gateway on a user flag that the Sage sync will later maintain.\n\nDone when the method is invisible to an unapproved account and available to an approved one."
+        },
+        {
+          "name": "VAT exemption rules and VAT number validation",
+          "size": "M",
+          "notes": "Spec 5.3: exempt on validated business VAT number, exempt for Ireland and worldwide addresses, OSS/IOSS compliance.\n\nThe conditional logic is custom. Only the number validation is worth outsourcing, and even that is one call to the EU VIES service.\n\nDepends on the VAT answers in the Stage 0 inputs pack.\n\nDone when each exemption path is demonstrable at checkout with a test address and number."
+        },
+        {
+          "name": "Address book: multiple saved addresses",
+          "size": "M",
+          "notes": "WooCommerce core gives one billing and one shipping address. The spec wants several saved and selectable, and Sage must keep invoice and delivery addresses separate.\n\nCustom build on the My Account hooks rather than the Address Book plugin, because the Sage mapping in Stage 3 has to read whatever structure this stores.\n\nDone when a customer can save several addresses and pick one at checkout."
+        },
+        {
+          "name": "Collection journey: local pickup and Ready for Collection",
+          "size": "M",
+          "notes": "The Ready for Collection order status already exists on the site (via bp-custom-order-status). What is missing is everything around it: Local Pickup as a shipping method, the customer email at that status, and the on-site messaging (\"You will receive an email when your order is ready for collection\").\n\nStatus flow: Pending, Processing, Ready for Collection, Completed.\n\nDone when a collection order moves through the flow and the customer is emailed at the right point."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 3: Sage integration",
+      "items": [
+        {
+          "name": "Reactivate and connect Woosage on dev",
+          "size": "M",
+          "notes": "Woosage is configured (259 settings, order schedules 08:00 to 17:30 weekdays) but the plugin is currently INACTIVE and no orders have ever run through it.\n\nReactivate on dev, confirm the connection, dry run against a copy before anything writes to Sage.\n\nDone when the connection is proven and the settings are reviewed against the decisions already agreed with Mick (stock allocation ON, Sage as stock source of truth, price list roles as secondary roles)."
+        },
+        {
+          "name": "Order push: website order creates the Sage order",
+          "size": "L",
+          "notes": "The core of the spec 5.8 proposal: no more manual entry from a shared inbox.\n\nMust carry the purchase order number and the cut-size notes. inc/cutsize.php already surfaces cut-size data to Woosage via rest_request_after_callbacks, so verify that path still holds once real orders flow.\n\nDone when an order placed on dev appears in Sage with the right lines, prices, PO number and notes."
+        },
+        {
+          "name": "Customer sync and duplicate prevention",
+          "size": "L",
+          "notes": "10,242 users were migrated and acctsyspri was empty on every row, so no Sage account numbers came across. The ACF Sage fields are waiting to receive them.\n\nSpec calls out duplicate account prevention for clients with multiple addresses, which is the hard part.\n\nDone when accounts sync both ways without creating duplicates, and Sage account numbers populate on the WordPress users."
+        },
+        {
+          "name": "Address mapping: invoice to billing, delivery to shipping",
+          "size": "M",
+          "notes": "Spec 5.3 and 5.8 both require the separation to survive the sync. Depends on the address book structure from Stage 2.\n\nDone when an order with different invoice and delivery addresses lands in Sage with both intact."
+        },
+        {
+          "name": "Stock pull from Sage and site display",
+          "size": "M",
+          "notes": "Sage is the source of truth, WooCommerce displays availability. Spec 5.4 allows live sync for high-volume items and assumed availability elsewhere.\n\nPairs with the messaging rules built in Stage 1.\n\nDone when a stock movement in Sage is reflected on the site within the agreed window."
+        },
+        {
+          "name": "Customer-specific pricing from Sage price lists",
+          "size": "L",
+          "notes": "Decision needed first: v-role-based-pricing is active with ZERO rules configured, while the theme already applies customer_discount_rate per user in dorotape_dynamic_pricing (inc/pricing.php). Two mechanisms for one job.\n\nAgreed with Mick that price list roles are assigned as secondary roles. Whichever mechanism wins, the other should be removed rather than left dormant.\n\nDone when a trade account sees its own prices in listing, product page, cart and checkout, and the theme's tier and discount logic still applies correctly on top."
+        },
+        {
+          "name": "Credit limits pulled from Sage into ACF",
+          "size": "M",
+          "notes": "Fills the field the Stage 2 checkout gate was built against, so this ticket is data, not logic.\n\nSpec note: real time is ideal but a scheduled job every 15 minutes may be more practical depending on Sage API performance.\n\nDone when a limit changed in Sage reaches the site and the checkout gate acts on the new value."
+        },
+        {
+          "name": "Invoice sync and download in My Account",
+          "size": "M",
+          "notes": "Today invoices are downloaded by hand and emailed one at a time. Spec: Sage generates them, they sync back, and the customer downloads from the account dashboard.\n\nDone when an invoice raised in Sage appears against the order in My Account and downloads cleanly."
+        },
+        {
+          "name": "Sync cadence and failure handling",
+          "size": "S",
+          "notes": "Settle real time versus scheduled jobs per object type, and decide what happens when a sync fails: who is told, what the customer sees, and how it is retried.\n\nA sync that fails silently on a live shop is worse than one that does not run.\n\nDone when the cadence is documented and a forced failure produces a visible, actionable alert."
+        },
+        {
+          "name": "Close the last 4 Sage SKU rows",
+          "size": "S",
+          "notes": "Michael answered 131 of 135 rows on the follow-up sheet (Dorotape New Website vs Sage Review - FollowUp.xlsx). Four remain.\n\nAlso confirm the locked SKU rule still holds for any product created from here on: variation and simple-product SKUs must be exact Sage codes.\n\nDone when the four are resolved or formally parked with a reason."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 4: commercial features",
+      "items": [
+        {
+          "name": "Discount coupons: campaign set and rules",
+          "size": "M",
+          "notes": "Coupons are enabled but ZERO exist and no rules are configured.\n\nBuild the set the client actually needs (newsletter, seasonal, free shipping), with restrictions on products, roles and minimum spend.\n\nDone when each coupon type behaves correctly against a trade account and a retail account."
+        },
+        {
+          "name": "Pricing interaction test matrix",
+          "size": "M",
+          "notes": "The real deliverable of this stage. Quantity tiers, per-customer discount, Sage price lists, coupons and cut-size lines all touch the same cart total, and they were built at different times.\n\nWrite the matrix, run it, record the results. Anything that surprises is a bug, not a preference.\n\nDone when every combination has a known and intended outcome."
+        },
+        {
+          "name": "Rewards and loyalty: install and configure",
+          "size": "L",
+          "notes": "Nothing exists today, no plugin and no code. This is the one place a plugin is clearly right: points ledger, redemption, fraud rules and admin UI are a lot to build and none of it is Dorotape-specific.\n\nRewardsWP is the spec's proposal. Depends on the purchase and the earn and redeem rates from the Stage 0 inputs pack.\n\nDone when points are earned on an order and redeemable at checkout."
+        },
+        {
+          "name": "Rewards history import",
+          "size": "M",
+          "notes": "Spec addition 2: points can be added manually per account, so existing balances can be carried over.\n\nDepends on a balances file from the client and on the rewards plugin being live.\n\nDone when the imported balances reconcile against the client's figures."
+        },
+        {
+          "name": "Re-order from a past order",
+          "size": "S",
+          "notes": "Spec addition 3. WooCommerce core already ships an Order Again button, untouched on this site, so the work is deciding whether core is enough and polishing rather than building from scratch.\n\nWatch the interaction with quantity steps and cut-size line data, which core knows nothing about.\n\nDone when re-ordering a past order with stepped quantities and cut sizes produces a correct basket."
+        },
+        {
+          "name": "Order stage notifications",
+          "size": "M",
+          "notes": "Spec 5.8: notifications at order received, ready for collection and dispatched.\n\nEmail first, using the templates set up in Stage 1. SMS is a separate decision with a cost attached.\n\nDone when each stage change sends the right message to the right person."
+        },
+        {
+          "name": "Courier integration and tracking emails",
+          "size": "L",
+          "notes": "Spec addition 9. Blocked on APC account access from the Stage 0 inputs pack.\n\nAgreed approach: see what is achievable with WooCommerce and the APC account directly before paying for ShipStation or similar, then judge whether the paid option earns its cost.\n\nDone when a dispatched order carries a tracking number and the customer gets a tracking email."
+        },
+        {
+          "name": "White label delivery",
+          "size": "M",
+          "notes": "Spec addition 6, and it is still a question rather than a build: the user journey has to be defined first.\n\nLikely shape is a user role plus a shipping rule, but do not build to that assumption until the journey is agreed.\n\nDone when the journey is agreed and implemented."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 5: navigation and discovery",
+      "items": [
+        {
+          "name": "Populate menus to the sitemap",
+          "size": "S",
+          "notes": "Only 4 nav menu items exist in the database. The theme registers primary, secondary and footer menus and none of them are meaningfully filled.\n\nBuild them to the spec sitemap: 8 product categories with subcategories, the six secondary pages, and the four policy pages in the footer.\n\nDone when every page in the sitemap is reachable from the navigation."
+        },
+        {
+          "name": "Mega menu build",
+          "size": "L",
+          "notes": "Custom build in the theme rather than the Max Mega Menu plugin. The navigation is already custom (js/scaffold.js dropdown nav) and the spec marks the plugin optional.\n\nSpec 5.6 wants icons and thumbnails for ranges, hover previews and featured products in the dropdowns, and mobile-friendly collapsible menus.\n\nDone when the mega menu renders from the CMS with images, and works on touch as well as hover."
+        },
+        {
+          "name": "Filter bar upgrade: AJAX, multi-select, swatches",
+          "size": "L",
+          "notes": "A filter bar exists (dorotape_render_filter_bar in inc/woocommerce.php: adhesive properties, colour, finish, using WooCommerce layered nav parameters with an Apply button as the no-JS fallback).\n\nSpec 5.5 asks for sticky AJAX filters, multi-select and colour swatches, so this is an upgrade of working code rather than a new build. Keep the no-JS fallback.\n\nDone when filtering does not reload the page, several values can be selected per attribute, and colours show as swatches."
+        },
+        {
+          "name": "Search relevance and result filtering",
+          "size": "M",
+          "notes": "FiboSearch is live and the theme adds SKU and item-number matching on top (posts_search plus the FiboSearch native filter), which covers the predictive search the spec asked for.\n\nRemaining: relevance weighting by colour, SKU and product type, and filters on the results page. Worth revisiting here whether semantic search (Queryra, Algolia) is still wanted now that predictive search works, since both are paid.\n\nDone when a trade customer searching by item number and by description both land on the right product quickly."
+        },
+        {
+          "name": "AI chatbot decision and install",
+          "size": "M",
+          "notes": "Spec 5.7: MX Chat, support and sales hybrid, trained on the product catalogue, FAQs and site content.\n\nPaid and not started. Needs a decision on whether it is in scope for launch or a phase two item, since it wants content that does not exist yet.\n\nDone when the decision is recorded, and installed and trained if it is a yes."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 6: hardening and platform",
+      "items": [
+        {
+          "name": "Move dorotape-migration out of the webroot",
+          "size": "S",
+          "notes": "Deploy is a git pull inside public_html, so every committed file is reachable over HTTP. dorotape-migration/ sits inside the theme and holds over 100 CSV exports of the client's old CMS, including customer data.\n\ntests/ ships an .htaccess for exactly this reason. dorotape-migration/ does not.\n\nMust be resolved before any staging or production deployment. Done when the directory is outside the webroot or provably unreachable."
+        },
+        {
+          "name": "Security hardening: Wordfence, 2FA, admin access",
+          "size": "S",
+          "notes": "Spec section 8. Currently: comments are disabled and the custom code follows escaping and sanitising conventions, but Wordfence is NOT installed and there is no 2FA.\n\nInstall and configure Wordfence, enable 2FA for admin users, restrict admin access, review roles and passwords.\n\nDone when the spec section 8 list is fully ticked."
+        },
+        {
+          "name": "SEO tooling: RankMath and schema",
+          "size": "M",
+          "notes": "No SEO plugin is installed. Nothing produces meta descriptions, and the site check baseline records that every page lacks one.\n\nInstall RankMath, set title and meta templates for products and categories, add Product, Organization and Breadcrumb schema.\n\nThis ticket is the tooling. The migration itself is Stage 7. Done when templates are producing sane metadata across the catalogue."
+        },
+        {
+          "name": "Cookie consent",
+          "size": "S",
+          "notes": "CookieYes per the spec, for GDPR. Not installed.\n\nWorth a plugin rather than custom code: the compliance rules change and the plugin is what keeps up with them.\n\nDone when consent is captured and non-essential scripts respect it."
+        },
+        {
+          "name": "Image optimisation and caching review",
+          "size": "M",
+          "notes": "W3 Total Cache is active. Imagify or equivalent is not installed, and there are 1,289 attachments.\n\nAdd WebP conversion and compression, then review the caching rules so cart, checkout and My Account are never cached, and review plugin load for bloat per spec section 9.\n\nDone when Lighthouse improves measurably and no logged-in or cart page is served stale."
+        },
+        {
+          "name": "Backup arrangement with the host",
+          "size": "S",
+          "notes": "All-in-One WP Migration is active, which is a migration tool rather than a backup regime.\n\nSpec: native host backup or a third-party plugin, to be agreed with the hosting provider. Settle frequency, retention and, most importantly, a tested restore.\n\nDone when a restore has actually been performed once."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 7: SEO migration and pre-launch QA",
+      "items": [
+        {
+          "name": "Pre-migration audit, benchmark and 301 map",
+          "size": "L",
+          "notes": "Spec section 10, phase 1. Nothing has been done on this yet and it cannot be rushed at the end: the old Kryptronic URLs have to be crawled while the old site is still up.\n\nFull site audit, benchmark current rankings and traffic, then build the 301 map old URL to new URL.\n\nDone when every old URL that matters has a mapped destination."
+        },
+        {
+          "name": "URL structure, internal links, sitemap and robots",
+          "size": "M",
+          "notes": "Spec section 10, phase 2. Preserve URL structure where possible, update internal links, publish the XML sitemap and robots.txt.\n\nNote the Orajet restructure already relies on core _wp_old_slug redirects for two products, so check those still resolve after any permalink change.\n\nDone when a crawl of the new site returns no unintended 404s and the sitemap is submitted."
+        },
+        {
+          "name": "Accessibility backlog from the Sprint 1 baseline",
+          "size": "L",
+          "notes": "Deferred from Sprint 1 by agreement. tests/fixtures/baseline.json carries 191 axe violations, mostly colour contrast on WooCommerce prices, add-to-cart buttons, tag links and wishlist labels.\n\nThey are baselined so they do not fail the build, but they are real defects rather than noise. Spec section 9 targets WCAG 2.1 AA where feasible.\n\nWork through them, then refresh with npm run baseline and commit the diff. Done when the baseline is materially smaller and the remaining entries are deliberate."
+        },
+        {
+          "name": "Cross-browser, device and Lighthouse pass",
+          "size": "M",
+          "notes": "Spec section 9: Chrome, Firefox, Edge and Safari; iPhone, Android, iPad and tablets; responsiveness across screen sizes; form submissions; Lighthouse audits for Core Web Vitals.\n\nThe automated suite in tests/ covers page loads, markup, accessibility and a product reaching checkout. This ticket is the manual pass it cannot do.\n\nDone when the checklist is completed and any findings are ticketed."
+        }
+      ]
+    },
+
+    {
+      "title": "Stage 8: launch",
+      "items": [
+        {
+          "name": "Pre-live review, backup and go-live",
+          "size": "M",
+          "notes": "Spec section 11, steps 1 to 5: final review and sign-off, backup of the current live site, DNS preparation and go-live scheduling, migration of files and database to production, replace dev URLs with live URLs.\n\nProduction deployment is manual and stays manual. A rollback plan must be ready before DNS changes.\n\nDone when the new site is live on the domain and the rollback path has been rehearsed."
+        },
+        {
+          "name": "Post-launch checks",
+          "size": "S",
+          "notes": "Spec section 11, step 6: link validation, form testing, analytics verification (GA4 and Search Console), responsive checks.\n\nAlso notify Google of the site change and request indexing, per spec section 10 phase 5.\n\nDone when all four checks pass on production and Search Console is receiving the new sitemap."
+        },
+        {
+          "name": "CMS user guides",
+          "size": "M",
+          "notes": "Spec section 12. Guides for the operations the client will actually perform: adding a product with quantity tiers, editing price breaks, marking a product POA, enabling the cut-size box, managing orders through the collection status flow, and issuing coupons.\n\nThe custom metaboxes in inc/admin.php are the least self-explanatory part of the build, so they get the most attention.\n\nDone when the client can perform each task from the guide without asking."
+        },
+        {
+          "name": "Order history transfer decision",
+          "size": "S",
+          "notes": "Spec addition 1. There is no out-of-the-box route and the default position is to start fresh, with a possibility of transforming the old data into a WooCommerce-readable form.\n\nThis ticket exists so the decision is recorded rather than defaulted into by silence. Done when the client has chosen, and the transform is either scoped as its own work or the fresh start is confirmed in writing."
+        }
+      ]
+    }
+  ]
+}

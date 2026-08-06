@@ -71,6 +71,68 @@ function dorotape_sku_index(): array {
 	return $out;
 }
 
+/**
+ * Does one unit of this product mean a ROLL rather than a metre?
+ *
+ * The sheet's figures are metres throughout. A step is a quantity multiplier,
+ * so writing "5" is only correct where one unit is one metre. Where the product
+ * is sold as fixed-length rolls, one unit is a whole roll and a step of 5 means
+ * five rolls — e.g. ASLAN CT11355 is a 1250mm x 5m roll at £38.10, so a step of
+ * 5 forces a £190.50 minimum and makes a single roll unbuyable.
+ *
+ * Two independent signals, either one is disqualifying:
+ *
+ *  (a) _dt_price_unit = 'roll' — set on the 13 whole-roll products.
+ *  (b) A variation axis that encodes a LENGTH as well as a width
+ *      ("1250mm x 5m roll", "transparent-1370mm-x-30m"). A per-metre product
+ *      varies by width alone ("610mm", "1220mm"), so a length in the option
+ *      label means the customer is choosing a roll, not a number of metres.
+ *
+ * (b) is what the earlier version missed: these products never carried the
+ * _dt_price_unit meta, so they defaulted to 'metre' and passed the old check.
+ *
+ * @param int $parent Parent product ID.
+ * @return string Empty if per-metre, otherwise the reason it is roll-quantity.
+ */
+function dorotape_roll_quantity_reason( int $parent ): string {
+	if ( 'roll' === get_post_meta( $parent, '_dt_price_unit', true ) ) {
+		return '_dt_price_unit=roll';
+	}
+
+	$product = wc_get_product( $parent );
+	if ( ! $product || ! $product->is_type( 'variable' ) ) {
+		return '';
+	}
+
+	global $wpdb;
+
+	foreach ( $product->get_children() as $child_id ) {
+		// Read the raw attribute_* meta rather than get_attributes(). On a
+		// product whose attribute setup is broken the declared axis can be
+		// empty while the real option label survives as an orphaned meta row —
+		// ASLAN SRL96 declares pa_width, blank on all four children, yet still
+		// carries attribute_pa_choose-roll-size-below = "1370mm-x-10m-roll".
+		// get_attributes() returns only the declared axis, so it reports "" and
+		// the roll would slip through.
+		$values = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT meta_value FROM {$wpdb->postmeta}
+				  WHERE post_id = %d AND meta_key LIKE 'attribute\\_%%' AND meta_value <> ''",
+				$child_id
+			)
+		);
+
+		foreach ( $values as $value ) {
+			// "<width>mm x <length>m" — the trailing (?!m) keeps "mm" out.
+			if ( preg_match( '/\d{2,4}\s*mm[\s\-]*x[\s\-]*(\d+(?:\.\d+)?)\s*m(?!m)/i', (string) $value, $m ) ) {
+				return sprintf( 'sold as fixed-length rolls (option "%s" is a %sm roll)', $value, $m[1] );
+			}
+		}
+	}
+
+	return '';
+}
+
 $index = dorotape_sku_index();
 
 $handle = fopen( $csv, 'r' );
@@ -79,6 +141,7 @@ fgetcsv( $handle ); // header
 $planned  = array(); // parent id => array( step, codes[] )
 $unmatched = array();
 $skipped   = array();
+$roll_cleanup = array(); // parent id => reason, for steps wrongly written before
 
 while ( false !== ( $row = fgetcsv( $handle ) ) ) {
 	if ( ! isset( $row[0] ) || '' === trim( $row[0] ) ) {
@@ -114,13 +177,18 @@ while ( false !== ( $row = fgetcsv( $handle ) ) ) {
 	// so the "15" against it describes the roll, not a quantity of rolls.
 	// Writing 15 as the step on a roll-priced product would force a 225m
 	// minimum order. Skip and report; the unit itself needs deciding first.
-	if ( 'roll' === get_post_meta( $parent, '_dt_price_unit', true ) ) {
+	$roll_reason = dorotape_roll_quantity_reason( $parent );
+	if ( '' !== $roll_reason ) {
 		$skipped[] = sprintf(
-			'%s (parent %d is priced per roll, sheet gives metres — increment %s not applied)',
+			'%s (parent %d — %s; sheet gives metres, increment %s not applied)',
 			$code,
 			$parent,
+			$roll_reason,
 			$incr
 		);
+		// An earlier run wrote this step before the roll check covered option
+		// labels, so the replay has to undo it rather than merely not repeat it.
+		$roll_cleanup[ $parent ] = $roll_reason;
 		continue;
 	}
 
@@ -161,8 +229,26 @@ foreach ( $planned as $parent => $plan ) {
 	++$written;
 }
 
+$removed = 0;
+foreach ( $roll_cleanup as $parent => $reason ) {
+	$current = get_post_meta( $parent, '_dt_qty_step', true );
+	if ( '' === $current || (int) $current <= 1 ) {
+		continue;
+	}
+	$title = html_entity_decode( get_the_title( $parent ) );
+	$label = sprintf( '#%-6d %-46s', $parent, mb_substr( $title, 0, 46 ) );
+	if ( $apply ) {
+		delete_post_meta( $parent, '_dt_qty_step' );
+		echo "  [remove] $label step $current removed — $reason\n";
+	} else {
+		echo "  [dry-rm] $label step $current would be removed — $reason\n";
+	}
+	++$removed;
+}
+
 echo "\n";
 printf( "parents targeted : %d\n", count( $planned ) );
+printf( "%s : %d\n", $apply ? 'roll steps removed' : 'roll steps to remove', $removed );
 printf( "%s : %d\n", $apply ? 'written        ' : 'would write    ', $written );
 printf( "already correct  : %d\n", $already );
 
