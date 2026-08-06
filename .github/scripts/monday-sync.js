@@ -742,7 +742,13 @@ function refsFromSources(cfg, sources) {
 }
 
 /**
- * Commit subjects and bodies in `from..HEAD`, or [] if that cannot be read.
+ * Commit SUBJECTS in `from..HEAD`, or [] if that cannot be read.
+ *
+ * Subjects only, deliberately. A body is where you explain a change, and
+ * explaining one ticket almost always means naming others: "the shape here is
+ * for DR-18", "zone layout stays in DR-3". Scanning bodies read those as work
+ * done and moved five untouched tickets to In progress in one push. A subject
+ * names the ticket the commit IS; a body names tickets it merely talks about.
  *
  * Deliberately quiet where refsFromRange is loud. Its caller is a deploy, where
  * a missing range means tickets go unreported and you need to know. Here it is
@@ -756,7 +762,7 @@ function refsFromCommitsQuiet(cfg, from) {
     return [];
   }
   try {
-    const out = execFileSync('git', ['log', '--format=%s%n%b', `${from}..HEAD`], {
+    const out = execFileSync('git', ['log', '--format=%s', `${from}..HEAD`], {
       encoding: 'utf8',
       maxBuffer: 20 * 1024 * 1024,
     });
@@ -824,6 +830,9 @@ function revExists(rev) {
 /**
  * Refs mentioned across a commit range - the multi-ticket deploy case.
  *
+ * Subjects only, for the reason given on refsFromCommitsQuiet: a ref in a body
+ * is a cross-reference, not a claim that the ticket was worked on.
+ *
  * If `from` does not resolve, this reports only `to` instead of failing. That
  * is exactly the first-deploy case: the deployed-dev marker does not exist yet,
  * and reporting the one commit we know shipped beats reporting nothing.
@@ -835,7 +844,7 @@ function refsFromRange(cfg, from, to) {
   }
   let out;
   try {
-    out = execFileSync('git', ['log', '--format=%s%n%b', range], {
+    out = execFileSync('git', ['log', '--format=%s', range], {
       encoding: 'utf8',
       maxBuffer: 20 * 1024 * 1024,
     });
