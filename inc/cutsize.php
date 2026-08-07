@@ -197,7 +197,7 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 		</button>
 		<div class="dt-cutsize__panel" id="dt_cutsize_panel" hidden>
 		<p class="dt-cutsize__hint">
-			<?php esc_html_e( 'Set how many rolls need each cut pattern below — the quantities must add up to your total order quantity. Add another cut within a pattern if a roll needs splitting into more than one length.', 'dorotape' ); ?>
+			<?php esc_html_e( 'Set how many rolls need each cut pattern below. The quantities must add up to your total order quantity. Add another cut within a pattern if a roll needs splitting into more than one length.', 'dorotape' ); ?>
 			<span class="dt-cutsize__max" style="<?php echo $max_width ? '' : 'display:none'; ?>">
 				<?php
 				/* translators: %s: roll width, e.g. 1220mm */

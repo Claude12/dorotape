@@ -237,7 +237,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		) ),
 		esc_html( sprintf(
 			/* translators: 1: minimum quantity + unit suffix e.g. "25m"/"10", 2: attribute label e.g. "Size / Width" */
-			__( 'Order %1$s or more — select a %2$s below to see full pricing', 'dorotape' ),
+			__( 'Order %1$s or more: select a %2$s below to see full pricing', 'dorotape' ),
 			$min_qty_for . rtrim( dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) )['qty_suffix'], '+' ),
 			$attr_label
 		) )
@@ -299,7 +299,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
 	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
-	echo '<td>—</td>';
+	echo '<td>&ndash;</td>';
 	echo '</tr>';
 
 	foreach ( $tiers as $tier ) {
@@ -313,7 +313,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
 		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
 		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
-		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '—' ) . '</td>';
+		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&ndash;' ) . '</td>';
 		echo '</tr>';
 	}
 
@@ -445,7 +445,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
 	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
-	echo '<td>&mdash;</td>';
+	echo '<td>&ndash;</td>';
 	echo '</tr>';
 
 	foreach ( $init_tiers as $tier ) {
@@ -460,7 +460,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		echo '<tr class="dt-tier-pricing__row" data-min="' . esc_attr( $min_qty ) . '" data-price="' . esc_attr( $tier_price ) . '">';
 		echo '<td>' . esc_html( $min_qty . $u['qty_suffix'] ) . '</td>';
 		echo '<td>' . wp_kses_post( wc_price( $tier_price ) ) . esc_html( $u['suffix'] ) . '</td>';
-		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&mdash;' ) . '</td>';
+		echo '<td>' . ( $saving > 0 ? esc_html( $saving . '% off' ) : '&ndash;' ) . '</td>';
 		echo '</tr>';
 	}
 

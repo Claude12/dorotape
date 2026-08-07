@@ -53,7 +53,7 @@ add_action( 'woocommerce_product_after_variable_attributes', function ( int $loo
 			style="width:100%;max-width:360px;"
 		/>
 		<p class="description">
-			<?php esc_html_e( 'Quantity discount tiers for this specific width/variation. Format: min:price segments separated by semicolons — e.g. 1-24:11.00;25:9.90 means £11.00/m for 1–24 metres, £9.90/m for 25+. Each variation can have its own tier prices (wider widths are typically higher). The tier table on the product page updates automatically when a customer selects this variation. Leave blank for no quantity discount on this variation.', 'dorotape' ); ?>
+			<?php esc_html_e( 'Quantity discount tiers for this specific width/variation. Format: min:price segments separated by semicolons. For example 1-24:11.00;25:9.90 means £11.00/m for 1–24 metres, £9.90/m for 25+. Each variation can have its own tier prices (wider widths are typically higher). The tier table on the product page updates automatically when a customer selects this variation. Leave blank for no quantity discount on this variation.', 'dorotape' ); ?>
 		</p>
 	</div>
 	<?php
@@ -112,7 +112,7 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 		'value'       => $tiers_raw,
 		'placeholder' => 'e.g. 1-24:11.00;25:9.90',
 		'desc_tip'    => false,
-		'description' => __( 'Format: min:price segments separated by semicolons. The price is £/metre at the base width — wider widths scale automatically. Example: 1-24:11.00;25:9.90 → £11.00/m for 1–24m, £9.90/m for 25m+. The table appears on the product page and the discount applies automatically in the cart. Leave blank for no quantity discount.', 'dorotape' ),
+		'description' => __( 'Format: min:price segments separated by semicolons. The price is £/metre at the base width; wider widths scale automatically. Example: 1-24:11.00;25:9.90 → £11.00/m for 1–24m, £9.90/m for 25m+. The table appears on the product page and the discount applies automatically in the cart. Leave blank for no quantity discount.', 'dorotape' ),
 	) );
 
 	woocommerce_wp_text_input( array(
@@ -121,7 +121,7 @@ add_action( 'woocommerce_product_options_general_product_data', function (): voi
 		'value'       => get_post_meta( $post->ID, 'colour_hex', true ),
 		'placeholder' => 'e.g. #cc0028',
 		'desc_tip'    => false,
-		'description' => __( 'CSS hex colour shown as a swatch on archive and product pages when no product image is uploaded. Format: #rrggbb — e.g. #cc0028 (red), #1a1a1a (black). Used for coloured vinyl ranges. Leave blank when a real product image is uploaded.', 'dorotape' ),
+		'description' => __( 'CSS hex colour shown as a swatch on archive and product pages when no product image is uploaded. Format: #rrggbb, e.g. #cc0028 (red), #1a1a1a (black). Used for coloured vinyl ranges. Leave blank when a real product image is uploaded.', 'dorotape' ),
 	) );
 
 	echo '</div>';

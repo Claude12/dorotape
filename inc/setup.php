@@ -154,7 +154,7 @@ function dorotape_setup_product_attributes(): void {
 
 		if ( is_wp_error( $result ) ) {
 			// Log silently — non-fatal, admin can create manually if needed.
-			error_log( 'Dorotape setup: failed to create attribute "' . $attribute['slug'] . '" — ' . $result->get_error_message() );
+			error_log( 'Dorotape setup: failed to create attribute "' . $attribute['slug'] . '": ' . $result->get_error_message() );
 		}
 	}
 

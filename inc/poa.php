@@ -150,7 +150,7 @@ add_filter( 'woocommerce_get_settings_products', function ( array $settings, str
 		'orderby'        => 'title',
 		'order'          => 'ASC',
 	] );
-	$options = [ '' => esc_html__( '— No form selected —', 'dorotape' ) ];
+	$options = [ '' => esc_html__( 'No form selected', 'dorotape' ) ];
 	foreach ( $forms as $form ) {
 		$options[ (string) $form->ID ] = $form->post_title . '  (#' . $form->ID . ')';
 	}
