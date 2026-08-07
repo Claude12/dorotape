@@ -64,7 +64,23 @@ function resolveSite() {
 }
 
 const SITE = resolveSite().replace(/\/$/, '');
+/**
+ * How many pages a run looks at.
+ *
+ * A normal run samples, because it has to finish while somebody is waiting for
+ * it. `npm run baseline` raises this to visit everything it can list, and that
+ * difference is deliberate: a template's record is only as complete as the
+ * pages it was recorded from. Record from ten products and a feature that only
+ * some products have - a tier pricing table, a gallery - is missing from the
+ * record, so the first run that samples a product carrying one reports it as
+ * new. Recording from all of them makes any later sample a subset.
+ */
 const SAMPLE = Number(process.env.SAMPLE_SIZE || 24);
+
+// How many rows a REST listing is asked for. A listing that comes back this
+// full is a listing that has been truncated, and the group behind it is bigger
+// than anything we are going to look at.
+const LISTING_LIMIT = 30;
 const OUT = path.join(__dirname, '.artifacts', 'plan.json');
 
 async function get(url) {
@@ -106,7 +122,13 @@ async function findSitemaps() {
 const countOf = (groups) =>
   Object.fromEntries(Object.entries(groups).map(([k, v]) => [k, v.length]));
 
-/** Spread the sample across post types rather than taking the first N of one. */
+/**
+ * Spread the sample across post types rather than taking the first N of one.
+ *
+ * Returns which group each URL came from as well as the URL. The baseline needs
+ * it: a page sampled out of thousands cannot be keyed the same way as a page
+ * that is checked in full. See lib/baseline.js.
+ */
 function spread(groups, total) {
   const out = [];
   const names = Object.keys(groups).filter((k) => groups[k].length);
@@ -114,11 +136,15 @@ function spread(groups, total) {
 
   const perGroup = Math.max(1, Math.floor(total / names.length));
   for (const name of names) {
-    const urls = groups[name];
+    // Sort before striding. Neither the REST API nor a sitemap promises a
+    // stable order, so an unsorted stride quietly picks a different sample on
+    // every run, and two runs of this check then have nothing in common to
+    // compare. Sorted, the same catalogue always yields the same sample.
+    const urls = [...groups[name]].sort();
     // Even stride through the group, so it is not just the newest posts.
     const stride = Math.max(1, Math.floor(urls.length / perGroup));
     for (let i = 0; out.length < total && i < urls.length; i += stride) {
-      out.push(urls[i]);
+      out.push({ url: urls[i], group: name });
     }
   }
   return out.slice(0, total);
@@ -134,17 +160,23 @@ function spread(groups, total) {
 async function collectFromRest() {
   const groups = {};
 
+  // Names of groups where the listing came back full, so the site holds an
+  // unknown number more. Worth knowing: a group we have seen all of can be
+  // recorded page by page, and one we have not has to be recorded per template.
+  const capped = [];
+
   for (const [name, endpoint] of [
-    ['pages', '/wp-json/wp/v2/pages?per_page=30&status=publish'],
-    ['posts', '/wp-json/wp/v2/posts?per_page=30&status=publish'],
-    ['products', '/wp-json/wc/store/v1/products?per_page=30'],
+    ['pages', `/wp-json/wp/v2/pages?per_page=${LISTING_LIMIT}&status=publish`],
+    ['posts', `/wp-json/wp/v2/posts?per_page=${LISTING_LIMIT}&status=publish`],
+    ['products', `/wp-json/wc/store/v1/products?per_page=${LISTING_LIMIT}`],
   ]) {
     const list = await getJson(SITE + endpoint);
     if (!Array.isArray(list) || !list.length) continue;
     groups[name] = list.map((item) => item.link || item.permalink).filter(Boolean);
+    if (list.length >= LISTING_LIMIT) capped.push(name);
   }
 
-  return groups;
+  return { groups, capped };
 }
 
 /**
@@ -164,10 +196,15 @@ async function collectUrls() {
   const found = await findSitemaps();
 
   if (!found) {
-    const groups = await collectFromRest();
+    const { groups, capped } = await collectFromRest();
     const total = Object.values(groups).reduce((n, g) => n + g.length, 0);
-    if (!total) return { urls: [], note: 'no sitemap and no REST listings' };
-    return { urls: spread(groups, SAMPLE), groups: countOf(groups), note: 'via REST API (no sitemap)' };
+    if (!total) return { picks: [], note: 'no sitemap and no REST listings' };
+    return {
+      picks: spread(groups, SAMPLE),
+      groups: countOf(groups),
+      capped,
+      note: 'via REST API (no sitemap)',
+    };
   }
 
   const groups = {};
@@ -186,7 +223,41 @@ async function collectUrls() {
     }
   }
 
-  return { urls: spread(groups, SAMPLE), groups: countOf(groups), note: `via ${found.index}` };
+  // A sitemap lists everything, so nothing here is truncated the way a REST
+  // listing is.
+  return { picks: spread(groups, SAMPLE), groups: countOf(groups), capped: [], note: `via ${found.index}` };
+}
+
+/**
+ * Which of the checked URLs stand in for pages nobody is going to check.
+ *
+ * A group whose every URL is in the sample is checked in full: there is no
+ * unseen remainder, so each page can be held to its own record. A group we took
+ * ten of thirty from is a sample, and today's ten are not tomorrow's - so the
+ * pages in it are recorded against their group instead, and the record covers
+ * the whole type rather than the handful that happened to be visited.
+ *
+ * A capped group counts as sampled even when every URL we know of is checked,
+ * because the cap means the listing was cut short and there are more pages we
+ * never saw. Without this, a baseline run - which deliberately visits every
+ * listed URL - would decide the catalogue was fully covered and go back to
+ * recording products one by one, which is the thing being fixed.
+ *
+ * Returns pathname -> group name, for the sampled ones only. lib/baseline.js
+ * reads it; nothing else needs to care.
+ */
+function templatesFor(picks, counts, capped) {
+  const sampled = {};
+  for (const p of picks) sampled[p.group] = (sampled[p.group] || 0) + 1;
+
+  const partial = new Set(capped || []);
+  const out = {};
+  for (const p of picks) {
+    if (partial.has(p.group) || sampled[p.group] < (counts || {})[p.group]) {
+      out[new URL(p.url).pathname] = p.group;
+    }
+  }
+  return out;
 }
 
 /**
@@ -216,29 +287,43 @@ async function findWooProduct() {
 }
 
 (async () => {
-  const { urls, groups, note } = await collectUrls();
+  const { picks, groups, capped, note } = await collectUrls();
   const woo = await findWooProduct();
   const shop = woo ? await findShopPages() : [];
 
   // The front page is always worth checking, and is the one URL every site has.
-  const paths = urls.map((u) => new URL(u).pathname);
+  const paths = picks.map((p) => new URL(p.url).pathname);
   const plan = {
     site: SITE,
     generatedAt: new Date().toISOString(),
     source: note || '',
     counts: groups || {},
     urls: [...new Set(['/', ...paths, ...shop])],
+    templates: templatesFor(picks, groups, capped),
     woocommerce: woo,
   };
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(plan, null, 2) + '\n');
 
+  // Clearing the baseline belongs here rather than in the specs. Recording adds
+  // to what is already on file, so without a clear a refresh could only grow:
+  // anything genuinely fixed would stay on the accepted list and keep being
+  // forgiven long after it stopped being true. Doing it once, before any test
+  // starts, also means parallel workers cannot wipe each other's findings.
+  if (process.env.RESET_BASELINE === '1') {
+    require('./lib/baseline').reset();
+  }
+
+  const templated = Object.keys(plan.templates).length;
+
   console.log(`Site:  ${SITE}`);
   console.log(`Pages: ${plan.urls.length}${note ? ` (${note})` : ''}`);
   if (groups) {
     for (const [k, v] of Object.entries(groups)) console.log(`         ${k}: ${v} found`);
   }
+  if (templated) console.log(`Known: ${templated} sampled, so baselined per template`);
+  if (process.env.RESET_BASELINE === '1') console.log('Base:  cleared, ready to record');
   if (!woo) console.log('Woo:   not a WooCommerce site - the shop journey will skip');
   else if (woo.none) console.log('Woo:   present, but nothing purchasable found - the shop journey will skip');
   else console.log(`Woo:   ${woo.type} product #${woo.id} "${woo.name}" at ${woo.path}`);

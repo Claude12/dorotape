@@ -7,7 +7,7 @@
     "pretest": "node discover.js",
     "test": "playwright test",
     "report": "playwright show-report .artifacts/report",
-    "baseline": "node discover.js && UPDATE_BASELINE=1 playwright test a11y markup --workers=1"
+    "baseline": "RESET_BASELINE=1 SAMPLE_SIZE=500 node discover.js && UPDATE_BASELINE=1 playwright test a11y markup --workers=1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

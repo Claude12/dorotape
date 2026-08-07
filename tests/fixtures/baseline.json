@@ -1,16 +1,10 @@
 {
   "a11y /": [],
   "a11y /cart/": [
-    "color-contrast @ .wc-block-grid__product:nth-child(1) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(2) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(3) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(4) > .wc-block-grid__product-link > .wc-block-grid__product-title"
+    "color-contrast @ .wc-block-grid__product:nth-child(n) > .wc-block-grid__product-link > .wc-block-grid__product-title"
   ],
   "a11y /checkout/": [
-    "color-contrast @ .wc-block-grid__product:nth-child(1) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(2) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(3) > .wc-block-grid__product-link > .wc-block-grid__product-title",
-    "color-contrast @ .wc-block-grid__product:nth-child(4) > .wc-block-grid__product-link > .wc-block-grid__product-title"
+    "color-contrast @ .wc-block-grid__product:nth-child(n) > .wc-block-grid__product-link > .wc-block-grid__product-title"
   ],
   "a11y /hello-world/": [
     "color-contrast @ .url",
@@ -20,210 +14,36 @@
   "a11y /my-account/": [
     "color-contrast @ .woocommerce-LostPassword > a"
   ],
-  "a11y /product/digi-fab/": [
-    "color-contrast @ .post-1023 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-1304 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-1304 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-745 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-934 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"1023\"]",
-    "color-contrast @ a[data-product_id=\"1304\"]",
-    "color-contrast @ a[data-product_id=\"745\"]",
-    "color-contrast @ a[data-product_id=\"934\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(1)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(2)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(3)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(4)",
-    "color-contrast @ p:nth-child(10) > span",
-    "color-contrast @ p:nth-child(12) > span",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(6) > span",
-    "color-contrast @ p:nth-child(8) > span",
-    "list @ ul:nth-child(11)",
-    "list @ ul:nth-child(13)"
-  ],
-  "a11y /product/doro-fix-465-25mm-x-50m/": [
-    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(1)",
-    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(2)",
-    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(2) > .woocommerce-Price-amount.amount",
-    "color-contrast @ .post-6505 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-859 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-860 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"6505\"]",
-    "color-contrast @ a[data-product_id=\"859\"]",
-    "color-contrast @ a[data-product_id=\"860\"]",
-    "color-contrast @ a[rel=\"tag\"]",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(5) > span",
-    "color-contrast @ p:nth-child(7) > span",
-    "color-contrast @ p:nth-child(9) > span",
-    "list @ ul:nth-child(10)"
-  ],
-  "a11y /product/gorilla-gripper/": [
-    "color-contrast @ .post-1509 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-774 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-927 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-955 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"1509\"]",
-    "color-contrast @ a[data-product_id=\"774\"]",
-    "color-contrast @ a[data-product_id=\"927\"]",
-    "color-contrast @ a[data-product_id=\"955\"]",
-    "color-contrast @ a[rel=\"tag\"]"
-  ],
-  "a11y /product/hotronix-heatpress-interchangable-lower-platens/": [
-    "color-contrast @ .post-6541 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-993 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-993 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-998 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-998 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-999 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .product_type_simple",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"6541\"]",
-    "color-contrast @ a[data-product_id=\"993\"]",
-    "color-contrast @ a[data-product_id=\"998\"]",
-    "color-contrast @ a[rel=\"tag\"]"
-  ],
-  "a11y /product/liquid-chalk-pen/": [
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[rel=\"tag\"]",
-    "link-in-text-block @ a[rel=\"tag\"]"
-  ],
-  "a11y /product/orajet-3162-removable-4-year-digital-vinyl/": [
-    "color-contrast @ #tab-description > p:nth-child(5) > span",
-    "color-contrast @ .post-1333 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-1333 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-6652 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-6652 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-745 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-746 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"1333\"]",
-    "color-contrast @ a[data-product_id=\"6652\"]",
-    "color-contrast @ a[data-product_id=\"745\"]",
-    "color-contrast @ a[data-product_id=\"746\"]",
-    "color-contrast @ a[rel=\"tag\"]",
-    "color-contrast @ p:nth-child(11) > span",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(7) > span",
-    "color-contrast @ p:nth-child(9) > span",
-    "color-contrast @ ul:nth-child(8) > p > span",
-    "image-alt @ p > img[decoding=\"async\"]",
-    "list @ ul:nth-child(10)",
-    "list @ ul:nth-child(12)",
-    "list @ ul:nth-child(8)"
-  ],
-  "a11y /product/poli-print-1230-5-year-polymeric-transparent-digital-vinyl-laminate/": [
-    "color-contrast @ .post-6647 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-6647 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-883 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-885 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-885 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-931 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"6647\"]",
-    "color-contrast @ a[data-product_id=\"883\"]",
-    "color-contrast @ a[data-product_id=\"885\"]",
-    "color-contrast @ a[data-product_id=\"931\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(1)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(2)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(3)",
-    "color-contrast @ p:nth-child(11) > span",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(5) > span",
-    "color-contrast @ p:nth-child(7) > span",
-    "color-contrast @ p:nth-child(9) > span",
-    "color-contrast @ ul:nth-child(8) > p > span",
-    "image-alt @ p > img[decoding=\"async\"]",
-    "list @ ul:nth-child(10)",
-    "list @ ul:nth-child(12)",
-    "list @ ul:nth-child(8)"
-  ],
-  "a11y /product/poli-print-810-4-year-gloss-transparent-digital-vinyl/": [
-    "color-contrast @ #tab-description > p:nth-child(5) > span",
-    "color-contrast @ .post-1003 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-1003 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-1298 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-1298 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-1301 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-1301 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-6647 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-6647 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"1003\"]",
-    "color-contrast @ a[data-product_id=\"1298\"]",
-    "color-contrast @ a[data-product_id=\"1301\"]",
-    "color-contrast @ a[data-product_id=\"6647\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(1)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(2)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(3)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(4)",
-    "color-contrast @ p:nth-child(11) > span",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(7) > span",
-    "color-contrast @ p:nth-child(9) > span",
-    "color-contrast @ ul:nth-child(8) > p > span",
-    "image-alt @ p > img[decoding=\"async\"]",
-    "list @ ul:nth-child(10)",
-    "list @ ul:nth-child(12)",
-    "list @ ul:nth-child(8)"
-  ],
-  "a11y /product/poly-canvas/": [
+  "a11y /shop/": [],
+  "a11y /wishlist/": [],
+  "a11y ~products": [
+    "color-contrast @ #tab-description > p:nth-child(n) > span",
     "color-contrast @ .dt-discount-hint__badge",
-    "color-contrast @ .post-1133 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-1164 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-446 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-918 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-918 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"1133\"]",
-    "color-contrast @ a[data-product_id=\"1164\"]",
-    "color-contrast @ a[data-product_id=\"446\"]",
-    "color-contrast @ a[data-product_id=\"918\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(1)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(2)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(3)",
-    "color-contrast @ p:nth-child(10) > span",
-    "color-contrast @ p:nth-child(12) > span",
-    "color-contrast @ p:nth-child(3) > span",
-    "color-contrast @ p:nth-child(6) > span",
-    "color-contrast @ p:nth-child(8) > span",
-    "color-contrast @ strong",
-    "list @ ul:nth-child(11)",
-    "list @ ul:nth-child(13)"
-  ],
-  "a11y /product/unger-squeegee-blade/": [
-    "color-contrast @ .post-528 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-529 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-530 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .post-807 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-807 > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
+    "color-contrast @ .dt-discount-hint__headline",
+    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(n)",
+    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(n) > .woocommerce-Price-amount.amount",
+    "color-contrast @ .post-N > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
+    "color-contrast @ .post-N > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
+    "color-contrast @ .product_type_simple",
     "color-contrast @ .product_type_variable",
     "color-contrast @ .single_add_to_cart_button",
     "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"528\"]",
-    "color-contrast @ a[data-product_id=\"529\"]",
-    "color-contrast @ a[data-product_id=\"530\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(1)",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(2)"
+    "color-contrast @ a[data-product_id=\"N\"]",
+    "color-contrast @ a[rel=\"tag\"]",
+    "color-contrast @ a[rel=\"tag\"]:nth-child(n)",
+    "color-contrast @ b",
+    "color-contrast @ i",
+    "color-contrast @ p:nth-child(n) > span",
+    "color-contrast @ strong",
+    "color-contrast @ ul:nth-child(n) > p > span",
+    "image-alt @ p > img[decoding=\"async\"]",
+    "image-alt @ ul:nth-child(n) > p > img[decoding=\"async\"]",
+    "link-in-text-block @ a[rel=\"tag\"]",
+    "list @ ul:nth-child(n)"
   ],
-  "a11y /shop/": [],
-  "a11y /wishlist/": [],
   "markup /": [
-    "no-h1",
     "no-canonical",
+    "no-h1",
     "no-meta-description"
   ],
   "markup /cart/": [
@@ -238,42 +58,15 @@
   "markup /my-account/": [
     "no-meta-description"
   ],
-  "markup /product/digi-fab/": [
-    "no-meta-description"
-  ],
-  "markup /product/doro-fix-465-25mm-x-50m/": [
-    "no-meta-description"
-  ],
-  "markup /product/gorilla-gripper/": [
-    "no-meta-description"
-  ],
-  "markup /product/hotronix-heatpress-interchangable-lower-platens/": [
-    "no-meta-description"
-  ],
-  "markup /product/liquid-chalk-pen/": [
-    "no-meta-description"
-  ],
-  "markup /product/orajet-3162-removable-4-year-digital-vinyl/": [
-    "no-meta-description"
-  ],
-  "markup /product/poli-print-1230-5-year-polymeric-transparent-digital-vinyl-laminate/": [
-    "no-meta-description"
-  ],
-  "markup /product/poli-print-810-4-year-gloss-transparent-digital-vinyl/": [
-    "no-meta-description"
-  ],
-  "markup /product/poly-canvas/": [
-    "no-meta-description"
-  ],
-  "markup /product/unger-squeegee-blade/": [
-    "no-meta-description"
-  ],
   "markup /shop/": [
-    "no-h1",
     "no-canonical",
+    "no-h1",
     "no-meta-description"
   ],
   "markup /wishlist/": [
+    "no-meta-description"
+  ],
+  "markup ~products": [
     "no-meta-description"
   ]
 }
