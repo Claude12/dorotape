@@ -116,8 +116,31 @@ jobs:
               exit 1
             fi
 
-            echo "Pulling $GIT_REMOTE/$GIT_BRANCH into $THEME_PATH"
-            git -C "$THEME_PATH" pull "$GIT_REMOTE" "$GIT_BRANCH"
+            # Fetch and reset rather than pull. A pull is a merge, and a merge
+            # refuses to run whenever a tracked file has been edited on the
+            # server - including by the deploy it is trying to replace. That
+            # turns any stray server-side edit into a blocked deploy that needs
+            # someone to SSH in and clear it by hand.
+            #
+            # This discards server-side edits every time, which is the point: a
+            # deploy target mirrors the branch, it is not somewhere to work.
+            # Anything edited directly on dev is lost on the next deploy, and
+            # should be committed here instead.
+            #
+            # Untracked files are deliberately left alone. `git clean` would
+            # take them too, and there is no way to tell a leftover from
+            # something the site needs from up here.
+            echo "Deploying $GIT_REMOTE/$GIT_BRANCH into $THEME_PATH"
+            git -C "$THEME_PATH" fetch "$GIT_REMOTE" "$GIT_BRANCH"
+
+            # Name what is being discarded, so a lost server-side edit shows up
+            # in the deploy log rather than being a silent surprise later.
+            if [ -n "$(git -C "$THEME_PATH" status --porcelain)" ]; then
+              echo "Discarding local changes on the server:"
+              git -C "$THEME_PATH" status --short
+            fi
+
+            git -C "$THEME_PATH" reset --hard FETCH_HEAD
         env:
           THEME_PATH: ${{ vars.DEV_THEME_PATH }}
           GIT_REMOTE: ${{ vars.DEV_GIT_REMOTE || 'origin' }}
