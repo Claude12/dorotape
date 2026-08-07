@@ -182,6 +182,22 @@ address. Branding is the site logo and the brand pink; WooCommerce's colour sync
 is off, because this is a classic theme with no `theme.json` and the sync would
 re-derive WooCommerce's default purple over it.
 
+**VAT** (DR-2) - 20 percent standard rate named "VAT", on `GB` and on `IM`. Prices
+are entered and displayed excluding tax with the suffix `ex VAT`, and tax is based
+on the delivery address. Every one of those values is the Kryptronic setting of
+the same meaning rather than a decision taken here, and
+`dorotape-migration/store_tax_rates.php` names the setting beside each one. The
+rate itself is confirmed from a credit note carrying 39.60 of tax on 198.00.
+
+Two country decisions are worth stating because they are invisible in the admin
+screen. The Isle of Man is a separate country to WooCommerce but sits inside the
+UK VAT area, so it carries the rate; a `GB`-only setup would ship Isle of Man
+orders with no VAT. Jersey and Guernsey are outside the UK VAT area and carry no
+rate, so the Channel Islands are absent by intent. Everywhere else is an export,
+zero rated, which is why there is no catch-all row. `inc VAT` exists as a
+Kryptronic string but is deliberately unused: it is the suffix the old site would
+have shown had display been inclusive, and it was not.
+
 **Shipping** - Local Pickup on WooCommerce's catch-all zone. There is no zone
 layout yet; designing one is a commercial decision and its own ticket.
 
