@@ -51,8 +51,9 @@ $settings = [
     'woocommerce_registration_generate_password' => [
         'no',
         'The customer sets their own password on the form. Auto-generating one '
-        . 'emails it, and transactional email is not working yet (DR-7), so every '
-        . 'registration would produce an account whose password never arrives.',
+        . 'emails it, and delivery is still unauthenticated PHP mail() until the '
+        . 'SMTP credentials land (see bin/email-settings.php), so a generated '
+        . 'password would be filed as spam and the account would be unreachable.',
     ],
     'woocommerce_enable_checkout_login_reminder' => [
         'yes',

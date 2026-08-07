@@ -180,12 +180,68 @@ It adds a single method and does not design the zone layout, which is a
 commercial decision and its own ticket. If a Local Pickup already exists
 anywhere, it does nothing.
 
+`bin/email-settings.php` covers transactional email: the sender, the branding,
+and where the shop's own copies land.
+
+```bash
+php bin/email-settings.php            # show what differs, change nothing
+php bin/email-settings.php --apply    # write the differences
+```
+
 It is not a mirror of every WooCommerce setting, only of the decisions. Anything
-absent from the file is left alone, so an admin changing something else in the UI
-is never overwritten.
+absent from these files is left alone, so an admin changing something else in the
+UI is never overwritten.
 
 CLI only, and `bin/.htaccess` denies the folder over HTTP. Both, because deploy
 puts it inside `public_html`.
+
+### Transactional email
+
+The sender is `sales@dorotape.co.uk`, for both the address customers see and the
+inbox the shop's own copies arrive in. That is not a guess: the old Kryptronic
+system carried 49 email templates, and it was the sender on every customer one
+and the recipient on every internal one.
+
+Two things about this are easy to get wrong.
+
+**wp-mail-smtp overrides WooCommerce, not the other way round.** It hooks
+`wp_mail_from` at `PHP_INT_MAX`, and out of the box `from_email_force` is on with
+`from_email` defaulting to `admin_email`. Activating the plugin without setting
+its own sender silently replaces the WooCommerce from address on every email.
+`bin/email-settings.php` sets both, in one run, for that reason.
+
+**Email colours resync from the theme unless told not to.** WooCommerce
+re-derives them on `customize_save_after` and on any global styles save. This is
+a classic theme with no `theme.json`, so what it derives is WooCommerce's own
+purple. `woocommerce_email_auto_sync_with_theme` is off, and has to stay off, or
+saving anything in the Customizer un-brands every email.
+
+**Delivery credentials are not in this repo, and not in the database.** Deploy is
+`git pull` inside `public_html`, and the database gets exported by All-in-One WP
+Migration. `wp-config.php` is the one file that is neither, so wp-mail-smtp reads
+its SMTP settings from constants defined there:
+
+```php
+define( 'WPMS_ON', true );
+define( 'WPMS_MAILER', 'smtp' );
+define( 'WPMS_SMTP_HOST', '' );
+define( 'WPMS_SMTP_PORT', 587 );
+define( 'WPMS_SSL', 'tls' );      // 'ssl' on port 465
+define( 'WPMS_SMTP_AUTH', true );
+define( 'WPMS_SMTP_USER', '' );
+define( 'WPMS_SMTP_PASS', '' );
+```
+
+Until those exist, mail goes out through PHP `mail()` unauthenticated, which on a
+live site means order emails are filed as spam or dropped, because the sending
+server has no right to send as `dorotape.co.uk`. `bin/email-settings.php` reports
+which constants are missing and never prints a value.
+
+`admin_email` is deliberately left alone. WordPress emails a confirmation link to
+the new address and does not switch until someone clicks it, so no script can
+honestly claim to have changed it. Every WooCommerce recipient is set explicitly
+so that nothing depends on it in the meantime, and changing it is a go-live step
+done by hand.
 
 ## Deploying
 
