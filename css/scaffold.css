@@ -10,8 +10,21 @@
 :root {
   --dt-black: #1a1a1a;
   --dt-gray: #424240;
+  /*
+   * Three pinks, and the distinction matters. #d7328a is the brand pink, but at
+   * 4.46:1 on white it is a hair under WCAG AA's 4.5, so it fails wherever it
+   * carries text - links, prices, filled buttons, the discount badge. --dt-accent
+   * is therefore decoration only: borders, rules, outlines, anything with no text
+   * on or in it. --dt-accent-ink is the same hue darkened just far enough to
+   * clear the bar (6.1:1 on white) and is what text and filled buttons use.
+   * --dt-accent-dk is the hover and active state beneath it.
+   *
+   * Temporary, like the rest of this file. The front-end phase gets to pick the
+   * real palette; until then the scaffold should not ship a known AA failure.
+   */
   --dt-accent: #d7328a;
-  --dt-accent-dk: #b5266d;
+  --dt-accent-ink: #b5266d;
+  --dt-accent-dk: #8f1a55;
   --dt-blue: #009fe3;
   --dt-mid: #4a5568;
   --dt-border: #dde1e7;
@@ -53,11 +66,40 @@ img {
 }
 
 a {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: none;
 }
 a:hover {
   text-decoration: underline;
+}
+
+/*
+ * A link sitting in a paragraph is underlined, not merely tinted.
+ *
+ * Colour alone is not enough to mark a link inside running text, and no pink
+ * can rescue this one: to be told apart by hue it needs 3:1 against the words
+ * around it, and to be readable at all it needs 4.5:1 against the page. Darken
+ * it for the second and it closes on the body grey, failing the first. The
+ * underline settles it and costs nothing.
+ *
+ * Navigation, buttons, product cards and the like are deliberately left out.
+ * They are not running text, their position already says they are links, and
+ * underlining them would only add noise.
+ */
+.entry-content a,
+.woocommerce-Tabs-panel a,
+.woocommerce-product-details__short-description a,
+.product_meta a,
+.comment-content a,
+.woocommerce-info a,
+.woocommerce-message a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.entry-content a.button,
+.woocommerce-info a.button,
+.woocommerce-message a.button {
+  text-decoration: none;
 }
 
 h1,
@@ -87,7 +129,7 @@ h6 {
   width: auto;
   height: auto;
   padding: 0.5rem 1rem;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   z-index: 9999;
   font-weight: 600;
@@ -262,7 +304,7 @@ h6 {
   border-bottom: none;
 }
 .nav-secondary ul ul li a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   background: #fef0f7;
   text-decoration: none;
 }
@@ -321,7 +363,7 @@ h6 {
   white-space: normal;
 }
 .nav-primary ul ul li a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   background: #fef0f7;
   text-decoration: none;
 }
@@ -422,7 +464,7 @@ h6 {
   color: var(--dt-mid);
 }
 .woocommerce-breadcrumb a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
 }
 
 /* Count visibility on subcategory cards is controlled by PHP
@@ -585,7 +627,7 @@ li.product .woocommerce-loop-product__title {
 li.product .price {
   padding: 0 0.75rem 0.5rem;
   font-size: 0.9rem;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   font-weight: 700;
 }
 li.product .price del {
@@ -600,7 +642,7 @@ li.product .add_to_cart_button {
   margin: auto 0.75rem 0.75rem;
   text-align: center;
   padding: 0.55rem 0.75rem;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   border-radius: var(--dt-radius);
   font-size: 0.82rem;
@@ -621,7 +663,7 @@ li.product .onsale {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   font-size: 0.7rem;
   font-weight: 700;
@@ -716,7 +758,7 @@ li.product {
 .entry-summary .price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   transition: opacity 0.1s ease;
 }
 .entry-summary .price del {
@@ -776,7 +818,7 @@ li.product {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   font-size: 0.72rem;
   font-weight: 700;
@@ -795,7 +837,7 @@ li.product {
 .dt-discount-hint__headline {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
 }
 .dt-discount-hint__sub {
   font-size: 0.8rem;
@@ -888,7 +930,7 @@ form.cart {
 
 .single_add_to_cart_button,
 .button.alt {
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   border: none;
   padding: 0.65rem 1.5rem;
@@ -984,7 +1026,7 @@ form.variations_form.cart {
   transition: color 0.12s;
 }
 .reset_variations:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   border-bottom-style: solid;
 }
 
@@ -1019,7 +1061,7 @@ form.variations_form.cart {
 /* "Enquire" button on archive product cards */
 .dt-btn-enquire {
   background: transparent;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   border: 1.5px solid var(--dt-accent);
   padding: 0.55rem 1.1rem;
   font-size: 0.85rem;
@@ -1033,7 +1075,7 @@ form.variations_form.cart {
   display: inline-block;
 }
 .dt-btn-enquire:hover {
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
 }
 
@@ -1094,7 +1136,7 @@ form.variations_form.cart {
   margin-top: 0.25rem;
 }
 .dt-poa-enquiry .wpforms-form .wpforms-submit {
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   border: none;
   padding: 0.65rem 1.75rem;
@@ -1152,7 +1194,7 @@ form.variations_form.cart {
 }
 
 .woocommerce-tabs ul.tabs li a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: none;
 }
 
@@ -1297,7 +1339,7 @@ form.variations_form.cart {
 .dt-tier-pricing__table thead th {
   background: var(--dt-bg);
   font-weight: 600;
-  color: var(--dt-dark);
+  color: var(--dt-text);
 }
 .dt-tier-pricing__row--base td {
   color: var(--dt-mid);
@@ -1308,7 +1350,7 @@ form.variations_form.cart {
 .dt-tier-active td {
   background: #ecfdf5;
   font-weight: 700;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
 }
 .dt-tier-pricing__note {
   font-size: 0.78rem;
@@ -1369,7 +1411,7 @@ form.variations_form.cart {
 }
 .widget_product_categories a:hover,
 .widget_categories a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: none;
 }
 
@@ -1437,7 +1479,7 @@ form.variations_form.cart {
 }
 .cart_item .product-price,
 .cart_item .product-subtotal {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   font-weight: 600;
 }
 
@@ -1489,7 +1531,7 @@ form.variations_form.cart {
 .wc-proceed-to-checkout .checkout-button {
   display: block;
   text-align: center;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   padding: 0.85rem;
   border-radius: var(--dt-radius);
@@ -1567,7 +1609,7 @@ form.variations_form.cart {
 
 #place_order {
   width: 100%;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   color: var(--dt-white);
   border: none;
   padding: 0.85rem;
@@ -1614,11 +1656,11 @@ form.variations_form.cart {
 .woocommerce-MyAccount-navigation li a:hover {
   background: var(--dt-white);
   text-decoration: none;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
 }
 .woocommerce-MyAccount-navigation li.is-active a {
   font-weight: 600;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   background: var(--dt-white);
   border-left: 3px solid var(--dt-accent);
 }
@@ -2017,7 +2059,7 @@ input[type="submit"]:hover {
 
 .dt-header-search__submit {
   padding: 8px 14px;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   border: none;
   border-radius: var(--dt-radius);
   color: var(--dt-white);
@@ -2097,7 +2139,7 @@ input[type="submit"]:hover {
 
 .dt-filter-bar__submit {
   padding: 7px 14px;
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   border: none;
   border-radius: var(--dt-radius);
   color: var(--dt-white);
@@ -2117,7 +2159,7 @@ input[type="submit"]:hover {
 
 .dt-filter-bar__clear {
   font-size: 0.9em;
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: underline;
   white-space: nowrap;
 }
@@ -2178,7 +2220,7 @@ input[type="submit"]:hover {
 }
 
 .dt-shop-refine .woocommerce-widget-layered-nav-list__item a:hover {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: underline;
 }
 
@@ -2188,7 +2230,7 @@ input[type="submit"]:hover {
 }
 
 .dt-shop-refine .woocommerce-widget-layered-nav-list__item--chosen a {
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   font-weight: 600;
 }
 
@@ -2237,12 +2279,12 @@ input[type="submit"]:hover {
 
 .woocommerce-pagination .page-numbers a:hover {
   border-color: var(--dt-accent);
-  color: var(--dt-accent);
+  color: var(--dt-accent-ink);
   text-decoration: none;
 }
 
 .woocommerce-pagination .page-numbers span.current {
-  background: var(--dt-accent);
+  background: var(--dt-accent-ink);
   border-color: var(--dt-accent);
   color: var(--dt-white);
 }

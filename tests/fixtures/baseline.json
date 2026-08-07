@@ -1,44 +1,17 @@
 {
   "a11y /": [],
-  "a11y /cart/": [
-    "color-contrast @ .wc-block-grid__product:nth-child(n) > .wc-block-grid__product-link > .wc-block-grid__product-title"
-  ],
-  "a11y /checkout/": [
-    "color-contrast @ .wc-block-grid__product:nth-child(n) > .wc-block-grid__product-link > .wc-block-grid__product-title"
-  ],
-  "a11y /hello-world/": [
-    "color-contrast @ .url",
-    "color-contrast @ a[rel=\"category tag\"]",
-    "color-contrast @ time"
-  ],
-  "a11y /my-account/": [
-    "color-contrast @ .woocommerce-LostPassword > a"
-  ],
+  "a11y /cart/": [],
+  "a11y /checkout/": [],
+  "a11y /hello-world/": [],
+  "a11y /my-account/": [],
   "a11y /shop/": [],
   "a11y /wishlist/": [],
   "a11y ~products": [
     "color-contrast @ #tab-description > p:nth-child(n) > span",
-    "color-contrast @ .dt-discount-hint__badge",
-    "color-contrast @ .dt-discount-hint__headline",
-    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(n)",
-    "color-contrast @ .dt-tier-pricing__row--base > td:nth-child(n) > .woocommerce-Price-amount.amount",
-    "color-contrast @ .post-N > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price",
-    "color-contrast @ .post-N > .woocommerce-LoopProduct-link.woocommerce-loop-product__link > .price > .woocommerce-Price-amount.amount > bdi",
-    "color-contrast @ .product_type_simple",
-    "color-contrast @ .product_type_variable",
-    "color-contrast @ .single_add_to_cart_button",
-    "color-contrast @ .yith-wcwl-add-to-wishlist-button__label",
-    "color-contrast @ a[data-product_id=\"N\"]",
-    "color-contrast @ a[rel=\"tag\"]",
-    "color-contrast @ a[rel=\"tag\"]:nth-child(n)",
-    "color-contrast @ b",
-    "color-contrast @ i",
     "color-contrast @ p:nth-child(n) > span",
-    "color-contrast @ strong",
     "color-contrast @ ul:nth-child(n) > p > span",
     "image-alt @ p > img[decoding=\"async\"]",
     "image-alt @ ul:nth-child(n) > p > img[decoding=\"async\"]",
-    "link-in-text-block @ a[rel=\"tag\"]",
     "list @ ul:nth-child(n)"
   ],
   "markup /": [
