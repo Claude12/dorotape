@@ -197,8 +197,8 @@
 
 		html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' + basePrice + '">'
 			+ '<td>1' + qtySuffix + '</td>'
-			+ '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&mdash;' ) + '</td>'
-			+ '<td>&mdash;</td>'
+			+ '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&ndash;' ) + '</td>'
+			+ '<td>&ndash;</td>'
 			+ '</tr>';
 
 		tiers.forEach( function ( tier ) {
@@ -209,7 +209,7 @@
 			html += '<tr class="dt-tier-pricing__row" data-min="' + tier.min_qty + '" data-price="' + tier.tier_price + '">'
 				+ '<td>' + escapeHtml( tier.min_qty + qtySuffix ) + '</td>'
 				+ '<td>' + fmt( tier.tier_price ) + '</td>'
-				+ '<td>' + ( saving > 0 ? saving + '% off' : '&mdash;' ) + '</td>'
+				+ '<td>' + ( saving > 0 ? saving + '% off' : '&ndash;' ) + '</td>'
 				+ '</tr>';
 		} );
 
@@ -632,7 +632,7 @@
 				var error = tr.querySelector( '.dt-cutsize__row-error' );
 				if ( ! error ) return;
 				error.textContent = ( invalid && idx === rows.length - 1 )
-					? 'Cuts add up to ' + ( Math.round( sum * 10 ) / 10 ) + 'mm — wider than the roll (' + currentMax + 'mm)'
+					? 'Cuts add up to ' + ( Math.round( sum * 10 ) / 10 ) + 'mm, wider than the roll (' + currentMax + 'mm)'
 					: '';
 			} );
 			return ! invalid;
@@ -652,7 +652,7 @@
 				allocNote.classList.toggle( 'dt-cutsize__alloc--bad', ! matches );
 				allocNote.textContent = matches
 					? ''
-					: 'Cut pattern quantities add up to ' + allocated + ' of ' + total + ' ordered — please adjust so they match.';
+					: 'Cut pattern quantities add up to ' + allocated + ' of ' + total + ' ordered. Please adjust so they match.';
 			}
 			if ( ! matches ) ok = false;
 
@@ -891,8 +891,8 @@
 				var hit      = qty >= mixMin;
 				if ( qty > 0 ) {
 					progress = hit
-						? qty + ' in total — discount applied.'
-						: qty + ' so far — ' + ( mixMin - qty ) + ' more to unlock the discount.';
+						? qty + ' in total, discount applied.'
+						: qty + ' so far, ' + ( mixMin - qty ) + ' more to unlock the discount.';
 				}
 
 				if ( mixLive ) {
