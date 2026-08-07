@@ -58,6 +58,16 @@ function dorotape_can_pay_on_account( ?int $user_id = null ): bool {
 /**
  * Remove the gateway for anyone not approved.
  *
+ * Priority 100, and it has to be. Invoice Gateway puts the gateway back: its
+ * IGFW_Invoice_Gateway::add_to_gateways() is on this same filter and re-adds
+ * itself whenever it finds itself missing. That callback sits at the default
+ * priority 10, registered from the gateway's constructor, so at priority 10 our
+ * removal is undone a moment after we make it - and which of the two wins comes
+ * down to which registered first, which is decided by when WooCommerce happens
+ * to instantiate the gateway. 100 is after all three of the plugin's callbacks
+ * (10 add_to_gateways, 20 hide_gateway_on_invoice_order_pay, 99 restrictions),
+ * so the answer no longer depends on load order.
+ *
  * @param array $gateways Available gateways, keyed by id.
  * @return array
  */
@@ -78,7 +88,7 @@ add_filter( 'woocommerce_available_payment_gateways', function ( $gateways ): ar
 	}
 
 	return $gateways;
-} );
+}, 100 );
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
