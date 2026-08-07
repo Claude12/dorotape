@@ -111,6 +111,7 @@ a copy-paste.
 | `cleanup.php` | strips WordPress defaults |
 | `admin.php` | admin-side tweaks |
 | `woocommerce.php` | all Woo integration — via hooks, not template overrides |
+| `stock.php` | the availability line: per-product lead times and out-of-stock wording |
 | `pricing.php` | price calculation |
 | `poa.php` | price-on-application products |
 | `cutsize.php` | cut-to-size ordering |
@@ -322,6 +323,68 @@ not be swept up by the `AB` and `PH` outcodes.
 Two things are still outstanding here and need the client: the BACS bank details,
 and a card gateway. No card gateway of any kind is installed, so a customer who
 is not approved for credit and is not collecting has no way to pay.
+
+### Stock and availability (DR-8)
+
+Sage owns stock, so `_manage_stock` is off on every product and everything reads
+in stock. WooCommerce only prints an availability line when it has a figure, a
+backorder or an out-of-stock to report, so with stock management off it prints
+nothing and the customer is told nothing about lead times.
+
+The old site had exactly the same model — 1,373 of its 1,510 inventory rows were
+`LOCALUNL`, local and unlimited, and only 44 were genuinely tracked — and solved
+it with wording rather than inventory. So this is messaging, not stock control.
+Two strings per item, and `inc/stock.php` carries both across:
+
+| Old field | Meta | Shown |
+| --- | --- | --- |
+| `customdispover` | `_dt_stock_note` | always, for something orderable but not on the shelf. Lead times: "2-3 days" on 88 items, "Delivery in 10-12 days" on 16 |
+| `customdispoos` | `_dt_out_of_stock_note` | instead of "Out of stock" when the product is out of stock: "Back in stock soon", "COMING SOON" |
+
+Both are editable per product under Product data → Inventory, and per variation on
+the variation's own Inventory panel. A variation with an empty field inherits the
+parent's, so a range with one lead time has one field to change. `store_stock_messages.php`
+seeded 124 parent products and left 232 variations to inherit rather than writing
+the same sentence into all 356 — otherwise editing a product would stop changing
+its sizes. Four prodnums had no product here to attach to: `SAV150M` and three
+Cover Styl' colours.
+
+Out of stock replaces the standard wording; everything else is appended to it. The
+replacement is right because "Back in stock soon" is phrased to stand in for "Out
+of stock" rather than follow it. Appending is right everywhere else because a real
+figure is information the note does not carry — which means the day a Sage sync
+starts writing levels, the level leads the line on its own and nothing here needs
+changing.
+
+Nothing global needed porting. `woocommerce_stock_format` is already `''`, which
+prints the exact figure, and that is what `ecom.showinstocklevel = 1` did. There
+was no low stock threshold at all on the old site (`ecom.lowinventoryalertstatus = 0`),
+and WooCommerce only invents a low stock message if that same option is set to
+`low_amount`, which it is not; the admin low stock *email* was switched off to
+match, while the out-of-stock email stays on.
+
+The one thing that did not come across is back-in-stock notifications, which the
+old site had on (`ecom.notifystock = 1`). WooCommerce core has no such feature and
+this is a plugin decision, not theme code — the same shape of decision as DR-27
+and DR-28. It matters because six products carry an out-of-stock note that says
+"Click to receive an in stock email notification", and there is nothing to click.
+Latent rather than live, since with stock management off nothing ever goes out of
+stock, but it needs settling before any product is marked out of stock by hand.
+
+CSS is in `scaffold.css`, and the availability line has three states rather than
+two. `get_availability_class()` returns `in-stock` for every purchasable product
+whether or not it printed a figure, so the class alone cannot tell "12 in stock"
+from a bare lead time; `inc/stock.php` adds `dt-stock-note-only` for the second
+case and the stylesheet colours it neutral, because a 10-12 day wait should not
+borrow the in-stock green. Each state also has its own left rule, so the line
+still reads in greyscale.
+
+Verified across 21 cases, with the in-stock ones read back out of the real product
+page fetched over HTTPS rather than by calling the theme's own functions: all five
+availability strings and all three out-of-stock strings render, variation
+inheritance and per-variation override both work in each direction, a product
+without a note renders no line at all, and a product without an out-of-stock note
+still says "Out of stock".
 
 ### Transactional email
 

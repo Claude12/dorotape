@@ -2700,3 +2700,54 @@ input[type="submit"]:hover {
     white-space: normal;
   }
 }
+
+/* ─── Stock availability line (DR-8) ───────────────────────────────────────────
+ *
+ * WooCommerce renders availability as <p class="stock in-stock|out-of-stock">.
+ * With stock management off it normally has nothing to print, so this exists
+ * almost entirely for the per-product lead-time and out-of-stock notes that
+ * inc/stock.php puts there instead. dt-stock-note marks a line a note reached.
+ *
+ * Three states, not two. A lead time is neither good news nor bad, so a line
+ * that is only a note stays neutral rather than borrowing the in-stock green and
+ * implying the roll is on the shelf. WooCommerce's own class cannot make that
+ * distinction - get_availability_class() returns in-stock for every purchasable
+ * product whether it printed a figure or nothing at all - which is why
+ * inc/stock.php adds dt-stock-note-only. It comes last here so that it beats the
+ * in-stock rule it ties with on specificity; the day a Sage sync starts writing
+ * real levels the note stops standing alone, the class goes away on its own and
+ * the green is correct again.
+ *
+ * Colour is not the only signal - each state has its own left rule, so the line
+ * still reads in greyscale and for a colour-blind customer. On --dt-bg,
+ * --dt-success measures 6.27:1, --dt-error 7.59:1 and --dt-info 9.44:1, all
+ * clear of AA. Temporary, like the rest of this file.
+ */
+.woocommerce div.product p.stock,
+.single-product p.stock {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--dt-border);
+  background: var(--dt-bg);
+  border-radius: 0 var(--dt-radius) var(--dt-radius) 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.woocommerce div.product p.stock.in-stock,
+.single-product p.stock.in-stock {
+  color: var(--dt-success);
+  border-left-color: var(--dt-success);
+}
+
+.woocommerce div.product p.stock.out-of-stock,
+.single-product p.stock.out-of-stock {
+  color: var(--dt-error);
+  border-left-color: var(--dt-error);
+}
+
+.woocommerce div.product p.stock.dt-stock-note-only,
+.single-product p.stock.dt-stock-note-only {
+  color: var(--dt-info);
+  border-left-color: var(--dt-blue);
+}
