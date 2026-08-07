@@ -45,10 +45,10 @@ than for any block at all.
 | `css/`, `js/` | `scaffold.css` and `scaffold.js` — the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
 | `bin/` | CLI scripts. `store-settings.php` is the record of the WooCommerce settings this project chose. See [Store settings](#store-settings) |
-| `dorotape-migration/` | one-off scripts and data from the Kryptronic migration |
 | `tests/` | automated site checks — [tests/README.md](tests/README.md) |
 | `.github/` | deploy and monday board pipeline — [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
+| `.htaccess` | denies raw data files over HTTP. See [Client data is not kept here](#client-data-is-not-kept-here) |
 
 ### `inc/`
 
@@ -220,13 +220,37 @@ Nothing in it is specific to this site — every value that points at an
 environment is a GitHub variable, so a copy cannot inherit this project's URL or
 server path.
 
-## Two things worth knowing
+## Client data is not kept here
 
 **Everything tracked here is served from the webroot.** Deploy is `git pull`
 inside `public_html`, so any committed file is reachable over HTTP unless
-something stops it. `tests/` ships an `.htaccess` denying access for that
-reason. `dorotape-migration/` does not have one, and it holds 108 CSV exports
-of the client's old CMS — worth addressing.
+something stops it. `bin/` and `tests/` each ship an `.htaccess` denying access
+for that reason.
+
+`dorotape-migration/` held the Kryptronic migration: one-off scripts alongside
+113 CSV exports of the client's old CMS, among them 10,358 customer rows with
+email addresses, password hashes, phone numbers and postal addresses. It had no
+deny rule, so all of it was served from the webroot on every deployed site.
+
+It now lives **outside the repository and outside the webroot**, at
+`~/dorotape-private/dorotape-migration/` on the machine that ran the migration.
+Nothing in the theme reads it: it was scripts that had already been run, plus
+their input. Three things keep it out:
+
+- `.gitignore` refuses `dorotape-migration/`, `*.csv`, `*.sql` and `*.xlsx`
+- the theme-root `.htaccess` denies that path, and denies raw data extensions
+  anywhere in the theme, for servers carrying an untracked or stale copy
+- this section, so the next person does not have to reconstruct the reason
+
+**If you need migration data, copy the one file you need to somewhere outside
+the repo.** Do not put it back.
+
+**The removal does not clear git history.** The files are gone from the working
+tree and from every future clone's checkout, but they remain in earlier commits.
+Clearing that needs a history rewrite and a force push, and is tracked
+separately.
+
+## One more thing worth knowing
 
 **`.cursorrules` describes a structure this repo does not have.** It specifies
 `/templates`, `/partials`, `/assets/js`, `/assets/scss`, `/assets/css`; the repo

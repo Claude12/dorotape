@@ -1,6 +1,0 @@
-"id","name","namespace","menuorder","menudisp"
-"checkoutfn","Checkout","checkoutfn","40","1"
-"home","Home","splash","10","1"
-"prodsearch","Advanced Search","prodsearch","50","1"
-"viewcart","Shopping Cart","viewcart","20","1"
-"viewwishlist","Wish List","viewwishlist","30","1"
