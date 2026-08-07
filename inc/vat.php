@@ -204,7 +204,10 @@ add_action( 'woocommerce_init', function (): void {
 	woocommerce_register_additional_checkout_field(
 		array(
 			'id'       => DOROTAPE_VAT_FIELD_ID,
-			'label'    => __( 'VAT number, including country code (optional)', 'dorotape' ),
+			// No "(optional)" here. WooCommerce derives its own optionalLabel by
+			// appending that, and renders it for any field that is not required,
+			// so putting it in the label gets the customer "(optional) (optional)".
+			'label'    => __( 'VAT number, including country code', 'dorotape' ),
 			'location' => 'order',
 			'type'     => 'text',
 			'required' => false,
