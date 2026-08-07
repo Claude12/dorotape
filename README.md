@@ -24,13 +24,67 @@ Checkout only.
 | My account | classic | it is `[woocommerce_my_account]`, a shortcode |
 | Shop | classic | no content, WooCommerce renders it |
 | Wishlist | classic | a YITH shortcode |
-| Privacy Policy, Refund and Returns | classic | unused core boilerplate |
+| Delivery, Returns, Privacy, Terms | classic | migrated policy copy, DR-6 |
 | anything new | classic | the default |
 
 Four of those pages contain block comments because WordPress wraps a lone
 shortcode in one, or because core created the page. That is not the same as
 being block built, so the rule tests for Woo's cart and checkout blocks rather
 than for any block at all.
+
+### Policy pages (DR-6)
+
+Four pages, published from the Kryptronic CMS export by
+`dorotape-migration/store_policy_pages.php`: Delivery Information (726 words),
+Returns and Refund Policy (553), Privacy Policy (1,086) and Terms and Conditions
+of Business (2,567). Returns and Privacy adopt the drafts that WooCommerce and
+WordPress ship on their own slugs rather than adding a second page on the same
+subject, because WordPress points its privacy tools at that specific post id.
+`woocommerce_terms_page_id` and `wp_page_for_privacy_policy` are set.
+
+The copy is the client's and moved verbatim. Nothing was reworded, no figure was
+updated, and the typos were left alone and reported instead. The markup around it
+had to change, because it could not ship as it stood.
+
+The export is Windows-1252. Read as UTF-8 every price on the delivery page becomes
+a replacement character and the page publishes "?150". The seeder converts, and
+checks for the pound signs afterwards rather than assuming the conversion worked.
+
+The markup carried real defects, not merely dated style. `<h2 style=color:#009ee3;">`
+has no opening quote, so the value runs to a stray closing one: PHP's own
+`strip_tags` reads it as an unterminated attribute and swallows the rest of the
+document, which is why the terms page first measured zero words on 18,000
+characters. Lists sat inside paragraphs, every list item had its own `<ul>` so a
+four-point list rendered as four lists, seven closers were mis-nested as
+`</ul></li>`, five `<li>` and one `<p>` were never closed, ampersands were bare,
+and the delivery page carried a `<style>` block of `#data` id selectors plus stray
+`</head>` and `<body>` tags mid-content. The terms page marked its 19 clause
+headings as bold-underlined paragraphs, so the document had no outline at all;
+they are now real headings.
+
+The cleaning is a sequence of narrow named rules, so a surprise in the source
+shows up as one rule not firing rather than as silent damage to the copy, and the
+result is then re-serialised through libxml to close whatever the author left
+open. The seeder refuses to write if any defect survives its own checks, which is
+how two broken regexes were caught rather than published.
+
+Presentational colour was dropped rather than translated, since hardcoded brand
+hex in post content is what makes a later restyle expensive. The delivery table's
+styling moved to `.dt-policy-table` in `css/scaffold.css`. Its hover state was
+white on `#009ee3`, a contrast ratio of 2.3:1; it now tints the row background and
+leaves the text alone, and all three colour pairs pass.
+
+Verified by comparing the visible text of each source page against the published
+page word by word: all four are identical in vocabulary and in order, so the
+migration provably changed markup and not words.
+
+Worth knowing, and flagged to the client rather than fixed here: the delivery page
+does not mention the sub-1.00 free sample band or the postage tariff, both of
+which the old site's shipping scripts do apply, so the published page was already
+an incomplete description of what the old site charged. The privacy page also
+carries four typos ("an order for too", "relevent", "platfroms", "data base") and
+names Meta and Sage, which is a data-protection statement worth a read rather than
+a copy-paste.
 
 ---
 

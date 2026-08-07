@@ -2644,3 +2644,59 @@ input[type="submit"]:hover {
   border-radius: var(--dt-radius);
   font: inherit;
 }
+
+/* ─── Policy page tables (DR-6) ────────────────────────────────────────────────
+   The delivery tariff table. Its styling came over from Kryptronic as a <style>
+   block of #data id selectors inside the page content, which would have leaked
+   into every other element on the page; it was stripped on migration and lives
+   here instead.
+
+   The old colours are kept in spirit but not literally: the header row was white
+   on #525252, which passes, but the hover state was white on #009ee3, which is
+   2.3:1 and unreadable. The hover here tints the row background instead and
+   leaves the text colour alone, so nothing depends on contrast that is not there. */
+
+.dt-policy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--dt-gap) 0;
+  /* Prices and thresholds sit in columns, so the digits should line up. */
+  font-variant-numeric: tabular-nums;
+}
+
+.dt-policy-table th,
+.dt-policy-table td {
+  border: 1px solid var(--dt-border);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dt-policy-table th {
+  background: var(--dt-gray);
+  color: var(--dt-white);
+  font-weight: 600;
+}
+
+.dt-policy-table tr:nth-child(even) td {
+  background: var(--dt-bg);
+}
+
+.dt-policy-table tr:hover td {
+  background: #e6f4fb;
+}
+
+/* A four-column price table does not fit a phone, and the page body must never
+   scroll sideways, so the table scrolls inside its own box. */
+.dt-policy-table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+@media (min-width: 700px) {
+  .dt-policy-table {
+    display: table;
+    white-space: normal;
+  }
+}
