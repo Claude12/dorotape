@@ -117,6 +117,7 @@ a copy-paste.
 | `cutsize.php` | cut-to-size ordering |
 | `quickadd.php` | quick add to cart |
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
+| `vat.php` | VAT number at checkout, its format check, and the VIES lookup |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
 | `shipping.php` | the delivery tariff, plus `class-dorotape-shipping-tariff.php` charging it |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
@@ -253,6 +254,22 @@ rate, so the Channel Islands are absent by intent. Everywhere else is an export,
 zero rated, which is why there is no catch-all row. `inc VAT` exists as a
 Kryptronic string but is deliberately unused: it is the suffix the old site would
 have shown had display been inclusive, and it was not.
+
+The country rules above are read off the old site's 3,016 orders rather than its
+settings table, and the two disagree. `core_country_dataexport.csv` lists a 20
+percent rate against 75 countries including the United States, Australia and
+Japan; replicating it would charge UK VAT worldwide. The orders show what was
+actually done: UK at 20 percent on goods and on delivery, exports zero rated. The
+six UK orders that carry no tax are not exemptions, they are zero value orders,
+every one with a `0.00` subtotal, so the UK is 100 percent consistent. Four of the
+eighteen export orders were charged 20 percent, and those are a bug on the old
+site rather than a rule to carry over: both Iceland orders have `taxcreftotal`
+equal to `taxctotal`, meaning the VAT was refunded in full, so the same mistake
+was made twice to the same customer. Verified across 33 cases covering twelve
+destinations: England, Scotland, the Highlands, Northern Ireland and the Isle of
+Man at 20 percent on both goods and delivery, Jersey, Guernsey, Ireland, Sweden,
+France, Iceland and the United States at zero, every display setting matching
+`core_settings_dataexport.csv`, and the VAT line itemised and labelled "VAT".
 
 **Shipping** (DR-3) - the published tariff, transcribed from the two Kryptronic
 custom shipping scripts and cross-checked against the live Delivery page, which
@@ -486,6 +503,76 @@ applied, the expired code is rejected, all three free-delivery codes zero the th
 tariff rates while leaving Local pickup and the rate list untouched, delivery is
 charged again once the code is removed, and none of the five deliberately omitted
 codes exist.
+
+### VAT numbers (DR-12)
+
+The spec asks for VAT exemption on a validated business VAT number. That cannot
+happen on this site, and it is worth saying plainly rather than building a switch
+that can never fire. VAT is charged to `GB` and `IM` only, and a domestic UK
+business-to-business supply is never zero rated for holding a VAT number.
+Everywhere else is already zero rated by the DR-2 rate table, so there is no VAT
+left for a number to remove. The number never changes what anybody pays.
+
+It is still worth collecting, for two reasons. A zero rated export has to be
+evidenced to HMRC, and the customer's registration is part of that evidence.
+And Woosage reads `vat_number` off the order and uses it to pick the Sage tax
+code: when the number's first two characters differ from its `local_country_code`
+setting and the line carries no tax, the line posts as **T4**, the EC zero rated
+code, instead of the default. So this field decides how these sales land on the
+VAT return.
+
+That Woosage rule drives two design decisions that look arbitrary otherwise.
+
+The country prefix is mandatory. Woosage takes the code from `substr($vat, 0, 2)`,
+so a number typed without its prefix hands it two digits, which never equal `GB`,
+and every such order would be coded T4 whether it deserved it or not. Rejecting a
+prefix-less number at checkout is what stops that.
+
+The field is offered on EU destinations only, all 27 member states and nothing
+else. Woosage's test is "not GB" rather than "in the EC", so a Norwegian or Swiss
+number would also produce T4, which is wrong because neither is in the EC.
+Limiting where the field appears is the cheapest way to keep T4 honest without
+patching the plugin.
+
+The field is registered through `woocommerce_register_additional_checkout_field()`,
+the same route as the PO number and for the same reason: checkout is block based
+and the classic hooks do not fire. Its conditional visibility is a JSON Schema
+rule evaluated against WooCommerce's `DocumentObject`, reading "hidden when the
+delivery country is not an EU member state", so it appears and disappears as the
+customer changes country with no JavaScript of ours. The value is stored under
+Woosage's own `vat_number` key rather than a `_dt_` one, so it reaches Sage with
+no mapping code. Woosage has no VAT field of its own, only a `TODO make
+compatible with other VAT plugins`, so unlike the PO field there is nothing to
+guard against.
+
+Validation is split in two, deliberately. The format check is offline, instant,
+and blocking: it normalises punctuation and case so a number copied off a
+letterhead is accepted, then tests the body against the published format for its
+prefix. The VIES lookup is advisory and never touches checkout. It runs on a
+scheduled single event after the order is placed, because a lookup that crosses
+the internet to a service that is regularly slow and occasionally down would
+otherwise mean the European Commission's uptime decides whether Doro Tape can take
+an order. The worst a VIES outage can do here is leave a verdict unfilled.
+
+Every VIES failure reads as "unavailable" rather than "invalid", including the
+ones that arrive as a `200` with a `userError` of `MS_UNAVAILABLE` or `TIMEOUT`.
+"We could not check" and "this is fake" are very different things to tell the
+accounts team, and reading the second for the first would accuse a real business
+of fraud because one member state's server was having a bad afternoon. `GB` and
+`XI` numbers are reported as "cannot be checked automatically" for the same
+reason: GB left VIES after Brexit, so its absence is not evidence of anything. The
+verdict is written to order meta and to a dated order note, which is where anyone
+investigating an order looks first.
+
+Verified across 57 cases: the field registers and is conditional, its schema is
+valid draft-07, it is offered to DE, FR, IE and SE and withheld from GB, IM, JE,
+US, NO, CH and an unset country, all 27 member states are covered, eight real
+numbers in seven formats are accepted including one pasted with spaces, five
+malformed ones are refused including a prefix-less number, the empty value passes
+because the field is optional, all six VIES failure modes read as unavailable, a
+withheld business name is not printed as `---`, an order carries the number where
+Woosage would find it, the cron run records the verdict and the note, and a GB
+number comes back unsupported rather than invalid.
 
 ### Transactional email
 
