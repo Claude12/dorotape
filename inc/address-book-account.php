@@ -21,19 +21,61 @@ add_action( 'init', function (): void {
 } );
 
 /**
- * Flush rewrite rules once, when the endpoint is new or has changed.
+ * Flush rewrite rules when the endpoint's rule is actually missing.
  *
- * Flushing on every load is expensive, and flushing never means the endpoint
- * 404s until someone thinks to re-save permalinks. A version option is the usual
- * middle ground.
+ * The obvious version is a hand-bumped version number in an option: flush when
+ * it does not match, write it, done. That is what was here, and it 404'd on dev
+ * while working locally, because the thing it records is whether *this code* has
+ * run before - not whether the rewrite rule exists. The two come apart easily
+ * and on this project they were always going to. The database is moved between
+ * environments by hand, so the option travels with it and arrives already
+ * claiming the work is done; meanwhile the destination regenerates its own
+ * rewrite rules, or a migration plugin flushes them, and the endpoint is gone
+ * with nothing left to notice. Bumping the number fixes it exactly once and
+ * leaves the next database move to break it again.
+ *
+ * So ask the question directly instead. The rewrite rules are an autoloaded
+ * option and already in memory, so looking for the endpoint in them costs
+ * nothing and is true regardless of what has happened to the site.
  */
 add_action( 'init', function (): void {
-	$version = '1';
-	if ( get_option( 'dorotape_address_book_rewrites' ) !== $version ) {
-		flush_rewrite_rules( false );
-		update_option( 'dorotape_address_book_rewrites', $version );
+	$rules = get_option( 'rewrite_rules' );
+
+	// Plain permalinks. There are no rules to carry the endpoint and none to
+	// flush - WooCommerce falls back to query vars, which work already.
+	if ( ! is_array( $rules ) || ! $rules ) {
+		return;
 	}
+
+	foreach ( $rules as $rewrite ) {
+		if ( str_contains( (string) $rewrite, DOROTAPE_ADDRESS_BOOK_ENDPOINT . '=' ) ) {
+			return; // Present, which is every request but the first.
+		}
+	}
+
+	// Missing. Rate limit the repair: if the endpoint ever fails to register at
+	// all, this would otherwise flush on every single request, and a rewrite
+	// flush is one of the more expensive things WordPress does. Once an hour
+	// turns that failure mode into something slow rather than something fatal.
+	if ( get_transient( 'dorotape_address_book_flush' ) ) {
+		return;
+	}
+
+	set_transient( 'dorotape_address_book_flush', 1, HOUR_IN_SECONDS );
+	flush_rewrite_rules( false );
 }, 11 );
+
+/**
+ * Tidy away the option the check above replaced.
+ *
+ * Autoloaded, so the test is a memory read on every request and a database
+ * write on exactly one.
+ */
+add_action( 'init', function (): void {
+	if ( false !== get_option( 'dorotape_address_book_rewrites' ) ) {
+		delete_option( 'dorotape_address_book_rewrites' );
+	}
+}, 12 );
 
 /**
  * @param array $vars

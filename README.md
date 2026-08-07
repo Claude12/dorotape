@@ -44,7 +44,6 @@ than for any block at all.
 | `acf-json/` | ACF field groups, synced to disk |
 | `css/`, `js/` | `scaffold.css` and `scaffold.js` — the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
-| `bin/` | CLI scripts. `store-settings.php` is the record of the WooCommerce settings this project chose. See [Store settings](#store-settings) |
 | `tests/` | automated site checks — [tests/README.md](tests/README.md) |
 | `.github/` | deploy and monday board pipeline — [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
@@ -155,45 +154,40 @@ the check suite installs without dragging in the dead `_s` toolchain.
 
 ## Store settings
 
-WooCommerce keeps its settings in the options table, so they are not in git and a
-deploy does not carry them. Configured by hand they have to be repeated
-identically on local, dev and live.
+WooCommerce keeps its settings in the options table, not in git, so a deploy does
+not carry them. On this project the database itself is moved by hand between
+environments, so the settings travel with it and there is nothing to re-apply
+after a deploy.
 
-`bin/store-settings.php` is the record of the ones this project decided on, with
-the reason for each written next to it. Run it on any environment to see what
-differs there, or to bring it into line:
+What follows is the record of what was decided and why, since the database says
+what a value is but never why it is that. Anything not listed was left alone.
 
-```bash
-php bin/store-settings.php            # show what differs, change nothing
-php bin/store-settings.php --apply    # write the differences
-```
+**Accounts** - registration is on, at My Account and at checkout, and the
+customer chooses their own password rather than being emailed a generated one.
+The checkout login reminder is on because 10,242 customers came across from
+Kryptronic; without it a returning customer meets a blank checkout, registers
+again, and the duplicate carries none of their history or pricing.
 
-`bin/shipping-collection.php` works the same way and covers the one piece of
-shipping configuration the collection journey depends on:
+**Payments** - Invoice Gateway on as "Pay on account" with 30 day terms, gated
+per customer in `inc/pay-on-account.php`. Cash on Delivery retitled "Pay on
+collection", restricted to Local Pickup and off for virtual orders, so it cannot
+be chosen for a delivery. BACS and Cheque off. Invoice Gateway's own purchase
+order field is deliberately off: `inc/purchase-order.php` already collects one
+and stores it where Sage reads it, and enabling both would show the customer two
+boxes and write the second where nothing looks.
 
-```bash
-php bin/shipping-collection.php           # show the current zones and methods
-php bin/shipping-collection.php --apply   # add Local Pickup if it is missing
-```
+**Email** - sender `sales@dorotape.co.uk` for both the visible from-address and
+wp-mail-smtp's own, which overrides it otherwise. Internal copies go to the same
+address. Branding is the site logo and the brand pink; WooCommerce's colour sync
+is off, because this is a classic theme with no `theme.json` and the sync would
+re-derive WooCommerce's default purple over it.
 
-It adds a single method and does not design the zone layout, which is a
-commercial decision and its own ticket. If a Local Pickup already exists
-anywhere, it does nothing.
+**Shipping** - Local Pickup on WooCommerce's catch-all zone. There is no zone
+layout yet; designing one is a commercial decision and its own ticket.
 
-`bin/email-settings.php` covers transactional email: the sender, the branding,
-and where the shop's own copies land.
-
-```bash
-php bin/email-settings.php            # show what differs, change nothing
-php bin/email-settings.php --apply    # write the differences
-```
-
-It is not a mirror of every WooCommerce setting, only of the decisions. Anything
-absent from these files is left alone, so an admin changing something else in the
-UI is never overwritten.
-
-CLI only, and `bin/.htaccess` denies the folder over HTTP. Both, because deploy
-puts it inside `public_html`.
+Two things are still outstanding here and need the client: the BACS bank details,
+and a card gateway. No card gateway of any kind is installed, so a customer who
+is not approved for credit and is not collecting has no way to pay.
 
 ### Transactional email
 
@@ -208,7 +202,8 @@ Two things about this are easy to get wrong.
 `wp_mail_from` at `PHP_INT_MAX`, and out of the box `from_email_force` is on with
 `from_email` defaulting to `admin_email`. Activating the plugin without setting
 its own sender silently replaces the WooCommerce from address on every email.
-`bin/email-settings.php` sets both, in one run, for that reason.
+Both senders are set, which is why the plugin's own is recorded above
+alongside WooCommerce's.
 
 **Email colours resync from the theme unless told not to.** WooCommerce
 re-derives them on `customize_save_after` and on any global styles save. This is
@@ -234,8 +229,8 @@ define( 'WPMS_SMTP_PASS', '' );
 
 Until those exist, mail goes out through PHP `mail()` unauthenticated, which on a
 live site means order emails are filed as spam or dropped, because the sending
-server has no right to send as `dorotape.co.uk`. `bin/email-settings.php` reports
-which constants are missing and never prints a value.
+server has no right to send as `dorotape.co.uk`. WP Mail SMTP's own Email Test
+is the quickest way to see whether a given environment can send at all.
 
 `admin_email` is deliberately left alone. WordPress emails a confirmation link to
 the new address and does not switch until someone clicks it, so no script can
@@ -280,8 +275,8 @@ server path.
 
 **Everything tracked here is served from the webroot.** Deploy is `git pull`
 inside `public_html`, so any committed file is reachable over HTTP unless
-something stops it. `bin/` and `tests/` each ship an `.htaccess` denying access
-for that reason.
+something stops it. `tests/` ships an `.htaccess` denying access for that reason,
+and the theme-root `.htaccess` is the backstop for raw data files anywhere here.
 
 `dorotape-migration/` held the Kryptronic migration: one-off scripts alongside
 113 CSV exports of the client's old CMS, among them 10,358 customer rows with

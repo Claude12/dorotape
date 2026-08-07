@@ -13,8 +13,9 @@
  *  - the status counting as paid, which it did not
  *  - the customer email at that status, which did not exist
  *  - on-site messaging setting the expectation that an email is coming
- *  - Local Pickup as a shipping method, which is configuration rather than code
- *    and lives in bin/shipping-collection.php
+ *  - Local Pickup as a shipping method, which is configuration rather than code.
+ *    It sits on WooCommerce's catch-all zone, because the site has no zone layout
+ *    yet, and travels between environments with the database rather than a deploy
  *
  * @package dorotape
  */
