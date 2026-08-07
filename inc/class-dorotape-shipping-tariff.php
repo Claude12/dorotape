@@ -98,12 +98,29 @@ class Dorotape_Shipping_Tariff extends WC_Shipping_Method {
 
 		$rates = dorotape_tariff_band( $tariff[ $which ][ $zone ], $subtotal );
 
+		/*
+		 * A free shipping coupon has to be honoured here, because this method is
+		 * the only thing rating the basket. WooCommerce's own free shipping
+		 * coupon works by unlocking WC_Shipping_Free_Shipping, which is not
+		 * enabled on any zone - so without this, FREESHIPPING and
+		 * FREEDELIVERYPLEASE would apply to the order, show as redeemed, and
+		 * change nothing the customer pays.
+		 *
+		 * Every option drops to zero rather than just the cheapest, which is what
+		 * the old site's FREESHIPPING code did: it zeroed the order's delivery
+		 * charge whichever service had been chosen. It does mean a customer
+		 * holding one of these codes gets the before-noon service for nothing
+		 * rather than the standard one, which is worth knowing before the codes
+		 * are handed out.
+		 */
+		$free = dorotape_shipping_is_free_by_coupon();
+
 		foreach ( $rates as $key => $rate ) {
 			$this->add_rate(
 				array(
 					'id'      => $this->get_rate_id( $key ),
 					'label'   => $rate['label'],
-					'cost'    => $rate['cost'],
+					'cost'    => $free ? 0.0 : $rate['cost'],
 					'package' => $package,
 					'meta_data' => array(
 						// Which tariff produced this, so an order that looks

@@ -317,3 +317,29 @@ add_action( 'admin_init', function (): void {
 		)
 	);
 } );
+
+/**
+ * Is a free delivery coupon in play for this basket? (DR-25)
+ *
+ * The tariff method calls this before pricing its rates. WooCommerce's own
+ * answer to a free shipping coupon is to unlock WC_Shipping_Free_Shipping, a
+ * separate method that has to be added to each zone and that would sit next to
+ * the tariff offering a second, cheaper choice. Asking the question here instead
+ * keeps one method per zone and means the free shipping coupons work on the
+ * zones that already exist, with nothing to remember to add to a new one.
+ *
+ * @return bool True when at least one applied coupon grants free delivery.
+ */
+function dorotape_shipping_is_free_by_coupon(): bool {
+	if ( ! WC()->cart ) {
+		return false;
+	}
+
+	foreach ( WC()->cart->get_coupons() as $coupon ) {
+		if ( $coupon->get_free_shipping() ) {
+			return true;
+		}
+	}
+
+	return false;
+}

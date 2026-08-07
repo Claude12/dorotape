@@ -1,6 +1,6 @@
 # Dorotape
 
-Custom WooCommerce theme for [dorotape.co.uk](https://dorotape.co.uk) —
+Custom WooCommerce theme for [dorotape.co.uk](https://dorotape.co.uk) -
 self-adhesive films and wrapping solutions. Built by Altitude Marketing.
 
 Built on [Underscores (`_s`)](https://underscores.me/): classic PHP templates,
@@ -92,14 +92,14 @@ a copy-paste.
 
 | Path | |
 | --- | --- |
-| `*.php` (root) | `_s` template hierarchy — `header.php`, `footer.php`, `single.php`, `archive.php`, `page.php`, `search.php`, `404.php` |
+| `*.php` (root) | `_s` template hierarchy - `header.php`, `footer.php`, `single.php`, `archive.php`, `page.php`, `search.php`, `404.php` |
 | `template-parts/` | reusable template fragments |
 | `inc/` | all theme logic, each file `require`d from `functions.php` |
 | `acf-json/` | ACF field groups, synced to disk |
-| `css/`, `js/` | `scaffold.css` and `scaffold.js` — the bulk of the front end |
+| `css/`, `js/` | `scaffold.css` and `scaffold.js` - the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
-| `tests/` | automated site checks — [tests/README.md](tests/README.md) |
-| `.github/` | deploy and monday board pipeline — [.github/README.md](.github/README.md) |
+| `tests/` | automated site checks - [tests/README.md](tests/README.md) |
+| `.github/` | deploy and monday board pipeline - [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
 | `.htaccess` | denies raw data files over HTTP. See [Client data is not kept here](#client-data-is-not-kept-here) |
 
@@ -110,7 +110,7 @@ a copy-paste.
 | `setup.php` | theme supports, menus, enqueues |
 | `cleanup.php` | strips WordPress defaults |
 | `admin.php` | admin-side tweaks |
-| `woocommerce.php` | all Woo integration — via hooks, not template overrides |
+| `woocommerce.php` | all Woo integration - via hooks, not template overrides |
 | `stock.php` | the availability line: per-product lead times and out-of-stock wording |
 | `pricing.php` | price calculation |
 | `poa.php` | price-on-application products |
@@ -205,7 +205,7 @@ There isn't one, despite appearances. `package.json` is stock `_s` and its
 exist in this repo**. They also depend on node-sass 7, which will not install on
 current Node. `style.css` and `css/scaffold.css` are edited directly.
 
-`tests/` deliberately has its own `package.json` for exactly this reason — so
+`tests/` deliberately has its own `package.json` for exactly this reason - so
 the check suite installs without dragging in the dead `_s` toolchain.
 
 ## Store settings
@@ -331,8 +331,8 @@ in stock. WooCommerce only prints an availability line when it has a figure, a
 backorder or an out-of-stock to report, so with stock management off it prints
 nothing and the customer is told nothing about lead times.
 
-The old site had exactly the same model — 1,373 of its 1,510 inventory rows were
-`LOCALUNL`, local and unlimited, and only 44 were genuinely tracked — and solved
+The old site had exactly the same model - 1,373 of its 1,510 inventory rows were
+`LOCALUNL`, local and unlimited, and only 44 were genuinely tracked - and solved
 it with wording rather than inventory. So this is messaging, not stock control.
 Two strings per item, and `inc/stock.php` carries both across:
 
@@ -345,14 +345,14 @@ Both are editable per product under Product data → Inventory, and per variatio
 the variation's own Inventory panel. A variation with an empty field inherits the
 parent's, so a range with one lead time has one field to change. `store_stock_messages.php`
 seeded 124 parent products and left 232 variations to inherit rather than writing
-the same sentence into all 356 — otherwise editing a product would stop changing
+the same sentence into all 356 - otherwise editing a product would stop changing
 its sizes. Four prodnums had no product here to attach to: `SAV150M` and three
 Cover Styl' colours.
 
 Out of stock replaces the standard wording; everything else is appended to it. The
 replacement is right because "Back in stock soon" is phrased to stand in for "Out
 of stock" rather than follow it. Appending is right everywhere else because a real
-figure is information the note does not carry — which means the day a Sage sync
+figure is information the note does not carry - which means the day a Sage sync
 starts writing levels, the level leads the line on its own and nothing here needs
 changing.
 
@@ -365,7 +365,7 @@ match, while the out-of-stock email stays on.
 
 The one thing that did not come across is back-in-stock notifications, which the
 old site had on (`ecom.notifystock = 1`). WooCommerce core has no such feature and
-this is a plugin decision, not theme code — the same shape of decision as DR-27
+this is a plugin decision, not theme code - the same shape of decision as DR-27
 and DR-28. It matters because six products carry an out-of-stock note that says
 "Click to receive an in stock email notification", and there is nothing to click.
 Latent rather than live, since with stock management off nothing ever goes out of
@@ -385,6 +385,107 @@ availability strings and all three out-of-stock strings render, variation
 inheritance and per-variation override both work in each direction, a product
 without a note renders no line at all, and a product without an out-of-stock note
 still says "Out of stock".
+
+### Discount codes (DR-25)
+
+The old site had 46 codes, 19 of them still active. Fourteen are live here. The
+five left out are not oversights: `WEAREMAY100` was 100 percent off including
+delivery, a staff or test code and the one thing on the list that must not exist
+on a live site, and `BLOOM10`, `CRFTY10`, `FEELTHEHEAT` and `PINK10` were marked
+`xmultisite = CRAFTSTICK`, so they belong to the other storefront whose range was
+never migrated. Note the direction of that flag: an empty `xmultisite` means every
+storefront, not none, so the seven codes with a blank value do apply here.
+
+Nothing about these codes was invented. Every value, product list and expiry comes
+from `ecom_discounts_dataexport.csv`, read through the export's own column
+definitions rather than by inference.
+
+| Code | Effect | Applies to |
+| --- | --- | --- |
+| `BLACK20` | 20% | 1 product |
+| `BOURNESAVE` | 5% | everything except 19 products |
+| `COLLECTION`, `FREEDELIVERYPLEASE`, `FREESHIPPING` | free delivery | everything |
+| `GIVENAMM10` | 10% | 27 products |
+| `GRIFFINSAVE` | 15% | 1 product |
+| `HERECOMESTHESUN` | 10% | everything |
+| `Hello stranger` | 10% | everything except 52 products |
+| `INKSAVE` | 8% | 3 products |
+| `LEADBITTERSAVE` | 5% | 1 product |
+| `QMW10` | 10% | 1 product |
+| `SAVEONSL99` | 10% | 1 product |
+| `STAHLS50` | £50 | 65 products, expired 2022-12-31 |
+
+`STAHLS50` arrives dead and is meant to. It expired years ago, WooCommerce refuses
+it on that basis, and keeping it costs nothing while deleting it would lose the
+record of what was offered.
+
+Two columns look like settings and are not. `codetype` reads as "Expiring" or
+"Non-Expiring", which sounds like a usage limit; Kryptronic's own definition is
+that an expiring code switches itself off "after a code's value is empty", so it
+counts down a balance gift-certificate style. Every code in the file is a
+percentage or free delivery, so no balance ever empties and the flag never fires.
+`FREESHIPPING` is marked Expiring and is still active after years of use, which is
+the proof. Mapping it to a usage limit of 1 would have burned each code on its
+first customer. **No usage limits are set.** If any of these should be
+one-per-customer that is Michael's call and a one-field change. `startdate` is
+similar: only `STAHLS50` has one, and it expired too, so there was nothing for a
+scheduling feature to gate and none was built.
+
+Every code is marked individual use, because the old checkout had a single
+discount code field and only one code could ever apply to an order.
+
+**The product lists were the hard part.** `xprod` holds Kryptronic product codes
+(`Aslan-S69-0625`, `ESM2_Inks`), while the site carries `_kryp_prodnum`, which is a
+different column of the same export. Each reference takes two hops: `xprod` against
+`ecom_inventory.id` or `ecom_prod.id`, then that row's `prodnum` against
+`_kryp_prodnum`. A direct `xprod` to `prodnum` match was tried as a third route and
+recovered nothing, so the id space is the only way through. Lists are then reduced
+to parent products, because `WC_Coupon::is_valid_for_product()` checks the parent
+id as well as the variation's own, so naming the parent already covers every size
+under it.
+
+An unresolved reference is only dangerous in one direction. Losing an entry from an
+include list makes a coupon apply to less than it did, which costs nobody anything.
+Losing one from an **exclude** list makes it apply to more, which is a discount the
+client never agreed to. So every unresolved exclusion is checked against the live
+catalogue by code prefix, and the seeder imports a coupon as a draft rather than
+published if anything plausibly matches, because a draft coupon cannot be redeemed.
+In the event none needed holding back: `Hello stranger` has 74 references to
+products that no longer exist here and none of them resolve to anything on sale, and
+`HERECOMESTHESUN`'s single exclusion is a Silhouette Cameo 4 that was never
+migrated, so it is simply 10% off everything.
+
+Four references land on products that are in the **trash**. Nobody can buy those, so
+the coupons are safe today, but restoring one of those products would quietly drop
+it out of an exclusion list: `Hotronix-Fusion-IQ-Heatpress` (`BLACK20`), `C11810S`
+and `C11809S` (`Hello stranger`), `4221-Silver-Carbon` (`STAHLS50`).
+
+**Free delivery needed a code change, not just a coupon.** WooCommerce implements a
+free-shipping coupon by unlocking `WC_Shipping_Free_Shipping`, a separate method
+that has to be added to every zone. The Doro Tape tariff is the only thing rating
+these baskets, so without that method present, `FREESHIPPING`, `FREEDELIVERYPLEASE`
+and `COLLECTION` would have applied to the order, shown as redeemed, and changed
+nothing the customer pays. `Dorotape_Shipping_Tariff::calculate_shipping()` now asks
+`dorotape_shipping_is_free_by_coupon()` and zeroes its rates directly, which keeps
+one method per zone with nothing to remember to add to a new one. Every option drops
+to zero rather than just the cheapest, matching what the old site's `FREESHIPPING`
+did, so a code holder gets the before-noon service for nothing rather than the
+standard one. Worth knowing before the codes go out.
+
+One thing needs a mention rather than code. `prodlimit = E` excluded both the listed
+products and any product flagged "Disable Discount Code Usage"; that flag is set on
+exactly one old product, `GIFTCERTIFICATE`, which is not on the new site.
+
+Rebuild with `dorotape-migration/store_coupons.php`, dry run by default. Verified
+across 26 cases by applying each code to a real cart and reading the discount off
+the totals rather than off the coupon object, since a coupon with all the right
+fields that still discounts nothing was the exact failure this ticket turned up:
+every code discounts the right amount, include and exclude lists are both enforced,
+a variation of a listed parent is covered, a second code is refused while one is
+applied, the expired code is rejected, all three free-delivery codes zero the three
+tariff rates while leaving Local pickup and the rate list untouched, delivery is
+charged again once the code is removed, and none of the five deliberately omitted
+codes exist.
 
 ### Transactional email
 
@@ -450,13 +551,13 @@ mean to ship. `.cursorrules` reserves it for the project owner.
 
 Production is manual and stays that way.
 
-After a deploy lands, [tests/](tests/) runs against dev — pages load clean, no
+After a deploy lands, [tests/](tests/) runs against dev - pages load clean, no
 JS errors, no new accessibility violations, sane markup, and a product still
 reaches checkout. Pass moves the tickets to QA; fail moves them to Blocked with
 a comment stating whether the code actually reached dev, because "the deploy
 broke" and "the deploy worked and the site is broken" need different reactions.
 
-The board also carries a **weighted progress bar** — every ticket has a Size
+The board also carries a **weighted progress bar** - every ticket has a Size
 (S/M/L/XL), progress is points rather than ticket counts, and it recalculates
 after each deploy and on a weekday schedule. It is written straight onto the
 board, in the description under the board title and on a progress item, so there
@@ -464,7 +565,7 @@ is no separate report to host or keep in sync. Setup is step 7 of
 [.github/README.md](.github/README.md).
 
 Setting all of this up on another project: [.github/README.md](.github/README.md).
-Nothing in it is specific to this site — every value that points at an
+Nothing in it is specific to this site - every value that points at an
 environment is a GitHub variable, so a copy cannot inherit this project's URL or
 server path.
 
