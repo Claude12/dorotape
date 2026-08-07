@@ -63,6 +63,7 @@ than for any block at all.
 | `quickadd.php` | quick add to cart |
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
+| `shipping.php` | the delivery tariff, plus `class-dorotape-shipping-tariff.php` charging it |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
 | `address-book.php` | saved addresses: storage and the read/write API |
 | `address-book-account.php` | the My Account screen for managing them |
@@ -198,8 +199,71 @@ zero rated, which is why there is no catch-all row. `inc VAT` exists as a
 Kryptronic string but is deliberately unused: it is the suffix the old site would
 have shown had display been inclusive, and it was not.
 
-**Shipping** - Local Pickup on WooCommerce's catch-all zone. There is no zone
-layout yet; designing one is a commercial decision and its own ticket.
+**Shipping** (DR-3) - the published tariff, transcribed from the two Kryptronic
+custom shipping scripts and cross-checked against the live Delivery page, which
+agrees with them exactly.
+
+The rates are in `inc/shipping.php`, not in WooCommerce settings, and that split is
+deliberate: the theme holds the prices and WooCommerce holds only the geography.
+Three parts of the tariff cannot be expressed by a native shipping method at all.
+Above the free-delivery threshold the *set of options changes* rather than a price,
+so on UK mainland economy delivery disappears and the before-noon upgrade drops
+from 19.25 to 7.50; Flat Rate has one cost per instance and no view of the
+subtotal. There are two separate tariffs chosen per product with different
+thresholds, 150 against 12, and Free Shipping allows one minimum per instance.
+Under 1.00 the main tariff ships free as a sample. Keeping the numbers in the theme
+also means a deploy carries them, where the options table does not.
+
+Seven zones, created by `dorotape-migration/store_shipping_zones.php`. Order
+matters, because WooCommerce takes the first zone that matches: the two
+postcode-scoped GB zones sit above plain GB, or every Highlands and Northern
+Ireland order would price as mainland. The Highlands list is the carrier-standard
+one, expanded to explicit outcode wildcards rather than WooCommerce postcode
+ranges, whose matcher compares differing-length postcodes inconsistently. It is
+ours rather than Michael's: Kryptronic held no postcode list, it showed a dropdown
+and let the customer pick their own region.
+
+Which part of the tariff a zone charges is a setting on the method instance, not
+the zone's name, so renaming a zone in the admin cannot quietly change what it
+costs to deliver there.
+
+Europe is the old site's own list of 18 countries, not WooCommerce's `EU`
+continent and not the EU. Gibraltar, San Marino and Switzerland are on it; Poland,
+Czechia, Hungary, Finland and the Baltics are not. It is who Doro Tape has shipped
+to. The continent would have added Norway, Iceland, Turkey and a dozen more that
+the old site quoted as worldwide.
+
+Two things changed rather than moved across. Collection is still WooCommerce's own
+Local Pickup, because `inc/collection.php` and the whole DR-11 journey identify a
+collection order by the `local_pickup` method id, and a lookalike rate from the
+tariff class would read as a delivery and stop the Ready for Collection flow
+firing with nothing on screen to show it. But it moved off the catch-all zone onto
+UK mainland only, which is what the old tariff offered; it had been offering
+collection from Leicestershire to every country on earth. Orders already placed
+keep the method stored on them, so history and the collection journey are
+unaffected.
+
+The postage tariff is in place but currently unreachable, and that is correct
+rather than broken. All 313 `UK_POSTAGE` rows in the inventory export are
+CraftStick items, and the CraftStick range was not migrated: no SKU begins `CS-`,
+no product title or attribute term mentions it. Note the join is
+`inventory.prodnum` to the product's `_kryp_prodnum` meta and not the SKU, because
+the SKUs here were reworked for Sage and only 286 of 2,233 still match a Kryptronic
+inventory id. A product goes on the `postage` shipping class only when every one of
+its inventory rows is `UK_POSTAGE`; 283 products are mixed, and in each of those
+the postage row is a CraftStick sheet while the item that actually exists here is
+the roll. Importing CraftStick later and re-running the seeder assigns them.
+
+One assumption needs Michael, because the data cannot answer it. The old site
+chose a tariff per product, so a basket mixing a roll and a sheet has no defined
+answer. `dorotape_package_tariff()` uses the postage tariff only when *everything*
+in the basket is a small item. That is the safe direction; the reverse would let
+one sticker carry a roll of tape to the Highlands for a pound.
+
+Rates were verified through real zone matching rather than by calling the tariff
+functions, across 19 cases covering every zone and every band, including two
+negative controls: Aberdeen city `AB10` and Perth `PH1` must fall to mainland and
+not be swept up by the `AB` and `PH` outcodes.
 
 Two things are still outstanding here and need the client: the BACS bank details,
 and a card gateway. No card gateway of any kind is installed, so a customer who

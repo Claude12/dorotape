@@ -136,6 +136,7 @@ require get_template_directory() . '/inc/cutsize.php';
 require get_template_directory() . '/inc/quickadd.php';
 require get_template_directory() . '/inc/purchase-order.php';
 require get_template_directory() . '/inc/pay-on-account.php';
+require get_template_directory() . '/inc/shipping.php';
 require get_template_directory() . '/inc/collection.php';
 require get_template_directory() . '/inc/address-book.php';
 require get_template_directory() . '/inc/address-book-account.php';
