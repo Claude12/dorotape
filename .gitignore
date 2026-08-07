@@ -20,6 +20,19 @@ dist/
 # The template carries names and comments, never values.
 !.env.example
 
+# Client data exports
+# dorotape-migration/ held 113 CSV exports of the old CMS, including 10,358
+# customer rows with email addresses, password hashes, phone numbers and
+# addresses. Deploying is a git pull inside public_html, so all of it was
+# served from the webroot, and the repository is public.
+#
+# The directory now lives outside the webroot. This entry stops it, or anything
+# like it, being committed back. Raw data does not belong in the theme.
+dorotape-migration/
+*.csv
+*.sql
+*.xlsx
+
 # Editor
 .vscode/
 .idea/

@@ -1,7 +1,0 @@
-"id","name","interface","secstrongpass","secrepeatpass","secexpirepass","seclockout","changepassalert","devauthalert","lockalert"
-"admin","Backend Admin","BackEnd","1","4","90","3","1","1","1"
-"reports","Backend Reports","BackEnd","1","4","90","3","1","1","1"
-"reseller","Wholesale Account","FrontEnd","0","0","0","0","0","0","0"
-"superuser","Backend Superuser","BackEnd","1","4","90","3","1","1","1"
-"users","Basic Account","FrontEnd","0","0","0","0","0","0","0"
-"wholesale","Wholesale Account","FrontEnd","0","0","0","0","0","0","0"

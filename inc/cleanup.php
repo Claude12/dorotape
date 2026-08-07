@@ -5,11 +5,59 @@
  * @package dorotape
  */
 
-// Disable Gutenberg block editor for all post types — ACF handles all content editing
-add_filter( 'use_block_editor_for_post', '__return_false' );
+// ─── Editor ───────────────────────────────────────────────────────────────────
+
+/**
+ * Classic editor everywhere, except pages that are genuinely built from blocks.
+ *
+ * ACF handles normal content editing, so the block editor is off by default and
+ * that is deliberate. But Cart and Checkout are the WooCommerce blocks, and a
+ * blanket __return_false meant opening Checkout in wp-admin gave a classic
+ * textarea full of raw `<!-- wp:woocommerce/checkout -->` comments. One stray
+ * keystroke or an autop pass there takes down the checkout, and the damage is
+ * not obvious in the editor that caused it.
+ *
+ * So: post type stays false, which makes classic the default for everything and
+ * every new page. The per-post filter runs after it and re-enables blocks only
+ * where the content is already block markup.
+ *
+ * The test is deliberately "is this a WooCommerce block page", not the broader
+ * has_blocks(). Four other pages would pass has_blocks() without being block
+ * built in any meaningful way: Privacy Policy and Refund and Returns are core
+ * boilerplate, and My account and Wishlist are single shortcodes that WordPress
+ * wrapped in a wp:shortcode comment. Handing those to the block editor would
+ * contradict the rule above for no benefit.
+ *
+ * Note what this says about My account: it is [woocommerce_my_account], the
+ * classic shortcode. The woocommerce_account_* hooks work there. Only Cart and
+ * Checkout are block territory.
+ */
 add_filter( 'use_block_editor_for_post_type', '__return_false' );
 
-// Remove core block patterns (not needed without Gutenberg)
+add_filter( 'use_block_editor_for_post', function ( bool $use, $post ): bool {
+	if ( ! $post instanceof WP_Post ) {
+		return $use;
+	}
+
+	// Woo's own pages by id, so they stay editable even if the content is emptied.
+	if ( function_exists( 'wc_get_page_id' ) ) {
+		$woo_pages = array_filter(
+			array( wc_get_page_id( 'cart' ), wc_get_page_id( 'checkout' ) ),
+			fn( $id ) => $id > 0
+		);
+		if ( in_array( $post->ID, $woo_pages, true ) ) {
+			return true;
+		}
+	}
+
+	// Any other page actually built from Woo blocks, so this keeps holding if
+	// more of the store is converted later, or on another site using this theme.
+	return has_block( 'woocommerce/cart', $post )
+		|| has_block( 'woocommerce/checkout', $post );
+}, 10, 2 );
+
+// Remove core block patterns. Nothing here builds pages from patterns, including
+// the Woo pages above, which carry two blocks placed by WooCommerce itself.
 add_action( 'after_setup_theme', function() {
 	remove_theme_support( 'core-block-patterns' );
 }, 20 );

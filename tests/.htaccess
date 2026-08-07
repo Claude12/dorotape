@@ -1,6 +1,7 @@
 # Deploy is `git pull` on the server, so anything tracked here lands inside
 # public_html. Nothing in this folder should be reachable over HTTP.
-# Same exposure dorotape-migration/ has always had.
+# The theme-root .htaccess covers the same ground more broadly; this file stays
+# so the rule survives being copied to another project on its own.
 
 <IfModule mod_authz_core.c>
     Require all denied

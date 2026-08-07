@@ -355,6 +355,13 @@ Every ref named gets the same status, the same PR link and the same comment, at
 every stage — branch push, PR opened, merge. They ship together, so there is
 nothing to decide between them.
 
+**Commit subjects are scanned. Commit bodies are not.** Write cross-references
+freely in a body: "the storage shape here is for DR-18", "zone layout stays in
+DR-3". Naming a ticket in a body says you thought about it, not that you built
+it, and an earlier version of this script read those as work done and moved five
+untouched tickets to In progress in a single push. If a commit really does work
+on a ticket, its ref belongs in the subject.
+
 Deploys and checks work off a commit *range* rather than a branch name: every
 commit subject in `deployed-dev..HEAD` is scanned. On a **merge commit** merge
 this needs no thought, because GitHub writes the branch name into the merge
