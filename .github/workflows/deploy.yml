@@ -86,6 +86,13 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          # How long to wait for the TCP connection, not for the script. The
+          # action's default is 30s, which is not a considered figure, and a
+          # deploy on 2026-08-08 failed on a bare `dial tcp i/o timeout` that
+          # cleared on an identical re-run. 60s costs nothing on a healthy
+          # connection and takes the marginal case off the table. It does not
+          # mask a real outage: an unreachable host still fails, just later.
+          timeout: 60s
           # envs passes these into the remote shell, so the values are never
           # spliced into the script text.
           envs: THEME_PATH,GIT_REMOTE,GIT_BRANCH
