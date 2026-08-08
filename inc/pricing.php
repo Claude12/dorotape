@@ -384,7 +384,13 @@ function dorotape_user_has_role_price( WC_Product $product ): bool {
 // ─── Price Calculation ────────────────────────────────────────────────────────
 
 /**
- * Apply quantity-break tier pricing and customer discount to each cart line.
+ * Apply quantity-break tier pricing to each cart line.
+ *
+ * Customer-specific pricing is deliberately NOT done here. It belongs to the
+ * Simple Role Based Pricing plugin, which is what Woosage writes Sage price
+ * lists into. This function's only job on that front is to get out of the way:
+ * a line that already carries a role price is skipped so tiers cannot stack on
+ * top of a negotiated price. See DR-20.
  *
  * @param WC_Cart $cart
  */
@@ -402,8 +408,6 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 		return;
 	}
 	$running = true;
-
-	$customer_discount = dorotape_get_customer_discount( get_current_user_id() );
 
 	$combined_qty = dorotape_combined_quick_add_qty( $cart );
 
@@ -431,10 +435,6 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 
 		$price = dorotape_get_tier_price( $qty, $lookup_id, $base_price );
 
-		if ( $customer_discount > 0 ) {
-			$price *= ( 1 - ( $customer_discount / 100 ) );
-		}
-
 		$product->set_price( round( $price, wc_get_price_decimals() ) );
 	}
 
@@ -442,26 +442,18 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 }
 add_action( 'woocommerce_before_calculate_totals', 'dorotape_dynamic_pricing', 20, 1 );
 
-/**
- * Retrieve the ACF customer discount rate for a logged-in user.
- * Returns 0 for guests or users with no discount configured.
- * The customer_discount_rate field lives on the user record (Sage sync),
- * not on products — ACF is user-only in this theme.
+/*
+ * dorotape_get_customer_discount() lived here: a per-user percentage read from
+ * an ACF customer_discount_rate field and multiplied into every line above.
+ * Removed for DR-20, along with the ACF field itself.
  *
- * @param int $user_id
- * @return float Percentage discount (0–99.99).
+ * It was the second of two customer-pricing mechanisms. Woosage's recommended
+ * route is the Simple Role Based Pricing plugin, because that is where Sage
+ * price lists land, and a percentage held on the WordPress user record has no
+ * counterpart in Sage: nothing would keep the two in step, and an account could
+ * end up with a discount here that its Sage price list disagrees with. Leaving
+ * it dormant was not an option either, since a stale rate would quietly apply.
  */
-function dorotape_get_customer_discount( int $user_id ): float {
-	if ( ! $user_id ) {
-		return 0.0;
-	}
-	$rate = get_field( 'customer_discount_rate', 'user_' . $user_id );
-	if ( ! is_numeric( $rate ) ) {
-		return 0.0;
-	}
-	$rate = (float) $rate;
-	return ( $rate > 0 && $rate < 100 ) ? $rate : 0.0;
-}
 
 // ─── Tier Parsing ─────────────────────────────────────────────────────────────
 

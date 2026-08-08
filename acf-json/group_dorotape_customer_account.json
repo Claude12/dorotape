@@ -91,28 +91,6 @@
 			"ui_on_text": "Approved",
 			"ui_off_text": "Not approved",
 			"allow_in_bindings": 0
-		},
-		{
-			"key": "field_dorotape_discount_rate",
-			"label": "Customer Discount Rate (%)",
-			"name": "customer_discount_rate",
-			"aria-label": "",
-			"type": "number",
-			"instructions": "A percentage discount applied across all products at checkout for this customer, on top of tier pricing. Synced from Sage where available. 0 = no discount.",
-			"required": 0,
-			"conditional_logic": 0,
-			"wrapper": {
-				"width": "50",
-				"class": "",
-				"id": ""
-			},
-			"default_value": 0,
-			"min": 0,
-			"max": 99.99,
-			"step": 0.01,
-			"prepend": "",
-			"append": "%",
-			"allow_in_bindings": 0
 		}
 	],
 	"location": [
