@@ -348,6 +348,16 @@ rather than assumed. Put a product in a cart, choose a delivery rate, and the
 store offers no payment method at all. Choose Local Pickup on the same cart and
 it offers Pay on collection.
 
+The old site's other live methods are deliberately not being reproduced, and the
+order counts are why. Across 3,016 orders from May 2025 to July 2026, SagePay
+Form took 3,009. Zero balance took 5, "call me and I will pay by phone" took 1,
+purchase on account took 1, and the emailed payment link and PayPal Express took
+none at all. PayPal Express was switched on the whole time and never used,
+because the SagePay option was itself labelled "Credit Card, Debit Card or
+PayPal", so PayPal sat inside the card flow rather than beside it. Opayo is the
+same shape. So the ask is one card gateway, not a set of alternative routes that
+took two orders between them in fifteen months.
+
 ### Stock and availability (DR-8)
 
 Sage owns stock, so `_manage_stock` is off on every product and everything reads
