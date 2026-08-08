@@ -228,7 +228,10 @@ again, and the duplicate carries none of their history or pricing.
 **Payments** - Invoice Gateway on as "Pay on account" with 30 day terms, gated
 per customer in `inc/pay-on-account.php`. Cash on Delivery retitled "Pay on
 collection", restricted to Local Pickup and off for virtual orders, so it cannot
-be chosen for a delivery. BACS and Cheque off. Invoice Gateway's own purchase
+be chosen for a delivery. BACS and Cheque off, and off for good: the decision on
+DR-4 was to match the old site, and the Kryptronic gateway export holds 162 rows
+without a single bank transfer among them, so there are no details to migrate and
+none to ask for. Invoice Gateway's own purchase
 order field is deliberately off: `inc/purchase-order.php` already collects one
 and stores it where Sage reads it, and enabling both would show the customer two
 boxes and write the second where nothing looks.
@@ -337,9 +340,13 @@ functions, across 19 cases covering every zone and every band, including two
 negative controls: Aberdeen city `AB10` and Perth `PH1` must fall to mainland and
 not be swept up by the `AB` and `PH` outcodes.
 
-Two things are still outstanding here and need the client: the BACS bank details,
-and a card gateway. No card gateway of any kind is installed, so a customer who
-is not approved for credit and is not collecting has no way to pay.
+One thing is still outstanding here and needs the client: a card gateway. None of
+any kind is installed, so a customer who is not approved for credit and is not
+collecting has no way to pay. That is not a side effect of BACS being off, which
+was settled deliberately; it is the whole of what is missing, and it is checkable
+rather than assumed. Put a product in a cart, choose a delivery rate, and the
+store offers no payment method at all. Choose Local Pickup on the same cart and
+it offers Pay on collection.
 
 ### Stock and availability (DR-8)
 
