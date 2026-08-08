@@ -334,6 +334,15 @@ add_filter( 'woocommerce_store_api_product_quantity_editable', function ( $edita
  * everything else (JS off, direct POST, saved links).
  */
 add_filter( 'woocommerce_add_to_cart_validation', function ( $passed, $product_id, $quantity, $variation_id = 0 ) {
+	// A re-order is not somebody choosing a quantity, it is a copy of one that
+	// was accepted at the time. Refusing it here would drop the line out of the
+	// basket entirely, and WooCommerce would then report the product as
+	// "currently unavailable", which is untrue and unhelpful. inc/reorder.php
+	// rounds the quantity up to a valid multiple instead, so the line survives
+	// and the customer is told what changed.
+	if ( dorotape_is_order_again() ) {
+		return $passed;
+	}
 	$product = wc_get_product( $variation_id ? $variation_id : $product_id );
 	if ( ! $product instanceof WC_Product ) {
 		return $passed;

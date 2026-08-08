@@ -116,6 +116,7 @@ a copy-paste.
 | `poa.php` | price-on-application products |
 | `cutsize.php` | cut-to-size ordering |
 | `quickadd.php` | quick add to cart |
+| `reorder.php` | teaches core's Order again about cut sizes and quantity steps |
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `vat.php` | VAT number at checkout, its format check, and the VIES lookup |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
@@ -159,6 +160,67 @@ normally there. The block rules above apply to Cart and Checkout only.
 
 Before building anything that touches checkout, confirm which checkout you are
 building for.
+
+### Re-ordering a past order (DR-29)
+
+WooCommerce ships an Order again button, so this looked like a ticket about
+whether core was good enough. It is not. Core rebuilds the basket in
+`WC_Cart_Session::populate_cart_from_order()`, and that method knows nothing
+about the two things this shop puts on a line. Measured on a real completed
+order before anything was changed:
+
+| | lines | rolls | cut to size |
+| --- | --- | --- | --- |
+| ordered | 2 | 75 | 2 |
+| re-ordered by core | 1 | 50 | 0 |
+
+Two faults produced that, and only one of them is obvious. Core seeds each
+line's cart item data as an empty array, and nothing but the
+`woocommerce_order_again_cart_item_data` filter can fill it, so the cut sizes
+were dropped. Then, because both lines now carried identical empty cart item
+data, `generate_cart_id()` handed them the same key and the second assignment
+overwrote the first rather than adding to it, so 25 rolls disappeared as well.
+The customer was told "1 item from your previous order is currently
+unavailable" and "The cart has been filled with the items from your previous
+order" at the same time. Neither described what had happened.
+
+Carrying the note across fixes both, because the note is part of the hash
+`generate_cart_id()` builds: distinct cut patterns give distinct keys, so the
+lines stay apart without any further work.
+
+The third fault is the quantity step. A past order can hold a quantity the step
+rule would now refuse, either because the step was added or changed since, or
+because staff raised the order in admin where the rule does not apply. Core's
+response is to drop the line and report the product as "currently unavailable",
+which is untrue: the product is available, the quantity is stale. So
+`inc/pricing.php`'s step validator stands down during a re-order and
+`inc/reorder.php` rounds the quantity up instead, never down, and says what it
+changed. It is a basket rather than a purchase, so a customer who wanted less
+can still edit it.
+
+The button is also added to the orders list, not just the single order view
+where core puts it, since re-ordering the same consumables is the common case
+here and core's placement costs a page load to reach a button you cannot see.
+
+`tests/php/probe-orderagain.php` is the check, so the numbers above can be
+re-run rather than remembered:
+
+```
+php tests/php/probe-orderagain.php
+```
+
+It finds its own WordPress and its own products rather than hardcoding either,
+so it runs on any copy of the site. It builds real orders, calls core's private
+`populate_cart_from_order()` through reflection rather than paraphrasing it,
+follows the round trip as far as the cut sizes landing back on the new order,
+and deletes every order and user it made, including when a check fails. It
+exits non-zero on failure.
+
+Two things in it are deliberate. It carries a control, because the fix relaxes
+the step validator during a re-order and a fix that had quietly deleted that
+rule altogether would otherwise look like a pass. And it was run with the fix
+disabled before being trusted: 6 of its 10 checks fail in that state, which is
+how you know it is testing something.
 
 ## The address book
 

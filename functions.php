@@ -135,6 +135,7 @@ require get_template_directory() . '/inc/stock.php';
 require get_template_directory() . '/inc/poa.php';
 require get_template_directory() . '/inc/cutsize.php';
 require get_template_directory() . '/inc/quickadd.php';
+require get_template_directory() . '/inc/reorder.php';
 require get_template_directory() . '/inc/purchase-order.php';
 require get_template_directory() . '/inc/vat.php';
 require get_template_directory() . '/inc/pay-on-account.php';
