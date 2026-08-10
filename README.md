@@ -120,6 +120,7 @@ a copy-paste.
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `vat.php` | VAT number at checkout, its format check, and the VIES lookup |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
+| `credit-limit.php` | takes that gateway away again when the basket is over the Sage credit limit |
 | `shipping.php` | the delivery tariff, plus `class-dorotape-shipping-tariff.php` charging it |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
 | `address-book.php` | saved addresses: storage and the read/write API |
@@ -297,6 +298,41 @@ none to ask for. Invoice Gateway's own purchase
 order field is deliberately off: `inc/purchase-order.php` already collects one
 and stores it where Sage reads it, and enabling both would show the customer two
 boxes and write the second where nothing looks.
+
+### Credit limits (DR-10)
+
+Two separate questions, deliberately on two separate hooks. `pay-on-account.php`
+answers "is this account allowed credit at all", which decides whether the
+Pay on account method exists for this customer. `credit-limit.php` answers "does
+this basket fit inside what is left of their limit", which decides whether they
+may use it today. The second runs at priority 110 so it lands after the first.
+
+The behaviour is the client's, confirmed 10 August 2026: an over-limit customer
+is told plainly and offered another way to pay. The order is not silently
+accepted and flagged, and it is not hard-blocked either.
+
+**The figures are Woosage's, not ours.** The connector already syncs both out of
+Sage onto the user as `woosage_credit_limit` and `woosage_account_balance`, so
+nothing here keeps a second copy in ACF. This is worth knowing before DR-21 is
+picked up, because that ticket was written as "pull credit limits from Sage into
+ACF" and most of it turns out to be done already, by the plugin.
+
+Two things to check against real Sage data, neither of which can be settled from
+the plugin source: that a positive `account_balance` means money owed, and so
+eats into the limit, and that the limit should be measured against the gross
+basket total rather than the goods total. Both are filterable
+(`dorotape_credit_balance`, `dorotape_credit_cart_total`) so neither needs a code
+change to correct.
+
+An unset limit means "Sage has not told us", not "a limit of zero", and nothing
+is enforced in that case. A limit of literally zero is a real limit and is
+enforced. Getting that the wrong way round would take pay on account away from
+every approved customer the moment the file shipped.
+
+Woosage's own credit feature is a different thing and does not collide with this
+one: it checks with Sage *after* the order is placed, moving it through
+`wc-pending-checks` to either its normal status or `wc-failed-checks`. This one
+runs before the order exists.
 
 **Email** - sender `sales@dorotape.co.uk` for both the visible from-address and
 wp-mail-smtp's own, which overrides it otherwise. Internal copies go to the same
