@@ -178,7 +178,8 @@ present in the DOM while being invisible on a phone.
 | `purchase-order.php` | PO number at checkout, stored where the Sage sync reads it |
 | `vat.php` | VAT number at checkout, its format check, and the VIES lookup |
 | `pay-on-account.php` | gates the Invoice gateway on an approved-for-credit user flag |
-| `credit-limit.php` | takes that gateway away again when the basket is over the Sage credit limit |
+| `credit-limit.php` | reads the Sage figures and works out whether an account is over its limit or on hold. Decides nothing |
+| `account-pending.php` | what happens when it is: card methods go, the order is taken and held in its own status |
 | `shipping.php` | the delivery tariff, plus `class-dorotape-shipping-tariff.php` charging it |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
 | `address-book.php` | saved addresses: storage and the read/write API |
@@ -357,23 +358,155 @@ order field is deliberately off: `inc/purchase-order.php` already collects one
 and stores it where Sage reads it, and enabling both would show the customer two
 boxes and write the second where nothing looks.
 
-### Credit limits (DR-10)
+### Credit limits and held orders (DR-10)
 
-Two separate questions, deliberately on two separate hooks. `pay-on-account.php`
-answers "is this account allowed credit at all", which decides whether the
-Pay on account method exists for this customer. `credit-limit.php` answers "does
-this basket fit inside what is left of their limit", which decides whether they
-may use it today. The second runs at priority 110 so it lands after the first.
+Three separate questions, deliberately in three separate places.
+`pay-on-account.php` answers "is this account allowed credit at all", which
+decides whether the Pay on account method exists for this customer.
+`credit-limit.php` answers "is this account over its limit, or on hold", and
+answers nothing else: it reads the Sage figures and does the arithmetic.
+`account-pending.php` decides what to do about it. The split is not tidiness for
+its own sake. The arithmetic has now outlived two opposite policies built on top
+of it, so it is kept where a third reversal cannot reach it.
 
-The behaviour is the client's, confirmed 10 August 2026: an over-limit customer
-is told plainly and offered another way to pay. The order is not silently
-accepted and flagged, and it is not hard-blocked either.
+**The behaviour is the client's, and it reversed on 11 August 2026.** The first
+build removed the Pay on account method from an over-limit customer and pointed
+them at paying by card, which is what he asked for on 10 August. The next morning:
+"we are not supposed to take orders with card payments from customers with account
+balances that are over their limit (or would take them over their credit limit)".
+The reason matters more than the instruction. A card payment settles the order, not
+the account, so it leaves the overdue balance where it was and adds more goods on
+top. Paying by card was never the way round the limit; it was the thing they are
+not allowed to do.
 
-**The figures are Woosage's, not ours.** The connector already syncs both out of
-Sage onto the user as `woosage_credit_limit` and `woosage_account_balance`, so
-nothing here keeps a second copy in ACF. This is worth knowing before DR-21 is
-picked up, because that ticket was written as "pull credit limits from Sage into
-ACF" and most of it turns out to be done already, by the plugin.
+So it is now the **card** methods that are removed and the account one that stays,
+and the order is taken: "it would be better to accept the order with a flag at our
+end and a message to the customer, something like 'Thank you for your order, which
+is on our system pending an account payment being made'". That sentence is used
+word for word, on the order received page, in the My Account order view and in the
+email.
+
+It covers two situations, not one. "This is also true in the case of a customer
+being on hold due to an overdue payment even though they may still have credit
+left on their account." So an account can be comfortably inside its limit and
+still be held, and the two facts are read separately, on-hold first.
+
+**"Card" is defined by exclusion.** A held customer is offered Pay on account and
+nothing else. A list of card gateway ids would be wrong twice: the site has no
+card gateway connected yet (DR-4, Opayo), so the list would be empty today, and it
+would silently stop matching the day a different one was installed. Excluding
+everything is also the more faithful reading, because any other method at checkout
+takes money for this order when the money is supposed to go to the account. Widen
+it with `dorotape_account_pending_gateways` if BACS or similar should ever be let
+through. Two guards worth knowing about: if the account method is not in the list
+at all, nothing is removed, because a checkout with no payment methods is a dead
+end; and admin is left alone, so a shop manager taking a phone order sees
+everything.
+
+**The flag is a custom order status**, `wc-dt-acct-pending`, "Pending account
+payment". A status shows in the admin filter row, the status column, the count
+badges and the customer's own order list for free, where a meta key would have to
+be gone looking for. Underneath it, meta records which of the two reasons applied
+and an order note records the figures as they stood, because both outlive the
+status being changed when the order is released.
+
+The status **belongs to `bp-custom-order-status-for-woocommerce`**, the same as
+Ready for Collection, and is created in the CMS rather than registered in
+`account-pending.php`. One mechanism for one concept, and the client can see and
+change their own furniture without a deploy. The theme was registering it itself
+for about a day; the argument for moving it is the same argument used for the top
+menu.
+
+The price of that is that **the status is database state and does not deploy.**
+Creating it is a blocking step on any new environment, and the settings matter as
+much as the slug:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| Slug | `dt-acct-pending` | exactly this, and it cannot be changed afterwards |
+| Paid Status | **off** | on, and the plugin adds it to `woocommerce_order_is_paid_statuses` and stamps `date_paid`. The whole meaning of the status is that a payment has not been made |
+| Edit Mode | **on** | a held order has not been paid for or picked, so accounts may need to take a line off it before releasing it |
+| Email Notification | **off** | the theme sends the customer email through `WC_Email`, and the plugin's own would be a second copy |
+
+`dorotape_account_pending_status_exists()` reports whether the row is there, an
+admin notice says so if it is not, and the gateway filter falls back to the
+gateway's own status rather than ours. That last one is not tidiness:
+`WC_Abstract_Order::set_status()` silently substitutes `pending` for an unknown
+status, and pending shows a Pay button, so a missing row would put a card payment
+in front of exactly the order that must not have one. Blocking the card methods
+still happens either way, because that rule is the client's and does not get to
+depend on a database row.
+
+The slug is abbreviated for two independent reasons: `post_status` is a
+`varchar(20)` and WooCommerce prefixes its statuses with `wc-`, so
+`wc-dt-account-pending` is 21 characters and would be truncated on write; and the
+plugin's own slug field allows 17. `dt-acct-pending` is 15, which clears both.
+
+One thing was lost in the move. The plugin `array_merge`s its statuses onto the end
+of `wc_order_statuses`, so this one now sits after Cancelled and Refunded rather
+than next to On hold where it belongs by meaning. It reads a little like an end
+state in the dropdown. Not worth a filter fighting the plugin over.
+
+It is deliberately **not** in `woocommerce_order_is_paid_statuses`, which is the
+opposite of the call made for Ready for Collection: the entire meaning of this
+status is that a payment has not been made. There are now two ways to get that
+wrong, since the plugin's Paid Status setting reaches the same filter, which is
+why it is in the table above. It is also not in
+`woocommerce_valid_order_statuses_for_payment`, so no Pay button appears against a
+held order in My Account. There is nothing for the customer to pay there, and the
+button would invite exactly the card payment the client has just ruled out.
+
+**Every email has to be wired by hand**, and this is the part of a custom status
+that fails silently. WooCommerce's transactional emails each list the exact
+transitions they fire on, and a custom status is in none of those lists, so the
+default is not a slightly wrong email but no email at all. The status plugin has
+its own email feature, which is left off: it fires on
+`woocommerce_order_status_changed` rather than through `WC_Emails`, so it does not
+use the templates, the settings screen or the wording of every other email on the
+site. Four
+things are missing until they are connected, and only the first is obvious:
+
+- the customer's confirmation when the order is held, which is the theme's own
+  email in `inc/emails/class-dorotape-email-account-pending.php`
+- the office's New Order email, so a held order is not invisible internally
+- the customer's Processing email when the order is **released**, which is the one
+  most easily missed, because by then everything looks normal
+- the office's Cancelled email, so a held order written off is not the single kind
+  of cancellation nobody is told about
+
+The three WooCommerce ones are pointed at the new transitions rather than copied
+into the theme, so they keep the one set of settings a shop manager can edit and
+their wording cannot drift from the email the same customer gets on an ordinary
+order. The list is `dorotape_account_pending_email_transitions()`; Completed needs
+nothing, because that email fires on a bare status action WooCommerce already
+knows.
+
+**The order lands in the status through Invoice Gateway's own filter**,
+`igfw_invoice_gateway_default_order_status`, which the plugin applies to its
+configured status before setting it. One hook, rather than a fight with whatever
+the gateway does next. The trade-off is that a different account gateway would not
+fire it. That is left as a known limit rather than guarded against, because every
+fallback worth having involves intercepting status changes the shop's own staff
+make, and getting that wrong is worse than the problem.
+
+Invoice Gateway also prints its configured instructions on the order received
+page. Those are plugin settings, not code, and they need reading now that the
+status means something different from "awaiting invoice payment".
+
+**None of this can be exercised on dev yet.** No user has a credit limit, a
+balance or a hold flag, none is approved for pay on account, and Woosage is not
+installed, so every path is currently switched off by its own guards. The filters
+`dorotape_credit_limit`, `dorotape_credit_balance`, `dorotape_account_on_hold`,
+`dorotape_credit_cart_total` and `dorotape_account_pending_reason` are how to
+drive it before Sage is connected.
+
+**The figures are Woosage's, not ours.** The connector already syncs all three
+out of Sage onto the user as `woosage_credit_limit`, `woosage_account_balance` and
+`woosage_account_on_hold`, so nothing here keeps a second copy in ACF. This is
+worth knowing before DR-21 is picked up, because that ticket was written as "pull
+credit limits from Sage into ACF" and most of it turns out to be done already, by
+the plugin. The on-hold flag in particular means the second half of this feature
+needed no new field at all.
 
 Two things to check against real Sage data, neither of which can be settled from
 the plugin source: that a positive `account_balance` means money owed, and so
@@ -385,12 +518,19 @@ change to correct.
 An unset limit means "Sage has not told us", not "a limit of zero", and nothing
 is enforced in that case. A limit of literally zero is a real limit and is
 enforced. Getting that the wrong way round would take pay on account away from
-every approved customer the moment the file shipped.
+every approved customer the moment the file shipped. The on-hold flag reads the
+same way: Woosage casts it to a boolean before storing, so it arrives as `1` or as
+an empty string, and an empty string, a missing key and a missing connector are all
+"not on hold". The alternative holds every order on the site.
 
-Woosage's own credit feature is a different thing and does not collide with this
-one: it checks with Sage *after* the order is placed, moving it through
-`wc-pending-checks` to either its normal status or `wc-failed-checks`. This one
-runs before the order exists.
+Woosage's own credit feature is a separate thing, and it is now close enough to
+this one to be worth watching. It checks with Sage *after* the order is placed,
+moving it through `wc-pending-checks` to either its normal status or
+`wc-failed-checks`. This one decides before the order is placed and then holds it,
+which is the same shape of outcome by a different route. They do not collide as
+things stand, because that feature is off, but switching it on would mean two
+mechanisms holding the same order for the same reason and reporting it in two
+places.
 
 **Email** - sender `sales@dorotape.co.uk` for both the visible from-address and
 wp-mail-smtp's own, which overrides it otherwise. Internal copies go to the same
@@ -810,6 +950,13 @@ push to main (style.css) → Deploy on version bump → git pull on the dev serv
 mean to ship. `.cursorrules` reserves it for the project owner.
 
 Production is manual and stays that way.
+
+**A deploy only moves theme code.** Menus, plugins, uploads, WooCommerce settings
+and the two custom order statuses live in the database and travel by All-in-One WP
+Migration or by hand. `dt-acct-pending` is the one to watch, because the code that
+depends on it deploys and it does not: see the settings table under [Credit limits
+and held orders](#credit-limits-and-held-orders-dr-10), and expect the admin
+notice if it is missing.
 
 After a deploy lands, [tests/](tests/) runs against dev - pages load clean, no
 JS errors, no new accessibility violations, sane markup, and a product still

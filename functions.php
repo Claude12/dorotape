@@ -140,6 +140,7 @@ require get_template_directory() . '/inc/purchase-order.php';
 require get_template_directory() . '/inc/vat.php';
 require get_template_directory() . '/inc/pay-on-account.php';
 require get_template_directory() . '/inc/credit-limit.php';
+require get_template_directory() . '/inc/account-pending.php';
 require get_template_directory() . '/inc/shipping.php';
 require get_template_directory() . '/inc/collection.php';
 require get_template_directory() . '/inc/address-book.php';
