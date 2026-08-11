@@ -86,6 +86,63 @@ carries four typos ("an order for too", "relevent", "platfroms", "data base") an
 names Meta and Sage, which is a data-protection statement worth a read rather than
 a copy-paste.
 
+### Navigation
+
+Three menu locations: Primary Navigation, Secondary Navigation and Footer
+Navigation. Only two have menus in them.
+
+Primary holds the category menu the client built. It is a four item stub down one
+branch (Applications > Retail Display > Gold Films / Silver Films) against an
+intended eight top level categories, and filling it out is DR-33, which is waiting
+on the client to say which categories go where.
+
+Secondary holds the top menu: My account, Wishlist, Cart. Built by
+`tools/provision_top_menu.php`. Checkout is deliberately not in it,
+because it is reached from the cart and a header link to it drops a customer on an
+empty checkout. Labels match the page titles rather than being reworded; "Basket"
+reads better on a UK trade site but the cart page, the cart block and every
+WooCommerce notice all say "Cart".
+
+Footer is empty. The policy pages are its natural home when the client is ready
+for that.
+
+An unassigned location renders nothing. This matters more than it sounds:
+`wp_nav_menu()`'s default `fallback_cb` is `wp_page_menu()`, which lists every
+published page alphabetically, so the two empty slots were putting Cart, Checkout,
+My account, Wishlist and all four policy pages into the header on every page. It
+looked like a menu nobody could edit, because it was not a menu at all, and there
+was nothing in Appearance > Menus to change. All three calls now pass
+`'fallback_cb' => false`, wrapped in `has_nav_menu()` so an empty slot does not
+leave a bare `<nav>` landmark behind either.
+
+The top menu is a real menu and not markup in `header.php` for the same reason.
+The complaint that started this was that those links could not be found or changed
+in the CMS; hardcoding them would have recreated exactly that.
+
+Menus live in the database and the deploy only carries theme files, so a menu built
+by hand on one site does not travel to the others. Hence the script: it is
+idempotent and resolves every page through its own WooCommerce or plugin option, so
+it can be re-run on dev and on live to the same result, and on a site without the
+wishlist plugin it produces a two item menu rather than an error.
+
+Two header defects came out of the same work.
+
+The mobile menu could not be opened at all. `navigation.js` finds the toggle button
+through `#site-navigation` and will not look anywhere else, so the button has to
+live inside `.nav-primary`; the mobile breakpoint was hiding that whole element,
+button included. It now hides the list and leaves the nav, and the opened list
+drops out of the header row as an absolutely positioned panel rather than being
+wedged into it.
+
+A `#secondary-menu` block in `css/scaffold.css` has been deleted. Every rule in it
+was of the shape `#secondary-menu ul li a`, which assumes `#secondary-menu` is a
+wrapper containing a list. `header.php` passes `'container' => false`, so
+`#secondary-menu` is the list, and those selectors matched nothing. Two
+declarations were live and both did harm: a stray padding, and an ID weight
+`display: none` under 768px which hid the account links on mobile and could not be
+overridden by any class rule. That is what made the account links measure as
+present in the DOM while being invisible on a phone.
+
 ---
 
 ## Layout
@@ -99,6 +156,7 @@ a copy-paste.
 | `css/`, `js/` | `scaffold.css` and `scaffold.js` - the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
 | `tests/` | automated site checks - [tests/README.md](tests/README.md) |
+| `tools/` | one-off CLI scripts that set up database state the deploy cannot carry. No client data, ever. `php_sapi_name()` guarded, so a web request gets `CLI only` and nothing runs |
 | `.github/` | deploy and monday board pipeline - [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
 | `.htaccess` | denies raw data files over HTTP. See [Client data is not kept here](#client-data-is-not-kept-here) |

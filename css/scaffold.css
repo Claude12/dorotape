@@ -194,9 +194,22 @@ h6 {
   width: auto;
 }
 
-/* Secondary nav — pushed right */
-.nav-secondary {
+/* Account links and search sit hard right, with the category menu keeping the
+   left. The auto margin has to be able to land on either one: it belongs to
+   the secondary nav when there is a menu in that slot, and to the search on
+   its own when there is not. Putting it only on .nav-secondary left the search
+   floating in the middle of the header on every page that had no secondary
+   menu assigned, which was all of them. */
+.nav-secondary,
+.dt-header-search {
   margin-left: auto;
+}
+
+/* Two autos would split the free space between them and drag the pair back
+   towards the centre, so the search gives up its own once the nav is there to
+   do the pushing. The flex `gap` still spaces them apart. */
+.nav-secondary + .dt-header-search {
+  margin-left: 0;
 }
 
 /* ── Nav shared ─────────────────────────────────────────────────────────── */
@@ -236,13 +249,27 @@ h6 {
   text-decoration: none;
 }
 
+/* These links were inline with horizontal padding only, so the box was the
+   15px line height and nothing more: the hover background came out as a thin
+   strip, and on a phone the tap target was well under the 24px minimum. The
+   deleted #secondary-menu block had a flex-and-full-height treatment for this,
+   which is what it should have been doing all along, but it never applied
+   because it was matching markup we do not render. 44px rather than the full
+   header height, so the utility links stay visually subordinate to the
+   category menu next to them. */
 .nav-secondary > ul > li > a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 0.78rem;
   padding: 0 0.7rem;
   font-weight: 500;
   color: var(--dt-white);
   border-bottom: none;
   letter-spacing: 0.01em;
+  white-space: nowrap;
+  border-radius: var(--dt-radius);
+  transition: background 0.15s;
 }
 .nav-secondary > ul > li > a:hover,
 .nav-secondary > ul > li.focus > a,
@@ -1752,16 +1779,33 @@ input[type="submit"]:hover {
     width: 100%;
   }
 
-  /* Mobile nav */
+  /* Mobile nav.
+
+     The toggle button lives inside .nav-primary, because navigation.js finds
+     it with #site-navigation and will not look anywhere else. So hiding the
+     whole nav here hid the button along with it and there was no way to open
+     the menu on a phone at all. What has to be hidden is the list, not the
+     nav around it. */
   .menu-toggle {
     display: block;
   }
-  .nav-primary,
-  .nav-secondary {
+  .nav-primary > ul {
     display: none;
   }
-  .nav-primary {
+
+  /* The account links stay on. They used to be display:none here, which on a
+     phone meant no route to the cart, the wishlist or My account at all. There
+     is no room for them on the same row as the logo, the toggle and the search,
+     so they take a row of their own: full width, and ordered last so the search
+     does not get pushed onto a third row behind them. */
+  .nav-secondary {
+    order: 10;
     width: 100%;
+    margin-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .nav-secondary > ul {
+    justify-content: space-between;
   }
 
   .site-header {
@@ -1776,13 +1820,33 @@ input[type="submit"]:hover {
     flex: 1;
   }
 
-  .nav-primary.toggled {
-    display: block;
-    width: 100%;
-  }
-  .nav-primary.toggled ul {
+  /* Opened, the list drops out of the header row entirely rather than being
+     wedged into it, so tapping the button does not reflow the logo and search
+     on the way down. .site-header is sticky, which makes it the containing
+     block for this. */
+  .nav-primary.toggled > ul {
+    display: flex;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.15);
+    /* The shared nav rule sets align-items: center, which is what vertically
+       centres the links in the desktop bar. Turned into a column that same
+       declaration centres them horizontally instead, so every item came out
+       floating in the middle of the panel. Stretch puts them back to full
+       width with the label on the left. */
+    align-items: stretch;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 550;
+    background: #005a82;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  /* Scoped to nested lists on purpose. As `.nav-primary.toggled ul` this
+     matched the top list too, at equal specificity and later in the file, so
+     it quietly took the panel's solid background back off again. Submenus get
+     their own tint from the .nav-primary ul ul rule below. */
+  .nav-primary.toggled ul ul {
+    flex-direction: column;
   }
   .nav-primary.toggled > ul > li > a {
     height: auto;
@@ -1839,57 +1903,17 @@ input[type="submit"]:hover {
   line-height: 0;
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   SECONDARY MENU (#secondary-menu)
-════════════════════════════════════════════════════════════════════════════ */
-#secondary-menu {
-  padding: 0 var(--dt-gap);
-}
-
-#secondary-menu ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-#secondary-menu ul li {
-  position: relative;
-}
-
-#secondary-menu ul li a {
-  display: flex;
-  align-items: center;
-  height: var(--dt-header-h);
-  padding: 0 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--dt-white);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-#secondary-menu ul li a:hover {
-  color: var(--dt-white);
-  background: rgba(255, 255, 255, 0.12);
-  text-decoration: none;
-}
-
-#secondary-menu ul li.current_page_item > a,
-#secondary-menu ul li.current_page_parent > a {
-  color: var(--dt-white);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
-  margin-bottom: -3px;
-}
-
-@media (max-width: 768px) {
-  #secondary-menu {
-    display: none;
-  }
-}
+/* The #secondary-menu block that used to sit here has been removed. It was
+   written against markup we do not render: every rule in it was of the shape
+   `#secondary-menu ul li a`, which assumes #secondary-menu is a wrapper with a
+   list inside it. header.php passes `'container' => false`, so #secondary-menu
+   IS the list, and every one of those descendant selectors matched nothing.
+   The .nav-secondary rules further up are what actually style this menu, and
+   they duplicate what these were trying to do.
+   Only two declarations in it were live, and both were doing harm: a stray
+   horizontal padding on the list, and an ID-weight `display: none` under 768px
+   that hid the account links on mobile and could not be overridden by any
+   class rule. */
 
 .woocommerce-loop-category__title {
   margin: 16px;

@@ -32,32 +32,52 @@
 				<?php endif; ?>
 			</div><!-- .site-branding -->
 
-			<nav id="site-navigation" class="nav-primary" aria-label="<?php esc_attr_e( 'Primary menu', 'dorotape' ); ?>">
-				<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
-					<?php esc_html_e( 'Menu', 'dorotape' ); ?>
-				</button>
-				<?php
-				wp_nav_menu(
-					array(
-						'theme_location' => 'primary',
-						'menu_id'        => 'primary-menu',
-						'container'      => false,
-					)
-				);
-				?>
-			</nav><!-- #site-navigation -->
+			<?php
+			// An unassigned menu location must render nothing. wp_nav_menu()'s
+			// default fallback_cb is wp_page_menu(), which lists every published
+			// page alphabetically, so an empty Secondary or Footer slot was
+			// putting Cart, Checkout, My account, Wishlist and the policy pages
+			// into the site navigation on every page. Nothing in Appearance >
+			// Menus can be edited to stop that, because none of those links are
+			// menu items: there is no menu. Hence fallback_cb => false, and
+			// has_nav_menu() around the wrapper so an empty slot does not leave
+			// an empty <nav> landmark behind either.
+			//
+			// Assigning real menus is DR-33 and needs the client to say which
+			// categories go where. This only stops the placeholder.
+			?>
+			<?php if ( has_nav_menu( 'primary' ) ) : ?>
+				<nav id="site-navigation" class="nav-primary" aria-label="<?php esc_attr_e( 'Primary menu', 'dorotape' ); ?>">
+					<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
+						<?php esc_html_e( 'Menu', 'dorotape' ); ?>
+					</button>
+					<?php
+					wp_nav_menu(
+						array(
+							'theme_location' => 'primary',
+							'menu_id'        => 'primary-menu',
+							'container'      => false,
+							'fallback_cb'    => false,
+						)
+					);
+					?>
+				</nav><!-- #site-navigation -->
+			<?php endif; ?>
 
-			<nav id="secondary-navigation" class="nav-secondary" aria-label="<?php esc_attr_e( 'Secondary menu', 'dorotape' ); ?>">
-				<?php
-				wp_nav_menu(
-					array(
-						'theme_location' => 'secondary',
-						'menu_id'        => 'secondary-menu',
-						'container'      => false,
-					)
-				);
-				?>
-			</nav><!-- #secondary-navigation -->
+			<?php if ( has_nav_menu( 'secondary' ) ) : ?>
+				<nav id="secondary-navigation" class="nav-secondary" aria-label="<?php esc_attr_e( 'Secondary menu', 'dorotape' ); ?>">
+					<?php
+					wp_nav_menu(
+						array(
+							'theme_location' => 'secondary',
+							'menu_id'        => 'secondary-menu',
+							'container'      => false,
+							'fallback_cb'    => false,
+						)
+					);
+					?>
+				</nav><!-- #secondary-navigation -->
+			<?php endif; ?>
 
 			<div class="dt-header-search" id="dt-header-search">
 				<button type="button" class="dt-header-search__toggle"
