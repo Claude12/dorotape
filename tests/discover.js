@@ -13,57 +13,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const { siteFromEnv, HOW_TO_SET } = require('./lib/env');
 
-/**
- * Load a gitignored .env from the repo root, for running this by hand.
- *
- * Real environment variables always win, so this cannot override what CI
- * passed in - in Actions the file does not exist and the repo's configured
- * variables are the only source. Dependency-free on purpose: this runs as a
- * pretest step, before anything can rely on a dotenv package being installed.
- */
-function loadDotEnv() {
-  const file = path.join(__dirname, '..', '.env');
-  if (!fs.existsSync(file)) return;
-
-  for (const raw of fs.readFileSync(file, 'utf8').split('\n')) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-
-    const eq = line.indexOf('=');
-    if (eq === -1) continue;
-
-    const key = line.slice(0, eq).trim().replace(/^export\s+/, '');
-    if (!key || key in process.env) continue;
-
-    let value = line.slice(eq + 1).trim();
-    if (/^(".*"|'.*')$/s.test(value)) value = value.slice(1, -1);
-    process.env[key] = value;
-  }
-}
-loadDotEnv();
-
-/**
- * Which site to check. SITE_URL first, then DEV_SITE_URL.
- *
- * There is deliberately no committed default. Both are environment variables
- * precisely so that a copy of this suite cannot inherit a previous project's
- * site and report a confident green about somebody else's pages.
- */
-function resolveSite() {
-  const url = process.env.SITE_URL || process.env.DEV_SITE_URL;
-  if (url) return url;
-
-  console.error(
-    'No site to check. Set one of:\n' +
-    '  SITE_URL=https://example.dev npm test\n' +
-    '  DEV_SITE_URL in a .env at the repo root (see .env.example)\n' +
-    '  the DEV_SITE_URL repository variable, in CI'
-  );
+const SITE = siteFromEnv();
+if (!SITE) {
+  console.error(`No site to check. ${HOW_TO_SET}`);
   process.exit(1);
 }
-
-const SITE = resolveSite().replace(/\/$/, '');
 /**
  * How many pages a run looks at.
  *
@@ -301,6 +257,12 @@ async function findWooProduct() {
     urls: [...new Set(['/', ...paths, ...shop])],
     templates: templatesFor(picks, groups, capped),
     woocommerce: woo,
+    // How many pages discovery actually turned up, NOT how many will be visited.
+    // The two differ by the front page and the shop paths, which are added here
+    // whether or not anything was found. Recorded because a run that discovered
+    // nothing still visits '/' and, before specs/discovery.spec.js existed, went
+    // green off that one page and reported the site as checked.
+    discovered: paths.length,
   };
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
@@ -319,6 +281,12 @@ async function findWooProduct() {
 
   console.log(`Site:  ${SITE}`);
   console.log(`Pages: ${plan.urls.length}${note ? ` (${note})` : ''}`);
+  if (!plan.discovered) {
+    console.log(
+      'WARN:  discovery found no pages, so only the front page would be checked.\n' +
+      '       specs/discovery.spec.js fails on this rather than letting the run go green.'
+    );
+  }
   if (groups) {
     for (const [k, v] of Object.entries(groups)) console.log(`         ${k}: ${v} found`);
   }

@@ -97,6 +97,19 @@ for (const [name, c] of groups) {
   console.log(`${BOX[state]} ${name} ${count}${note}`);
 }
 
+// A run with no tests in it used to summarise as "0 checks passed", which reads
+// like a pass and is not one. specs/discovery.spec.js should catch the cause
+// before this line is ever reached, so getting here means something stranger
+// happened and the wording should not paper over it.
+// Exits 0 deliberately, even though this is bad news. This runs inside a step
+// that pipes stdout into GITHUB_OUTPUT under `bash -e`, so a non-zero exit here
+// kills the step and the monday comment arrives with an empty body. Reporting the
+// failure is specs/discovery.spec.js's job; this file only has to describe it.
+if (!total) {
+  console.log('\nNo checks ran at all. Nothing about this site was verified. See the run log.');
+  process.exit(0);
+}
+
 if (!failures.length) {
   console.log(`\n${total} checks passed in ${Math.round((stats.duration || 0) / 1000)}s.`);
   process.exit(0);

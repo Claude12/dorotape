@@ -315,11 +315,44 @@ jobs:
           fi
           echo "Checking: ${DEV_SITE_URL}"
 
+      # Prove dev is serving the code that was just deployed, before anything is
+      # checked or even discovered. Three runs in August 2026 came back red on the
+      # front page alone and passed on a re-run of the identical commit, because
+      # the checks reached dev before dev was serving the new theme. See
+      # tests/wait-for-deploy.js. Needs no npm install, so it runs before one.
+      - name: Wait for dev to serve this deploy
+        id: settle
+        continue-on-error: true
+        working-directory: tests
+        env:
+          THEME_PATH: ${{ vars.DEV_THEME_PATH }}
+        run: |
+          set -euo pipefail
+
+          # The theme's directory name on the server is also its directory name
+          # under wp-content/themes, which is what the style.css URL needs. The
+          # workspace basename is the REPO name and can differ, so it is not used.
+          SLUG=$(basename "${THEME_PATH%/}")
+          if [ -z "${THEME_PATH}" ] || [ "$SLUG" = "." ] || [ "$SLUG" = "/" ]; then
+            echo "::error::Cannot work out the theme directory name from DEV_THEME_PATH ('${THEME_PATH}'). It is the absolute path to the theme on the dev server."
+            exit 1
+          fi
+
+          VERSION=$(grep -m1 '^Version:' ../style.css | awk '{print $2}')
+          if [ -z "${VERSION}" ]; then
+            echo "::error::No 'Version:' line in style.css, so there is no way to tell which code dev is serving."
+            exit 1
+          fi
+
+          THEME_SLUG="$SLUG" EXPECT_VERSION="$VERSION" node wait-for-deploy.js
+
       - name: Install
+        if: steps.settle.outcome == 'success'
         working-directory: tests
         run: npm ci
 
       - name: Install browser
+        if: steps.settle.outcome == 'success'
         working-directory: tests
         run: npx playwright install --with-deps chromium
 
@@ -327,6 +360,7 @@ jobs:
       # broken workflow. The outcome is read back on the next line.
       - name: Run checks
         id: check
+        if: steps.settle.outcome == 'success'
         continue-on-error: true
         working-directory: tests
         # No SITE_URL here: discover.js falls back to DEV_SITE_URL, which the
@@ -335,7 +369,7 @@ jobs:
 
       - name: Summarise
         id: summary
-        if: always()
+        if: steps.check.outcome != 'skipped'
         working-directory: tests
         run: |
           {
@@ -345,7 +379,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Keep the report
-        if: always()
+        if: steps.check.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: site-check-report
@@ -369,8 +403,12 @@ jobs:
           node .github/scripts/monday-sync.js checks-passed \
             --refs "$REFS" --run-url "$RUN_URL" --summary "$SUMMARY"
 
+      # 'failure', not '!= success'. When the wait above times out the checks are
+      # skipped rather than failed, and this message is the wrong one for that: it
+      # says the code is live on dev and may be broken, which is the opposite of
+      # what happened. That case is the next step.
       - name: Mark Blocked - checks failed
-        if: steps.check.outcome != 'success'
+        if: steps.check.outcome == 'failure'
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
           SUMMARY: ${{ steps.summary.outputs.text }}
@@ -379,6 +417,21 @@ jobs:
         run: |
           node .github/scripts/monday-sync.js blocked \
             --refs "$REFS" --stage checks --run-url "$RUN_URL" --detail "$SUMMARY"
+
+      # --stage deploy, even though deploy.yml reported success. From the board's
+      # point of view the code did not arrive: the site is still serving the old
+      # version, and that stage's wording says so and marks the checks not run,
+      # rather than claiming something was verified.
+      - name: Mark Blocked - deploy never appeared on dev
+        if: steps.settle.outcome != 'success'
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REFS: ${{ needs.deploy-tracking.outputs.refs }}
+        run: |
+          node .github/scripts/monday-sync.js blocked \
+            --refs "$REFS" --stage deploy --run-url "$RUN_URL" \
+            --detail "The deploy step reported success, but dev never began serving this theme version within the wait, so no checks were run. Nothing here says the code is faulty. Look at whether the deploy reached the server and whether a cache is still holding the previous theme."
 
   # ---------------------------------------------------------------- progress
   # Recalculate the weighted progress bar and write it onto the board.

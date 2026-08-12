@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const { defineConfig, devices } = require('@playwright/test');
+const { resolveBaseUrl } = require('./lib/env');
 
-// discover.js runs as the pretest step and writes this. Falling back to the env
-// var keeps `playwright test` usable on its own, e.g. when re-running one spec.
+// discover.js runs as the pretest step and writes this.
 let plan = {};
 try {
   plan = JSON.parse(fs.readFileSync(path.join(__dirname, '.artifacts', 'plan.json'), 'utf8'));
@@ -31,7 +31,10 @@ module.exports = defineConfig({
     ['html', { outputFolder: '.artifacts/report', open: 'never' }],
   ],
   use: {
-    baseURL: plan.site || process.env.SITE_URL,
+    // The environment wins over the plan file, and a disagreement throws. The
+    // other way round, a stale .artifacts/plan.json silently redirected a whole
+    // run at the site it was generated from while the log said otherwise.
+    baseURL: resolveBaseUrl(plan),
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'off',
