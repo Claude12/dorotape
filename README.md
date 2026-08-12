@@ -96,10 +96,10 @@ branch (Applications > Retail Display > Gold Films / Silver Films) against an
 intended eight top level categories, and filling it out is DR-33, which is waiting
 on the client to say which categories go where.
 
-Secondary holds the top menu: My account, Wishlist, Cart. Built by
-`tools/provision_top_menu.php`. Checkout is deliberately not in it,
-because it is reached from the cart and a header link to it drops a customer on an
-empty checkout. Labels match the page titles rather than being reworded; "Basket"
+Secondary holds the top menu: My account, Wishlist, Cart. Built by hand in the
+admin, like every other piece of database state. Checkout is deliberately not in
+it, because it is reached from the cart and a header link to it drops a customer on
+an empty checkout. Labels match the page titles rather than being reworded; "Basket"
 reads better on a UK trade site but the cart page, the cart block and every
 WooCommerce notice all say "Cart".
 
@@ -120,10 +120,11 @@ The complaint that started this was that those links could not be found or chang
 in the CMS; hardcoding them would have recreated exactly that.
 
 Menus live in the database and the deploy only carries theme files, so a menu built
-by hand on one site does not travel to the others. Hence the script: it is
-idempotent and resolves every page through its own WooCommerce or plugin option, so
-it can be re-run on dev and on live to the same result, and on a site without the
-wishlist plugin it produces a two item menu rather than an error.
+by hand on one site does not travel to the others. It gets rebuilt in the admin on
+each site, or carried with the database. There was a provisioning script for this
+at one point; it was dropped because the database is moved wholesale between
+environments anyway, so a script that reproduced one menu earned its keep only
+until the first migration.
 
 Two header defects came out of the same work.
 
@@ -156,7 +157,6 @@ present in the DOM while being invisible on a phone.
 | `css/`, `js/` | `scaffold.css` and `scaffold.js` - the bulk of the front end |
 | `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
 | `tests/` | automated site checks - [tests/README.md](tests/README.md) |
-| `tools/` | one-off CLI scripts that set up database state the deploy cannot carry. No client data, ever. `php_sapi_name()` guarded, so a web request gets `CLI only` and nothing runs |
 | `.github/` | deploy and monday board pipeline - [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
 | `.htaccess` | denies raw data files over HTTP. See [Client data is not kept here](#client-data-is-not-kept-here) |
@@ -182,6 +182,7 @@ present in the DOM while being invisible on a phone.
 | `account-pending.php` | what happens when it is: card methods go, the order is taken and held in its own status |
 | `shipping.php` | the delivery tariff, plus `class-dorotape-shipping-tariff.php` charging it |
 | `collection.php` | the Ready for Collection journey, plus `emails/` for its email class |
+| `dispatch.php` | what Completed means, and which of the two emails a customer gets for it |
 | `address-book.php` | saved addresses: storage and the read/write API |
 | `address-book-account.php` | the My Account screen for managing them |
 | `address-book-checkout.php` | picking one at checkout |
@@ -653,6 +654,72 @@ because the SagePay option was itself labelled "Credit Card, Debit Card or
 PayPal", so PayPal sat inside the card flow rather than beside it. Opayo is the
 same shape. So the ask is one card gateway, not a set of alternative routes that
 took two orders between them in fifteen months.
+
+### Order stage notifications (DR-30)
+
+Spec 5.8 asks for a notification at three stages: order received, ready for
+collection, and dispatched. Two of them were already built. The third turned out
+to be a wording problem rather than a missing stage.
+
+**Order received** needs nothing new, and that is a checked statement rather than
+an assumption. Every status an order can land in straight after checkout already
+sends the customer something:
+
+| First status | What sends | Reached by |
+| --- | --- | --- |
+| `processing` | WooCommerce's Processing email | a card payment, Pay on collection, and Pay on account for an account in good standing (`igfw_default_order_status` is `processing`) |
+| `dt-acct-pending` | `Dorotape_Email_Account_Pending` | Pay on account when the account is over its limit or on hold |
+| `on-hold` | WooCommerce's On hold email | BACS and Cheque, both off, but registered |
+| `failed` | WooCommerce's Failed email | a declined card |
+| `pending` | nothing, correctly | the customer left the gateway without paying. There is no order to confirm |
+
+`wc-pending-checks` and `wc-failed-checks` look like a gap in that list and are
+not one. They are Woosage's, not ours, and so is `WC_Pending_Checks_Email`. The
+status and the email are gated on the same `additional_checks_enabled()` setting,
+and the hook that would set the status is commented out in the plugin, so that
+route is dormant at both ends. If it is ever switched on, the email comes with
+it, and writing our own would be a second copy of somebody else's.
+
+**Ready for collection** is DR-14, in `inc/collection.php`.
+
+**Dispatched has no status of its own, on purpose.** Sage already owns the
+signal. When goods leave, Sage pushes the order back through the Woosage REST
+API, which does exactly this:
+
+```php
+$order->set_status( 'completed', 'Order marked as completed (dispatched) in Sage.', true );
+```
+
+So Completed *is* dispatched here, set by the warehouse's own system rather than
+by anybody clicking in WP admin. A Dispatched status would be a second, emptier
+version of a fact Sage is already reporting, and every order would have to be
+dragged through it by hand to keep the two in step.
+
+What was actually wrong was the message. Completed arrives on both routes, and
+WooCommerce 11 ships that email as "Your order from Dorotape is on its way!" over
+"Good things are heading your way!" - a courier update, sent to a customer who
+may have just carried the order out of the building. So `inc/dispatch.php` splits
+it:
+
+- **a delivery order** gets the theme's own dispatch email, and *not*
+  WooCommerce's completed one. This is also where DR-31's courier tracking
+  belongs; it hooks `woocommerce_email_order_meta`, which the template fires.
+- **a collection order** keeps WooCommerce's email, with the subject and heading
+  corrected to say the order is complete and thank them for collecting it.
+- **an order with no shipping line at all** keeps WooCommerce's email untouched.
+  Nothing was dispatched, so claiming a van exists would be worse than the stock
+  wording being bland.
+
+Never both emails. One message per stage is the whole requirement.
+
+Two details in there are load-bearing. The corrections to WooCommerce's email
+only apply when its wording is still the stock wording, checked against
+`get_default_subject()`, so a shop manager who writes their own subject keeps it
+rather than having it silently replaced on half the orders. And the filter that
+holds WooCommerce's email back returns the shop's own setting untouched when
+there is no order to judge, because the same filter runs on the settings screen,
+where answering "disabled" would show a manager an email switched off that they
+never switched off.
 
 ### Stock and availability (DR-8)
 

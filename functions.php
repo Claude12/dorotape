@@ -143,6 +143,7 @@ require get_template_directory() . '/inc/credit-limit.php';
 require get_template_directory() . '/inc/account-pending.php';
 require get_template_directory() . '/inc/shipping.php';
 require get_template_directory() . '/inc/collection.php';
+require get_template_directory() . '/inc/dispatch.php';
 require get_template_directory() . '/inc/address-book.php';
 require get_template_directory() . '/inc/address-book-account.php';
 require get_template_directory() . '/inc/address-book-checkout.php';
