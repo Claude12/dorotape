@@ -36,13 +36,19 @@ test.describe('the run checked something', () => {
   test('discovery found pages beyond the front page', () => {
     // The front page and the shop paths go into plan.urls unconditionally, so
     // plan.urls.length is not the measure here. plan.discovered is.
+    // The probe list comes first on purpose. summarise.js takes this message up
+    // to its first blank line and truncates it at 300 characters for the monday
+    // comment, so whatever leads is what the board gets. The status codes are the
+    // only part that distinguishes the causes; the prose below them is the part
+    // somebody can already guess.
     expect(
       plan.discovered,
-      `Discovery found no pages on ${plan.site} (${plan.source || 'no source'}).\n` +
-      'Neither a sitemap nor the REST API returned anything, so the only URL ' +
-      'checked was the front page and the other specs had nothing to iterate.\n' +
-      'Usually one of: the site was unreachable when discovery ran, the REST API ' +
-      'is blocked, or the deploy had not landed yet.'
+      `No pages discovered on ${plan.site}. Probes: ${plan.probesSummary || 'none recorded'}\n` +
+      `Source: ${plan.source || 'no source'}. Only the front page was checked, so ` +
+      'the other specs had nothing to iterate.\n' +
+      'A 403 or a 200 that is not JSON means something answered instead of ' +
+      'WordPress, and the host refusing the machine running the check is as likely ' +
+      'as the site being wrong. A 404 on the sitemaps is normal here.'
     ).toBeGreaterThan(0);
   });
 

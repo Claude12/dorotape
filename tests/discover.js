@@ -36,8 +36,86 @@ const SAMPLE = Number(process.env.SAMPLE_SIZE || 24);
 // How many rows a REST listing is asked for. A listing that comes back this
 // full is a listing that has been truncated, and the group behind it is bigger
 // than anything we are going to look at.
+//
+// It is a cap on the *listing*, not on the sample, so raising SAMPLE_SIZE does
+// not see past it: `npm run baseline` asks for 500 pages and still records from
+// at most 30 products, however many the shop has. See tests/README.md.
 const LISTING_LIMIT = 30;
+
+// Listings are asked for in a pinned order, because the default is not one.
+//
+// Both the WordPress and the Store API default to newest-first, so an uncapped
+// listing is stable but a *capped* one is a moving window: the 30 newest of 995
+// products is a different 30 after anything adds a product, which on this site
+// a Sage sync does. spread() then sorts and strides through that window, and a
+// stride landing on every third row of a list that shifted by one lands on
+// entirely different rows - measured on dev, one added product changed 8 of the
+// 8 sampled products. Two runs of the check then have no page in common, and
+// the a11y baseline is compared against pages it was never recorded from, so
+// known faults on newly-sampled products arrive looking like regressions.
+//
+// Ascending id is arbitrary but fixed, which is the only property needed here.
+const LISTING_ORDER = 'orderby=id&order=asc';
 const OUT = path.join(__dirname, '.artifacts', 'plan.json');
+
+/**
+ * Every HTTP probe discovery makes, and what came back.
+ *
+ * A run that finds nothing used to report only that it found nothing, and that
+ * one sentence covers causes with nothing in common: the REST API switched off,
+ * the site mid-deploy, or the host refusing the machine the check runs on. On
+ * 12 August 2026 it was the last of those - the suite found nothing from a
+ * GitHub runner while passing from a laptop minutes later - and the board could
+ * not have said so, because the status codes were thrown away at the two
+ * functions below.
+ *
+ * So every attempt is recorded with its status, and its body when the answer was
+ * not the one wanted. A 403 and a 200 carrying a bot-check page are different
+ * problems, and neither looks like a sitemap that is simply absent.
+ */
+const probes = [];
+
+// Enough of a body to recognise what answered: a WAF page, a login form, a
+// hosting holding page. Not enough to fill a monday comment.
+const SNIPPET = 80;
+
+function probe(url, status, body) {
+  const entry = { url: url.startsWith(SITE) ? url.slice(SITE.length) || '/' : url, status };
+  if (body) entry.body = String(body).replace(/\s+/g, ' ').trim().slice(0, SNIPPET);
+  probes.push(entry);
+}
+
+/**
+ * One line naming what answered and how, short enough to survive the trip to
+ * monday. summarise.js takes a failure message up to its first blank line and
+ * truncates at 300 characters, so this is built here, once, rather than
+ * assembled in the spec where the budget is easy to lose track of.
+ */
+function probesSummary() {
+  // Identical answers are collapsed, and query strings dropped. Three sitemap
+  // candidates all answering 403 is one fact, not three, and spelling it out
+  // three times used up the 300 characters before reaching the REST endpoints -
+  // which are the ones that decide whether anything is discovered at all. The
+  // full list, query strings and all, stays in plan.probes for the run log.
+  const groups = new Map();
+
+  for (const p of probes) {
+    const key = `${p.status}|${p.body || ''}`;
+    if (groups.has(key)) {
+      groups.get(key).also++;
+    } else {
+      groups.set(key, { url: p.url.split('?')[0], status: p.status, body: p.body, also: 0 });
+    }
+  }
+
+  return [...groups.values()]
+    .map(
+      (p) =>
+        `${p.url}${p.also ? ` (+${p.also} more)` : ''} ${p.status}` +
+        `${p.body ? ` "${p.body.slice(0, 40)}"` : ''}`
+    )
+    .join('; ');
+}
 
 async function get(url) {
   try {
@@ -45,8 +123,11 @@ async function get(url) {
       redirect: 'follow',
       headers: { 'User-Agent': 'wp-site-check/1.0' },
     });
-    return res.ok ? await res.text() : null;
-  } catch {
+    const text = await res.text().catch(() => '');
+    probe(url, res.status, res.ok ? '' : text);
+    return res.ok ? text : null;
+  } catch (e) {
+    probe(url, e.code || e.name || 'failed', e.message);
     return null;
   }
 }
@@ -54,9 +135,31 @@ async function get(url) {
 async function getJson(url) {
   try {
     const res = await fetch(url, { headers: { 'User-Agent': 'wp-site-check/1.0' } });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
+    const text = await res.text().catch(() => '');
+
+    if (!res.ok) {
+      probe(url, res.status, text);
+      return null;
+    }
+
+    // A 200 that is not JSON is the case worth separating out. res.json() threw
+    // here and the throw was swallowed as a null, so an endpoint answering with
+    // a challenge page, a redirect to a holding page or a PHP fatal was
+    // indistinguishable from one that returned an empty list.
+    try {
+      const json = JSON.parse(text);
+      // Recorded on success too, with no body. An endpoint that answers 200 with
+      // an empty list is a site with nothing published; one that is never
+      // reached at all is a site that refused us. The summary has to be able to
+      // show which, so a successful probe cannot be silent.
+      probe(url, res.status);
+      return json;
+    } catch {
+      probe(url, `${res.status} not JSON`, text);
+      return null;
+    }
+  } catch (e) {
+    probe(url, e.code || e.name || 'failed', e.message);
     return null;
   }
 }
@@ -95,7 +198,14 @@ function spread(groups, total) {
     // Sort before striding. Neither the REST API nor a sitemap promises a
     // stable order, so an unsorted stride quietly picks a different sample on
     // every run, and two runs of this check then have nothing in common to
-    // compare. Sorted, the same catalogue always yields the same sample.
+    // compare.
+    //
+    // Sorting is necessary and not sufficient. It fixes the order of whatever
+    // arrived, and says nothing about whether the same rows arrive: a capped
+    // listing in the API's default newest-first order is a window that moves,
+    // and sorting a window that moved gives a stable order over different
+    // content. That is what LISTING_ORDER is for. Both are needed - the pin
+    // fixes which rows, the sort fixes where in the stride they land.
     const urls = [...groups[name]].sort();
     // Even stride through the group, so it is not just the newest posts.
     const stride = Math.max(1, Math.floor(urls.length / perGroup));
@@ -122,9 +232,9 @@ async function collectFromRest() {
   const capped = [];
 
   for (const [name, endpoint] of [
-    ['pages', `/wp-json/wp/v2/pages?per_page=${LISTING_LIMIT}&status=publish`],
-    ['posts', `/wp-json/wp/v2/posts?per_page=${LISTING_LIMIT}&status=publish`],
-    ['products', `/wp-json/wc/store/v1/products?per_page=${LISTING_LIMIT}`],
+    ['pages', `/wp-json/wp/v2/pages?per_page=${LISTING_LIMIT}&status=publish&${LISTING_ORDER}`],
+    ['posts', `/wp-json/wp/v2/posts?per_page=${LISTING_LIMIT}&status=publish&${LISTING_ORDER}`],
+    ['products', `/wp-json/wc/store/v1/products?per_page=${LISTING_LIMIT}&${LISTING_ORDER}`],
   ]) {
     const list = await getJson(SITE + endpoint);
     if (!Array.isArray(list) || !list.length) continue;
@@ -226,7 +336,11 @@ async function findWooProduct() {
 
   // A simple product needs no variation picking, so prefer one. Fall back to a
   // variable product and let the spec choose the first option in each dropdown.
-  for (const query of ['type=simple&per_page=20', 'per_page=20']) {
+  //
+  // Pinned for the same reason as the listings: unpinned, this is whichever
+  // product was added most recently, so the shop check buys a different thing
+  // each run and a failure in it cannot be reproduced by running it again.
+  for (const query of [`type=simple&per_page=20&${LISTING_ORDER}`, `per_page=20&${LISTING_ORDER}`]) {
     const list = await getJson(`${SITE}/wp-json/wc/store/v1/products?${query}`);
     if (!Array.isArray(list)) continue;
     const usable = list.find((p) => p.is_purchasable && p.is_in_stock && p.permalink);
@@ -263,6 +377,10 @@ async function findWooProduct() {
     // nothing still visits '/' and, before specs/discovery.spec.js existed, went
     // green off that one page and reported the site as checked.
     discovered: paths.length,
+    // What answered, and how. Read by specs/discovery.spec.js so a run that
+    // discovers nothing says why on the board rather than only that it happened.
+    probes,
+    probesSummary: probesSummary(),
   };
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
@@ -286,6 +404,12 @@ async function findWooProduct() {
       'WARN:  discovery found no pages, so only the front page would be checked.\n' +
       '       specs/discovery.spec.js fails on this rather than letting the run go green.'
     );
+    // Printed in full here, where there is no length limit, as well as going to
+    // the board in the shortened form. The run log is where somebody looks once
+    // the board has told them to.
+    for (const p of plan.probes) {
+      console.log(`       ${p.url} -> ${p.status}${p.body ? `  ${p.body}` : ''}`);
+    }
   }
   if (groups) {
     for (const [k, v] of Object.entries(groups)) console.log(`         ${k}: ${v} found`);

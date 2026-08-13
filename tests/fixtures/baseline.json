@@ -2,14 +2,26 @@
   "a11y /": [],
   "a11y /cart/": [],
   "a11y /checkout/": [],
+  "a11y /delivery/": [],
   "a11y /hello-world/": [],
   "a11y /my-account/": [],
+  "a11y /privacy-policy/": [],
+  "a11y /returns-and-refunds/": [],
   "a11y /shop/": [],
+  "a11y /terms-and-conditions/": [
+    "listitem @ li:nth-child(n)"
+  ],
   "a11y /wishlist/": [],
   "a11y ~products": [
+    "aria-allowed-attr @ iframe .ytmVideoInfoVideoTitle",
+    "aria-prohibited-attr @ iframe #movie_player",
+    "button-name @ iframe .ytmVideoInfoChannelAvatar",
     "color-contrast @ #tab-description > p:nth-child(n) > span",
+    "color-contrast @ b",
+    "color-contrast @ font",
     "color-contrast @ p:nth-child(n) > span",
     "color-contrast @ ul:nth-child(n) > p > span",
+    "frame-title @ iframe",
     "image-alt @ p > img[decoding=\"async\"]",
     "image-alt @ ul:nth-child(n) > p > img[decoding=\"async\"]",
     "list @ ul:nth-child(n)"

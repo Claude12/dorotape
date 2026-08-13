@@ -61,6 +61,15 @@ Two things follow from that, both deliberate:
   run uses. It is slower on purpose. A template's record is only as complete as
   the pages it was recorded from, and features that only some products have (a
   tier pricing table, a gallery) are missed by a small sample.
+
+  **"Can list" is the limit, and on a real catalogue it is a low one.** A REST
+  listing is asked for `LISTING_LIMIT` (30) rows, and `SAMPLE_SIZE` does not see
+  past that: `npm run baseline` asks for 500 pages and records from at most 30
+  products, out of 995 here. So `a11y ~products` and `markup ~products` describe
+  30 products and are applied to all of them. Anything a product outside those 30
+  has and those 30 do not shows up as a regression the first time it is sampled.
+  Raising the cap means paginating the listing and a much slower baseline run,
+  which is a real change and not yet made.
 - **Selectors are stored with content identifiers removed.** `.post-1023`
   becomes `.post-N`, `a[data-product_id="527"]` becomes `a[data-product_id="N"]`,
   `:nth-child(3)` becomes `:nth-child(n)`. Those parts say which row this is,
@@ -102,6 +111,18 @@ across post types rather than taking the newest of one:
    and the WooCommerce Store API).
 3. Plus `/shop/`, `/cart/`, `/checkout/`, `/my-account/` where they exist.
 
+Listings are asked for in a **pinned order** (`orderby=id&order=asc`), which
+matters more than it looks. Both APIs default to newest-first, and a listing
+capped at 30 rows in newest-first order is a window that moves: the 30 newest of
+995 products is a different 30 as soon as anything adds a product, which a Sage
+sync does here. Sorting before striding does not save it, because sorting fixes
+the order of whatever arrived rather than which rows arrive. Measured on dev, one
+added product changed **8 of the 8** sampled products, so two runs had no product
+in common and each compared the `~products` baseline against pages it was never
+recorded from. Known contrast faults on newly-sampled products then arrived
+looking like regressions, and the board went red on three consecutive runs with a
+different product named each time.
+
 The fallback matters more than it sounds. WordPress switches off
 `/wp-sitemap.xml` entirely when "Discourage search engines from indexing this
 site" is on, which is the correct setting for a dev site, so the environment
@@ -121,6 +142,22 @@ one-page plan. One page loaded fine, four checks reported a tick, and the board
 was told the deploy was verified. `specs/discovery.spec.js` now fails when
 `plan.discovered` is 0, and again when WooCommerce is present but the Store API
 returned nothing purchasable, which silently skipped the entire shop journey.
+
+Failing was not enough on its own, because every cause looked the same from the
+board. `discover.js` records each probe it makes with the status that came back,
+into `plan.probes`, and the failure message leads with a collapsed one-line
+version so it survives the trip to monday. The four answers to tell apart:
+
+| Probes say | Cause |
+| --- | --- |
+| `403` on everything | something refused us. Often the host, not the site: check whether it refuses the machine the checks run from before assuming WordPress is wrong |
+| `200 not JSON` on `/wp-json/` | something answered instead of WordPress - a bot check, a holding page, or a PHP fatal |
+| `404` on sitemaps, `200` on `/wp-json/` | the site really has nothing published. Normal on a new install; sitemap 404s are normal here always |
+| `fetch failed` | nothing was listening |
+
+A 200 that is not JSON is called out separately because it used to be invisible:
+`res.json()` threw, the throw was swallowed, and the result was a `null`
+indistinguishable from an empty list.
 
 **A stale plan pointing at another site.** `playwright.config.js` took its
 `baseURL` from `plan.json` in preference to the environment, so a leftover plan
