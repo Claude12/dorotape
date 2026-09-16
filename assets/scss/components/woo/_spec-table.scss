@@ -1,0 +1,82 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Product tab spec grids (inc/product-tabs.php).
+//
+// The colour-reference tables (Pantone / RAL / Avery / Mactac / Oracal /
+// Metamark on the F-Sign Platinum range) and the heat-press and aftercare
+// grids. On the old site they were styled by a <style> block sitting inside
+// the tab content, whose selectors were bare `table` and `th, td`: global, so
+// it also restyled the Additional Information table and anything else on the
+// page. The import dropped that block, which is what left these tables
+// left-aligned with ragged column widths and no cell separation, and what the
+// client reported as "the colour refs are not aligned on the F-Sign Platinum
+// pages".
+//
+// So the intended look is reproduced here instead, scoped to .dt-product-tab
+// where it cannot leak. Cell width is min-width, not width, so six columns
+// scroll inside the tab on a phone rather than forcing the page sideways.
+
+.dt-product-tab {
+  overflow-x: auto;
+
+  table {
+    margin: 0 auto;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    min-width: 160px;
+    height: 30px;
+    padding: var(--spacer-4);
+    // The separation between cells is made by gutters in the page's own
+    // background colour, not by a visible rule, which is how the old site
+    // drew it. On the light site those gutters were white; here they are the
+    // navy canvas.
+    border-right: 5px solid var(--color-background);
+    border-bottom: 5px solid var(--color-background);
+    border-left: 5px solid var(--color-background);
+    background-color: var(--color-indigo);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  th {
+    font-weight: $font-weight-semibold;
+  }
+
+  // Tick and cross glyphs in the aftercare grids carry an inline
+  // `color: white`, which only reads against a filled cell. Keep them sized
+  // with it.
+  td sup {
+    font-size: 0.7em;
+  }
+}
+
+// Datasheet, fire-certificate and colour-selector icon links. The imported
+// markup puts the <a><img> pairs directly inside a <ul> with no <li>, so they
+// inherit the list's indent and sit out of line with the copy above them.
+// Strip the list chrome when a list has no real items and lay the icons out
+// as a row.
+.woocommerce-Tabs-panel ul:not(:has(> li)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-8) var(--spacer-16);
+  margin: var(--spacer-8) 0;
+  padding-left: 0;
+  list-style: none;
+
+  br {
+    display: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}

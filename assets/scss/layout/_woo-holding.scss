@@ -1,0 +1,801 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMPORARY. Delete this file when the WooCommerce page designs land.
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// The homepage is the only signed-off design so far. Shop, product, cart,
+// checkout and my-account have no design yet, but they are live pages that
+// still have to be usable, and WooCommerce's own markup collapses into an
+// unreadable pile without some layout applied to it.
+//
+// So this is a holding layer, not a design: grids, list resets, image
+// constraints and just enough surface and border to separate one region from
+// another, all on the design system's tokens so nothing clashes with the
+// navy canvas. There are no bespoke colours, no shadows and no type scale
+// beyond the existing tokens.
+//
+// Nothing else should import from here and no new component should be built
+// on top of it. When each Woo page gets its design, that page's rules are
+// deleted from this file and written properly under components/ or layout/.
+// The file is finished when it is empty.
+
+// ── Shared page chrome ─────────────────────────────────────────────────────
+
+.woocommerce-breadcrumb {
+  margin-bottom: var(--spacer-20);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+
+  a {
+    color: var(--color-muted-foreground);
+
+    &:hover {
+      color: var(--color-cyan);
+    }
+  }
+}
+
+.woocommerce-message,
+.woocommerce-error,
+.woocommerce-info {
+  margin: 0 0 var(--spacer-20);
+  padding: var(--spacer-12) var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  list-style: none;
+  font-size: $font-size-sm;
+}
+
+.woocommerce-message {
+  border-left-color: var(--color-success);
+}
+
+.woocommerce-error {
+  border-left-color: var(--color-danger);
+}
+
+.woocommerce-info {
+  border-left-color: var(--color-cyan);
+}
+
+// ── Shop and category archives ─────────────────────────────────────────────
+
+.woocommerce-products-header__title,
+h1.page-title {
+  margin-bottom: var(--spacer-16);
+  font-size: $font-size-30;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-tight;
+}
+
+.woocommerce-result-count {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+}
+
+// One column on a phone, stepping up to four. Woo's own columns-N class wins
+// where a template sets it.
+ul.products {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-20);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include min-breakpoint(mobile) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  &.columns-2 {
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &.columns-3 {
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}
+
+li.product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+
+  a.woocommerce-loop-product__link {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background-color: var(--color-surface-2);
+  }
+
+  .woocommerce-loop-product__title,
+  .woocommerce-loop-category__title {
+    padding: var(--spacer-12) var(--spacer-12) var(--spacer-4);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-snug;
+  }
+
+  .price {
+    padding: 0 var(--spacer-12) var(--spacer-8);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+
+    del {
+      margin-right: var(--spacer-4);
+      color: var(--color-muted-foreground);
+      font-weight: $font-weight-regular;
+    }
+  }
+
+  // Pushed to the bottom of the card so buttons line up across a row
+  // whatever length the titles run to.
+  .button,
+  .add_to_cart_button,
+  .dt-btn-enquire {
+    display: block;
+    margin: auto var(--spacer-12) var(--spacer-12);
+    text-align: center;
+  }
+
+  .onsale {
+    position: absolute;
+    top: var(--spacer-8);
+    right: var(--spacer-8);
+    padding: var(--spacer-4) var(--spacer-8);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+  }
+}
+
+.woocommerce-pagination ul.page-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: var(--spacer-28) 0 var(--spacer-8);
+  padding: 0;
+  border: 0;
+  list-style: none;
+
+  li {
+    border: 0;
+  }
+
+  .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-foreground);
+    text-decoration: none;
+
+    &.current {
+      border-color: var(--color-magenta);
+      background-color: var(--color-magenta);
+      color: var(--color-primary-foreground);
+    }
+  }
+}
+
+// ── Single product ─────────────────────────────────────────────────────────
+
+.product_title.entry-title {
+  margin-bottom: var(--spacer-8);
+  font-size: $font-size-30;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-tight;
+}
+
+.single-product div.product {
+  display: grid;
+  // minmax(0, ...) rather than 1fr: a plain 1fr track grows to its content's
+  // min-content width, so the spec table's fixed-width cells were pushing the
+  // whole page past the viewport on phones instead of scrolling inside
+  // .dt-product-tab.
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-40);
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.woocommerce-product-gallery {
+  position: relative;
+  overflow: hidden;
+
+  // WooCommerce's own stylesheet positions the zoom trigger, and that
+  // stylesheet is not loaded, so without this the icon sits above the image.
+  &__trigger {
+    position: absolute;
+    top: var(--spacer-12);
+    right: var(--spacer-12);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    font-size: $font-size-base;
+    line-height: 1;
+    text-decoration: none;
+
+    img,
+    .emoji {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  &__image img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+  }
+
+  .flex-control-thumbs {
+    display: flex;
+    gap: var(--spacer-8);
+    margin: var(--spacer-8) 0 0;
+    padding: 0;
+    overflow-x: auto;
+    list-style: none;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .flex-active img {
+      border-color: var(--color-magenta);
+    }
+  }
+}
+
+.entry-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-12);
+  // style.css (underscores) gives .entry-summary a top margin, which drops the
+  // summary below the gallery it sits beside.
+  margin: 0;
+
+  .price {
+    color: var(--color-foreground);
+    font-size: $font-size-24;
+    font-weight: $font-weight-extrabold;
+
+    del {
+      color: var(--color-muted-foreground);
+      font-size: $font-size-base;
+      font-weight: $font-weight-regular;
+    }
+
+    ins {
+      text-decoration: none;
+    }
+  }
+}
+
+// Quantity + add-to-cart on one row.
+form.cart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-12);
+}
+
+.variations_form.cart,
+.single_variation_wrap {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.woocommerce-variation-add-to-cart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-12);
+}
+
+.quantity input[type="number"] {
+  width: 80px;
+  text-align: center;
+}
+
+// Attribute picker: label above select, no table chrome.
+table.variations {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0 0 var(--spacer-12);
+    border: 0;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th.label {
+    padding-right: var(--spacer-16);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  td.value {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-12);
+  }
+}
+
+.reset_variations {
+  color: var(--color-cyan);
+  font-size: $font-size-sm;
+}
+
+.woocommerce-product-details__short-description {
+  color: var(--color-muted-foreground);
+}
+
+// ── Product tabs ───────────────────────────────────────────────────────────
+
+// Everything after the gallery and summary spans both columns.
+.woocommerce-tabs,
+.single-product div.product > .related,
+.single-product div.product > .upsells {
+  grid-column: 1 / -1;
+}
+
+.woocommerce-tabs {
+  margin-top: var(--spacer-32);
+
+  ul.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-4);
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--color-border);
+    list-style: none;
+
+    li a {
+      display: block;
+      padding: var(--spacer-12) var(--spacer-16);
+      color: var(--color-muted-foreground);
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      text-decoration: none;
+    }
+
+    li.active a {
+      border-bottom: 2px solid var(--color-magenta);
+      color: var(--color-foreground);
+    }
+  }
+
+  .woocommerce-Tabs-panel {
+    padding-top: var(--spacer-20);
+  }
+}
+
+.woocommerce-product-attributes {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: var(--spacer-8) var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  th {
+    width: 30%;
+    color: var(--color-muted-foreground);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// ── Sidebar widgets ────────────────────────────────────────────────────────
+
+.widget-area,
+#secondary {
+  padding: var(--spacer-20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+}
+
+.widget {
+  margin-bottom: var(--spacer-24);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.widget-title {
+  margin-bottom: var(--spacer-12);
+  padding-bottom: var(--spacer-8);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.widget_product_categories ul,
+.widget_categories ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: var(--spacer-4) 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: $font-size-sm;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--color-foreground);
+
+    &:hover {
+      color: var(--color-cyan);
+    }
+  }
+}
+
+.widget_product_categories .children {
+  margin-top: var(--spacer-4);
+  padding-left: var(--spacer-12);
+  border-left: 2px solid var(--color-border);
+}
+
+// ── Cart ───────────────────────────────────────────────────────────────────
+
+.woocommerce-cart-form table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+
+  th {
+    padding: var(--spacer-8) var(--spacer-12);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  td {
+    padding: var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+}
+
+.cart_item {
+  .product-thumbnail img {
+    width: 60px;
+    height: 60px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+
+  .product-name a {
+    color: var(--color-foreground);
+  }
+
+  .product-name .variation {
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+  }
+
+  .product-price,
+  .product-subtotal {
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.cart-collaterals {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacer-32);
+}
+
+.cart_totals {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+
+  @include min-breakpoint(tablet) {
+    width: 380px;
+  }
+
+  h2 {
+    margin: 0;
+    padding: var(--spacer-12) var(--spacer-16);
+    background-color: var(--color-surface-2);
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+  }
+
+  th,
+  td {
+    padding: var(--spacer-12) var(--spacer-16);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  th {
+    width: 40%;
+    color: var(--color-muted-foreground);
+    font-weight: $font-weight-regular;
+  }
+
+  .order-total th,
+  .order-total td {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.wc-proceed-to-checkout {
+  padding: var(--spacer-16);
+
+  .checkout-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// ── Checkout ───────────────────────────────────────────────────────────────
+
+.checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-32);
+  align-items: start;
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: minmax(0, 1fr) 420px;
+  }
+
+  h3 {
+    margin-bottom: var(--spacer-16);
+    padding-bottom: var(--spacer-8);
+    border-bottom: 1px solid var(--color-border);
+    font-size: $font-size-md;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.woocommerce-billing-fields,
+.woocommerce-shipping-fields,
+#order_review {
+  padding: var(--spacer-20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+}
+
+.woocommerce-billing-fields,
+.woocommerce-shipping-fields {
+  margin-bottom: var(--spacer-24);
+}
+
+.form-row {
+  margin-bottom: var(--spacer-12);
+
+  label {
+    display: block;
+    margin-bottom: var(--spacer-4);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select,
+  textarea {
+    width: 100%;
+  }
+}
+
+#place_order {
+  width: 100%;
+}
+
+// ── My account ─────────────────────────────────────────────────────────────
+
+// Scoped to the page content and to the logged-in dashboard only. A bare
+// .woocommerce-account .woocommerce also matched FiboSearch's wrapper in the
+// header (it carries the woocommerce class), and when logged out there is no
+// navigation to fill the 220px column.
+.woocommerce-account .entry-content > .woocommerce:has(> .woocommerce-MyAccount-navigation) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-32);
+  align-items: start;
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+}
+
+.woocommerce-MyAccount-navigation {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    display: block;
+    padding: var(--spacer-12) var(--spacer-16);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+      background-color: var(--color-surface-2);
+    }
+  }
+
+  li.is-active a {
+    border-left: 3px solid var(--color-magenta);
+    background-color: var(--color-surface-2);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.woocommerce-MyAccount-content {
+  min-height: 300px;
+}
+
+#customer_login {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-32);
+
+  @include min-breakpoint(tablet) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.login,
+.register {
+  padding: var(--spacer-24);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+
+  h2 {
+    margin-bottom: var(--spacer-16);
+    font-size: $font-size-md;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// ── Wishlist (YITH) ────────────────────────────────────────────────────────
+// YITH colours its heart through these custom properties, defaulting to
+// black, which disappears on the navy canvas.
+
+.yith-add-to-wishlist-button-block {
+  --add-to-wishlist-icon-color: var(--color-foreground);
+  --added-to-wishlist-icon-color: var(--color-magenta);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    color: var(--color-foreground);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-magenta);
+    }
+  }
+}
+
+// ── Show-password toggle ───────────────────────────────────────────────────
+// WooCommerce's stylesheet (not loaded) positions this and draws its eye icon,
+// so without it the button is an empty sliver under the field.
+
+.password-input {
+  position: relative;
+  display: block;
+
+  input {
+    padding-right: 44px;
+  }
+}
+
+.show-password-input {
+  position: absolute;
+  top: 50%;
+  right: var(--spacer-8);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background-color: var(--color-muted-foreground);
+  transform: translateY(-50%);
+  cursor: pointer;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / 20px no-repeat;
+
+  &.display-password {
+    background-color: var(--color-magenta);
+  }
+}

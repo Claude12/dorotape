@@ -1,0 +1,69 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Tables.
+//
+// Two jobs. `.dt-policy-table` is the delivery tariff grid that came over
+// from Kryptronic on the policy pages (DR-6), and the bare `table` rule
+// catches the ones inside migrated page content, which arrive with no class
+// at all. Both were styled for black-on-white by the Sprint 1 scaffold and are
+// rebuilt here for the navy canvas.
+//
+// The old Kryptronic hover was white text on #009ee3, which measures 2.3:1.
+// The hover here tints the row and leaves the text alone, so nothing depends
+// on contrast that is not there.
+
+@mixin table-base {
+  width: 100%;
+  border-collapse: collapse;
+  // Prices and thresholds sit in columns, so the digits should line up.
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: var(--spacer-12) var(--spacer-16);
+    border: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: top;
+    font-size: $font-size-sm;
+  }
+
+  th {
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+    font-weight: $font-weight-bold;
+  }
+
+  tbody tr:nth-child(even) td {
+    background-color: color-mix(in oklab, var(--color-surface) 60%, transparent);
+  }
+
+  tbody tr:hover td {
+    background-color: var(--color-surface);
+  }
+}
+
+.dt-policy-table {
+  @include table-base;
+
+  margin: var(--spacer-24) 0;
+
+  // A four-column price table does not fit a phone, and the page body must
+  // never scroll sideways, so the table scrolls inside its own box.
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  @include min-breakpoint(tablet) {
+    display: table;
+    white-space: normal;
+  }
+}
+
+// Unclassed tables in migrated content. Scoped to .rte so this cannot reach
+// a table a component builds for its own layout.
+.rte table {
+  @include table-base;
+
+  margin: var(--spacer-24) 0;
+}

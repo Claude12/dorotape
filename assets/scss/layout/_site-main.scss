@@ -1,0 +1,33 @@
+@use "abstracts/variables" as *;
+@use "abstracts/mixins" as *;
+
+// The page wrapper and the main content column.
+//
+// Two kinds of page. A classic page (and every WooCommerce page, which uses
+// WooCommerce's own wrapper-start.php and lands on .site-main too) gets the
+// content well: capped width, gutters, vertical rhythm. A block-built page
+// gets none of that, because each ACF block paints its own full-bleed
+// background and owns its own padding. page.php adds site-main--blocks only
+// when the page actually renders flexible content.
+
+.site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.site-main {
+  // Pushes the footer to the bottom of short pages without the footer having
+  // to know anything about the content above it.
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: $container-max;
+  margin: 0 auto;
+  padding: var(--spacer-40) $gutter var(--spacer-80);
+}
+
+.site-main--blocks {
+  max-width: none;
+  padding: 0;
+}

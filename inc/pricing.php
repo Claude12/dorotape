@@ -41,7 +41,7 @@ function dorotape_price_unit( int $product_id ): string {
  * Display strings for a pricing unit.
  *
  * @param string $unit 'metre' | 'roll' | 'item'
- * @return array {header, suffix, qty_suffix, note}
+ * @return array {header, suffix, qty_suffix, qty_label, total, note}
  */
 function dorotape_unit_strings( string $unit ): array {
 	switch ( $unit ) {
@@ -50,6 +50,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price per roll', 'dorotape' ),
 				'suffix'     => '/roll', // client request: mirror the metre products' /m
 				'qty_suffix' => '+',
+				'qty_label'  => __( 'Roll(s)', 'dorotape' ),
 				'total'      => __( 'Total rolls', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically based on the number of rolls ordered.', 'dorotape' ),
 			);
@@ -58,6 +59,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price each', 'dorotape' ),
 				'suffix'     => '',
 				'qty_suffix' => '+',
+				'qty_label'  => __( 'Item(s)', 'dorotape' ),
 				'total'      => __( 'Total quantity', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically based on the quantity ordered.', 'dorotape' ),
 			);
@@ -66,6 +68,7 @@ function dorotape_unit_strings( string $unit ): array {
 				'header'     => __( 'Price per metre', 'dorotape' ),
 				'suffix'     => '/m',
 				'qty_suffix' => 'm+',
+				'qty_label'  => __( 'Metre(s)', 'dorotape' ),
 				'total'      => __( 'Total metres', 'dorotape' ),
 				'note'       => __( 'Quantity discounts apply automatically. Enter your required length in the quantity field. Material is supplied as a continuous length.', 'dorotape' ),
 			);
@@ -101,6 +104,25 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 	} else {
 		$product->delete_meta_data( '_dt_price_unit' ); // metre = default
 	}
+} );
+
+// ─── Quantity unit label ──────────────────────────────────────────────────────
+
+/**
+ * Name the unit above the quantity box, so "3" is unambiguous at the point of
+ * ordering. Runs on the product page only; the loop's add-to-cart buttons and
+ * the cart table have their own wording.
+ */
+add_action( 'woocommerce_before_add_to_cart_quantity', function (): void {
+	$product = dorotape_stepped_qty_product();
+	if ( ! $product ) {
+		return;
+	}
+	$u = dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) );
+	printf(
+		'<span class="dt-qty-label">%s</span>',
+		esc_html( $u['qty_label'] )
+	);
 } );
 
 // ─── Quantity input step ──────────────────────────────────────────────────────
@@ -231,13 +253,13 @@ add_filter( 'woocommerce_available_variation', function ( $data, $parent, $varia
  * So the box becomes read-only and gains a pair of buttons that move it by
  * exactly one step. The buttons are rendered here on the single-product page,
  * where the global product is available, and the "sold in multiples of" note
- * with them. Readonly is set by scaffold.js rather than here, deliberately: the
+ * with them. Readonly is set by assets/js/lib/qty-step.js rather than here, deliberately: the
  * buttons only work with scripts running, and a box locked with no working
  * buttons would be worse than a typable one. With scripts off the field stays
  * typable and the add-to-cart check below is what refuses a bad quantity.
  *
  * These two hooks pass no product, so they fall back to the global — which the
- * cart page does not set for its line items. scaffold.js injects the missing
+ * cart page does not set for its line items. qty-step.js injects the missing
  * buttons there before it locks anything, so the cart box is never stranded.
  *
  * Note this does NOT use WooCommerce's own $readonly template flag: that flag
@@ -288,7 +310,8 @@ add_action( 'woocommerce_after_quantity_input_field', function (): void {
  * Mark the quantity wrapper so the CSS and JS can find a stepped box.
  *
  * woocommerce_quantity_input_classes applies to the input itself, which is all
- * the JS needs — the wrapper is styled off :has() in scaffold.css.
+ * the JS needs. The wrapper is styled off :has() in
+ * assets/scss/components/woo/_qty-step.scss.
  */
 add_filter( 'woocommerce_quantity_input_classes', function ( $classes, $product ) {
 	if ( $product instanceof WC_Product && dorotape_qty_step( $product ) > 1 ) {
@@ -330,7 +353,7 @@ add_filter( 'woocommerce_store_api_product_quantity_editable', function ( $edita
  * it is still possible to manually enter any number into this box?"). Reject
  * anything that isn't a whole multiple of the step and say what the nearest
  * valid quantities are, so a mistyped 7 can't reach the warehouse as an order
- * we can't cut. scaffold.js snaps the box on the way out too; this catches
+ * we can't cut. qty-step.js snaps the box on the way out too; this catches
  * everything else (JS off, direct POST, saved links).
  */
 add_filter( 'woocommerce_add_to_cart_validation', function ( $passed, $product_id, $quantity, $variation_id = 0 ) {

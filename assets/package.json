@@ -1,0 +1,35 @@
+{
+  "name": "dorotape-assets",
+  "version": "1.0.0",
+  "license": "ISC",
+  "browserslist": [
+    "last 3 versions",
+    "> 5%"
+  ],
+  "scripts": {
+    "watch": "gulp watch",
+    "build": "gulp build"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.21.3",
+    "@babel/preset-env": "^7.21.4",
+    "autoprefixer": "^10.4.14",
+    "browser-sync": "^3.0.3",
+    "cssnano": "^7.0.6",
+    "del": "^8.0.0",
+    "eslint": "^9.17.0",
+    "eslint-webpack-plugin": "^4.0.1",
+    "gulp": "^5.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-postcss": "^10.0.0",
+    "gulp-sass": "^6.0.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "sass": "^1.83.0",
+    "webpack-stream": "^7.0.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.21.8",
+    "postcss": "^8.4.23",
+    "webpack": "^5.82.0"
+  }
+}

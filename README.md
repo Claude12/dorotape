@@ -70,7 +70,7 @@ how two broken regexes were caught rather than published.
 
 Presentational colour was dropped rather than translated, since hardcoded brand
 hex in post content is what makes a later restyle expensive. The delivery table's
-styling moved to `.dt-policy-table` in `css/scaffold.css`. Its hover state was
+styling moved to `.dt-policy-table` (now `assets/scss/components/_tables.scss`). Its hover state was
 white on `#009ee3`, a contrast ratio of 2.3:1; it now tints the row background and
 leaves the text alone, and all three colour pairs pass.
 
@@ -135,7 +135,7 @@ button included. It now hides the list and leaves the nav, and the opened list
 drops out of the header row as an absolutely positioned panel rather than being
 wedged into it.
 
-A `#secondary-menu` block in `css/scaffold.css` has been deleted. Every rule in it
+A `#secondary-menu` block in the old `css/scaffold.css` has been deleted. Every rule in it
 was of the shape `#secondary-menu ul li a`, which assumes `#secondary-menu` is a
 wrapper containing a list. `header.php` passes `'container' => false`, so
 `#secondary-menu` is the list, and those selectors matched nothing. Two
@@ -154,8 +154,9 @@ present in the DOM while being invisible on a phone.
 | `template-parts/` | reusable template fragments |
 | `inc/` | all theme logic, each file `require`d from `functions.php` |
 | `acf-json/` | ACF field groups, synced to disk |
-| `css/`, `js/` | `scaffold.css` and `scaffold.js` - the bulk of the front end |
-| `style.css` | theme header plus hand-written styles. **The `Version:` line triggers deploys** |
+| `assets/` | front-end source: `scss/` (compiled by gulp) and `js/` (ES modules, bundled by webpack) |
+| `dist/` | build output, `css/style.css` and `js/main.js`. The only theme stylesheet and script enqueued |
+| `style.css` | theme metadata only, never enqueued. **The `Version:` line triggers deploys** |
 | `tests/` | automated site checks - [tests/README.md](tests/README.md) |
 | `.github/` | deploy and monday board pipeline - [.github/README.md](.github/README.md) |
 | `.env.example` | template for local runs of the checks and pipeline scripts. Copy to `.env`, which is gitignored |
@@ -222,6 +223,40 @@ normally there. The block rules above apply to Cart and Checkout only.
 Before building anything that touches checkout, confirm which checkout you are
 building for.
 
+### Cutting rolls to size
+
+Application tapes and print rolls can be slit before they ship, and the customer
+says how in `inc/cutsize.php`'s box on the product page. The model is the
+client's own, and it is worth stating because an earlier version of this box
+used a different one and read wrong to them:
+
+**one table row group is one physical roll.** A roll holds the sizes it is slit
+into and how many cuts are wanted at each size, so "roll 1: 2 x 500mm and
+1 x 220mm" is one roll, two rows. The columns are Roll, Cut size (mm), Qty. The
+earlier version made the first column a *quantity of rolls sharing a cut
+pattern*, which is more compact for large orders but is not how the warehouse or
+the sales team describe the job. Compactness lost.
+
+Two rules hold it together, checked live in `assets/js/lib/cut-size-rows.js` and again in PHP,
+because the live check is a courtesy and the PHP one is the guard:
+
+- a roll's cuts cannot add up to more than the roll is wide, and
+- you cannot enter cuts for more rolls than you are ordering. The balance of the
+  order is supplied whole.
+
+The roll width comes from `_dt_roll_width_mm` (see `inc/rollsize.php`), falling
+back to a regex over the product title, which is where the width lived before
+that field existed and still does on most products.
+
+Each cut roll is added to the basket as its own line, because rolls slit
+differently are different things to pick. Rolls slit *identically* merge back
+into one line without any code asking them to: the cut note is part of the hash
+`generate_cart_id()` builds, so ten rolls cut the same way share a key and
+arrive as one line of ten. The note also goes to Sage, as a line item addon, via
+the `rest_request_after_callbacks` filter at the foot of the file. Woosage
+rebuilds its REST response strictly from its own schema, so plain order item
+meta never reaches Sage on its own.
+
 ### Re-ordering a past order (DR-29)
 
 WooCommerce ships an Order again button, so this looked like a ticket about
@@ -246,7 +281,7 @@ unavailable" and "The cart has been filled with the items from your previous
 order" at the same time. Neither described what had happened.
 
 Carrying the note across fixes both, because the note is part of the hash
-`generate_cart_id()` builds: distinct cut patterns give distinct keys, so the
+`generate_cart_id()` builds: distinct cut lists give distinct keys, so the
 lines stay apart without any further work.
 
 The third fault is the quantity step. A past order can hold a quantity the step
@@ -320,17 +355,27 @@ The theme lives at:
 /Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape
 ```
 
-Edit and refresh. There is nothing to run.
+PHP edits need only a refresh. CSS and JS need a build.
 
 ### Build step
 
-There isn't one, despite appearances. `package.json` is stock `_s` and its
-`watch` / `compile:css` scripts point at a `sass/` directory **that does not
-exist in this repo**. They also depend on node-sass 7, which will not install on
-current Node. `style.css` and `css/scaffold.css` are edited directly.
+Front-end source lives in `assets/` and has its own `package.json`:
 
-`tests/` deliberately has its own `package.json` for exactly this reason - so
-the check suite installs without dragging in the dead `_s` toolchain.
+```
+cd assets
+npm install
+npx gulp build   # or: npx gulp watch
+```
+
+That compiles `assets/scss/style.scss` to `dist/css/style.css` and bundles
+`assets/js/main.js` to `dist/js/main.js`, which are the only theme assets
+`functions.php` enqueues. `dist/` is committed, so the server never builds.
+`style.css` holds the theme metadata only and is never enqueued; do not add
+styles to it.
+
+The root `package.json` is stock `_s` and its scripts point at a `sass/`
+directory that does not exist. Ignore it. `tests/` has its own `package.json` so
+the check suite installs without dragging that toolchain in.
 
 ## Store settings
 
@@ -768,7 +813,7 @@ and DR-28. It matters because six products carry an out-of-stock note that says
 Latent rather than live, since with stock management off nothing ever goes out of
 stock, but it needs settling before any product is marked out of stock by hand.
 
-CSS is in `scaffold.css`, and the availability line has three states rather than
+CSS is in `assets/scss/components/woo/_stock.scss`, and the availability line has three states rather than
 two. `get_availability_class()` returns `in-stock` for every purchasable product
 whether or not it printed a figure, so the class alone cannot tell "12 in stock"
 from a bare lead time; `inc/stock.php` adds `dt-stock-note-only` for the second
@@ -1075,11 +1120,9 @@ separately.
 
 ## One more thing worth knowing
 
-**`.cursorrules` describes a structure this repo does not have.** It specifies
-`/templates`, `/partials`, `/assets/js`, `/assets/scss`, `/assets/css`; the repo
-actually uses `template-parts/`, `js/`, `css/` and no SCSS at all. Treat its
-conventions (BEM, PHP typing, flag-before-creating) as live, and its paths as
-aspirational until someone reconciles them.
+**Follow [.cursorrules](.cursorrules).** Front-end source is `assets/scss/` and
+`assets/js/`, flexible content blocks are `inc/blocks/`, and template fragments
+are `template-parts/`.
 
 ## Conventions
 

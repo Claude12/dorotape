@@ -49,7 +49,8 @@ add_action( 'widgets_init', 'dorotape_woocommerce_widgets_init' );
 
 // Swap the default WooCommerce sidebar for our shop sidebar.
 // The theme has no sidebar column on shop pages, so widgets render after the
-// grid — wrap them in a "Refine by" panel that scaffold.css lays out in columns.
+// grid, so wrap them in a "Refine by" panel that
+// assets/scss/components/woo/_filter-bar.scss lays out in columns.
 function dorotape_woocommerce_sidebar() {
 	// Archives only — the refine panel is meaningless on single product pages.
 	if ( ! is_shop() && ! is_product_taxonomy() ) {
@@ -82,15 +83,16 @@ add_filter( 'body_class', function ( $classes ) {
 
 /**
  * Localise currency and decimal settings for the product page tier table JS.
- * scaffold.js reads dorotapeProduct.currencySymbol and .priceDecimals to format
- * prices when rebuilding the tier table tbody on variation change.
+ * assets/js/lib/price-utils.js reads dorotapeProduct.currencySymbol and
+ * .priceDecimals to format prices when rebuilding the tier table tbody on
+ * variation change.
  */
 function dorotape_product_js_data(): void {
 	if ( ! is_product() ) {
 		return;
 	}
 	wp_localize_script(
-		'dorotape-navigation',
+		'dorotape-design-system',
 		'dorotapeProduct',
 		array(
 			'currencySymbol' => get_woocommerce_currency_symbol(),
@@ -288,7 +290,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html( $u['header'] ) . '</th>';
+	echo '<th>' . esc_html( dorotape_price_header( $u, $product->get_id() ) ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
@@ -436,7 +438,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
-	echo '<th>' . esc_html( $u['header'] ) . '</th>';
+	echo '<th>' . esc_html( dorotape_price_header( $u, $product->get_id() ) ) . '</th>';
 	echo '<th>' . esc_html__( 'Save', 'dorotape' ) . '</th>';
 	echo '</tr></thead>';
 	echo '<tbody>';
@@ -1008,7 +1010,7 @@ function dorotape_filter_bar_terms( string $attribute ): array {
  *
  * Uses WooCommerce's native layered-nav URL parameters (filter_<attribute>),
  * so filtering is handled entirely by core — this is presentation only.
- * Selects auto-submit via scaffold.js; the Apply button is the no-JS fallback.
+ * Selects auto-submit via assets/js/lib/filter-bar.js; the Apply button is the no-JS fallback.
  */
 function dorotape_render_filter_bar(): void {
 	// The shop page and non-leaf categories display subcategory tiles, not a

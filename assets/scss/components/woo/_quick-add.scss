@@ -1,0 +1,170 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Quick-add grid (assets/js/lib/quick-add.js).
+//
+// Hook & Loop and the other mix-and-match ranges sell a row of SKUs off one
+// page. The grid replaces the single add-to-cart with a quantity box per SKU,
+// and the running mix total tells the customer how close the combined
+// quantity is to the next break, which is the whole reason the grid exists.
+
+.dt-quickadd {
+  margin: var(--spacer-16) 0;
+}
+
+.dt-quickadd__table {
+  width: 100%;
+  margin-bottom: var(--spacer-16);
+  border-collapse: collapse;
+
+  th {
+    padding: var(--spacer-8) var(--spacer-12);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  td {
+    padding: var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+}
+
+.dt-quickadd__sku {
+  display: block;
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+}
+
+.dt-quickadd__label {
+  display: block;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+.dt-quickadd__tier {
+  display: block;
+  color: var(--color-success);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+// Per-row line total, written by the script on every quantity change.
+.dt-quickadd__line {
+  display: block;
+  margin-top: var(--spacer-4);
+  color: var(--color-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  font-variant-numeric: tabular-nums;
+
+  &--discount {
+    color: var(--color-success);
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dt-quickadd__qty-col {
+  width: 90px;
+  text-align: center;
+
+  input {
+    width: 72px;
+    padding: var(--spacer-8);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.dt-quickadd__price-cell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Mix-and-match prompt ───────────────────────────────────────────────────
+
+.dt-quickadd__mix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacer-4) var(--spacer-12);
+  margin: 0 0 var(--spacer-12);
+  padding: var(--spacer-12);
+  border-radius: var(--radius);
+  background-color: color-mix(in oklab, var(--color-success) 14%, transparent);
+  font-size: $font-size-sm;
+}
+
+.dt-quickadd__mix-lead {
+  color: var(--color-foreground);
+  font-weight: $font-weight-semibold;
+}
+
+// "N more to go", muted until the break is actually reached.
+.dt-quickadd__mix-live {
+  color: var(--color-muted-foreground);
+
+  &--hit {
+    color: var(--color-success);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// ── Combined quantity box ──────────────────────────────────────────────────
+//
+// Deliberately shaped like the standard quantity box on every other product,
+// because that is the point of it: the grid had removed the control people
+// look for. It is readonly, so like .dt-qty--stepped it takes no focus ring.
+
+.dt-quickadd-total {
+  margin: 0 0 var(--spacer-16);
+}
+
+.dt-quickadd-total__row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+.dt-quickadd-total__label {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.dt-quickadd-total__input {
+  width: 70px;
+  padding: var(--spacer-8);
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+  color: var(--color-foreground);
+  font: inherit;
+  font-size: $font-size-sm;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+
+  // Green once the combined quantity qualifies for a break.
+  &--hit {
+    border-color: var(--color-success);
+    color: var(--color-success);
+    font-weight: $font-weight-bold;
+  }
+}
+
+.dt-quickadd__submit {
+  width: 100%;
+
+  @include min-breakpoint(mobile) {
+    width: auto;
+  }
+}

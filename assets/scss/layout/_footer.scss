@@ -1,0 +1,466 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Site footer, built from the design's SiteFooter component.
+//
+// Four bands inside one container: the newsletter strip, the brand and link
+// columns, the accreditation and payment badges, and the legal bar. Each
+// band is rendered conditionally in footer.php, so every rule here has to
+// work with the bands above it missing.
+//
+// The design sets no transitions on the footer's text links (only on the
+// social buttons), so the column and legal links change colour instantly.
+
+.site-footer {
+  padding-top: var(--spacer-64);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+// ── Newsletter strip ───────────────────────────────────────────────────────
+//
+// The aurora edge is a 2px padded wrapper rather than a border, because a
+// border cannot carry a gradient. The inner panel's radius is 2px tighter so
+// the two curves stay concentric (the design's 1.25rem and 1.15rem).
+
+.site-footer__signup {
+  padding: 2px;
+  border-radius: var(--radius-2xl);
+  background-image: var(--gradient-aurora);
+}
+
+.site-footer__signup-inner {
+  display: grid;
+  gap: var(--spacer-24);
+  padding: var(--spacer-32);
+  border-radius: calc(var(--radius-2xl) - 2px);
+  background-color: var(--color-surface);
+
+  @include min-breakpoint(tablet) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.site-footer__signup-heading {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-lg;
+  letter-spacing: $letter-spacing-tight;
+}
+
+.site-footer__signup-body {
+  margin: var(--spacer-4) 0 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+.site-footer__signup-form {
+  width: 100%;
+  max-width: 28rem;
+
+  // The WPForms theme variables, pointed at the design's tokens. The plugin
+  // declares them on :root, so setting them here reaches everything it draws
+  // inside the form, including states this file never restyles (the submit
+  // button's focus ring, for one).
+  --wpforms-field-background-color: var(--color-background);
+  --wpforms-field-border-color: var(--color-input);
+  --wpforms-field-text-color: var(--color-foreground);
+  --wpforms-label-error-color: var(--color-destructive);
+  --wpforms-button-background-color: var(--color-primary);
+  --wpforms-button-text-color: var(--color-primary-foreground);
+  --wpforms-button-border-radius: var(--radius-2xl);
+
+  @include min-breakpoint(tablet) {
+    width: auto;
+  }
+}
+
+// ── Newsletter form (WPForms) ──────────────────────────────────────────────
+//
+// The form is a WPForms form chosen on Theme Settings, so the markup is the
+// plugin's. Its stylesheet loads after the theme's, which means every rule
+// here has to win on specificity rather than source order: each selector is
+// at least one class heavier than the plugin rule it replaces.
+//
+// The design's field and button sit side by side at the same height: a 46px
+// field (20px line, 12px padding, 1px border) and a button stretched to
+// match.
+
+.site-footer__signup-form .wpforms-container.wpforms-container-full {
+  margin: 0;
+}
+
+.site-footer__signup-form .wpforms-container-full .wpforms-form {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacer-8);
+}
+
+.site-footer__signup-form .wpforms-container-full .wpforms-field-container {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+
+  // A set width rather than a flex basis: the strip's grid sizes this column
+  // from its content, and only a definite width counts towards that.
+  @include min-breakpoint(tablet) {
+    flex: 0 1 auto;
+    width: 18rem;
+  }
+}
+
+.site-footer__signup-form .wpforms-container-full .wpforms-form .wpforms-field {
+  padding: 0;
+}
+
+.site-footer__signup-form .wpforms-form .wpforms-field-email input[type="email"] {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  padding: var(--spacer-12) var(--spacer-20);
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+  transition: none;
+
+  // WPForms fades the placeholder to half the field's text colour, which is
+  // already the design's placeholder, so only the outline states are reset.
+  &:focus {
+    border-color: var(--color-magenta);
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+// `em`, because WPForms puts the same class on the invalid input as well.
+.site-footer__signup-form .wpforms-container-full .wpforms-form em.wpforms-error {
+  margin: var(--spacer-6) 0 0;
+  padding: 0 0 0 var(--spacer-20);
+  color: var(--color-destructive);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+.site-footer__signup-form .wpforms-container-full .wpforms-form .wpforms-submit-container {
+  display: flex;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+// `[type="submit"]` is the one extra attribute that lifts this over the
+// plugin's `:not(:hover):not(:active)` button rule.
+.site-footer__signup-form .wpforms-container-full .wpforms-submit-container .wpforms-submit[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  // The field's rendered height, so the pair lines up even while an error
+  // message is making the field column taller.
+  min-height: calc(#{$line-height-sm} * 1em + var(--spacer-24) + 2px);
+  height: auto;
+  padding: var(--spacer-12) var(--spacer-24);
+  border: 0;
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-primary);
+  background-image: none;
+  color: var(--color-primary-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-sm;
+  transition: background-color var(--transition-fast);
+
+  &:hover,
+  &:active {
+    background-color: color-mix(in oklab, var(--color-primary) 90%, transparent);
+    background-image: none;
+  }
+
+  // The design's arrow. WPForms swaps the button's text while it submits,
+  // which would wipe any icon placed in the markup, so it is drawn here.
+  // ::before rather than ::after because the plugin uses ::after for its
+  // focus ring; `order` moves it behind the label.
+  &::before {
+    content: "";
+    order: 1;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}
+
+// The plugin shows a spinner beside the button while it submits, which would
+// push the row wider. The button's own "Signing up..." text is the feedback
+// instead. It is hidden with visibility because the plugin toggles its
+// display inline.
+.site-footer__signup-form .wpforms-container-full .wpforms-form .wpforms-submit-spinner {
+  position: absolute;
+  visibility: hidden;
+}
+
+.site-footer__signup-form .wpforms-container-full .wpforms-confirmation-container-full {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  // The plugin colours the message paragraph itself (#333), which vanishes
+  // on the navy panel.
+  p {
+    margin: 0;
+    color: inherit;
+  }
+}
+
+// ── Brand and link columns ─────────────────────────────────────────────────
+
+.site-footer__top {
+  display: grid;
+  gap: var(--spacer-48);
+  margin-top: var(--spacer-64);
+
+  // Single column until desktop, as in the design (lg:grid-cols-...). The
+  // brand column is wider than the three link columns beside it, which is
+  // what stops the blurb setting at an awkward measure.
+  @include min-breakpoint(desktop) {
+    grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
+  }
+}
+
+.site-footer__logo {
+  margin: 0;
+
+  &--text {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-lg;
+    letter-spacing: $letter-spacing-tight;
+  }
+}
+
+// `.custom-logo-link` and `.custom-logo` are WordPress's own classes on the
+// the_custom_logo() output.
+.site-footer__logo .custom-logo-link {
+  display: inline-block;
+}
+
+.site-footer__logo .custom-logo {
+  display: block;
+  width: auto;
+  height: 32px;
+}
+
+.site-footer__blurb {
+  max-width: 20rem;
+  margin: var(--spacer-20) 0 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+.site-footer__socials {
+  display: flex;
+  gap: var(--spacer-12);
+  margin: var(--spacer-24) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__social-item {
+  margin: 0;
+}
+
+.site-footer__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacer-10);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  color: var(--color-foreground);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-magenta);
+    color: var(--color-magenta);
+  }
+}
+
+.site-footer__social-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.site-footer__column-heading {
+  margin: 0 0 var(--spacer-20);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-caps;
+
+  // The badge groups sit a step further from their heading (mb-6 against the
+  // link columns' mb-5).
+  &--badges {
+    margin-bottom: var(--spacer-24);
+  }
+}
+
+.site-footer__menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__menu-item {
+  margin: 0;
+}
+
+.site-footer__menu-link {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+}
+
+// Products hovers magenta, the other two cyan, as in the design.
+.site-footer__column--magenta .site-footer__menu-link:hover,
+.site-footer__column--magenta .site-footer__menu-link:focus-visible {
+  color: var(--color-magenta);
+}
+
+.site-footer__column--cyan .site-footer__menu-link:hover,
+.site-footer__column--cyan .site-footer__menu-link:focus-visible {
+  color: var(--color-cyan);
+}
+
+// ── Accreditation and payment badges ───────────────────────────────────────
+
+.site-footer__badges {
+  margin-top: var(--spacer-64);
+}
+
+.site-footer__badges-grid {
+  display: grid;
+  gap: var(--spacer-40);
+  padding-top: var(--spacer-48);
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+}
+
+.site-footer__badge-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  gap: var(--spacer-32);
+
+  @include min-breakpoint(mobile) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include min-breakpoint(xl) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+// The payment marks are dark-on-white artwork, so they get a white plate
+// rather than sitting invisibly on the navy canvas.
+.site-footer__badge-row--plate {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacer-8) var(--spacer-16);
+  padding: var(--spacer-12) var(--spacer-16);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-white);
+}
+
+.site-footer__badge {
+  width: auto;
+  max-width: 150px;
+  height: 64px;
+  object-fit: contain;
+
+  @include min-breakpoint(tablet) {
+    height: 80px;
+  }
+
+  &--payment {
+    max-width: 130px;
+    height: 36px;
+
+    @include min-breakpoint(tablet) {
+      height: 40px;
+    }
+  }
+}
+
+// ── Legal bar ──────────────────────────────────────────────────────────────
+
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-16);
+  margin-top: var(--spacer-48);
+  padding: var(--spacer-32) 0;
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+.site-footer__copyright {
+  margin: 0;
+}
+
+.site-footer__legal-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-24);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__legal-item {
+  margin: 0;
+}
+
+.site-footer__legal-link {
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-foreground);
+  }
+}

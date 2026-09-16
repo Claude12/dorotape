@@ -1,0 +1,148 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Markup WordPress core and the classic editor emit into post content, which
+// the theme never writes itself: alignment classes, captions, galleries,
+// embeds. These used to come from the underscores starter CSS in style.css,
+// which is no longer enqueued.
+
+// The design (Tailwind preflight) lets links take their parent's colour, and
+// each component sets its own. The browser's blue and purple are unreadable
+// on the navy canvas.
+a {
+  color: inherit;
+}
+
+// Width/height attributes on content images would otherwise fix the height
+// while max-width shrinks the width, squashing the image.
+img {
+  height: auto;
+}
+
+embed,
+iframe,
+object,
+video {
+  max-width: 100%;
+}
+
+// WooCommerce wraps sale prices in <ins>. Browsers underline it and older
+// starter CSS gave it a yellow highlight, neither of which reads as a price.
+ins {
+  text-decoration: none;
+}
+
+mark {
+  padding: 0 var(--spacer-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+hr {
+  height: 1px;
+  margin: var(--spacer-24) 0;
+  border: 0;
+  background-color: var(--color-border);
+}
+
+pre {
+  max-width: 100%;
+  padding: var(--spacer-16);
+  overflow: auto;
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  font-size: $font-size-sm;
+}
+
+// The skip link moves focus to #primary. Outlining the whole content column
+// on arrival is noise, not a focus indicator.
+#primary[tabindex="-1"]:focus {
+  outline: 0;
+}
+
+.custom-logo-link {
+  display: inline-block;
+}
+
+.widget select {
+  max-width: 100%;
+}
+
+.updated:not(.published) {
+  display: none;
+}
+
+// ── Alignment ────────────────────────────────────────────────────────────────
+// Floats only from mobile up: below that a floated image leaves a sliver of
+// text beside it, so aligned media stacks instead.
+
+.alignleft,
+.alignright,
+.aligncenter {
+  display: block;
+  margin: 0 auto var(--spacer-24);
+}
+
+.alignleft {
+  @include min-breakpoint(mobile) {
+    float: left;
+    margin: 0 var(--spacer-24) var(--spacer-24) 0;
+  }
+}
+
+.alignright {
+  @include min-breakpoint(mobile) {
+    float: right;
+    margin: 0 0 var(--spacer-24) var(--spacer-24);
+  }
+}
+
+.aligncenter {
+  clear: both;
+}
+
+// ── Captions ─────────────────────────────────────────────────────────────────
+
+.wp-caption {
+  max-width: 100%;
+  margin-bottom: var(--spacer-24);
+
+  img[class*="wp-image-"] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.wp-caption-text,
+.gallery-caption {
+  display: block;
+  margin-top: var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  text-align: center;
+}
+
+// ── Galleries ────────────────────────────────────────────────────────────────
+// Two columns on phones whatever the editor chose, then the chosen count.
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacer-16);
+  margin-bottom: var(--spacer-24);
+
+  @include min-breakpoint(tablet) {
+    @for $i from 1 through 9 {
+      &.gallery-columns-#{$i} {
+        grid-template-columns: repeat($i, minmax(0, 1fr));
+      }
+    }
+  }
+}
+
+.gallery-item {
+  width: 100%;
+  text-align: center;
+}

@@ -8,9 +8,9 @@
 define( 'DOROTAPE_VERSION', '1.0.4' );
 
 /**
- * Cache-buster for a theme asset: the file's own last-modified time. Editing
- * scaffold.js/scaffold.css (or any enqueued asset) then invalidates browser
- * caches on the next request automatically — no need to remember to bump
+ * Cache-buster for a theme asset: the file's own last-modified time.
+ * Rebuilding dist/js/main.js or dist/css/style.css (or editing any other
+ * enqueued asset) then invalidates browser caches on the next request — no need to remember to bump
  * DOROTAPE_VERSION, which is how a fixed quick-add bug once still looked
  * "not working" from a stale cached copy.
  */
@@ -28,15 +28,8 @@ function dorotape_setup() {
 		'html5',
 		array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' )
 	);
-	add_theme_support(
-		'custom-logo',
-		array(
-			'height'      => 100,
-			'width'       => 300,
-			'flex-width'  => true,
-			'flex-height' => true,
-		)
-	);
+	// No custom-logo support: the logo is set in Theme Settings (ACF), so the
+	// Customizer does not offer a second control that the templates ignore.
 
 	// WooCommerce
 	add_theme_support(
@@ -57,11 +50,25 @@ function dorotape_setup() {
 	add_theme_support( 'wc-product-gallery-lightbox' );
 	add_theme_support( 'wc-product-gallery-slider' );
 
+	/*
+	 * The footer has three link columns and a legal row rather than one menu.
+	 * footer-products is optional: with nothing assigned to it the Products
+	 * column renders the primary menu, which is what the design shows (the
+	 * same eight categories as the header).
+	 *
+	 * 'footer' stays registered for the single-menu footer that shipped
+	 * before this rebuild. Nothing is assigned to it, and it can be dropped
+	 * once that is confirmed on the live site too.
+	 */
 	register_nav_menus(
 		array(
-			'primary'   => esc_html__( 'Primary Navigation', 'dorotape' ),
-			'secondary' => esc_html__( 'Secondary Navigation', 'dorotape' ),
-			'footer'    => esc_html__( 'Footer Navigation', 'dorotape' ),
+			'primary'         => esc_html__( 'Primary Navigation', 'dorotape' ),
+			'secondary'       => esc_html__( 'Secondary Navigation', 'dorotape' ),
+			'footer-products' => esc_html__( 'Footer: Products', 'dorotape' ),
+			'footer-support'  => esc_html__( 'Footer: Support', 'dorotape' ),
+			'footer-about'    => esc_html__( 'Footer: About', 'dorotape' ),
+			'footer-legal'    => esc_html__( 'Footer: Legal', 'dorotape' ),
+			'footer'          => esc_html__( 'Footer Navigation (legacy)', 'dorotape' ),
 		)
 	);
 
@@ -78,24 +85,42 @@ function dorotape_content_width() {
 add_action( 'after_setup_theme', 'dorotape_content_width', 0 );
 
 function dorotape_scripts() {
-	wp_enqueue_style( 'dorotape-style', get_stylesheet_uri(), array(), dorotape_asset_version( '/style.css' ) );
-
-	// TEMP Sprint 1 scaffold styles — remove when real design system lands.
+	/*
+	 * Design system. Compiled from assets/scss by `cd assets && npx gulp build`.
+	 * Fonts are self-hosted, so there is no Google Fonts request: the @font-face
+	 * lives in this stylesheet and the woff2 in /fonts/.
+	 *
+	 * This is the whole front end. style.css only carries the theme metadata
+	 * and is not enqueued; the Sprint 1 scaffold (css/scaffold.css) has been
+	 * removed, and what the client signed off on from it now lives in
+	 * assets/scss/components/woo/.
+	 *
+	 * It loads after any plugin stylesheet that registers on the default
+	 * priority, which is what lets the FiboSearch overrides in
+	 * layout/_header.scss win on source order at equal specificity rather
+	 * than with !important. Moving this enqueue earlier would break those.
+	 */
 	wp_enqueue_style(
-		'dorotape-scaffold',
-		get_template_directory_uri() . '/css/scaffold.css',
-		array( 'dorotape-style' ),
-		dorotape_asset_version( '/css/scaffold.css' )
+		'dorotape-design-system',
+		get_template_directory_uri() . '/dist/css/style.css',
+		array(),
+		dorotape_asset_version( '/dist/css/style.css' )
 	);
 
-	wp_enqueue_script( 'dorotape-navigation', get_template_directory_uri() . '/js/navigation.js', array(), dorotape_asset_version( '/js/navigation.js' ), true );
-
-	// TEMP Sprint 1 scaffold JS — remove when real frontend lands.
+	/*
+	 * All frontend JS. Bundled by webpack from assets/js/main.js, which boots
+	 * each feature module in assets/js/lib/ independently so a throw in one
+	 * cannot stop the others from starting.
+	 *
+	 * jQuery is a real dependency, not a convenience: the WooCommerce feature
+	 * modules listen for WC's own jQuery events (show_variation, reset_data,
+	 * updated_wc_div) and there is no native equivalent to hook.
+	 */
 	wp_enqueue_script(
-		'dorotape-scaffold',
-		get_template_directory_uri() . '/js/scaffold.js',
-		array( 'dorotape-navigation', 'jquery' ),
-		dorotape_asset_version( '/js/scaffold.js' ),
+		'dorotape-design-system',
+		get_template_directory_uri() . '/dist/js/main.js',
+		array( 'jquery' ),
+		dorotape_asset_version( '/dist/js/main.js' ),
 		true
 	);
 }
@@ -124,9 +149,13 @@ function dorotape_disable_emojis() {
 }
 add_action( 'init', 'dorotape_disable_emojis' );
 
+require get_template_directory() . '/inc/acf.php';
 require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/setup.php';
+require get_template_directory() . '/inc/header.php';
+require get_template_directory() . '/inc/footer.php';
+require get_template_directory() . '/inc/rollsize.php';
 require get_template_directory() . '/inc/pricing.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';

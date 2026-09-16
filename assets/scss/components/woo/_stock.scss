@@ -1,0 +1,50 @@
+@use "base/typography" as *;
+
+// Stock availability line (inc/stock.php).
+//
+// WooCommerce renders availability as <p class="stock in-stock|out-of-stock">.
+// Stock management is off, so this exists almost entirely for the per-product
+// lead-time and out-of-stock notes inc/stock.php puts there instead.
+//
+// Three states, not two. A lead time is neither good news nor bad, so a line
+// that is only a note stays neutral rather than borrowing the in-stock green
+// and implying the roll is on the shelf. WooCommerce's own class cannot draw
+// that distinction (get_availability_class() returns in-stock for every
+// purchasable product, whether it printed a figure or nothing at all), which
+// is why inc/stock.php adds dt-stock-note-only. It comes last here so it beats
+// the in-stock rule it ties with on specificity. The day a Sage sync starts
+// writing real levels, the note stops standing alone, the class drops off by
+// itself and the green is correct again.
+//
+// Colour is not the only signal: each state has its own left rule, so the line
+// still reads in greyscale and for a colour-blind customer.
+
+.woocommerce div.product p.stock,
+.single-product p.stock {
+  margin: 0 0 var(--spacer-16);
+  padding: var(--spacer-8) var(--spacer-12);
+  border-left: 3px solid var(--color-border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-snug;
+}
+
+.woocommerce div.product p.stock.in-stock,
+.single-product p.stock.in-stock {
+  border-left-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.woocommerce div.product p.stock.out-of-stock,
+.single-product p.stock.out-of-stock {
+  border-left-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.woocommerce div.product p.stock.dt-stock-note-only,
+.single-product p.stock.dt-stock-note-only {
+  border-left-color: var(--color-cyan);
+  color: var(--color-cyan);
+}

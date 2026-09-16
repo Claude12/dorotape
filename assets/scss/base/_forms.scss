@@ -1,0 +1,97 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Form controls, site-wide.
+//
+// These are element selectors on purpose. WooCommerce, WPForms and the
+// comment form all render inputs the theme never sees the markup for, and
+// there is no class to hang styling on. Element selectors also carry the
+// lowest specificity of anything in the build, so a component that needs a
+// different field (the header's search, the cut-size table's number boxes)
+// overrides them with a single class and no fight.
+//
+// Nothing here was ported from the Sprint 1 scaffold: its fields were
+// dark text on white, and this is the same set of controls rebuilt for the
+// navy canvas.
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px var(--spacer-12);
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius);
+  background-color: var(--color-surface-2);
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  line-height: $line-height-snug;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-magenta);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-magenta) 25%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+// The native arrow is drawn by the OS in its own colours, and on some
+// platforms that is a dark glyph which disappears against the field. Drawn
+// here as a background image instead so it is always the muted foreground.
+select {
+  padding-right: var(--spacer-40);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a0b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacer-12) center;
+  background-size: 16px 16px;
+  appearance: none;
+}
+
+// A select's own <option> list is painted by the OS, which on Windows and
+// Linux inherits the field's colours and would otherwise render light text
+// on a light popup.
+option {
+  background-color: var(--color-popover);
+  color: var(--color-foreground);
+}
+
+label {
+  display: inline-block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--color-foreground);
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-magenta);
+}

@@ -8,7 +8,11 @@ npm-debug.log*
 yarn-error.log*
 
 # Build artefacts
-dist/
+# dist/ is deliberately NOT ignored. Deploying is a git pull inside
+# public_html with no build step on the server, so the compiled
+# dist/css/style.css and dist/js/main.js have to be committed or production
+# gets a 404 for both. Rebuild (cd assets && npx gulp build) and commit the
+# result alongside the SCSS/JS change that produced it.
 *.min.js
 *.min.css
 

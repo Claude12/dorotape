@@ -1,0 +1,90 @@
+// Rich text (RTE): the shared styling for any ACF WYSIWYG output.
+//
+// This is the one sanctioned place where raw elements are styled, because the
+// editor controls which tags appear. Scoped to .rte so it can never reach the
+// rest of the page.
+//
+// The body size, leading and colour live on the .rte root and the text
+// elements inherit them, so a block that wants its prose smaller (the 50/50's
+// text-sm on phones) sets it once on its own wrapper class instead of
+// reaching into p and li.
+//
+// Headings set their colour explicitly rather than inheriting it, because a
+// block can paint a surface behind the rich text as well as the page canvas.
+
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "../base/typography" as *;
+
+.rte {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-base;
+  line-height: $line-height-relaxed;
+
+  h2 {
+    @include heading-character;
+
+    color: var(--color-foreground);
+    font-size: $font-size-block-heading;
+    margin: 0 0 var(--spacer-16);
+  }
+
+  h3 {
+    @include heading-character;
+
+    color: var(--color-foreground);
+    font-size: $font-size-lg;
+    margin: 0 0 var(--spacer-12);
+  }
+
+  p {
+    margin: 0 0 var(--spacer-16);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0 0 var(--spacer-16);
+    padding-left: var(--spacer-24);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  li {
+    margin-bottom: var(--spacer-8);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--color-cyan);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-primary);
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-xl);
+  }
+
+  // Long tables are the one thing that can force a phone to scroll sideways,
+  // so the wrapper scrolls instead of the page.
+  table {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+}

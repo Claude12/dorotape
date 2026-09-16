@@ -1,0 +1,51 @@
+// Compiled to ../dist/css/style.css by `npx gulp build`.
+// Order matters: abstracts (no output) -> base -> components -> layout ->
+// utilities. Every new block partial gets @use-d in the components list.
+
+@use "abstracts/variables";
+@use "abstracts/functions";
+@use "abstracts/mixins";
+
+@use "base/fonts";
+@use "base/reset";
+@use "base/typography";
+@use "base/colors";
+@use "base/global";
+@use "base/forms";
+@use "base/wordpress";
+
+@use "components/button";
+@use "components/tables";
+@use "components/rte";
+@use "components/rte-block";
+@use "components/hero-block";
+@use "components/image-text-block";
+
+// WooCommerce functionality carried over from the Sprint 1 scaffold. These
+// are the custom features the client signed off on, retokenised for the dark
+// design system. They are components in their own right, not holding styles.
+@use "components/woo/qty-step";
+@use "components/woo/tier-pricing";
+@use "components/woo/cut-size";
+@use "components/woo/quick-add";
+@use "components/woo/filter-bar";
+@use "components/woo/poa";
+@use "components/woo/stock";
+@use "components/woo/swatch";
+@use "components/woo/spec-table";
+
+@use "layout/header";
+@use "layout/site-main";
+@use "layout/footer";
+
+// Temporary. Delete the @use and the file when the Woo page designs land.
+@use "layout/woo-holding";
+
+// Configured to the design's FadeIn (src/components/site/FadeIn.tsx): 16px
+// rise over 0.6s ease-out. Set here through the library's !default config so
+// the library file itself stays as shipped.
+@use "utilities/animations" with (
+  $animation-duration: 0.6s,
+  $animation-easing: ease-out,
+  $animation-distance: 16px
+);

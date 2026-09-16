@@ -1,0 +1,28 @@
+// Self-hosted webfont (latin subset), served from the theme's /fonts/
+// directory instead of the Google Fonts CDN, which removes the
+// preconnect + stylesheet + font round-trip chain the Lovable design
+// carried in its <head>. Never re-add the Google Fonts CDN link, in PHP
+// or SCSS.
+//
+// Nunito is a VARIABLE font: one file covers the whole 400-900 range that
+// the design uses, so there is a single @font-face here rather than one
+// per weight. Google serves the identical file for every weight in the
+// css2 API, so downloading it five times under five names would have shipped
+// 195KB to deliver 39KB. Any weight between 400 and 900 is now free.
+//
+// The unicode-range is Google's own latin subset: a glyph outside it falls
+// back to the system font rather than rendering tofu.
+
+$font-path: "../../fonts";
+$latin-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+  U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+  U+2212, U+2215, U+FEFF, U+FFFD;
+
+@font-face {
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("#{$font-path}/nunito-variable.woff2") format("woff2");
+  unicode-range: $latin-range;
+}

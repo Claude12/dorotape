@@ -1,0 +1,170 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Quantity break pricing.
+//
+// Three pieces that all move together as the customer changes quantity:
+// the tier table (assets/js/lib/tier-table.js highlights the active row),
+// the note that rides alongside the rewritten headline price
+// (assets/js/lib/live-price.js), and the hint shown before a variation is
+// picked, which explains that breaks exist at all.
+
+.dt-tier-pricing {
+  margin: var(--spacer-16) 0 var(--spacer-8);
+
+  &__title {
+    margin-bottom: var(--spacer-8);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+    font-variant-numeric: tabular-nums;
+
+    th,
+    td {
+      padding: var(--spacer-8) var(--spacer-12);
+      border: 1px solid var(--color-border);
+      text-align: left;
+    }
+
+    thead th {
+      background-color: var(--color-surface-2);
+      color: var(--color-foreground);
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  // The unit price with no break applied. Muted, because it is the row the
+  // customer is trying to beat.
+  &__row--base td {
+    color: var(--color-muted-foreground);
+  }
+
+  &__row:hover td {
+    background-color: var(--color-surface);
+  }
+
+  &__note {
+    margin-top: var(--spacer-8);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+  }
+}
+
+// The break the current quantity qualifies for. Set by tier-table.js on every
+// quantity change.
+.dt-tier-active td {
+  background-color: color-mix(in oklab, var(--color-success) 16%, transparent);
+  color: var(--color-success);
+  font-weight: $font-weight-bold;
+}
+
+// Rides inline beside the headline price once live-price.js has rewritten it.
+.dt-live-price__note {
+  padding: 3px var(--spacer-8);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in oklab, var(--color-success) 16%, transparent);
+  color: var(--color-success);
+  font-size: 0.55em;
+  font-weight: $font-weight-semibold;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+// Shown until a variation is chosen, then faded out by the pricing script.
+.dt-discount-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-12);
+  margin-bottom: var(--spacer-16);
+  padding: var(--spacer-12) var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-magenta);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  transform-origin: top;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+
+  &.dt-hint-out {
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+  }
+
+  &__badge {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-single;
+    letter-spacing: $letter-spacing-tight;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__headline {
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+  }
+
+  &__sub {
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+  }
+}
+
+// ── Variable products ──────────────────────────────────────────────────────
+//
+// assets/js/lib/variation-price.js rewrites the main .price element in place
+// as the customer picks a variation, rather than letting WooCommerce print a
+// second price inside the form. These three rules are what make that swap
+// look deliberate instead of like a flicker, so they are functional, not
+// decorative.
+
+// Woo's own in-form variation price, suppressed because the script writes the
+// headline price instead. `!important` because Woo sets display inline on the
+// element itself when a variation is chosen.
+.woocommerce-variation-price {
+  display: none !important;
+}
+
+// Faded out for the frame in which the script swaps the text.
+.entry-summary .price.dt-price-fading {
+  opacity: 0;
+}
+
+// The tier table stays hidden until a variation is chosen, then eases in.
+#dt_variable_tier_table {
+  display: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+
+  &.dt-table-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -3,97 +3,228 @@
 ## Stack
 - WordPress custom theme (no page builders, no Gutenberg)
 - ACF PRO + Classic Editor
-- WooCommerce
+- WooCommerce (Sage ERP sync via Woosage, role based pricing, quantity break tiers)
 - Vanilla JS (no jQuery unless WP provides it)
 - SASS/SCSS with variables and partials
 - PHP 8.0+ with strict types and full type hints
 
+## Design Source of Truth
+- The signed off homepage design is at `wp-content/themes/v2 Final Homepage Design` (built on lovable.dev, TanStack Router + Tailwind v4)
+- Every design token in the theme came from `v2 Final Homepage Design/src/styles.css`. That file is the reference when a colour, radius or gradient is in question
+- Compare rendered blocks against the design components in `v2 Final Homepage Design/src/components/` for spacing, colour, typography and responsive behaviour
+- Flag design ambiguities before building. Do not guess a value that is not in the design
+
+---
+
+## CRITICAL: Build One Block Per Session
+
+### Workflow (NON-NEGOTIABLE)
+1. Build ONE block only (ACF registration + template + SCSS + JS if needed)
+2. STOP and wait for explicit approval
+3. Wait for review of the code, testing in wp-admin, verification on mobile/tablet/desktop, confirmation that the design matches
+4. Only after "build next" proceed to the next block
+
+### Never Do This
+- Build multiple blocks in one response
+- Assume all blocks follow the same pattern without testing
+- Skip the testing and review cycle
+- Auto commit without review
+
+---
+
 ## Agent behaviour
 - You CAN make decisions and proceed with tasks confidently
-- You MUST flag and notify me when any of the following happen — do not silently proceed:
+- You MUST flag and notify me when any of the following happen, do not silently proceed:
   - Adding a new SCSS variable
   - Adding a new SCSS partial
   - Using !important
   - Nesting deeper than 3 levels
   - Introducing a new mixin
   - Creating a new file outside the established structure
-- Flag format: start your response with ⚠️ FLAGGED: and explain what and why before proceeding
+- Flag format: start your response with the warning sign emoji and FLAGGED: then explain what and why before proceeding
 - Never commit unless I explicitly say "commit this" or "commit"
-- Always make sure the commit message summarise what has been done
+- Always make sure the commit message summarises what has been done
 - Never modify git remote URLs
 
 ## Git rules
 - Never switch to or push directly to main or production branches
 - Always work on the current branch
 - Follow conventional commits: feature / bugfix / style / refactor / chore
-- Never modify the Version line in style.css — I do that manually
+- Never modify the Version line in style.css, I do that manually
 - Never touch wp-config.php, .env, or any file containing credentials
+- Never push. I do that myself
+- `dist/` IS committed on purpose. Deployment is a `git pull` inside public_html with no build step, so a missing `dist/` means a 404 on the live CSS. Rebuild before committing
+- This repository is public. Never commit customer data. `dorotape-migration/`, `*.csv`, `*.sql` and `*.xlsx` are gitignored deliberately because that directory held customer exports
 
-## BEM rules
-- All new selectors must follow BEM: block__element--modifier
-- Block = standalone component (e.g. .card, .hero, .product-grid)
-- Element = part of a block (e.g. .card__title, .hero__image)
-- Modifier = variant or state (e.g. .card--featured, .hero--dark)
-- Never use a modifier without the base class also being present
-- Never create a new block name that conflicts with an existing one — check first
-- Never style raw HTML elements directly (h1, p, ul etc) inside a component — always use a BEM class
-- JavaScript hooks use a js- prefix and are never styled: e.g. .js-toggle, .js-slider
-- State classes use is- or has- prefix: e.g. .is-active, .has-error
-- If a component needs more than 3 levels of nesting in BEM, it should be split into sub-components
+---
 
-## SASS rules
-- Always use existing variables from _variables.scss — never create new ones without flagging
-- Never hardcode hex values, font sizes, spacing, or breakpoints — always reference a variable
-- Never use magic numbers — if a value isn't in _variables.scss, flag it before using it
-- Always import via the central index/manifest file
-- Follow the existing partial structure — flag before creating new partials
-- Nesting max 3 levels deep — flag if going deeper
-- Never use @extend — use mixins or shared classes instead
-- Always use mixins for repeated patterns (breakpoints, flex centring, typography scales)
+## Architecture Snapshot
+
+- Page content is the ACF flexible content field `content_sections`, rendered by `dorotape_render_flexible_content()` in `inc/acf.php`. The layout name (underscores) maps to `inc/blocks/{name}.php` (hyphens)
+- **The Classic editor is kept.** `page.php` calls `dorotape_has_flexible_content()` first and falls back to the classic content template when a page has no blocks. Every existing page still renders through that fallback, so never remove it
+- Cart and Checkout are block editor pages, My Account is still a shortcode. See the editor policy before changing any of those three
+- The whole front end is on the design system: `dist/css/style.css` and `dist/js/main.js` are the only theme assets enqueued. Functional WooCommerce UI the client signed off on (qty stepper, tier pricing, cut size, quick add, filter bar, POA, stock line, swatches, spec table) lives in `assets/scss/components/woo/` and `assets/js/lib/`
+- WooCommerce pricing logic lives in `inc/pricing.php` (quantity break tiers from `_price_tiers` post meta) and `inc/quickadd.php`. Sage price list customers pay their role price flat with no tiers. Do not change tier maths without checking both files
+
+---
+
+## Global styles (read before writing any block SCSS)
+
+The scaffold (`css/scaffold.css`, `js/scaffold.js`) and the underscores starter CSS in `style.css` are gone. `dist/css/style.css` is the only theme stylesheet, so global rules in `base/` now apply everywhere:
+- `body` sets the navy canvas, foreground colour and Nunito; `h1..h6` carry the shared heading character (weight, tracking) from `base/_typography.scss`; links inherit colour
+- WordPress content markup (alignments, captions, galleries, embeds) is styled in `base/_wordpress.scss`
+- Blocks still set their own `background-color` when the design gives them a surface other than the canvas
+- A global rule reaches every page including WooCommerce, so after adding or changing one, check a product page, the cart and My account as well as the homepage
+- `layout/_woo-holding.scss` keeps Woo pages usable on the new canvas until their designs arrive. Delete rules from it as each Woo page is built properly; do not build new work on top of it
+
+---
+
+## PHP Standards & Security
+
+### File Headers
+Every PHP file starts with `<?php`, then `declare(strict_types=1);`, THEN the file docblock. This order is deliberate.
+
+### Inside Block Templates
+- ONLY `get_sub_field()` inside flexible content loops, NEVER `get_field()` for layout fields. Options are read with `get_field('name', 'option')`
+- Escape at echo time, not at assignment. Text: `esc_html()`. Rich text: `wp_kses_post()`. URLs: `esc_url()`. Attributes: `esc_attr()`
+- Deliberately unescaped output requires a `// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- <reason>` on the echo line
+- **Images: always `wp_get_attachment_image($id, $size, false, ['loading' => ..., 'sizes' => ...])`.** Never a raw `<img src="$image['url']">`, that loses srcset, alt and dimensions. Pick a registered size that matches the rendered slot
+- The first block on a page gets `loading="eager"`, the rest get `lazy`. `dorotape_render_flexible_content()` exposes the position as the `block_index` query var
+- Blocks early return when required data is missing. A block with nothing filled in renders nothing, it never renders an empty shell
+
+### Defensive patterns (established in this codebase, keep them)
+- `function_exists()` guard around every plugin provided function (`have_rows()`, `wc_*`)
+- `is_wp_error()` check on `get_term_link()` before `esc_url()`
+- `get_field(..., 'option') ?: []`, option fields return null until the options page is saved once
+- No direct database queries, use WP_Query or WP functions. Prepared statements if a raw query is unavoidable
+- Prefix all functions and hooks with `dorotape_`
+- No hardcoded URLs, use `home_url()`, `get_template_directory_uri()`
+- Never dequeue or remove scripts or styles you did not add
+- ACF fields accessed via `get_field()` / `get_sub_field()`, never directly from `$_POST`
+
+### Forbidden Actions, STOP & ASK
+- Do NOT modify `wp-config.php`, `.env` or `.htaccess` without explicit approval
+- Do NOT create custom post types, taxonomies or metaboxes
+- Do NOT install new plugins
+- Do NOT modify git remote URLs or commit version numbers automatically
+- Do NOT add inline styles. Enumerated choices (a background select) become modifier classes. The only inline style exception is an editor uploaded background image
+- Do NOT use `eval()`, `extract()` or variable variables
+
+---
+
+## Linting & QA (run before calling anything done)
+
+- **Every PHP change:** `php -l` on the file. `phpcs.xml.dist` and `composer.json` exist but `vendor/` is not installed in this theme yet, so run `composer install` first if you want phpcs, and match the existing WPCS style in `inc/`: tabs, space padded parens
+- **Every SCSS/JS change:** `cd assets && npx gulp build`. ESLint runs inside the JS build and enforces single quotes
+- **Verify in the browser after EVERY CSS change, not just the first.** Check 390, 768 and 1440
+- Local test site: http://localhost/dorotape_wordpresscms/
+- No page may scroll horizontally at 390px. Grid tracks use `minmax(0, 1fr)`, never bare `1fr`, or wide content (spec tables) forces the track open
+
+---
+
+## JavaScript
+
+- Vanilla ES6 modules in `assets/js/lib/`, imported and initialised in `assets/js/main.js` on DOMContentLoaded, bundled by webpack via gulp. Each module early returns when its root element is absent
+- Configuration flows through `data-*` attributes on the markup. No inline handlers, no localised script objects unless WooCommerce provides them
+- Use `js-` prefixed classes for DOM hooks and never style them. State classes use `is-` or `has-`
+- No `console.log` in committed code
+- Heavy per block assets register in the block asset callback in `functions.php` so they enqueue only on pages using that layout. Do not add separate enqueue callbacks
+
+---
+
+## SCSS/CSS
+
+### Structure & Tokens
+- Block partials live in `assets/scss/components/_{block-name}.scss` and are `@use`d in `assets/scss/style.scss`
+- Compiled output is `dist/css/style.css` and `dist/js/main.js`. Never edit compiled files directly
+- Spacing: `var(--spacer-4)` through `var(--spacer-112)` on a 4px grid. No raw px for spacing
+- Colours: `var(--color-*)` from `base/_global.scss`, defined in `base/_colors.scss`. No raw hex at a call site
+- The palette is oklch and the surfaces are `color-mix(in oklab, ...)`. cssnano's `colormin` is disabled in `gulpfile.js` to stop it mangling those. Do not re enable it
+- Raw hex is allowed in exactly one place: `$color-navy` in `base/_colors.scss`, the canvas every surface is mixed from
+- Fonts are **self hosted**. One variable woff2 at `/fonts/nunito-variable.woff2` with a single `@font-face` covering weights 400 to 900. Never re add a Google Fonts CDN link, in PHP or SCSS, and never split the variable font into per weight files
+- Never use `@extend`. Use mixins or shared classes
 - Never use ID selectors for styling
-- Never use !important unless overriding a third-party plugin — flag it and comment why inline
-- Mobile first — base styles target mobile, use min-width breakpoints to scale up
-- Never use max-width media queries — always min-width
+- Never use `!important` unless overriding a third party plugin. Flag it and comment why inline
+
+### Typography, always via base/_typography.scss
+- **Every fixed `font-size`, `font-weight` and `line-height` MUST be a variable from `base/_typography.scss`** (`@use "base/typography" as *;` then `$font-size-*` / `$font-weight-*` / `$line-height-*`). Never a raw px or unitless number at the call site. Colours and spacing work this way through custom properties, typography is SCSS variables instead, same rule by a different mechanism
+- Why this matters: resizing type sitewide, or auditing what sizes exist, should mean editing one file, not grepping every component partial for a raw `14px`
+- The scale preserves the design's exact pixel values, it does not round them off. If a component needs a size with no token yet, **add the token to `_typography.scss` first** (and flag it), then reference it. Do not inline the value and do not silently snap it to the nearest tier, that is a visual change and not a refactor
+- **Every flexible content block's own section heading uses `$font-size-block-heading`** (`clamp(24px, 3vw, 36px)`). Consistency across blocks outranks per block design fidelity. Do not give a block a bespoke heading clamp, change the shared token
+- Exception: page level and hero headings get their own `clamp()`. `$font-size-3xl` is the hero tier
+- `font-weight` maps onto `$font-weight-regular/semibold/bold/extrabold/black` (400/600/700/800/900). No numeric literals
+
+### Responsive
+- **Mobile first via the SCSS mixin.** Base styles are mobile, then `@include min-breakpoint(mobile|tablet|desktop|wide)` for 576 / 768 / 1024 / 1440, defined in `abstracts/_mixins.scss`
+- Never `max-width` media queries and never hardcoded breakpoint values
+- CSS custom properties do NOT resolve inside media query conditions. Use the mixin
 - Media queries go inside the component they affect, not in a separate file
-- Breakpoints must use variables from _variables.scss, never hardcoded px values
-- Always compile to check for errors before committing
 
-## PHP rules
-- strict_types=1 at the top of every file
-- Full type hints on all function arguments and return types
-- Prefix all functions and hooks with the theme slug to avoid conflicts
-- No direct database queries — use WP_Query or WP functions
-- Always use prepared statements if raw queries are unavoidable
-- ACF fields accessed via get_field() only, never directly from $_POST
-- Never dequeue or remove scripts/styles you didn't add
-- No hardcoded URLs — use home_url(), get_template_directory_uri() etc
+### BEM
+- `.block`, `.block__element`, `.block--modifier`, `.block__element--modifier`
+- Block is a standalone component, element is a part of it, modifier is a variant or state
+- Never use a modifier without the base class present
+- Never create a block name that conflicts with an existing one, check first
+- Max nesting depth 2 inside a component partial, and flag anything past 3
+- If a component needs more than 3 levels, split it into sub components
+- **Never style raw HTML elements inside a component**, with one exception: ACF WYSIWYG output. The editor controls those tags, so `.rte h2`, `.rte p` and similar inside a scoped `.rte` wrapper are the sanctioned way to style editor content
 
-## JavaScript rules
-- Vanilla JS only — no jQuery unless WP provides it and it's unavoidable
-- No console.log left in committed code
-- Use js- prefixed classes for DOM hooks, never style them
-- No inline event handlers in HTML — always addEventListener in JS files
+---
+
+## ACF
+
+- **Everything an editor might change is managed by ACF.** Page content is the `content_sections` flexible content field. Site-wide content (logo, header copy and buttons, footer copy, headings, badges, social links) is a field on the Theme Settings options page (`acf-json/group_dorotape_theme_settings.json`), read with `dorotape_setting()` / `dorotape_setting_link()` from `inc/acf.php`. Never hardcode visible copy, links or images in a template, and never expose them through a filter instead of a field
+- Navigation stays in WordPress menus (Appearance > Menus); ACF holds anything around a menu, such as its heading
+- Not content, so stays in code: screen-reader and aria text, and labels that change with state (Login / My account, Basket (n))
+- An empty field hides what it feeds; do not print a hardcoded fallback in its place
+- Field groups live as local JSON in `acf-json/`. When editing JSON directly, bump the group's `"modified"` timestamp so wp-admin offers a sync
+- The flexible content layout slug matches the block template name: layout `image_text_block` renders `inc/blocks/image-text-block.php`
+- Every field gets an `instructions` line an editor can act on, for example "Leave empty to hide."
+- Repeaters and galleries get min/max when the layout constrains them. Leave genuinely unbounded lists uncapped
+- Background and similar enumerated choices are selects whose values become BEM modifier classes, never inline styles
+- `inc/blocks/image-text-block.php` is the reference block. New blocks are built by copying its shape: read sub fields at the top, early return when empty, escape at echo time, one BEM root class plus modifiers
+
+---
 
 ## File structure rules
-- Template files in /templates
-- Reusable parts in /partials
-- ACF JSON saved to /acf-json
-- JS in /assets/js
-- SCSS partials in /assets/scss following existing folder structure
-- Compiled CSS output to /assets/css — never edit compiled files directly
+- Block templates in `/inc/blocks`
+- Reusable template parts in `/template-parts`
+- WooCommerce template overrides in `/woocommerce` in the theme root, never modify WooCommerce core files
+- Theme logic split by concern in `/inc`
+- ACF JSON saved to `/acf-json`
+- SCSS partials in `/assets/scss` following the existing folder structure (abstracts, base, components, layout, utilities)
+- JS in `/assets/js`, modules in `/assets/js/lib`
+- Self hosted fonts in `/fonts`
+- Compiled output in `/dist`
 - Flag before creating any new file outside this structure
 
 ## WooCommerce rules
 - Never modify WooCommerce core files
-- Override templates by copying to /woocommerce/ in the theme root
-- Always check if WooCommerce is active before using WC functions
-- Flag any WooCommerce template override changes before making them
+- Override templates by copying to `/woocommerce/` in the theme root
+- Always check WooCommerce is active before using WC functions
+- Flag any WooCommerce template override change before making it
+- Pricing, quantity steps and tier display are load bearing for the Sage sync. Read `inc/pricing.php` fully before changing any of it
+
+---
 
 ## Before committing checklist
 - No debug code left (console.log, var_dump, print_r, error_log)
-- No hardcoded credentials or hex values
-- No wp-config.php changes
-- SCSS compiled successfully with no errors
+- No hardcoded credentials, no hardcoded hex values outside the palette file
+- No wp-config.php or .env changes
+- No customer data, no csv, sql or xlsx files
+- SCSS compiled successfully with no errors and `dist/` rebuilt
+- `php -l` clean on every changed PHP file
 - All new selectors follow BEM
-- No new variables, partials, or files created without flagging
+- No new variables, partials, mixins or files created without flagging
 - Version line in style.css unchanged
+
+## Success Criteria
+A change is done when:
+- It renders without errors and matches the design
+- It is responsive at 390 / 768 / 1440, re verified in the browser after the final edit
+- All output is escaped, there are no inline styles and no console errors
+- `php -l` and `gulp build` are clean
+- Empty and missing field states are handled, the block hides or degrades and never fatals
+- Existing pages (a product page, the cart, My account) still render correctly
+- It has been reviewed by me
+- It is committed with a clear message

@@ -1,0 +1,55 @@
+// RTE Block: a full-width rich text section.
+//
+// The plain-prose block. It carries no layout of its own beyond the container
+// and the section rhythm, so the WYSIWYG content in components/_rte.scss is
+// what the editor sees.
+
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "../base/typography" as *;
+
+.rte-block {
+  // Paints its own canvas rather than inheriting from <body>, so the block
+  // stays correct on any template and the variants below have something to
+  // override.
+  background-color: var(--color-background);
+  padding-block: var(--spacer-64);
+  position: relative;
+
+  @include min-breakpoint(tablet) {
+    padding-block: var(--spacer-112);
+  }
+
+  // Background variants, one modifier per choice of the block's
+  // background_color select. Matches the 50/50 block's options.
+  &--bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  &--bg-surface-2 {
+    background-color: var(--color-surface-2);
+  }
+
+  &--bg-aurora {
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-aurora-soft);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+  }
+
+  // Keeps prose to a comfortable measure instead of running the full 1400px
+  // container width, which is unreadable on a desktop monitor.
+  &__inner {
+    position: relative;
+    max-width: 800px;
+  }
+
+  &--centered &__inner {
+    margin-inline: auto;
+    text-align: center;
+  }
+}

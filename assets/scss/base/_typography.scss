@@ -1,0 +1,134 @@
+@use "sass:math";
+@use "abstracts/functions" as *;
+@use "abstracts/variables" as *;
+@use "abstracts/mixins" as *;
+@use "base/colors" as *;
+
+// Typography, extracted from the signed-off homepage design.
+//
+// Every fixed font-size, font-weight and line-height in a component MUST
+// reference a token from this file, never a raw px/rem/unitless number at
+// the call site. Colours and spacing work through custom properties
+// (var(--color-*), var(--spacer-*)); typography is SCSS variables instead
+// This is the same rule, by a different mechanism. The point is that resizing type
+// sitewide, or even auditing what sizes exist at all, means editing one
+// file rather than grepping every component partial.
+//
+// If a component needs a size that has no token yet, ADD THE TOKEN HERE
+// FIRST, then reference it. Don't inline the value, and don't silently
+// snap it to the nearest existing tier, because that's a visual change, not a
+// refactor.
+
+// Font family: one family for the whole site (see base/_fonts.scss).
+$font-body: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
+// Font sizes. The design was built in Tailwind, so the scale below is
+// Tailwind's default tiers (the ones the design actually uses), plus the
+// handful of bespoke sizes it set in square brackets.
+$font-size-11: 11px; // micro labels: badge text, stock pills
+$font-size-12: 12px; // eyebrow / uppercase tracking labels (text-xs)
+$font-size-13: 13px; // bespoke, header category row between 1280 and 1440 only
+$font-size-14: 14px; // meta, nav, body-small (text-sm), the design's workhorse
+$font-size-16: 16px; // body copy (text-base)
+$font-size-18: 18px; // large body / small subheading (text-lg)
+$font-size-20: 20px; // text-xl
+$font-size-24: 24px; // text-2xl
+$font-size-30: 30px; // text-3xl, section headings on mobile
+$font-size-35: 35px; // bespoke, stat figures
+$font-size-36: 36px; // text-4xl
+$font-size-48: 48px; // text-5xl, section headings from tablet
+$font-size-53: 53px; // bespoke, hero heading mid-range
+$font-size-60: 60px; // text-6xl
+$font-size-72: 72px; // text-7xl, hero heading ceiling
+
+// Aliases. Prefer these at call sites, they read better than the numeric
+// tokens for the sizes that come up most.
+$font-size-xs: $font-size-12;
+$font-size-sm: $font-size-14;
+$font-size-base: $font-size-16;
+$font-size-md: $font-size-18;
+$font-size-lg: $font-size-20;
+$font-size-xl: $font-size-24;
+
+// Fluid tiers. The design steps type at the md breakpoint rather than
+// scaling it continuously; these clamps reproduce that jump as a smooth
+// ramp so there is no snap at exactly 768px.
+//
+// Each ramp is anchored on the design's own values: the mobile size at a
+// 390px phone and the large size where the design reaches it. A plain vw
+// clamp got there far too late (46px against the design's 60px at 768).
+$font-size-2xl: clamp(30px, 11.43px + 4.76vw, 48px); // large section heading: 30 at 390, 48 at 768 (text-3xl -> text-5xl)
+$font-size-3xl: clamp(36px, 13.86px + 5.68vw, 72px); // hero heading: 36 at 390, 57 at 768, 72 at 1024 (text-4xl -> text-7xl)
+
+// Every ACF flexible-content block's own section heading uses this one
+// size. Consistency across blocks outranks per-block design fidelity here
+// Don't give a block its own bespoke heading clamp, change this token.
+$font-size-block-heading: clamp(24px, 3vw, 36px);
+
+// Font weights, named as Tailwind names them (font-extrabold is 800). The
+// design leans heavy: headings are 800 and even body labels sit at 600-700.
+$font-weight-regular: 400;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+// Line heights
+$line-height-none: 0; // icon-only flex children, kills the line box
+$line-height-single: 1; // tight numerals/labels with no descenders
+$line-height-display: 1.05; // large display headings only
+$line-height-hero: 1.03; // the hero heading, leading-[1.03] in the design
+$line-height-tight: 1.25; // headings
+$line-height-snug: 1.4;
+$line-height-base: 1.5; // body copy
+$line-height-relaxed: 1.625;
+
+// Line heights paired with a font size. Tailwind gives every size tier its
+// own leading and the design rarely overrides it, so pairing a size with its
+// partner here reproduces the design's line box to the pixel: $font-size-sm
+// with $line-height-sm is the design's 14px on 20px.
+$line-height-xs: math.div(16, 12); // text-xs
+$line-height-sm: math.div(20, 14); // text-sm
+$line-height-md: math.div(28, 18); // text-lg
+$line-height-lg: math.div(28, 20); // text-xl
+$line-height-xl: math.div(32, 24); // text-2xl
+$line-height-30: math.div(36, 30); // text-3xl
+$line-height-36: math.div(40, 36); // text-4xl; text-5xl and up use $line-height-single
+
+// Letter spacing
+$letter-spacing-wide: 0.025em; // tracking-wide, the 50/50 eyebrow chip
+$letter-spacing-label: 0.08em; // uppercase WooCommerce labels, pre-dates the design
+$letter-spacing-caps: 0.18em; // footer column headings, tracking-[0.18em]
+$letter-spacing-widest: 0.2em; // the hero eyebrow chip, tracking-[0.2em]
+$letter-spacing-tight: -0.02em; // headings, the design sets this on h1-h3
+
+body {
+  font-family: $font-body;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+// The design gives every heading the same heavy, tightened treatment. Sizes
+// stay with the component; this is the shared character only.
+//
+// Applied globally now that the Sprint 1 scaffold is gone and this stylesheet
+// is the only thing styling the site. The mixin stays for components that
+// need the character on an element that is not a heading (a <p> acting as a
+// column label, for instance).
+@mixin heading-character {
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-tight;
+  line-height: $line-height-tight;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include heading-character;
+}

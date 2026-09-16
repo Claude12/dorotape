@@ -76,7 +76,7 @@ add_action( 'woocommerce_before_single_product_summary', function (): void {
  * This puts a box back in the expected place. It is a running total, not an
  * input: the real quantities are still the per-option ones, and a single number
  * here could not say how it splits between them. So it is read-only, filled in
- * by scaffold.js as the grid is used. It carries no name attribute and so posts
+ * by assets/js/lib/quick-add.js as the grid is used. It carries no name attribute and so posts
  * nothing.
  *
  * Just the label and the number. The mix-and-match rule and the progress towards

@@ -1,0 +1,247 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Hero Block.
+//
+// The homepage hero from the signed-off design (Hero.tsx). A drifting magenta
+// texture at the back, a radial wash that fades it into the navy canvas from
+// the top left, then the copy and a row of headline figures on a two-column
+// grid that settles onto a shared bottom edge from desktop up.
+
+.hero-block {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  // The wash. Always present, image or not: it is what turns the flat navy
+  // into the design's magenta glow in the top left corner.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(
+      147% 90% at 15% 10%,
+      color-mix(in oklab, var(--color-magenta) 38%, transparent),
+      var(--color-background) 92%
+    );
+  }
+
+  // First block on the page: run up underneath the sticky header by exactly
+  // its height, so the texture shows through the translucent utility bar the
+  // way it does under the design's fixed header. The top padding is then the
+  // design's own (pt-28 / md:pt-32), measured from the top of the viewport
+  // just as it is there. --site-header-height is set in layout/_header.scss.
+  &--overlap {
+    margin-top: calc(-1 * var(--site-header-height));
+    padding-top: var(--spacer-112);
+
+    @include min-breakpoint(tablet) {
+      padding-top: calc(var(--spacer-112) + var(--spacer-16));
+    }
+  }
+
+  // ── Backdrop ───────────────────────────────────────────────────────────
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  &__backdrop-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: hero-block-drift 9s ease-in-out infinite;
+  }
+
+  // ── Layout ─────────────────────────────────────────────────────────────
+
+  &__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacer-40);
+    padding-top: var(--spacer-64);
+    padding-bottom: var(--spacer-80);
+
+    @include min-breakpoint(tablet) {
+      padding-top: var(--spacer-96);
+      padding-bottom: var(--spacer-112);
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      align-items: end;
+    }
+  }
+
+  // ── Copy ───────────────────────────────────────────────────────────────
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    margin: 0 0 var(--spacer-20);
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-background) 50%, transparent);
+    backdrop-filter: blur(8px);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    letter-spacing: $letter-spacing-widest;
+    text-transform: uppercase;
+  }
+
+  &__eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-magenta);
+  }
+
+  // A hero heading, so it takes the hero tier rather than the shared block
+  // heading size (see .cursorrules, Typography).
+  &__heading {
+    max-width: 48rem;
+    margin: 0;
+    font-size: $font-size-3xl;
+    line-height: $line-height-hero;
+  }
+
+  &__intro {
+    max-width: 36rem;
+    margin: var(--spacer-24) 0 0;
+    color: color-mix(in oklab, var(--color-foreground) 80%, transparent);
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+
+    @include min-breakpoint(mobile) {
+      font-size: $font-size-md;
+      line-height: $line-height-md;
+    }
+  }
+
+  // ── Buttons ────────────────────────────────────────────────────────────
+  //
+  // Larger than the site's .btn (px-7 py-3.5 against px-6 py-3), and the
+  // secondary is a translucent glass pill rather than the magenta-on-hover
+  // ghost, so the hero owns its own pair.
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacer-12);
+    margin-top: var(--spacer-36);
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    padding: var(--spacer-14) var(--spacer-28);
+    border-radius: var(--radius-2xl);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+
+  &__button--primary {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(in oklab, var(--color-primary) 90%, transparent);
+    }
+  }
+
+  // Bordered, so it stands 2px taller than the primary, as in the design.
+  &__button--secondary {
+    border: 1px solid var(--color-border);
+    background-color: color-mix(in oklab, var(--color-background) 40%, transparent);
+    backdrop-filter: blur(8px);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-secondary);
+    }
+  }
+
+  &__button-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  &__button:hover &__button-icon {
+    transform: translateX(4px);
+  }
+
+  // ── Figures ────────────────────────────────────────────────────────────
+  //
+  // A rule above them while stacked, a rule beside them once they sit to the
+  // right of the copy.
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacer-16);
+    margin: 0;
+    padding-top: var(--spacer-24);
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+
+    @include min-breakpoint(desktop) {
+      padding-top: 0;
+      padding-left: var(--spacer-40);
+      border-top: 0;
+      border-left: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    }
+  }
+
+  &__stat-value {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xl;
+
+    @include min-breakpoint(mobile) {
+      font-size: $font-size-30;
+      line-height: $line-height-30;
+    }
+  }
+
+  &__stat-label {
+    margin: var(--spacer-4) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    line-height: $line-height-xs;
+
+    @include min-breakpoint(mobile) {
+      font-size: $font-size-sm;
+      line-height: $line-height-sm;
+    }
+  }
+}
+
+// The design's aurora-shift: a slow breathing zoom. Scaled above 1 throughout
+// so the drift never pulls an edge of the image into view.
+@keyframes hero-block-drift {
+  0%,
+  100% {
+    transform: scale(1.05) translate(0, 0);
+  }
+
+  50% {
+    transform: scale(1.08) translate(-1%, 1%);
+  }
+}

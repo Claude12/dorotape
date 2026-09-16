@@ -1,0 +1,77 @@
+@use "sass:map";
+@use "functions" as *;
+
+// Spacing scale. The design is built on a 4px grid (Tailwind's default
+// spacing unit), and these are the steps it actually uses. Spacing in a
+// component goes through var(--spacer-N); no raw px. The three off-grid
+// steps are Tailwind's half steps, which the design uses for its pills and
+// buttons, so they are tokens rather than raw values at the call site.
+$spacer-4: rem(4px);
+$spacer-6: rem(6px); // off-grid: chip padding (py-1.5)
+$spacer-8: rem(8px);
+$spacer-10: rem(10px); // off-grid: icon buttons, quote button (p-2.5, py-2.5)
+$spacer-12: rem(12px);
+$spacer-14: rem(14px); // off-grid: hero buttons, search icon inset (py-3.5, left-3.5)
+$spacer-16: rem(16px);
+$spacer-20: rem(20px);
+$spacer-24: rem(24px);
+$spacer-28: rem(28px);
+$spacer-32: rem(32px);
+$spacer-36: rem(36px); // hero button row offset (mt-9)
+$spacer-40: rem(40px);
+$spacer-44: rem(44px); // drawer search field height (h-11)
+$spacer-48: rem(48px);
+$spacer-56: rem(56px);
+$spacer-64: rem(64px);
+$spacer-80: rem(80px);
+$spacer-96: rem(96px);
+$spacer-112: rem(112px);
+
+// Layout. The design centres content in a 1400px container with a 24px
+// gutter that does not change between breakpoints.
+$container-max: 1400px;
+$gutter: 24px;
+
+// Section rhythm: homepage sections are py-20 on mobile, py-28 from tablet.
+$section-padding: $spacer-80;
+$section-padding-lg: $spacer-112;
+
+// Corner radii, named exactly as the design's styles.css names them, so
+// `rounded-2xl` in the design source is var(--radius-2xl) here and nobody has
+// to translate. 20px is the signature radius (buttons, chips, cards, and
+// every `rounded-[20px]` in the design).
+$radius: 12px; // --radius base
+$radius-sm: $radius - 4px;
+$radius-md: $radius - 2px;
+$radius-lg: $radius;
+$radius-xl: $radius + 4px;
+$radius-2xl: $radius + 8px; // signature
+$radius-3xl: $radius + 12px;
+$radius-pill: 999px;
+
+// Motion. Tailwind's default curve and durations: transition-colors is
+// 150ms, duration-300 and duration-700 the slower steps the design uses.
+$ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: 0.15s $ease-standard;
+$transition: 0.3s $ease-standard;
+$transition-slow: 0.7s $ease-standard;
+
+// Z-index scale. Always go through z($layer) instead of a hard-coded
+// number, so stacking order stays visible in one place.
+$z-layers: (
+  base: 1,
+  dropdown: 10,
+  header: 100,
+  overlay: 200,
+  modal: 300,
+  toast: 400,
+);
+
+@function z($layer) {
+  @if not map.has-key($z-layers, $layer) {
+    @warn "Unknown z-index layer `#{$layer}`. Check $z-layers in abstracts/_variables.scss.";
+    @return null;
+  }
+
+  @return map.get($z-layers, $layer);
+}

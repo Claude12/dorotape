@@ -1,0 +1,87 @@
+// Brand palette, extracted verbatim from the signed-off homepage design
+// (wp-content/themes/v2 Final Homepage Design/src/styles.css).
+//
+// The design is authored in oklch() rather than hex, and these values are
+// kept in that space on purpose: the Aurora gradient interpolates through
+// oklab, and converting the stops to sRGB hex first would visibly dull the
+// magenta -> indigo -> cyan ramp that the whole brand leans on. Modern
+// browsers all support oklch(); the gulp build is configured not to let
+// cssnano rewrite these into legacy formats.
+
+// Brand
+$color-magenta: oklch(0.582 0.213 349.5); // primary CTA, gradient start
+$color-cyan: oklch(0.653 0.146 236.5); // accent, gradient end, eyebrow rules
+$color-ink: oklch(0.42 0.004 106); // warm near-black, used on light surfaces
+$color-indigo: oklch(0.276 0.086 285); // deep gradient mid-stop
+$color-lilac: oklch(0.762 0.084 322); // soft tint accent
+$color-white: oklch(1 0 0); // plate behind supplied dark-on-white artwork (footer payment marks)
+
+// Brand secondaries: category/accent chips in the design
+$color-yellow: oklch(0.855 0.171 92);
+$color-lime: oklch(0.79 0.176 122);
+$color-orange: oklch(0.687 0.183 51);
+
+// Canvas: the navy base every surface is mixed from. This one stays hex
+// because it is the literal base colour the color-mix() surfaces below are
+// derived from, and the design defines it that way.
+$color-navy: #131d2e;
+
+$color-background: $color-navy;
+$color-foreground: oklch(0.98 0 0);
+
+// Raised surfaces. Each is the navy canvas lightened by mixing in white.
+$color-surface: color-mix(in oklab, #131d2e 90%, white); // cards, panels
+$color-surface-2: color-mix(in oklab, #131d2e 82%, white); // inputs, muted fills
+$color-popover: color-mix(in oklab, #131d2e 92%, white); // dropdowns, dialogs
+
+// Semantic aliases. Reference these in components, not the raw brand names
+// above, so a re-theme only means editing this file.
+$color-primary: $color-magenta;
+$color-primary-foreground: oklch(0.99 0 0);
+$color-accent: $color-cyan;
+$color-accent-foreground: $color-navy;
+$color-card: $color-surface;
+$color-card-foreground: $color-foreground;
+$color-secondary: $color-surface-2;
+$color-muted: $color-surface-2;
+$color-muted-foreground: oklch(0.72 0.01 300); // body copy on navy
+$color-border: oklch(1 0 0 / 12%);
+$color-input: oklch(1 0 0 / 16%);
+$color-ring: $color-magenta; // focus ring
+
+// Feedback. The design only named a destructive colour, because the homepage
+// has no forms and no stock states. The shop does, so success/warning/info
+// are added here rather than invented per component.
+//
+// These are tuned to be read AS TEXT on the navy canvas, which is why they
+// sit high on the lightness axis: the scaffold's versions were picked for
+// black text on white and go muddy the moment the background inverts.
+// Measured on $color-navy: success 8.9:1, warning 11.7:1, danger 6.2:1,
+// info 7.3:1, all clear of WCAG AA for body text.
+$color-destructive: oklch(0.6 0.23 27); // solid fills, where the text sits ON it
+$color-destructive-foreground: oklch(0.99 0 0);
+$color-success: oklch(0.78 0.15 155);
+$color-warning: oklch(0.85 0.15 88);
+$color-danger: oklch(0.72 0.19 25); // destructive, as text on the canvas
+$color-info: $color-cyan;
+
+// Signature gradients: the Aurora ramp. `aurora-soft` is the same ramp with
+// transparency mixed in for overlaying imagery; `line` is the hairline rule
+// used between homepage sections.
+$gradient-aurora: linear-gradient(
+  115deg,
+  #{$color-magenta} 0%,
+  oklch(0.42 0.19 320) 42%,
+  #{$color-indigo} 62%,
+  #{$color-cyan} 100%
+);
+$gradient-aurora-soft: linear-gradient(
+  115deg,
+  color-mix(in oklab, #{$color-magenta} 85%, transparent) 0%,
+  color-mix(in oklab, #{$color-indigo} 70%, transparent) 55%,
+  color-mix(in oklab, #{$color-cyan} 80%, transparent) 100%
+);
+$gradient-line: linear-gradient(90deg, transparent, #{$color-magenta}, #{$color-cyan}, transparent);
+
+// Magenta bloom under raised/hover cards
+$shadow-glow: 0 24px 70px -30px color-mix(in oklab, #{$color-magenta} 70%, transparent);

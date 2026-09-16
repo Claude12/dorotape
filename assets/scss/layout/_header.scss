@@ -1,0 +1,742 @@
+@use "abstracts/variables" as *;
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Site header, built from the signed-off design's SiteHeader component
+// (v2 Final Homepage Design/src/components/site/SiteHeader.tsx).
+//
+// Three stacked rows, each appearing at its own breakpoint:
+//   utility  - delivery message + phone/account/basket, from tablet up
+//   main     - logo, aurora-bordered search, quick links, quote button, always
+//   nav      - the eight product categories, from xl (1280px) up
+// Below xl the categories move into a drawer under the main row.
+//
+// The design fixes the header to the viewport so the hero can run underneath
+// it. This uses sticky instead: it pins identically, but it keeps its space in
+// the flow, so no page needs a compensating top offset and nothing can end up
+// hidden behind the header. The one block that should run underneath it, the
+// hero, pulls itself up by --site-header-height instead (components/_hero-block.scss).
+//
+// The rows paint their own backgrounds rather than the header as a whole,
+// because the utility row is translucent in the design. On any page without a
+// hero it sits over the same navy, so it looks opaque there.
+//
+// State classes (is-solid, is-drawer-open, is-open, is-focused) are set by
+// assets/js/lib/header.js.
+
+// The header's rendered height at each tier, for the hero overlap. CSS rather
+// than a JS measurement, so the hero is in place on first paint instead of
+// jumping up once a script runs. Keep these in step with the row heights
+// below: main 80px, utility 36px + 1px border from tablet, category row
+// 48px + 1px border from xl, plus the header's own 1px bottom border.
+:root {
+  --site-header-height: 81px;
+
+  @include min-breakpoint(tablet) {
+    --site-header-height: 118px;
+  }
+
+  @include min-breakpoint(xl) {
+    --site-header-height: 167px;
+  }
+}
+
+// The bottom border is always there, transparent until the page scrolls. The
+// design adds the border only once solid, which is harmless under its fixed
+// header but would nudge every page down by 1px under a sticky one.
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: z(header);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition);
+}
+
+// Set once the page scrolls past 40px, the design's threshold. At the top of
+// a page the header reads as part of the hero; once content runs under it,
+// it gets an edge to sit on.
+.site-header.is-solid {
+  border-bottom-color: color-mix(in oklab, var(--color-border) 60%, transparent);
+}
+
+// Solid once scrolled, so page content does not show through it.
+.site-header.is-solid .site-header__utility {
+  border-bottom-color: color-mix(in oklab, var(--color-border) 60%, transparent);
+  background-color: var(--color-background);
+}
+
+// ── Utility row ──────────────────────────────────────────────────────────
+//
+// Hidden on phones: the design drops it entirely rather than wrapping it,
+// and its links (basket, account) all have a home in the drawer.
+
+.site-header__utility {
+  display: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  background-color: color-mix(in oklab, var(--color-background) 50%, transparent);
+  backdrop-filter: blur(8px);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition);
+
+  @include min-breakpoint(tablet) {
+    display: block;
+  }
+}
+
+.site-header__utility-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-16);
+  min-height: var(--spacer-36);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+.site-header__notice {
+  margin: 0;
+}
+
+// Held back to desktop. At tablet the row has 720px to hold the delivery
+// notice and these four links, and the two longest ("Trade account" and
+// "Basket (0)") were breaking mid-label and pushing the row to two lines.
+// Every one of them is repeated in the drawer, which is what the hamburger
+// opens at that width, so hiding them here costs nothing.
+.site-header__utility-links {
+  display: none;
+  align-items: center;
+  gap: var(--spacer-20);
+  // Stays on the right when the delivery notice is left empty.
+  margin-left: auto;
+
+  @include min-breakpoint(desktop) {
+    display: flex;
+  }
+}
+
+.site-header__utility-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  color: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+
+  // Login and basket are the two actions, so they carry full contrast
+  // against the informational links either side of them.
+  &--strong {
+    color: var(--color-foreground);
+    font-weight: $font-weight-bold;
+  }
+}
+
+.site-header__utility-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+// ── Main row ─────────────────────────────────────────────────────────────
+
+// Opaque in the design at all times, over the hero included.
+.site-header__main {
+  background-color: var(--color-background);
+}
+
+.site-header__main-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-24);
+  min-height: var(--spacer-80);
+  padding-top: var(--spacer-12);
+  padding-bottom: var(--spacer-12);
+}
+
+// The only item in the row allowed to give way. At the design's 50px the logo
+// and the two phone buttons need 352px, so on a 320px phone the logo scales
+// down inside its slot rather than pushing the menu button off the screen.
+.site-header__branding {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+// `.custom-logo-link` and `.custom-logo` are WordPress's own classes on the
+// the_custom_logo() output. Sized by height so any logo aspect ratio drops in
+// without distorting.
+.site-header__branding .custom-logo-link {
+  display: block;
+  min-width: 0;
+}
+
+.site-header__branding .custom-logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 50px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.site-header__name {
+  color: var(--color-foreground);
+  font-size: $font-size-xl;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-xl;
+  letter-spacing: $letter-spacing-tight;
+  text-decoration: none;
+}
+
+// The centre group: search plus the editorial links. Hidden on phones, where
+// the search collapses to an icon in the actions group instead.
+//
+// `min-width: 0` is load-bearing. A flex item defaults to `min-width: auto`,
+// which refuses to shrink below its content, and the search field's intrinsic
+// minimum is around 180px. Without this the row could not give way and the
+// actions group was pushed 89px past the right edge of the viewport at 768,
+// scrolling the whole page sideways.
+.site-header__centre {
+  display: none;
+
+  @include min-breakpoint(tablet) {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacer-24);
+    padding-inline: var(--spacer-16);
+  }
+
+  @include min-breakpoint(desktop) {
+    padding-inline: var(--spacer-32);
+  }
+}
+
+// ── Search ───────────────────────────────────────────────────────────────
+//
+// The aurora gradient is the element's own background and the 2px padding is
+// what lets it show as a border. A real `border-image` cannot take a radius,
+// which is why the design nests a rounded field inside a rounded wrapper, and
+// why the field's radius is the wrapper's less those 2px.
+
+.site-header__search {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 28rem;
+  padding: 2px;
+  border-radius: var(--radius-2xl);
+  background-image: var(--gradient-aurora);
+
+  @include min-breakpoint(desktop) {
+    max-width: 32rem;
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 1px var(--color-magenta);
+  }
+}
+
+.site-header__search-field {
+  width: 100%;
+  height: var(--spacer-40);
+  padding: 0 var(--spacer-16) 0 var(--spacer-40);
+  border: 0;
+  border-radius: calc(var(--radius-2xl) - 2px);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  &:focus {
+    border: 0;
+    outline: none;
+    box-shadow: none;
+  }
+
+  // Safari draws its own cancel affordance on type="search" and it lands on
+  // the navy field as a light blob.
+  &::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+.site-header__search-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--spacer-14);
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+}
+
+// FiboSearch renders its own field when the plugin is active. It is handed
+// the same box so the aurora border and radius still apply to it, and the
+// rules below restate the design's field on top of the plugin's "pirx" skin.
+//
+// The plugin's markup is not ours to class, so these are the one place in the
+// header that reaches into third-party elements. Every selector is the same
+// weight as the plugin rule it replaces, and dist/css/style.css is enqueued
+// after dgwt-wcas-style (see dorotape_scripts() in functions.php), so the
+// theme wins on source order and nothing needs !important.
+.site-header__search .dgwt-wcas-search-wrapp {
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+}
+
+// pirx paints a white 10px-padded card around the input. The aurora wrapper
+// is already that frame, so this one is flattened away.
+.site-header__search .dgwt-wcas-sf-wrapp {
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius-2xl) - 2px);
+  background: transparent;
+}
+
+// One class deeper than pirx's base input rule, so it also ties the plugin's
+// mobile-wrapper variant (which would otherwise strip the fill and radius in
+// the drawer) and wins on source order.
+.site-header__search .dgwt-wcas-search-wrapp .dgwt-wcas-sf-wrapp input[type="search"].dgwt-wcas-search-input {
+  width: 100%;
+  height: var(--spacer-40);
+  padding: 0 var(--spacer-16) 0 var(--spacer-40);
+  border: 0;
+  border-radius: calc(var(--radius-2xl) - 2px);
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  // pirx greys the field on hover, and whitens it on hover while focused.
+  // The design's field has no hover state, so both are held to the surface.
+  &:hover {
+    background-color: var(--color-surface);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+// The plugin's submit button carries the magnifier, so it takes the place of
+// the theme's own icon rather than sitting beside it. pirx pins it with hard
+// pixel offsets measured against its taller field; these re-centre it in the
+// 40px one, with the 16px glyph landing 14px in, as the design's icon does.
+.site-header__search .dgwt-wcas-sf-wrapp button.dgwt-wcas-search-submit {
+  top: 50%;
+  left: var(--spacer-12);
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  min-height: 20px;
+  transform: translateY(-50%);
+  background: none;
+
+  &:hover {
+    background: none;
+    box-shadow: none;
+  }
+}
+
+.site-header__search .dgwt-wcas-search-submit svg.dgwt-wcas-ico-magnifier {
+  width: 16px;
+  height: 16px;
+}
+
+.site-header__search .dgwt-wcas-has-submit .dgwt-wcas-search-submit svg path {
+  fill: var(--color-muted-foreground);
+}
+
+// Once there is a query, pirx throws the button over to the right and swaps
+// the input's padding to match. The design keeps the magnifier on the left at
+// all times, so the filled state is held to the same geometry as the empty
+// one and the field never jumps as you type.
+.site-header__search .dgwt-wcas-search-filled .dgwt-wcas-sf-wrapp button.dgwt-wcas-search-submit {
+  right: auto;
+  left: var(--spacer-12);
+}
+
+.site-header__search .dgwt-wcas-search-filled .dgwt-wcas-sf-wrapp input[type="search"].dgwt-wcas-search-input {
+  padding-right: var(--spacer-16);
+  padding-left: var(--spacer-40);
+}
+
+// The suggestions list is appended to <body>, so it escapes the header's
+// stacking context and has to clear it on its own.
+.dgwt-wcas-suggestions-wrapp,
+.dgwt-wcas-details-wrapp {
+  z-index: z(overlay);
+}
+
+// ── Quick links ──────────────────────────────────────────────────────────
+
+// Held back to desktop. At 768 the tablet layout has 720px of container to
+// fit the logo, the search and the actions group, and these three links were
+// the 115px that pushed it over. They are secondary navigation, so they are
+// what gives way rather than the search field shrinking further.
+.site-header__quick-links {
+  display: none;
+
+  @include min-breakpoint(desktop) {
+    display: flex;
+    flex-shrink: 0;
+  }
+}
+
+.site-header__quick-links-list {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-20);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header__quick-links-item {
+  margin: 0;
+}
+
+.site-header__quick-link {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────
+
+.site-header__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--spacer-12);
+}
+
+// The two phone buttons share a shape but not a character: the design's
+// search button is muted with a hover fill, its menu button is plain
+// foreground with no hover state at all.
+.site-header__icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacer-10);
+  border: 0;
+  border-radius: var(--radius-2xl);
+  background: none;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.site-header__button-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+// The phone search button opens the same drawer as the menu button, so it
+// has nothing to do once the inline search field appears at tablet.
+.site-header__search-toggle {
+  color: var(--color-muted-foreground);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--color-secondary);
+    color: var(--color-foreground);
+  }
+
+  @include min-breakpoint(tablet) {
+    display: none;
+  }
+}
+
+.site-header__menu-toggle {
+  @include min-breakpoint(xl) {
+    display: none;
+  }
+}
+
+// The hamburger becomes a cross while the drawer is open. Both icons are in
+// the markup and only the visible one is laid out, so nothing reflows and no
+// script has to touch the DOM to make the swap. These come after
+// .site-header__button-icon so they win at the same weight.
+.site-header__toggle-icon--close {
+  display: none;
+}
+
+.site-header.is-drawer-open .site-header__toggle-icon--menu {
+  display: none;
+}
+
+.site-header.is-drawer-open .site-header__toggle-icon--close {
+  display: block;
+}
+
+// The design shows this from Tailwind's sm (640px). The nearest tier here is
+// mobile (576px), and between the two there is room for it.
+.site-header__quote {
+  display: none;
+
+  @include min-breakpoint(mobile) {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacer-10) var(--spacer-20);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(in oklab, var(--color-primary) 90%, transparent);
+    }
+  }
+}
+
+// ── Category nav row ─────────────────────────────────────────────────────
+
+.site-header__nav {
+  display: none;
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  background-color: var(--color-background);
+
+  @include min-breakpoint(xl) {
+    display: block;
+  }
+}
+
+.site-header__nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--spacer-48);
+}
+
+// `flex-wrap` is the safety net. The eight labels are menu items an editor
+// controls, so their combined width is not fixed: today they need 1308px and
+// the container at 1280 offers 1232. Rather than let a long label push the
+// whole page sideways, the row wraps. The tighter type below 1440 is what
+// makes sure it does not have to.
+//
+// Horizontal scrolling would be the other option, but it needs
+// `overflow-x: auto`, and that clips the dropdown panels, which matters
+// because the client's menus nest three levels deep.
+.site-header__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header__nav-item {
+  position: relative;
+}
+
+// Between 1280 and 1440 the labels are set one step tighter than the design,
+// which specifies 14px type on 12px of padding. At 1440 there is room for the
+// design's values; at 1280 there is not, and the choice is between tightening
+// the labels by a pixel or holding the whole category row back to a width the
+// design does not use.
+.site-header__nav-link {
+  display: block;
+  padding: var(--spacer-8);
+  border-radius: var(--radius-2xl);
+  color: var(--color-foreground);
+  font-size: $font-size-13;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  @include min-breakpoint(wide) {
+    padding: var(--spacer-8) var(--spacer-12);
+    font-size: $font-size-sm;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+
+  // Dropdown links. Not in the design, which shows no submenus.
+  &--sub {
+    font-size: $font-size-13;
+    font-weight: $font-weight-semibold;
+    white-space: normal;
+  }
+}
+
+// Dropdowns. The design shows none, but these are WordPress menus and the
+// client's Primary menu already has three levels in it, so the markup has to
+// cope. Anything nested renders as a panel instead of being dropped, which
+// would silently hide menu items an editor had added.
+.site-header__nav-item.menu-item-has-children > .site-header__nav-link::after {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: var(--spacer-8);
+  vertical-align: middle;
+  border-top: 4px solid currentcolor;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.site-header__nav-submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: z(dropdown);
+  flex-direction: column;
+  width: max-content;
+  min-width: 240px;
+  margin: 0;
+  padding: var(--spacer-8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-popover);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--color-navy) 60%, transparent);
+  list-style: none;
+}
+
+.site-header__nav-submenu .site-header__nav-submenu {
+  top: calc(-1 * var(--spacer-8));
+  left: 100%;
+}
+
+.site-header__nav-item:hover > .site-header__nav-submenu,
+.site-header__nav-item.is-focused > .site-header__nav-submenu,
+.site-header__nav-item.is-open > .site-header__nav-submenu {
+  display: flex;
+}
+
+// ── Mobile drawer ────────────────────────────────────────────────────────
+//
+// One drawer serves both the menu button and the phone search button, so
+// there is a single open state to reason about and no way to get two panels
+// on screen at once.
+
+.site-header__drawer {
+  display: none;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: var(--spacer-16) 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+// Hidden again from xl, where the category row takes over. Same weight as the
+// open rule and after it, so it wins without !important.
+.site-header.is-drawer-open .site-header__drawer {
+  display: block;
+
+  @include min-breakpoint(xl) {
+    display: none;
+  }
+}
+
+.site-header__drawer .site-header__search {
+  max-width: none;
+  margin-bottom: var(--spacer-16);
+}
+
+.site-header__drawer .site-header__search-field,
+.site-header__drawer .site-header__search .dgwt-wcas-sf-wrapp input[type="search"].dgwt-wcas-search-input {
+  height: var(--spacer-44);
+}
+
+.site-header__drawer-list,
+.site-header__drawer-submenu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// space-y-1 and a 50% rule under each top-level item, as in the design.
+.site-header__drawer-item {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+
+  & + & {
+    margin-top: var(--spacer-4);
+  }
+
+  &--sub {
+    border-bottom: 0;
+  }
+}
+
+.site-header__drawer-link {
+  display: block;
+  padding: var(--spacer-12) 0;
+  color: var(--color-foreground);
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-base;
+  text-decoration: none;
+
+  // Nested items stay visible rather than needing a second tap: a drawer that
+  // hides the client's third-level categories behind an accordion is a worse
+  // trade than a slightly longer scroll. Not in the design, which has none.
+  &--sub {
+    padding-left: var(--spacer-16);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-sm;
+  }
+}
+
+// The utility links have no row of their own on a phone, so they close out
+// the drawer instead of being unreachable. Not in the design; set like the
+// utility row it stands in for.
+.site-header__drawer-utility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-16);
+  margin-top: var(--spacer-20);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}

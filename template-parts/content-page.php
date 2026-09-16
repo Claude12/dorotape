@@ -16,7 +16,13 @@
 
 	<?php dorotape_post_thumbnail(); ?>
 
-	<div class="entry-content">
+	<?php
+	// Classic-editor page content is rich text, so it gets the shared .rte
+	// styles. Not on the WooCommerce pages: their content is a Cart/Checkout
+	// block or a shortcode that renders forms and tables of its own.
+	$dorotape_is_wc_page = function_exists( 'is_woocommerce' ) && ( is_cart() || is_checkout() || is_account_page() );
+	?>
+	<div class="entry-content<?php echo $dorotape_is_wc_page ? '' : ' rte'; ?>">
 		<?php
 		the_content();
 

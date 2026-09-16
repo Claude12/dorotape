@@ -1,0 +1,318 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Cut sizes (assets/js/lib/cut-size.js, cut-size-rows.js).
+//
+// Products that came over from Kryptronic with a CUTSIZE box let the customer
+// ask for a roll to be cut down. The builder is a table: one row-group per
+// roll, one row per cut, with a running allocation total that turns red when
+// the cuts exceed the roll. Collapsed by default, because the roll ships
+// uncut unless somebody asks.
+
+.dt-cutsize {
+  margin: var(--spacer-16) 0;
+  padding: var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+}
+
+// ── Disclosure ─────────────────────────────────────────────────────────────
+
+.dt-cutsize__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-12);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-foreground);
+  font: inherit;
+  font-weight: $font-weight-semibold;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover .dt-cutsize__toggle-text {
+    text-decoration: underline;
+  }
+}
+
+.dt-cutsize__toggle-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-base;
+  line-height: $line-height-single;
+}
+
+.dt-cutsize__toggle-hint {
+  margin-left: auto;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.dt-cutsize__panel {
+  margin-top: var(--spacer-12);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// ── Presets ────────────────────────────────────────────────────────────────
+
+.dt-cutsize__presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-8);
+  margin: 0 0 var(--spacer-12);
+}
+
+.dt-cutsize__presets-label {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+.dt-cutsize__preset {
+  padding: var(--spacer-4) var(--spacer-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+  color: var(--color-cyan);
+  font: inherit;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-cyan);
+    background-color: color-mix(in oklab, var(--color-cyan) 12%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+// ── Rows table ─────────────────────────────────────────────────────────────
+
+.dt-cutsize__table-wrap {
+  overflow-x: auto;
+}
+
+.dt-cutsize__table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: var(--spacer-8);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    padding-bottom: var(--spacer-8);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
+
+// Column widths. Fixed so the roll number, quantity and action columns stay
+// put as rows are added and removed.
+.dt-cutsize__roll-col {
+  width: 52px;
+
+  @include min-breakpoint(mobile) {
+    width: 72px;
+  }
+}
+
+.dt-cutsize__cutqty-col {
+  width: 90px;
+}
+
+.dt-cutsize__action-col {
+  width: 76px;
+}
+
+.dt-cutsize__roll-cell {
+  padding-top: var(--spacer-16);
+  border-right: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+// The roll number is the row-group's heading, not a field.
+.dt-cutsize__roll-num {
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+}
+
+// Separate cuts within a roll, but not after the last one in the group.
+.dt-cutsize__body tr.dt-cutsize__row:not(:last-child) td,
+.dt-cutsize__body tr.dt-cutsize__row:not(:last-child) th {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dt-cutsize__cutqty,
+.dt-cutsize__size,
+.dt-cutsize__unit {
+  padding: var(--spacer-8) var(--spacer-12);
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+  color: var(--color-foreground);
+  font: inherit;
+}
+
+.dt-cutsize__cutqty {
+  width: 60px;
+  font-weight: $font-weight-semibold;
+
+  @include min-breakpoint(mobile) {
+    width: 72px;
+  }
+}
+
+.dt-cutsize__size {
+  width: 80px;
+
+  @include min-breakpoint(mobile) {
+    width: 100px;
+  }
+}
+
+.dt-cutsize__unit-suffix {
+  margin-left: var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+.dt-cutsize__hint {
+  margin: 0 0 var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+// ── Row and group controls ─────────────────────────────────────────────────
+
+.dt-cutsize__actions {
+  display: flex;
+  gap: var(--spacer-8);
+  white-space: nowrap;
+}
+
+.dt-cutsize__addcut,
+.dt-cutsize__remove,
+.dt-cutsize__removegroup {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-md;
+  line-height: $line-height-single;
+  cursor: pointer;
+}
+
+.dt-cutsize__addcut:hover {
+  border-color: var(--color-cyan);
+  color: var(--color-cyan);
+}
+
+.dt-cutsize__remove:hover,
+.dt-cutsize__removegroup:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+// Only worth offering to remove a roll when there is more than one on screen.
+.dt-cutsize__removegroup {
+  display: none;
+  width: 28px;
+  height: 28px;
+  margin-left: var(--spacer-8);
+  vertical-align: middle;
+}
+
+.dt-cutsize--multi .dt-cutsize__removegroup {
+  display: inline-block;
+}
+
+.dt-cutsize__addgroup {
+  padding: var(--spacer-8) var(--spacer-16);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--color-cyan);
+  font: inherit;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-cyan);
+    background-color: color-mix(in oklab, var(--color-cyan) 12%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+// ── Validation and running total ───────────────────────────────────────────
+
+.dt-cutsize__row--invalid .dt-cutsize__size {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-danger) 30%, transparent);
+}
+
+.dt-cutsize__row-error {
+  display: block;
+  margin-top: var(--spacer-4);
+  color: var(--color-danger);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.dt-cutsize__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-8);
+  margin-top: var(--spacer-12);
+}
+
+.dt-cutsize__alloc {
+  margin: 0;
+  color: var(--color-success);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+
+  // The script empties this rather than hiding it when there is nothing to
+  // report, so an empty element must not hold the footer's gap open.
+  &:empty {
+    display: none;
+  }
+
+  &--bad {
+    color: var(--color-danger);
+  }
+}

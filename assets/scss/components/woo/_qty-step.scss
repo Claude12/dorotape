@@ -1,0 +1,81 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Stepped quantity control (assets/js/lib/qty-step.js).
+//
+// Products sold in fives or tens get a locked box with a minus and a plus
+// either side, so an off-step quantity can never be typed. The box itself is
+// readonly, which is why it does not use the shared field styling in
+// base/_forms.scss: a focus ring on a control you cannot type into is a lie.
+
+.quantity:has(.dt-qty-step) {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.dt-qty-step {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 42px;
+  border: 1px solid var(--color-input);
+  background-color: var(--color-surface-2);
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  line-height: $line-height-single;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-surface);
+  }
+
+  &--down {
+    border-right: 0;
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  &--up {
+    border-left: 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+}
+
+.quantity input[type="number"].dt-qty--stepped {
+  width: 72px;
+  height: 42px;
+  border-radius: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+
+  // The value is button-driven, so the browser's own spinner would offer a
+  // second, unstepped way in on some platforms.
+  appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
+// Names the unit above the quantity box, so a bare "3" is unambiguous.
+.dt-qty-label {
+  flex: 0 0 100%;
+  margin-bottom: var(--spacer-4);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.02em;
+}
+
+// Sits outside the button group, on its own line under the control.
+.dt-qty-step__note {
+  flex: 0 0 100%;
+  margin-top: var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
