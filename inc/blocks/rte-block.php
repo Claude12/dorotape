@@ -33,9 +33,13 @@ if ( $dt_background ) {
 if ( $dt_centered ) {
 	$dt_classes .= ' rte-block--centered';
 }
+
+$dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
+$dt_classes .= dorotape_background_shape_class( $dt_shape );
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="container">
 		<div class="rte-block__inner">
 			<div class="rte"><?php echo wp_kses_post( $dt_content ); ?></div>

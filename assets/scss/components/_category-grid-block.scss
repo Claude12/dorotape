@@ -1,0 +1,190 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Category Grid.
+//
+// Follows "Shop by category" in the signed-off homepage design: a header row
+// (heading left, muted intro right) over a grid of category cards, two across
+// on phones and four from desktop. The section carries a magenta glow rising
+// from its bottom-right corner and, optionally, the aurora hairline above it.
+
+.category-grid-block {
+  position: relative;
+  isolation: isolate;
+  // 84px and 116px in the design, which sit between spacer steps.
+  padding: calc(var(--spacer-80) + var(--spacer-4)) 0 var(--spacer-80);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: calc(var(--spacer-112) + var(--spacer-4)) 0 var(--spacer-112);
+  }
+
+  // The glow. A layer behind the content rather than the section's own
+  // background, so the section keeps a flat background-color underneath.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(
+      200% 110% at 95% 95%,
+      color-mix(in oklab, var(--color-magenta) 80%, transparent),
+      var(--color-background) 80%
+    );
+  }
+
+  // With the hairline on, the section stands off the block above by a
+  // margin for the line to sit in. Without it there is nothing to separate,
+  // so the block above's own bottom padding is the gap.
+  &--divider {
+    margin-top: var(--spacer-48);
+
+    @include min-breakpoint(tablet) {
+      margin-top: var(--spacer-64);
+    }
+  }
+
+  // The hairline sits in the middle of the margin above the section, not on
+  // its edge: the design lifts it by half the margin.
+  &__rule {
+    position: absolute;
+    top: calc(-1 * var(--spacer-24));
+    right: 0;
+    left: 0;
+
+    @include min-breakpoint(tablet) {
+      top: calc(-1 * var(--spacer-32));
+    }
+  }
+
+  // ── Header row ─────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--spacer-16);
+    margin-bottom: var(--spacer-48);
+  }
+
+  &__heading {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    max-width: 24rem;
+    margin: 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    line-height: $line-height-sm;
+  }
+
+  // ── Grid ───────────────────────────────────────────────────────────────
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacer-16);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(tablet) {
+      gap: var(--spacer-20);
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__item {
+    display: flex;
+  }
+
+  // The whole card is the link.
+  &__card {
+    @include aurora-ring;
+
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include aurora-ring-visible;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: transform var(--transition-md);
+
+    @include min-breakpoint(tablet) {
+      height: 208px;
+    }
+  }
+
+  &__image--empty {
+    background-color: var(--color-surface-2);
+  }
+
+  &__card:hover &__image,
+  &__card:focus-visible &__image {
+    transform: scale(1.05);
+  }
+
+  &__body {
+    position: relative;
+    padding: var(--spacer-16);
+
+    @include min-breakpoint(tablet) {
+      padding: var(--spacer-20);
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $font-size-sm;
+    line-height: $line-height-sm;
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-base;
+      line-height: $line-height-base;
+    }
+  }
+
+  &__button {
+    display: inline-block;
+    margin-top: var(--spacer-12);
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  &__card:hover &__button,
+  &__card:focus-visible &__button {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}

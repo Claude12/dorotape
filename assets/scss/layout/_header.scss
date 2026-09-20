@@ -28,35 +28,35 @@
 // than a JS measurement, so the hero is in place on first paint instead of
 // jumping up once a script runs. Keep these in step with the row heights
 // below: main 80px, utility 36px + 1px border from tablet, category row
-// 48px + 1px border from xl, plus the header's own 1px bottom border.
+// 48px + 1px border from xl. The header's own bottom edge is a shadow and
+// takes no space.
 :root {
-  --site-header-height: 81px;
+  --site-header-height: 80px;
 
   @include min-breakpoint(tablet) {
-    --site-header-height: 118px;
+    --site-header-height: 117px;
   }
 
   @include min-breakpoint(xl) {
-    --site-header-height: 167px;
+    --site-header-height: 166px;
   }
 }
 
-// The bottom border is always there, transparent until the page scrolls. The
-// design adds the border only once solid, which is harmless under its fixed
-// header but would nudge every page down by 1px under a sticky one.
 .site-header {
   position: sticky;
   top: 0;
   z-index: z(header);
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--transition);
+  box-shadow: 0 1px 0 transparent;
+  transition: box-shadow var(--transition);
 }
 
 // Set once the page scrolls past 40px, the design's threshold. At the top of
 // a page the header reads as part of the hero; once content runs under it,
-// it gets an edge to sit on.
+// it gets an edge to sit on. The design adds a border here, which is harmless
+// under its fixed header; under a sticky one a border would push the page
+// down 1px, so this draws the same line as a shadow just below the header.
 .site-header.is-solid {
-  border-bottom-color: color-mix(in oklab, var(--color-border) 60%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--color-border) 60%, transparent);
 }
 
 // Solid once scrolled, so page content does not show through it.
@@ -362,7 +362,9 @@
   }
 }
 
-.site-header__search .dgwt-wcas-search-submit svg.dgwt-wcas-ico-magnifier {
+// Mirrors pirx's own `.dgwt-wcas-sf-wrapp button.dgwt-wcas-search-submit svg`
+// chain, which sets 18px and would otherwise outrank this.
+.site-header__search .dgwt-wcas-sf-wrapp button.dgwt-wcas-search-submit svg.dgwt-wcas-ico-magnifier {
   width: 16px;
   height: 16px;
 }

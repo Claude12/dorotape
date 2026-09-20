@@ -1,0 +1,63 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// USP strip, from UspStrip.tsx in the signed-off internal pages design.
+// One row of promises on desktop, two columns on tablet, stacked on phones.
+//
+// The design has two treatments: banded, where the strip sits on the surface
+// tone between two hairlines, and plain, where it sits straight on the page
+// canvas (the About page uses plain, between two aurora rules). That is the
+// `plain` toggle rather than two blocks.
+
+.usp-strip-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-32) 0;
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  background-color: color-mix(in oklab, var(--color-surface) 30%, transparent);
+  color: var(--color-foreground);
+
+  &--plain {
+    border-top: 0;
+    border-bottom: 0;
+    background-color: var(--color-background);
+  }
+
+  &__list {
+    display: grid;
+    gap: var(--spacer-24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--spacer-24);
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-12);
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--color-cyan);
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-snug;
+  }
+}

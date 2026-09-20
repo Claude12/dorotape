@@ -58,12 +58,26 @@ $font-size-xl: $font-size-24;
 // 390px phone and the large size where the design reaches it. A plain vw
 // clamp got there far too late (46px against the design's 60px at 768).
 $font-size-2xl: clamp(30px, 11.43px + 4.76vw, 48px); // large section heading: 30 at 390, 48 at 768 (text-3xl -> text-5xl)
-$font-size-3xl: clamp(36px, 13.86px + 5.68vw, 72px); // hero heading: 36 at 390, 57 at 768, 72 at 1024 (text-4xl -> text-7xl)
+// Hero heading: 36 at 390, 60 at 768, 72 at 1024 (text-4xl, sm:text-6xl,
+// lg:text-7xl). Two ramps that meet at 768; min() takes the first below it
+// and the second above, so one straight ramp no longer undershoots 768.
+$font-size-3xl: clamp(36px, min(11.2381px + 6.3492vw, 24px + 4.6875vw), 72px);
+
+// Internal page banner heading. Deliberately one step below the hero at every
+// stop: 36 at 390, 48 at 768, 60 at 1024 (text-4xl, sm:text-5xl, lg:text-6xl
+// against the hero's text-4xl, sm:text-6xl, lg:text-7xl). The design keeps an
+// internal page from competing with the homepage, so this cannot reuse
+// $font-size-3xl. Two ramps meeting at 768 as above, but this one is the
+// shallower of the pair below 768, so it takes max() where the hero takes min().
+$font-size-internal-banner: clamp(36px, max(23.619px + 3.1746vw, 12px + 4.6875vw), 60px);
 
 // Every ACF flexible-content block's own section heading uses this one
 // size. Consistency across blocks outranks per-block design fidelity here
 // Don't give a block its own bespoke heading clamp, change this token.
-$font-size-block-heading: clamp(24px, 3vw, 36px);
+//
+// Anchored like the tiers above, on the design's most common section heading
+// (text-3xl md:text-4xl): 30 at a 390px phone, 36 from 768.
+$font-size-block-heading: clamp(30px, 23.8095px + 1.5873vw, 36px);
 
 // Font weights, named as Tailwind names them (font-extrabold is 800). The
 // design leans heavy: headings are 800 and even body labels sit at 600-700.
@@ -80,6 +94,7 @@ $line-height-display: 1.05; // large display headings only
 $line-height-hero: 1.03; // the hero heading, leading-[1.03] in the design
 $line-height-tight: 1.25; // headings
 $line-height-snug: 1.4;
+$line-height-leading-snug: 1.375; // Tailwind leading-snug, the testimonial quote from tablet; $line-height-snug above pre-dates the design
 $line-height-base: 1.5; // body copy
 $line-height-relaxed: 1.625;
 
@@ -95,11 +110,16 @@ $line-height-xl: math.div(32, 24); // text-2xl
 $line-height-30: math.div(36, 30); // text-3xl
 $line-height-36: math.div(40, 36); // text-4xl; text-5xl and up use $line-height-single
 
+// Partner to $font-size-block-heading, on the same ramp: text-3xl's 36px
+// line at 390, text-4xl's 40px from 768.
+$line-height-block-heading: clamp(36px, 31.873px + 1.0582vw, 40px);
+
 // Letter spacing
 $letter-spacing-wide: 0.025em; // tracking-wide, the 50/50 eyebrow chip
 $letter-spacing-label: 0.08em; // uppercase WooCommerce labels, pre-dates the design
 $letter-spacing-caps: 0.18em; // footer column headings, tracking-[0.18em]
 $letter-spacing-widest: 0.2em; // the hero eyebrow chip, tracking-[0.2em]
+$letter-spacing-ultra: 0.25em; // the trust bar label, tracking-[0.25em]
 $letter-spacing-tight: -0.02em; // headings, the design sets this on h1-h3
 
 body {

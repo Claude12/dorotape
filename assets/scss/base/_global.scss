@@ -52,6 +52,17 @@
   --color-warning: #{$color-warning};
   --color-danger: #{$color-danger};
   --color-info: #{$color-info};
+  // The shard hue and chroma scale the six --color-shard-* values read; the
+  // testimonial block overrides this pair to re-tint the whole set.
+  --shard-hue: #{$shard-hue-magenta};
+  --shard-chroma: #{$shard-chroma-magenta};
+  --color-shard-1: #{$color-shard-1};
+  --color-shard-2: #{$color-shard-2};
+  --color-shard-3: #{$color-shard-3};
+  --color-shard-4: #{$color-shard-4};
+  --color-shard-5: #{$color-shard-5};
+  --color-shard-6: #{$color-shard-6};
+  --color-vignette: #{$color-vignette};
 
   // Signature gradients
   --gradient-aurora: #{$gradient-aurora};
@@ -94,6 +105,7 @@
   // Motion
   --transition-fast: #{$transition-fast};
   --transition: #{$transition};
+  --transition-md: #{$transition-md};
   --transition-slow: #{$transition-slow};
 
   // Exposed for JS only. See the note above.

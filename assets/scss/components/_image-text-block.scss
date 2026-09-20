@@ -87,21 +87,14 @@
     letter-spacing: $letter-spacing-wide;
   }
 
-  // The design's own steps (text-3xl md:text-5xl) rather than the shared
-  // $font-size-block-heading, which tops out at 36px against the design's 48.
-  // Open question with the team: see the audit notes.
+  // The shared block heading size rather than the design's text-3xl/5xl
+  // steps: every block's section heading is the same size (decided
+  // 2026-09-16, consistency over per-block fidelity).
   &__heading {
     margin: var(--spacer-20) 0 0;
     color: var(--color-foreground);
-    font-size: $font-size-30;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-30;
-    letter-spacing: $letter-spacing-tight;
-
-    @include min-breakpoint(tablet) {
-      font-size: $font-size-48;
-      line-height: $line-height-single;
-    }
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
   }
 
   &__intro {

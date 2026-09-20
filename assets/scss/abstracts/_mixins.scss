@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "variables" as *;
 
 // Media query breakpoints (.cursorrules tiers)
 //
@@ -44,4 +45,48 @@ $breakpoints: (
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+// Aurora ring
+//
+// The design's hover border for cards (`gradient-border-hover`): a 2px
+// layer in the aurora gradient whose middle is masked out, so only a ring
+// shows, following the card's own radius. Include `aurora-ring` on the card
+// and `aurora-ring-visible` in its hover/focus state. The card needs
+// `isolation: isolate` (set here) so the ring's z-index stays inside it.
+//
+// Usage:
+// .card {
+//   @include aurora-ring;
+//
+//   &:hover,
+//   &:focus-visible {
+//     @include aurora-ring-visible;
+//   }
+// }
+@mixin aurora-ring {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: z(base);
+    padding: 2px;
+    border-radius: inherit;
+    background-image: var(--gradient-aurora);
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+@mixin aurora-ring-visible {
+  &::before {
+    opacity: 1;
+  }
 }

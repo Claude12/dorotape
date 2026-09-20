@@ -1,0 +1,152 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// CTA Cards.
+//
+// Follows the three signpost cards in the signed-off homepage design
+// (Applications, Sustainability, Support): image over title, sentence and a
+// "Learn more" label. Stacked on phones, three across from tablet, every
+// card in a row the same height with its label pinned to the bottom.
+
+.cta-cards-block {
+  padding: var(--spacer-64) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(desktop) {
+    padding: var(--spacer-96) 0;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(tablet) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__item {
+    display: flex;
+  }
+
+  &__card {
+    @include aurora-ring;
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  a#{&}__card:hover,
+  a#{&}__card:focus-visible {
+    @include aurora-ring-visible;
+  }
+
+  &__media {
+    position: relative;
+    height: 192px;
+    overflow: hidden;
+
+    @include min-breakpoint(tablet) {
+      height: 224px;
+    }
+
+    @include min-breakpoint(desktop) {
+      height: 256px;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  &__image--empty {
+    background-color: var(--color-surface-2);
+  }
+
+  a#{&}__card:hover #{&}__image,
+  a#{&}__card:focus-visible #{&}__image {
+    transform: scale(1.05);
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--spacer-24);
+
+    @include min-breakpoint(desktop) {
+      padding: var(--spacer-32);
+    }
+  }
+
+  &__title {
+    margin: 0 0 var(--spacer-8);
+    color: var(--color-foreground);
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xl;
+
+    @include min-breakpoint(desktop) {
+      font-size: $font-size-30;
+      line-height: $line-height-30;
+    }
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+
+    @include min-breakpoint(desktop) {
+      font-size: $font-size-base;
+    }
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: var(--spacer-8);
+    margin-top: var(--spacer-16);
+    color: var(--color-cyan);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    transition: color var(--transition-fast);
+  }
+
+  &__arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  &__card:hover &__label,
+  &__card:focus-visible &__label {
+    color: var(--color-magenta);
+  }
+
+  &__card:hover &__arrow,
+  &__card:focus-visible &__arrow {
+    transform: translateX(var(--spacer-4));
+  }
+}

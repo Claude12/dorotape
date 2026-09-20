@@ -1,0 +1,197 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// "Our experts" grid, from the About page in the signed-off internal pages
+// design. Cards share the signature 20px radius, the surface fill and the
+// aurora ring on hover with every other card on the site.
+//
+// The bio stretches so the contact row sits on the same line across a row of
+// cards however long the biographies are.
+
+.team-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--spacer-24);
+    margin-bottom: var(--spacer-48);
+
+    @include min-breakpoint(tablet) {
+      margin-bottom: var(--spacer-64);
+    }
+  }
+
+  &__header-lead {
+    max-width: 42rem;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    margin: 0 0 var(--spacer-20);
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(wide) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__card {
+    @include aurora-ring;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+  }
+
+  &__photo {
+    display: block;
+    width: 100%;
+    height: 224px;
+    object-fit: cover;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: var(--spacer-24);
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-snug;
+  }
+
+  &__role {
+    margin: var(--spacer-6) 0 0;
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__bio {
+    flex: 1;
+    margin: var(--spacer-16) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  &__contact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-12);
+    margin-top: var(--spacer-20);
+  }
+
+  &__email {
+    // Same 24px target rule as the banner breadcrumb: a card action on its own
+    // line, so the line box alone leaves it at 21px.
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--spacer-24);
+    gap: var(--spacer-6);
+    color: var(--color-cyan);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+
+    &:hover .team-block__arrow,
+    &:focus-visible .team-block__arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  &__arrow {
+    width: 14px;
+    height: 14px;
+    transition: transform $transition-fast ease;
+  }
+
+  &__linkedin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-left: auto;
+    border-radius: var(--radius-md);
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    transition: background-color $transition-fast ease;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-cyan);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__arrow {
+      transition: none;
+    }
+  }
+}

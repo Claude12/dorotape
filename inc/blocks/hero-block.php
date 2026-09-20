@@ -44,10 +44,14 @@ if ( $dt_is_first ) {
 	$dt_classes .= ' hero-block--overlap';
 }
 
+$dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
+$dt_classes .= dorotape_background_shape_class( $dt_shape );
+
 $dt_stats = is_array( $dt_stats ) ? $dt_stats : array();
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>">
+	<?php dorotape_background_shape( $dt_shape ); ?>
 
 	<?php if ( ! empty( $dt_background['ID'] ) ) : ?>
 		<div class="hero-block__backdrop" aria-hidden="true">

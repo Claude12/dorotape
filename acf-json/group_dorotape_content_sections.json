@@ -212,6 +212,354 @@
                                     "append": ""
                                 }
                             ]
+                        },
+                        {
+                            "key": "field_dthero000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtbanr000001": {
+                    "key": "layout_dtbanr000001",
+                    "name": "internal_banner_block",
+                    "label": "Internal banner",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtbanr000101",
+                            "label": "Background image",
+                            "name": "background_image",
+                            "aria-label": "",
+                            "type": "image",
+                            "instructions": "Optional texture behind the banner. The magenta wash and the fade into the next section are drawn either way, so leaving this empty is a valid choice.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "library": "all",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "",
+                            "allow_in_bindings": 0,
+                            "preview_size": "medium"
+                        },
+                        {
+                            "key": "field_dtbanr000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals above the heading, with a magenta dot.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtbanr000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "The page title. Rendered as the H1 when the banner is the first section on the page.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtbanr000104",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "One or two sentences under the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtbanr000105",
+                            "label": "Show breadcrumb",
+                            "name": "breadcrumb",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Home, any parent pages, then this page. Built from the page's own position in the menu structure.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtbanr000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtusps000001": {
+                    "key": "layout_dtusps000001",
+                    "name": "usp_strip_block",
+                    "label": "USP strip",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtusps000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtusps000102",
+                            "label": "No band",
+                            "name": "plain",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Drop the surface tint and the hairlines above and below, so the row sits straight on the page background. Use this when the strip already sits between two aurora lines.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtusps000103",
+                            "label": "Promises",
+                            "name": "items",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "One row per promise. Rows without a label are skipped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 6,
+                            "collapsed": "field_dtusps000105",
+                            "button_label": "Add promise",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtusps000104",
+                                    "label": "Icon",
+                                    "name": "icon",
+                                    "aria-label": "",
+                                    "type": "select",
+                                    "instructions": "Outline icon shown before the label.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "30",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "truck": "Delivery van",
+                                        "lightbulb": "Lightbulb",
+                                        "calendar": "Calendar",
+                                        "swatch": "Swatch book",
+                                        "globe": "Globe",
+                                        "shield": "Shield",
+                                        "award": "Award"
+                                    },
+                                    "default_value": false,
+                                    "return_format": "value",
+                                    "multiple": 0,
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 0,
+                                    "ajax": 0,
+                                    "placeholder": "",
+                                    "create_options": 0,
+                                    "save_options": 0
+                                },
+                                {
+                                    "key": "field_dtusps000105",
+                                    "label": "Label",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Keep it to a few words so the row stays on one line.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "70",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtusps000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
                         }
                     ],
                     "min": "",
@@ -426,6 +774,2673 @@
                                     "allow_in_bindings": 0
                                 }
                             ]
+                        },
+                        {
+                            "key": "field_dt5050000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dticol000001": {
+                    "key": "layout_dticol000001",
+                    "name": "intro_columns_block",
+                    "label": "Intro columns",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dticol000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dticol000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dticol000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dticol000104",
+                            "label": "Standfirst",
+                            "name": "lead",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "The bolder opening sentence, under the heading in the left column.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dticol000105",
+                            "label": "Body copy",
+                            "name": "text",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "The longer text, in the right column.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "allow_in_bindings": 0,
+                            "tabs": "all",
+                            "toolbar": "basic",
+                            "media_upload": 0,
+                            "delay": 0
+                        },
+                        {
+                            "key": "field_dticol000106",
+                            "label": "Link",
+                            "name": "link",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "Optional underlined link below the body copy. Point it at an anchor such as #experts to jump further down this page.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dticol000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtcatg000001": {
+                    "key": "layout_dtcatg000001",
+                    "name": "category_grid_block",
+                    "label": "Category Grid",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtcatg000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtcatg000102",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Section heading. Leave empty to hide the whole header.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcatg000104",
+                            "label": "Button label",
+                            "name": "button_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Label on the arrow button that sits on every card, e.g. \"Browse\". Leave empty for the arrow alone.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcatg000103",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "One or two lines under the heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcatg000105",
+                            "label": "Categories",
+                            "name": "categories",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one card. Rows without a category are skipped. The first card is shown larger on desktop.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 8,
+                            "collapsed": "field_dtcatg000107",
+                            "button_label": "Add category",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtcatg000106",
+                                    "label": "Category",
+                                    "name": "category",
+                                    "aria-label": "",
+                                    "type": "taxonomy",
+                                    "instructions": "The product category this card links to.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "34",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "taxonomy": "product_cat",
+                                    "add_term": 0,
+                                    "save_terms": 0,
+                                    "load_terms": 0,
+                                    "return_format": "id",
+                                    "field_type": "select",
+                                    "allow_in_bindings": 0,
+                                    "bidirectional": 0,
+                                    "multiple": 0,
+                                    "allow_null": 1,
+                                    "bidirectional_target": []
+                                },
+                                {
+                                    "key": "field_dtcatg000107",
+                                    "label": "Card title",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Overrides the category name on the card. Leave empty to use the category name.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtcatg000108",
+                                    "label": "Image",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Shown behind the card title, cropped to fill.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtcatg000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dttrst000001": {
+                    "key": "layout_dttrst000001",
+                    "name": "trust_bar_block",
+                    "label": "Trust Bar",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dttrst000100",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dttrst000101",
+                            "label": "Label",
+                            "name": "label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Short line above the logos, e.g. \"Trusted by\". Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dttrst000102",
+                            "label": "Logos",
+                            "name": "logos",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one logo. Rows without an image are skipped. The strip scrolls on its own and pauses on hover.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "table",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": "",
+                            "collapsed": "",
+                            "button_label": "Add logo",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dttrst000103",
+                                    "label": "Logo",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Transparent PNG or SVG. Logos are shown at a set height.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "34",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_dttrst000104",
+                                    "label": "Brand name",
+                                    "name": "name",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Used as the image alt text and as the tooltip.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dttrst000105",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. Leave empty for a logo that does not link anywhere.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dttrst000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dttest000001": {
+                    "key": "layout_dttest000001",
+                    "name": "testimonial_block",
+                    "label": "Testimonials",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dttest000100",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dttest000101",
+                            "label": "Quotes",
+                            "name": "quotes",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one quote. Rows without quote text are skipped. With more than one row the block rotates through them.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": "",
+                            "collapsed": "field_dttest000103",
+                            "button_label": "Add quote",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dttest000102",
+                                    "label": "Quote",
+                                    "name": "text",
+                                    "aria-label": "",
+                                    "type": "textarea",
+                                    "instructions": "The quote itself, without quotation marks.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "rows": 4,
+                                    "placeholder": "",
+                                    "new_lines": ""
+                                },
+                                {
+                                    "key": "field_dttest000103",
+                                    "label": "Name",
+                                    "name": "name",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Who said it.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "34",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dttest000104",
+                                    "label": "Role",
+                                    "name": "role",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Their job title. Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dttest000105",
+                                    "label": "Company",
+                                    "name": "company",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Their company. Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dttest000110",
+                            "label": "Shard colour",
+                            "name": "shard_colour",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Colour of the faceted shards behind the quote. \"Aurora mix\" fans the shards across all three brand colours.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "Magenta (default)",
+                                "indigo": "Indigo",
+                                "cyan": "Cyan",
+                                "aurora": "Aurora mix"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dttest000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtprow000001": {
+                    "key": "layout_dtprow000001",
+                    "name": "product_row_block",
+                    "label": "Product Row",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtprow000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtprow000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small line above the heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtprow000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Section heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtprow000104",
+                            "label": "View all link",
+                            "name": "link",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "Button to the right of the heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dtprow000105",
+                            "label": "Products",
+                            "name": "source",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "How the row picks its products.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "newest": "Newest",
+                                "featured": "Featured",
+                                "on_sale": "On sale",
+                                "best_selling": "Best selling",
+                                "manual": "Hand-picked"
+                            },
+                            "default_value": "newest",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dtprow000106",
+                            "label": "How many",
+                            "name": "count",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Number of products to show. Ignored for hand-picked rows.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": 8,
+                            "min": 1,
+                            "max": 24,
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": 1,
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtprow000107",
+                            "label": "Hand-picked products",
+                            "name": "products",
+                            "aria-label": "",
+                            "type": "relationship",
+                            "instructions": "Used only when Products is set to \"Hand-picked\". Drag to reorder.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "post_type": [
+                                "product"
+                            ],
+                            "post_status": [],
+                            "taxonomy": [],
+                            "filters": [
+                                "search"
+                            ],
+                            "return_format": "id",
+                            "min": "",
+                            "max": 24,
+                            "allow_in_bindings": 0,
+                            "elements": [
+                                "featured_image"
+                            ],
+                            "bidirectional": 0,
+                            "bidirectional_target": []
+                        },
+                        {
+                            "key": "field_dtprow000108",
+                            "label": "Badge",
+                            "name": "badge",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Corner label on every card, e.g. \"New\". A product on sale shows its own discount instead. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtprow000109",
+                            "label": "Hover button",
+                            "name": "hover_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Label on the button that appears over a card on hover, e.g. \"Quick view\". Leave empty for the arrow alone.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtprow000111",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtctac000001": {
+                    "key": "layout_dtctac000001",
+                    "name": "cta_cards_block",
+                    "label": "CTA Cards",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtctac000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtctac000102",
+                            "label": "Cards",
+                            "name": "cards",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one card. Rows without a title are skipped. Two or three cards sit side by side on desktop.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 4,
+                            "collapsed": "field_dtctac000104",
+                            "button_label": "Add card",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtctac000103",
+                                    "label": "Image",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Shown behind the card, cropped to fill and darkened.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_dtctac000104",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Card heading.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtctac000105",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "Where the card goes. The link label is used on the button.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_dtctac000106",
+                                    "label": "Text",
+                                    "name": "text",
+                                    "aria-label": "",
+                                    "type": "textarea",
+                                    "instructions": "One or two lines under the title. Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "rows": 3,
+                                    "placeholder": "",
+                                    "new_lines": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtctac000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtcase000001": {
+                    "key": "layout_dtcase000001",
+                    "name": "case_studies_block",
+                    "label": "Case Studies",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtcase000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtcase000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small line above the heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcase000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Section heading. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcase000104",
+                            "label": "Projects",
+                            "name": "projects",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one tile. Rows without a title are skipped. Tiles are laid out in a mosaic, so a wide tile takes two columns.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": "",
+                            "collapsed": "field_dtcase000107",
+                            "button_label": "Add project",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtcase000105",
+                                    "label": "Image",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Shown behind the tile, cropped to fill.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_dtcase000106",
+                                    "label": "Category",
+                                    "name": "category",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Small label above the title, e.g. \"Broadcast\".",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtcase000107",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Project name.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtcase000108",
+                                    "label": "Wide tile",
+                                    "name": "wide",
+                                    "aria-label": "",
+                                    "type": "true_false",
+                                    "instructions": "Make this tile span two columns on desktop.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "message": "",
+                                    "default_value": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 1,
+                                    "ui_on_text": "",
+                                    "ui_off_text": ""
+                                },
+                                {
+                                    "key": "field_dtcase000109",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. Leave empty for a tile that does not link anywhere.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtcase000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dttimg000001": {
+                    "key": "layout_dttimg000001",
+                    "name": "text_image_block",
+                    "label": "Text + Image",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dttimg000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dttimg000102",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Section heading. Line breaks are kept, so you can control where it wraps. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dttimg000103",
+                            "label": "Text",
+                            "name": "text",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "Body copy beside the image.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "allow_in_bindings": 0,
+                            "tabs": "all",
+                            "toolbar": "basic",
+                            "media_upload": 0,
+                            "delay": 0
+                        },
+                        {
+                            "key": "field_dttimg000104",
+                            "label": "Button",
+                            "name": "button",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "Solid button under the text. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dttimg000107",
+                            "label": "Second button",
+                            "name": "button_secondary",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "Optional, shown beside the first in the outline style. A mailto: address gets an envelope icon instead of the arrow.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dttimg000105",
+                            "label": "Image side",
+                            "name": "image_side",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Which side the image sits on at desktop width. On phones the image always follows the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "right": "Right",
+                                "left": "Left"
+                            },
+                            "default_value": "right",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dttimg000106",
+                            "label": "Image",
+                            "name": "image",
+                            "aria-label": "",
+                            "type": "image",
+                            "instructions": "Shown beside the text, cropped to fill.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "library": "all",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "",
+                            "allow_in_bindings": 0,
+                            "preview_size": "medium"
+                        },
+                        {
+                            "key": "field_dttimg000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtmdbd000001": {
+                    "key": "layout_dtmdbd000001",
+                    "name": "media_band_block",
+                    "label": "Image band",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtmdbd000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtmdbd000102",
+                            "label": "Image",
+                            "name": "image",
+                            "aria-label": "",
+                            "type": "image",
+                            "instructions": "Shown full container width and cropped to a strip, so use a wide photo. At least 1600px across.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "library": "all",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "",
+                            "allow_in_bindings": 0,
+                            "preview_size": "medium"
+                        },
+                        {
+                            "key": "field_dtmdbd000103",
+                            "label": "Taller crop",
+                            "name": "tall",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "480px instead of 384px from tablet up.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtmdbd000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dttagl000001": {
+                    "key": "layout_dttagl000001",
+                    "name": "tag_list_block",
+                    "label": "Tag list",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dttagl000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dttagl000102",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dttagl000103",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Optional, under the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dttagl000104",
+                            "label": "Tags",
+                            "name": "tags",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "One row per pill. A row with no link still shows, as plain text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": "",
+                            "collapsed": "field_dttagl000105",
+                            "button_label": "Add tag",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dttagl000105",
+                                    "label": "Label",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "40",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dttagl000106",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "60",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "allow_in_bindings": 0
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dttagl000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtvdeo000001": {
+                    "key": "layout_dtvdeo000001",
+                    "name": "video_block",
+                    "label": "Video",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtvdeo000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtvdeo000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtvdeo000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtvdeo000104",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Sits to the right of the heading on desktop.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtvdeo000105",
+                            "label": "Video URL",
+                            "name": "video_url",
+                            "aria-label": "",
+                            "type": "url",
+                            "instructions": "Paste the address of the video page itself, for example the youtube.com/watch link. WordPress turns it into the player.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": ""
+                        },
+                        {
+                            "key": "field_dtvdeo000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtteam000001": {
+                    "key": "layout_dtteam000001",
+                    "name": "team_block",
+                    "label": "Team",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtteam000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtteam000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtteam000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtteam000104",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Sits to the right of the heading on desktop.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtteam000105",
+                            "label": "Anchor",
+                            "name": "anchor",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Optional id for this section, so a link elsewhere on the page can jump to it. \"experts\" becomes #experts.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtteam000106",
+                            "label": "People",
+                            "name": "members",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "One row per person. Rows without a name are skipped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": "",
+                            "collapsed": "field_dtteam000108",
+                            "button_label": "Add person",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtteam000107",
+                                    "label": "Photo",
+                                    "name": "image",
+                                    "aria-label": "",
+                                    "type": "image",
+                                    "instructions": "Cropped to a 224px tall band, so centre the face. At least 640px across.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "library": "all",
+                                    "min_width": "",
+                                    "min_height": "",
+                                    "min_size": "",
+                                    "max_width": "",
+                                    "max_height": "",
+                                    "max_size": "",
+                                    "mime_types": "",
+                                    "allow_in_bindings": 0,
+                                    "preview_size": "medium"
+                                },
+                                {
+                                    "key": "field_dtteam000108",
+                                    "label": "Name",
+                                    "name": "name",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtteam000109",
+                                    "label": "Role",
+                                    "name": "role",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Shown in cyan capitals under the name.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtteam000110",
+                                    "label": "Email",
+                                    "name": "email",
+                                    "aria-label": "",
+                                    "type": "email",
+                                    "instructions": "Optional. Shows an \"Email {name}\" link.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtteam000111",
+                                    "label": "Bio",
+                                    "name": "bio",
+                                    "aria-label": "",
+                                    "type": "textarea",
+                                    "instructions": "Two or three lines. Cards in a row line their contact details up however long the bios are.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "rows": 4,
+                                    "placeholder": "",
+                                    "new_lines": ""
+                                },
+                                {
+                                    "key": "field_dtteam000112",
+                                    "label": "LinkedIn",
+                                    "name": "linkedin",
+                                    "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. Shows the LinkedIn badge.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtteam000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtrnow000001": {
+                    "key": "layout_dtrnow000001",
+                    "name": "right_now_block",
+                    "label": "Right Now",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtrnow000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtrnow000102",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Heading over the updates column. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtrnow000103",
+                            "label": "Offers heading",
+                            "name": "offers_heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Heading over the offers column. Leave empty to hide.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtrnow000104",
+                            "label": "Updates",
+                            "name": "items",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one update in the left-hand column. Rows without a title are skipped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 5,
+                            "collapsed": "field_dtrnow000106",
+                            "button_label": "Add update",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtrnow000105",
+                                    "label": "Label",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Small tag on the row, e.g. \"News\".",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "34",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtrnow000106",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "The update itself.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtrnow000107",
+                                    "label": "Date",
+                                    "name": "date",
+                                    "aria-label": "",
+                                    "type": "date_picker",
+                                    "instructions": "Shown under the title. Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "33",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "display_format": "j F Y",
+                                    "return_format": "j F Y",
+                                    "first_day": 1,
+                                    "allow_in_bindings": 0
+                                },
+                                {
+                                    "key": "field_dtrnow000108",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. Leave empty for a row that does not link anywhere.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtrnow000109",
+                            "label": "Offers",
+                            "name": "offers",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one offer in the right-hand column. Rows without a title are skipped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 5,
+                            "collapsed": "field_dtrnow000110",
+                            "button_label": "Add offer",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtrnow000110",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "The offer itself.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtrnow000111",
+                                    "label": "Detail",
+                                    "name": "detail",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Terms or dates under the title. Optional.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtrnow000112",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. Leave empty for a row that does not link anywhere.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtrnow000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
                         }
                     ],
                     "min": "",
@@ -509,6 +3524,38 @@
                             "ui": 1,
                             "ui_on_text": "",
                             "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtrte000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
                         }
                     ],
                     "min": "",
@@ -538,5 +3585,5 @@
     "active": true,
     "description": "Flexible content blocks for pages. Layout name maps to inc/blocks/{name}.php.",
     "show_in_rest": 0,
-    "modified": 1789579935
+    "modified": 1789894888
 }

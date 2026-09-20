@@ -83,5 +83,33 @@ $gradient-aurora-soft: linear-gradient(
 );
 $gradient-line: linear-gradient(90deg, transparent, #{$color-magenta}, #{$color-cyan}, transparent);
 
+// Testimonial shard art: the six translucent panes behind the quote, and the
+// near-black vignette laid over them to keep the text legible. The design
+// gives these as rgba(); they are converted to oklch here to sit with the rest
+// of the palette, alphas unchanged.
+//
+// The hue and the chroma scale are left as custom properties so the whole set
+// re-tints from one pair of values. --shard-hue / --shard-chroma default to
+// the design's magenta in base/_global.scss; the testimonial block's colour
+// select overrides them per section. Only lightness and alpha, which give the
+// shards their depth, are fixed per pane.
+$color-shard-1: oklch(0.393 calc(0.144 * var(--shard-chroma)) var(--shard-hue) / 55%);
+$color-shard-2: oklch(0.599 calc(0.213 * var(--shard-chroma)) var(--shard-hue) / 35%);
+$color-shard-3: oklch(0.73 calc(0.194 * var(--shard-chroma)) var(--shard-hue) / 22%);
+$color-shard-4: oklch(0.511 calc(0.19 * var(--shard-chroma)) var(--shard-hue) / 45%);
+$color-shard-5: oklch(0.279 calc(0.101 * var(--shard-chroma)) var(--shard-hue) / 60%);
+$color-shard-6: oklch(0.644 calc(0.213 * var(--shard-chroma)) var(--shard-hue) / 28%);
+$color-vignette: oklch(0.171 0.01 285.3);
+
+// The three hues the shards can take, with the chroma scale that keeps each
+// one inside its own gamut: magenta is the palette's most saturated hue, so
+// indigo and cyan are scaled down from it rather than pushed to match.
+$shard-hue-magenta: 352.4;
+$shard-hue-indigo: 285;
+$shard-hue-cyan: 236.5;
+$shard-chroma-magenta: 1;
+$shard-chroma-indigo: 0.4;
+$shard-chroma-cyan: 0.69;
+
 // Magenta bloom under raised/hover cards
 $shadow-glow: 0 24px 70px -30px color-mix(in oklab, #{$color-magenta} 70%, transparent);

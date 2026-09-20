@@ -1,0 +1,81 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Trust Bar.
+//
+// Follows "Brands you can trust" in the signed-off homepage design: a small
+// uppercase label over a centred, wrapping row of brand logos, ruled above
+// and below.
+
+.trust-bar-block {
+  padding: var(--spacer-48) 0;
+  border-block: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  &__label {
+    margin: 0 0 var(--spacer-32);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xs;
+    letter-spacing: $letter-spacing-ultra;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacer-24) var(--spacer-32);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(tablet) {
+      column-gap: var(--spacer-48);
+    }
+
+    @include min-breakpoint(desktop) {
+      column-gap: var(--spacer-64);
+    }
+  }
+
+  &__item {
+    display: flex;
+  }
+
+  &__link {
+    display: flex;
+  }
+
+  // The logos are white on black. Screening them onto the page drops the
+  // black out, leaving only the wordmark.
+  &__image {
+    display: block;
+    width: auto;
+    height: 56px;
+    object-fit: contain;
+    opacity: 0.9;
+    filter: grayscale(1);
+    mix-blend-mode: screen;
+    transition: opacity var(--transition), filter var(--transition);
+
+    @include min-breakpoint(tablet) {
+      height: 80px;
+    }
+
+    &:hover {
+      opacity: 1;
+      filter: none;
+    }
+  }
+
+  &__link:focus-visible &__image {
+    opacity: 1;
+    filter: none;
+  }
+}

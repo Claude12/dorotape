@@ -1,0 +1,76 @@
+@use "abstracts/mixins" as *;
+
+// Background shape.
+//
+// The two line motifs the internals-pages design puts behind its sections
+// (inc/background-shape.php): the isometric cube lattice and the low-poly
+// triangle mesh. Any flexible-content block can carry one, so this is a
+// component of its own rather than part of a block.
+//
+// The wrapper covers the whole section and clips, so the triangles' fixed
+// 620px band cannot push a short section open. Sitting at z-index -1 inside
+// the section's own stacking context puts it over the section background and
+// under its content, with no z-index needed on the content.
+
+.has-background-shape {
+  position: relative;
+  isolation: isolate;
+}
+
+.background-shape {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+
+  &__svg {
+    position: absolute;
+    display: block;
+    width: 62%;
+
+    @include min-breakpoint(tablet) {
+      width: 46%;
+    }
+  }
+
+  // The gradient the motif is stroked with. Classed rather than coloured in
+  // the SVG so the ramp stays in base/_colors.scss.
+  &__stop--magenta {
+    stop-color: var(--color-magenta);
+  }
+
+  &__stop--indigo {
+    stop-color: var(--color-indigo);
+  }
+
+  &__stop--cyan {
+    stop-color: var(--color-cyan);
+  }
+
+  // Cubes repeat, so they take the full height however tall the section is.
+  &--cubes-left &__svg,
+  &--cubes-right &__svg {
+    top: 0;
+    height: 100%;
+  }
+
+  // Triangles are one fixed drawing, so they keep the design's 620px band and
+  // centre in the section.
+  &--triangles-left &__svg,
+  &--triangles-right &__svg {
+    top: 50%;
+    height: 620px;
+    transform: translateY(-50%);
+  }
+
+  &--cubes-left &__svg,
+  &--triangles-left &__svg {
+    left: 0;
+  }
+
+  &--cubes-right &__svg,
+  &--triangles-right &__svg {
+    right: 0;
+  }
+}

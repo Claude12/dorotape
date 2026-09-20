@@ -1,0 +1,102 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Text + Image.
+//
+// Follows "Supplying specialist self-adhesive films" in the signed-off
+// homepage design: heading, body copy and a cyan button beside one large
+// photo. Stacked on phones, text first; two columns from tablet.
+
+.text-image-block {
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__grid {
+    display: grid;
+    align-items: start;
+    gap: var(--spacer-40);
+
+    @include min-breakpoint(tablet) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-56);
+    }
+  }
+
+  // Image on the left from tablet; phones keep the text first either way.
+  &--image-left &__media {
+    @include min-breakpoint(tablet) {
+      order: -1;
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  // The design's paragraphs sit 20px apart, not the rich text's usual 16.
+  &__text {
+    margin-top: var(--spacer-24);
+    font-size: $font-size-sm;
+
+    @include min-breakpoint(tablet) {
+      margin-top: var(--spacer-32);
+      font-size: $font-size-base;
+    }
+
+    p:not(:last-child) {
+      margin-bottom: var(--spacer-20);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacer-12);
+    margin-top: var(--spacer-32);
+  }
+
+  // The shared .btn shape in the design's cyan, turning magenta on hover.
+  &__button {
+    background-color: var(--color-cyan);
+    color: var(--color-background);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background-color: var(--color-magenta);
+      color: var(--color-primary-foreground);
+    }
+  }
+
+  &__arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  &__media {
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 288px;
+    object-fit: cover;
+
+    @include min-breakpoint(tablet) {
+      height: 460px;
+    }
+  }
+}

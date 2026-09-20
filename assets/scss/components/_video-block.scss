@@ -1,0 +1,85 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Video band, from the About page in the signed-off internal pages design.
+// The embed comes back from oEmbed with its own width and height attributes,
+// so the frame forces the aspect ratio and stretches whatever iframe lands
+// inside it rather than trusting the provider's numbers.
+
+.video-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--spacer-24);
+    margin-bottom: var(--spacer-48);
+
+    @include min-breakpoint(tablet) {
+      margin-bottom: var(--spacer-64);
+    }
+  }
+
+  &__header-lead {
+    max-width: 42rem;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    margin: 0 0 var(--spacer-20);
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+  }
+
+  &__frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+
+    iframe,
+    video,
+    embed,
+    object {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+}

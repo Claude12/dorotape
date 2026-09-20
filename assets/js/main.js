@@ -7,6 +7,7 @@ import { initFilterBar } from './lib/filter-bar';
 import { initCutRows } from './lib/cut-size-rows';
 import { initQuickAdd } from './lib/quick-add';
 import { initQtyStep } from './lib/qty-step';
+import { initTestimonials } from './lib/testimonial';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -23,6 +24,7 @@ const features = [
   initCutRows,
   initQuickAdd,
   initQtyStep,
+  initTestimonials,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

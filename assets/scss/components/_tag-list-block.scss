@@ -1,0 +1,69 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Industries band, from the About page in the signed-off internal pages
+// design: pills that wrap freely, each picking up the aurora ring on hover
+// like the cards elsewhere on the site.
+
+.tag-list-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    margin: var(--spacer-16) 0 0;
+    max-width: 42rem;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-12);
+    margin: var(--spacer-40) 0 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(tablet) {
+      gap: var(--spacer-16);
+    }
+  }
+
+  &__tag {
+    display: block;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-pill);
+    padding: var(--spacer-12) var(--spacer-24);
+    background-color: color-mix(in oklab, var(--color-background) 80%, transparent);
+    backdrop-filter: blur(8px);
+    color: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+  }
+
+  &__tag--link {
+    @include aurora-ring;
+
+    transition: color $transition-fast ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-cyan);
+    }
+  }
+}

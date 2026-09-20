@@ -1,0 +1,237 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Product Row.
+//
+// Follows the product rows in the signed-off homepage design ("New
+// products", "Most popular this season"): eyebrow, heading and a "View all"
+// link over a strip of product cards that scrolls sideways and snaps card by
+// card. An optional background shape (inc/background-shape.php) sits behind
+// one side, shared with every other content block.
+
+.product-row-block {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-96) 0;
+  }
+
+  &__container {
+    position: relative;
+    z-index: z(base);
+  }
+
+  // ── Header row ─────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--spacer-16);
+    margin-bottom: var(--spacer-40);
+  }
+
+  &__eyebrow {
+    margin: 0 0 var(--spacer-8);
+    color: var(--color-magenta);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-widest;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__heading {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-cyan);
+    }
+  }
+
+  &__arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  // ── Strip ──────────────────────────────────────────────────────────────
+  //
+  // The strip runs out to the page edge through the container's padding, so
+  // cards scroll away under the edge rather than being cut off at the
+  // gutter. scroll-padding keeps each snapped card lined up with the
+  // heading instead of flush against the screen edge.
+
+  &__track {
+    display: flex;
+    gap: var(--spacer-20);
+    margin: 0 calc(-1 * #{$gutter});
+    padding: 0 $gutter var(--spacer-16);
+    overflow-x: auto;
+    list-style: none;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: $gutter;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__item {
+    display: flex;
+    flex-shrink: 0;
+    width: 74%;
+    scroll-snap-align: start;
+
+    @include min-breakpoint(mobile) {
+      width: 46%;
+    }
+
+    @include min-breakpoint(desktop) {
+      width: 23.5%;
+    }
+  }
+
+  // The whole card is the link.
+  &__card {
+    @include aurora-ring;
+
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      @include aurora-ring-visible;
+    }
+  }
+
+  &__media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 192px;
+    object-fit: cover;
+    transition: transform var(--transition-md);
+  }
+
+  &__image--empty {
+    background-color: var(--color-surface-2);
+  }
+
+  &__card:hover &__image,
+  &__card:focus-visible &__image {
+    transform: scale(1.05);
+  }
+
+  &__tag {
+    position: absolute;
+    top: var(--spacer-12);
+    left: var(--spacer-12);
+    padding: var(--spacer-4) var(--spacer-12);
+    border-radius: var(--radius-pill);
+    background-image: var(--gradient-aurora);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-11;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-base;
+    text-transform: uppercase;
+  }
+
+  // "Shop now": rises into place over the image while the card is hovered.
+  &__cta {
+    position: absolute;
+    bottom: var(--spacer-12);
+    left: 50%;
+    padding: var(--spacer-6) var(--spacer-16);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-magenta);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xs;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, var(--spacer-12));
+    transition: opacity var(--transition), transform var(--transition), background-color var(--transition);
+
+    &:hover {
+      background-color: var(--color-cyan);
+    }
+  }
+
+  &__card:hover &__cta,
+  &__card:focus-visible &__cta {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  &__body {
+    padding: var(--spacer-20);
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $font-size-base;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-base;
+  }
+
+  &__meta {
+    margin: var(--spacer-4) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    line-height: $line-height-xs;
+  }
+
+  // get_price_html() markup: amounts, unit suffix, and on a sale the old
+  // price in a <del>, which steps back so the price paid reads first.
+  &__price {
+    margin: var(--spacer-12) 0 0;
+    color: var(--color-cyan);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+
+    del {
+      color: var(--color-muted-foreground);
+      font-weight: $font-weight-regular;
+    }
+
+    ins {
+      text-decoration: none;
+    }
+  }
+}

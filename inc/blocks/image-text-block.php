@@ -47,6 +47,9 @@ if ( $dt_background ) {
 	$dt_classes .= ' image-text-block--bg-' . $dt_background;
 }
 
+$dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
+$dt_classes .= dorotape_background_shape_class( $dt_shape );
+
 // One column fills the row; two split it. The modifier is on the grid rather
 // than resolved in CSS with :only-child, because the column count also
 // decides the image crop height.
@@ -54,6 +57,7 @@ $dt_count = is_array( $dt_columns ) ? count( $dt_columns ) : 0;
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="container">
 
 		<?php if ( $dt_eyebrow || $dt_heading || $dt_intro ) : ?>

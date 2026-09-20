@@ -1,0 +1,85 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// "Who we are" split, from the About page in the signed-off internal pages
+// design. Heading and standfirst left, body copy and onward link right.
+//
+// The heading uses the shared block heading size rather than the design's
+// text-4xl/6xl step, for the same reason every other block does: one section
+// heading size across the site (decided 2026-09-16).
+
+.intro-columns-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-48);
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-64);
+    }
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    margin: 0;
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__heading {
+    margin: var(--spacer-20) 0 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__standfirst {
+    margin: var(--spacer-24) 0 0;
+    color: color-mix(in oklab, var(--color-foreground) 90%, transparent);
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-relaxed;
+
+    @include min-breakpoint(mobile) {
+      font-size: $font-size-lg;
+    }
+  }
+
+  &__text {
+    color: var(--color-muted-foreground);
+  }
+
+  &__link {
+    display: inline-block;
+    margin-top: var(--spacer-24);
+    border-bottom: 2px solid var(--color-cyan);
+    padding-bottom: var(--spacer-4);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+    transition: color $transition-fast ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-cyan);
+    }
+  }
+}

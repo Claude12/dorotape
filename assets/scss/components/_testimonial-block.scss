@@ -1,0 +1,246 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/colors" as *;
+@use "base/typography" as *;
+
+// Testimonials.
+//
+// Follows the testimonial band in the signed-off homepage design: one
+// centred quote over six translucent shards, with a vignette over the shards
+// to keep the quote legible. Quotes rotate (lib/testimonial.js); all of them
+// share one grid cell so the section never changes height.
+//
+// The shards are magenta in the design. The block's colour select re-tints
+// them by overriding --shard-hue / --shard-chroma, which every shard colour
+// in base/_colors.scss is built from, so each pane keeps its own lightness
+// and alpha and only the hue moves. The colours are written out here rather
+// than read from --color-shard-* because a custom property resolves its
+// var()s where it is declared: taking them from :root would bake in the
+// default magenta before the modifier could move the hue.
+
+.testimonial-block {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--spacer-96) 0;
+  background-color: var(--color-background);
+  color: var(--color-primary-foreground);
+
+  // The vignette, over the shards and under the quote.
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(
+      ellipse at center,
+      color-mix(in oklab, var(--color-vignette) 35%, transparent) 0%,
+      color-mix(in oklab, var(--color-vignette) 55%, transparent) 70%,
+      color-mix(in oklab, var(--color-vignette) 75%, transparent) 100%
+    );
+  }
+
+  // ── Shard art ──────────────────────────────────────────────────────────
+  //
+  // Each shard is a box sized and placed as a percentage of the section,
+  // cut to a four-point polygon. The numbers are the design's own.
+
+  &__art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  &__shard {
+    position: absolute;
+
+    &--1 {
+      top: -20%;
+      left: -10%;
+      width: 70%;
+      height: 140%;
+      background-color: #{$color-shard-1};
+      clip-path: polygon(0% 0%, 100% 10%, 80% 100%, 0% 90%);
+    }
+
+    &--2 {
+      top: -10%;
+      right: -5%;
+      width: 65%;
+      height: 130%;
+      background-color: #{$color-shard-2};
+      clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 85%);
+    }
+
+    &--3 {
+      top: 10%;
+      left: 15%;
+      width: 45%;
+      height: 90%;
+      background-color: #{$color-shard-3};
+      clip-path: polygon(0% 15%, 100% 0%, 90% 100%, 10% 100%);
+    }
+
+    &--4 {
+      bottom: -15%;
+      left: 5%;
+      width: 75%;
+      height: 80%;
+      background-color: #{$color-shard-4};
+      clip-path: polygon(10% 0%, 100% 25%, 85% 100%, 0% 100%);
+    }
+
+    &--5 {
+      top: 30%;
+      right: -10%;
+      width: 55%;
+      height: 70%;
+      background-color: #{$color-shard-5};
+      clip-path: polygon(40% 0%, 100% 30%, 80% 100%, 0% 80%);
+    }
+
+    &--6 {
+      top: 5%;
+      left: 40%;
+      width: 35%;
+      height: 55%;
+      background-color: #{$color-shard-6};
+      clip-path: polygon(0% 0%, 100% 20%, 70% 100%, 20% 80%);
+    }
+  }
+
+  // ── Shard colour ───────────────────────────────────────────────────────
+
+  &--shards-indigo {
+    --shard-hue: #{$shard-hue-indigo};
+    --shard-chroma: #{$shard-chroma-indigo};
+  }
+
+  &--shards-cyan {
+    --shard-hue: #{$shard-hue-cyan};
+    --shard-chroma: #{$shard-chroma-cyan};
+  }
+
+  // Aurora walks the shards along the magenta -> indigo -> cyan ramp instead
+  // of holding one hue, so the band echoes the divider lines. The panes are
+  // stacked 1 to 6, so taking every third one keeps the hues interleaved
+  // rather than banded.
+  &--shards-aurora &__shard--2,
+  &--shards-aurora &__shard--5 {
+    --shard-hue: #{$shard-hue-indigo};
+    --shard-chroma: #{$shard-chroma-indigo};
+  }
+
+  &--shards-aurora &__shard--3,
+  &--shards-aurora &__shard--6 {
+    --shard-hue: #{$shard-hue-cyan};
+    --shard-chroma: #{$shard-chroma-cyan};
+  }
+
+  // ── Quote ──────────────────────────────────────────────────────────────
+
+  // max-w-3xl in the design, measured to the outside of its 24px padding;
+  // .container supplies the padding here, so the column is 48rem less it.
+  &__inner {
+    max-width: calc(48rem - 2 * #{$gutter});
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  &__icon {
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin: 0 auto var(--spacer-24);
+  }
+
+  &__slides {
+    display: grid;
+  }
+
+  &__slide {
+    grid-area: 1 / 1;
+    margin: 0;
+    visibility: hidden;
+
+    &.is-active {
+      visibility: visible;
+    }
+  }
+
+  &__quote {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-relaxed;
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-30;
+      line-height: $line-height-leading-snug;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__caption {
+    margin-top: var(--spacer-32);
+  }
+
+  &__name {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+  }
+
+  &__meta {
+    display: block;
+    color: color-mix(in oklab, var(--color-primary-foreground) 80%, transparent);
+    font-size: $font-size-xs;
+    line-height: $line-height-xs;
+  }
+
+  // ── Picker ─────────────────────────────────────────────────────────────
+
+  &__dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacer-8);
+    margin-top: var(--spacer-32);
+  }
+
+  // The visible bar is 6px tall, which is far under WCAG 2.5.8's 24px target.
+  // The button carries the target and draws the bar in a pseudo-element, so
+  // the picker looks exactly as the design has it but is reachable on a phone.
+  &__dot {
+    display: flex;
+    align-items: center;
+    width: 12px;
+    height: var(--spacer-24);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: width var(--transition-fast);
+
+    &::before {
+      content: "";
+      width: 100%;
+      height: 6px;
+      border-radius: var(--radius-2xl);
+      background-color: color-mix(in oklab, var(--color-primary-foreground) 40%, transparent);
+      transition: background-color var(--transition-fast);
+    }
+
+    &.is-active {
+      width: 32px;
+    }
+
+    &.is-active::before {
+      background-color: var(--color-primary-foreground);
+    }
+  }
+}
