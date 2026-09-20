@@ -327,7 +327,7 @@
 .site-footer__menu {
   display: flex;
   flex-direction: column;
-  gap: var(--spacer-12);
+  gap: var(--spacer-4);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -338,6 +338,10 @@
 }
 
 .site-footer__menu-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--spacer-24);
+  padding-block: var(--spacer-4);
   color: var(--color-foreground);
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
@@ -457,7 +461,13 @@
   margin: 0;
 }
 
+// 16px of text is under the 24px WCAG 2.5.8 target minimum, and these three
+// sit together on one line, so they get the padding rather than more type.
 .site-footer__legal-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--spacer-24);
+  padding-block: var(--spacer-4);
   color: var(--color-muted-foreground);
   text-decoration: none;
 

@@ -79,7 +79,7 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    @include min-breakpoint(wide) {
+    @include min-breakpoint(xl) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }

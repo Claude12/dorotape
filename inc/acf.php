@@ -59,6 +59,14 @@ if ( ! function_exists( 'dorotape_render_flexible_content' ) ) :
 
 			++$block_index;
 		endwhile;
+
+		// The per-block `divider` switch only ever draws a rule above its own
+		// block, so the last section has nothing to hang a closing rule from.
+		// The About page ends on one, the homepage does not, so it is a
+		// page-level choice rather than something the renderer decides.
+		if ( $block_index > 0 && get_field( 'content_sections_end_rule', $post_id ) ) {
+			echo '<div class="aurora-rule" aria-hidden="true"></div>';
+		}
 	}
 endif;
 

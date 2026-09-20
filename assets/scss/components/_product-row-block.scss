@@ -59,6 +59,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spacer-8);
+    min-height: var(--spacer-24);
     color: var(--color-foreground);
     font-size: $font-size-sm;
     font-weight: $font-weight-extrabold;

@@ -28,6 +28,14 @@ if ( ! $dt_embed ) {
 	return;
 }
 
+// Provider markup does not go through wp_filter_content_tags(), so the iframe
+// arrives with no loading attribute. This block never sits above the fold and
+// a video embed pulls in a lot of third-party script, so it is deferred here,
+// as loading="lazy" in the design.
+if ( false === strpos( $dt_embed, ' loading=' ) ) {
+	$dt_embed = str_replace( '<iframe ', '<iframe loading="lazy" ', $dt_embed );
+}
+
 $dt_eyebrow = trim( (string) get_sub_field( 'eyebrow' ) );
 $dt_heading = trim( (string) get_sub_field( 'heading' ) );
 $dt_intro   = trim( (string) get_sub_field( 'intro' ) );

@@ -218,28 +218,27 @@
   &__dot {
     display: flex;
     align-items: center;
-    width: 12px;
+    justify-content: center;
+    min-width: var(--spacer-24);
     height: var(--spacer-24);
     padding: 0;
     border: 0;
     background: none;
     cursor: pointer;
-    transition: width var(--transition-fast);
 
     &::before {
       content: "";
-      width: 100%;
+      width: 12px;
       height: 6px;
       border-radius: var(--radius-2xl);
       background-color: color-mix(in oklab, var(--color-primary-foreground) 40%, transparent);
-      transition: background-color var(--transition-fast);
-    }
-
-    &.is-active {
-      width: 32px;
+      transition:
+        width var(--transition-fast),
+        background-color var(--transition-fast);
     }
 
     &.is-active::before {
+      width: 32px;
       background-color: var(--color-primary-foreground);
     }
   }

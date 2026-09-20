@@ -3565,6 +3565,27 @@
             "min": "",
             "max": "",
             "button_label": "Add Block"
+        },
+        {
+            "key": "field_dt_content_sections_end_rule",
+            "label": "Aurora line after the last section",
+            "name": "content_sections_end_rule",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "Draw the thin aurora gradient line between the last section and the footer. The per-section \"Aurora line above\" switch can only draw a line above a section, so a closing line is set here.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "allow_in_bindings": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
         }
     ],
     "location": [
@@ -3585,5 +3606,5 @@
     "active": true,
     "description": "Flexible content blocks for pages. Layout name maps to inc/blocks/{name}.php.",
     "show_in_rest": 0,
-    "modified": 1789894888
+    "modified": 1789898868
 }

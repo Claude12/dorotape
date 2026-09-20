@@ -116,10 +116,14 @@
   }
 }
 
+// The utility bar is 36px tall, so 4px of vertical padding brings each link
+// up to the 24px WCAG 2.5.8 target minimum without changing the bar.
 .site-header__utility-link {
   display: inline-flex;
   align-items: center;
   gap: var(--spacer-8);
+  min-height: var(--spacer-24);
+  padding-block: var(--spacer-4);
   color: inherit;
   white-space: nowrap;
   text-decoration: none;
@@ -423,6 +427,10 @@
 }
 
 .site-header__quick-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--spacer-24);
+  padding-block: var(--spacer-4);
   color: var(--color-muted-foreground);
   font-size: $font-size-sm;
   line-height: $line-height-sm;
