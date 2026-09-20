@@ -44,28 +44,10 @@ if ( $dt_is_first ) {
 $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 $dt_classes .= dorotape_background_shape_class( $dt_shape );
 
-// The trail is built from the page's own ancestors rather than a breadcrumb
-// plugin, so it keeps working on any site this theme is dropped onto.
-$dt_trail = array();
-
-if ( $dt_breadcrumb ) {
-	$dt_trail[] = array(
-		'label' => __( 'Home', 'dorotape' ),
-		'url'   => home_url( '/' ),
-	);
-
-	foreach ( array_reverse( (array) get_post_ancestors( get_the_ID() ) ) as $dt_ancestor ) {
-		$dt_trail[] = array(
-			'label' => (string) get_the_title( $dt_ancestor ),
-			'url'   => (string) get_permalink( $dt_ancestor ),
-		);
-	}
-
-	$dt_trail[] = array(
-		'label' => (string) get_the_title(),
-		'url'   => '',
-	);
-}
+// Rank Math owns the trail so that it always agrees with the BreadcrumbList
+// schema. inc/breadcrumbs.php falls back to the page's own ancestors when
+// Rank Math is not there.
+$dt_trail = $dt_breadcrumb ? dorotape_breadcrumb_trail() : array();
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>">

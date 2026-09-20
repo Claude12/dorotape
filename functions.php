@@ -157,6 +157,7 @@ require get_template_directory() . '/inc/header.php';
 require get_template_directory() . '/inc/footer.php';
 require get_template_directory() . '/inc/background-shape.php';
 require get_template_directory() . '/inc/product-row.php';
+require get_template_directory() . '/inc/breadcrumbs.php';
 require get_template_directory() . '/inc/rollsize.php';
 require get_template_directory() . '/inc/pricing.php';
 require get_template_directory() . '/inc/template-tags.php';
