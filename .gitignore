@@ -49,3 +49,8 @@ dorotape-migration/
 # Sass cache
 .sass-cache/
 .cache/
+
+# Playwright
+# Runner state and trace output, rewritten on every run. The specs are
+# committed, what they produced is not.
+tests/test-results/
