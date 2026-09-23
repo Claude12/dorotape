@@ -36,8 +36,16 @@
   border-radius: calc(var(--radius-2xl) - 2px);
   background-color: var(--color-surface);
 
-  @include min-breakpoint(tablet) {
-    grid-template-columns: minmax(0, 1fr) auto;
+  // The copy column takes only what it needs so the form can have the rest,
+  // which stretches the email field across the gap instead of leaving it at
+  // the design's fixed 18rem. The 26rem floor is the design's field plus the
+  // button, so the field can never end up narrower than the design's.
+  //
+  // Side by side only from desktop: at tablet the row is not wide enough for
+  // both without wrapping the heading, so the strip stays stacked and the
+  // field spans it instead.
+  @include min-breakpoint(desktop) {
+    grid-template-columns: minmax(0, auto) minmax(26rem, 1fr);
     align-items: center;
   }
 }
@@ -73,8 +81,8 @@
   --wpforms-button-text-color: var(--color-primary-foreground);
   --wpforms-button-border-radius: var(--radius-2xl);
 
-  @include min-breakpoint(tablet) {
-    width: auto;
+  @include min-breakpoint(desktop) {
+    max-width: none;
   }
 }
 
@@ -103,13 +111,6 @@
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-
-  // A set width rather than a flex basis: the strip's grid sizes this column
-  // from its content, and only a definite width counts towards that.
-  @include min-breakpoint(tablet) {
-    flex: 0 1 auto;
-    width: 18rem;
-  }
 }
 
 .site-footer__signup-form .wpforms-container-full .wpforms-form .wpforms-field {
@@ -327,21 +328,26 @@
 .site-footer__menu {
   display: flex;
   flex-direction: column;
-  gap: var(--spacer-4);
+  // space-y-3 in the design, against a 24px link box below, for its 36px pitch.
+  gap: var(--spacer-12);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .site-footer__menu-item {
+  // Flex, so the inline-flex link below is the whole item box. As a line box
+  // it would pick up the strut and stand a pixel taller than the design.
+  display: flex;
   margin: 0;
 }
 
 .site-footer__menu-link {
   display: inline-flex;
   align-items: center;
+  // 24px is both the design's line box and the WCAG 2.5.8 minimum target, so
+  // no padding is needed on top of it.
   min-height: var(--spacer-24);
-  padding-block: var(--spacer-4);
   color: var(--color-foreground);
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;

@@ -65,23 +65,8 @@
     margin-top: var(--spacer-32);
   }
 
-  // The shared .btn shape in the design's cyan, turning magenta on hover.
-  &__button {
-    background-color: var(--color-cyan);
-    color: var(--color-background);
-
-    &:hover:not(:disabled),
-    &:focus-visible {
-      background-color: var(--color-magenta);
-      color: var(--color-primary-foreground);
-    }
-  }
-
-  &__arrow {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
+  // The CTAs are `.btn .btn--lg .btn--cyan` and `.btn .btn--lg .btn--ghost`
+  // from components/_buttons.scss.
 
   &__media {
     overflow: hidden;

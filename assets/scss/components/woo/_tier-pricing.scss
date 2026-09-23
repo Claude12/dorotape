@@ -61,8 +61,8 @@
 // The break the current quantity qualifies for. Set by tier-table.js on every
 // quantity change.
 .dt-tier-active td {
-  background-color: color-mix(in oklab, var(--color-success) 16%, transparent);
-  color: var(--color-success);
+  background-color: color-mix(in oklab, var(--color-tier) 16%, transparent);
+  color: var(--color-tier);
   font-weight: $font-weight-bold;
 }
 
@@ -70,8 +70,8 @@
 .dt-live-price__note {
   padding: 3px var(--spacer-8);
   border-radius: var(--radius-sm);
-  background-color: color-mix(in oklab, var(--color-success) 16%, transparent);
-  color: var(--color-success);
+  background-color: color-mix(in oklab, var(--color-tier) 16%, transparent);
+  color: var(--color-tier);
   font-size: 0.55em;
   font-weight: $font-weight-semibold;
   vertical-align: middle;

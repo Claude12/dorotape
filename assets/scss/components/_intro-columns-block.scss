@@ -66,20 +66,9 @@
     color: var(--color-muted-foreground);
   }
 
+  // `.link .link--underline` from components/_buttons.scss. Only the step off
+  // the paragraph above it belongs to this block.
   &__link {
-    display: inline-block;
     margin-top: var(--spacer-24);
-    border-bottom: 2px solid var(--color-cyan);
-    padding-bottom: var(--spacer-4);
-    color: var(--color-foreground);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
-    text-decoration: none;
-    transition: color $transition-fast ease;
-
-    &:hover,
-    &:focus-visible {
-      color: var(--color-cyan);
-    }
   }
 }

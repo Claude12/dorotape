@@ -63,20 +63,20 @@ $dt_secondary_is_email = $dt_has_secondary && 0 === stripos( (string) $dt_button
 				<?php if ( $dt_has_primary || $dt_has_secondary ) : ?>
 					<div class="text-image-block__actions">
 						<?php if ( $dt_has_primary ) : ?>
-							<a class="btn text-image-block__button" href="<?php echo esc_url( $dt_button['url'] ); ?>"<?php echo $dt_button['target'] ? ' target="' . esc_attr( $dt_button['target'] ) . '" rel="noopener"' : ''; ?>>
+							<a class="btn btn--lg btn--cyan" href="<?php echo esc_url( $dt_button['url'] ); ?>"<?php echo $dt_button['target'] ? ' target="' . esc_attr( $dt_button['target'] ) . '" rel="noopener"' : ''; ?>>
 								<?php echo esc_html( $dt_button['title'] ); ?>
-								<svg class="text-image-block__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+								<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 							</a>
 						<?php endif; ?>
 
 						<?php if ( $dt_has_secondary ) : ?>
-							<a class="btn btn--ghost" href="<?php echo esc_url( $dt_button_2['url'] ); ?>"<?php echo $dt_button_2['target'] ? ' target="' . esc_attr( $dt_button_2['target'] ) . '" rel="noopener"' : ''; ?>>
+							<a class="btn btn--lg btn--ghost" href="<?php echo esc_url( $dt_button_2['url'] ); ?>"<?php echo $dt_button_2['target'] ? ' target="' . esc_attr( $dt_button_2['target'] ) . '" rel="noopener"' : ''; ?>>
 								<?php if ( $dt_secondary_is_email ) : ?>
-									<svg class="text-image-block__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+									<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
 								<?php endif; ?>
 								<?php echo esc_html( $dt_button_2['title'] ); ?>
 								<?php if ( ! $dt_secondary_is_email ) : ?>
-									<svg class="text-image-block__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+									<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 								<?php endif; ?>
 							</a>
 						<?php endif; ?>

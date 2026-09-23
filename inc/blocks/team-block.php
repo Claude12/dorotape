@@ -106,16 +106,6 @@ add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 						<?php endif; ?>
 
 						<div class="team-block__contact">
-							<?php if ( '' !== $dt_email ) : ?>
-								<a class="team-block__email" href="<?php echo esc_url( 'mailto:' . $dt_email ); ?>">
-									<?php
-									/* translators: %s: team member's first name. */
-									echo esc_html( sprintf( __( 'Email %s', 'dorotape' ), $dt_name ) );
-									?>
-									<svg class="team-block__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-								</a>
-							<?php endif; ?>
-
 							<?php if ( '' !== $dt_linkedin ) : ?>
 								<a class="team-block__linkedin" href="<?php echo esc_url( $dt_linkedin ); ?>" target="_blank" rel="noopener">
 									<span class="screen-reader-text">
@@ -124,7 +114,17 @@ add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 										echo esc_html( sprintf( __( '%s on LinkedIn', 'dorotape' ), $dt_name ) );
 										?>
 									</span>
-									<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13M7.12 20.45H3.56V9h3.56zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0"/></svg>
+									<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><rect width="24" height="24" rx="4" fill="currentColor"/><path d="M5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452zM20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z" fill="var(--color-surface)"/></svg>
+								</a>
+							<?php endif; ?>
+
+							<?php if ( '' !== $dt_email ) : ?>
+								<a class="link link--arrow team-block__email" href="<?php echo esc_url( 'mailto:' . $dt_email ); ?>">
+									<?php
+									/* translators: %s: team member's first name. */
+									echo esc_html( sprintf( __( 'Email %s', 'dorotape' ), $dt_name ) );
+									?>
+									<svg class="link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 								</a>
 							<?php endif; ?>
 						</div>

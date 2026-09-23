@@ -232,8 +232,11 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 		</p>
 			<?php
 			/**
-			 * Quick-add cut sizes offered above the table. Manual entry is
-			 * always available alongside; these only fill the box in.
+			 * Quick add: the sizes customers ask for most, offered above the
+			 * table. Manual entry is always available alongside; these only
+			 * fill the box in. The bar stays in view as the table grows (see
+			 * _cut-size.scss) because a customer entering four rolls was
+			 * having to scroll back up to reach it.
 			 *
 			 * @param int[]      $presets Sizes in mm.
 			 * @param WC_Product $product
@@ -243,7 +246,7 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 			if ( $presets ) :
 				?>
 			<div class="dt-cutsize__presets">
-				<span class="dt-cutsize__presets-label"><?php esc_html_e( 'Common cut sizes:', 'dorotape' ); ?></span>
+				<span class="dt-cutsize__presets-label"><?php esc_html_e( 'Quick add:', 'dorotape' ); ?></span>
 				<?php foreach ( $presets as $preset ) : ?>
 					<button type="button" class="dt-cutsize__preset" data-size="<?php echo esc_attr( $preset ); ?>">
 						<?php
@@ -269,6 +272,8 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 						<td class="dt-cutsize__roll-cell" rowspan="1">
 							<span class="dt-cutsize__roll-num">1</span>
 							<button type="button" class="dt-cutsize__removegroup" aria-label="<?php esc_attr_e( 'Remove this roll', 'dorotape' ); ?>">&times;</button>
+							<?php /* Filled by cut-size-rows.js: what is left on this roll after its cuts, beside the boxes being typed into. */ ?>
+							<span class="dt-cutsize__roll-left"></span>
 						</td>
 						<td>
 							<input type="number" class="dt-cutsize__size" name="dt_cut_rows[0][0][size]"
@@ -289,6 +294,11 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="dt-cutsize__diagram" id="dt_cutsize_diagram" hidden>
+			<p class="dt-cutsize__diagram-title"><?php esc_html_e( 'How each roll will be cut', 'dorotape' ); ?></p>
+			<div class="dt-cutsize__diagram-rolls"></div>
+			<p class="dt-cutsize__diagram-note"><?php esc_html_e( 'Each bar is one roll across its width. Shaded blocks are your cuts, the pale end is what is left on the roll.', 'dorotape' ); ?></p>
 		</div>
 		<div class="dt-cutsize__footer">
 			<button type="button" class="dt-cutsize__addgroup"><?php esc_html_e( '+ CLICK HERE FOR NEXT ROLL TO CUT/CONVERT/SLIT', 'dorotape' ); ?></button>

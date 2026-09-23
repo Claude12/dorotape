@@ -60,7 +60,13 @@ function dorotape_roll_length_m( int $product_id ): ?string {
 
 	$length = trim( (string) $length );
 
-	return ( '' !== $length && (float) $length > 0 ) ? rtrim( rtrim( $length, '0' ), '.' ) : null;
+	if ( '' === $length || (float) $length <= 0 ) {
+		return null;
+	}
+
+	// 91.40 -> 91.4, but 100 stays 100: trailing zeros only mean nothing to
+	// the right of a decimal point, and a 100m roll read back as "1m".
+	return false !== strpos( $length, '.' ) ? rtrim( rtrim( $length, '0' ), '.' ) : $length;
 }
 
 /**

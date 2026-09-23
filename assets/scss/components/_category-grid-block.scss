@@ -169,16 +169,11 @@
     }
   }
 
+  // `.btn .btn--sm .btn--outline` from components/_buttons.scss. The design
+  // fills it from the card's hover rather than its own, so the block re-fires
+  // the outline type's hover from the card.
   &__button {
-    display: inline-block;
     margin-top: var(--spacer-12);
-    padding: var(--spacer-6) var(--spacer-16);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
-    font-size: $font-size-xs;
-    font-weight: $font-weight-bold;
-    line-height: $line-height-xs;
-    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   }
 
   &__card:hover &__button,

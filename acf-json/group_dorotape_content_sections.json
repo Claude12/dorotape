@@ -3300,8 +3300,8 @@
                                         "class": "",
                                         "id": ""
                                     },
-                                    "display_format": "j F Y",
-                                    "return_format": "j F Y",
+                                    "display_format": "d M Y",
+                                    "return_format": "d M Y",
                                     "first_day": 1,
                                     "allow_in_bindings": 0
                                 },
@@ -3606,5 +3606,5 @@
     "active": true,
     "description": "Flexible content blocks for pages. Layout name maps to inc/blocks/{name}.php.",
     "show_in_rest": 0,
-    "modified": 1789898868
+    "modified": 1790147873
 }

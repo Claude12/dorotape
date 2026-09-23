@@ -12,6 +12,8 @@ export function initCutRows() {
   const maxNote     = box.querySelector( '.dt-cutsize__max' );
   const allocNote   = box.querySelector( '.dt-cutsize__alloc' );
   const addRollBtn  = box.querySelector( '.dt-cutsize__addgroup' );
+  const diagram     = box.querySelector( '.dt-cutsize__diagram' );
+  const diagramRows = box.querySelector( '.dt-cutsize__diagram-rolls' );
   const form        = box.closest( 'form.cart' );
   if ( ! body || ! form ) return;
 
@@ -113,17 +115,125 @@ export function initCutRows() {
     validateAll();
   }
 
-  function validateRoll( rows ) {
-    var sum = 0, any = false;
+  /* One roll's cuts, in the order they were entered: what the customer has
+     typed, read straight off the inputs so the picture, the "left on the
+     roll" figure and what gets posted can never disagree. */
+  function readCuts( rows ) {
+    var cuts = [], sum = 0;
     rows.forEach( function ( tr ) {
-      var size = parseFloat( tr.querySelector( '.dt-cutsize__size' ).value ) || 0;
-      var qtyEl = tr.querySelector( '.dt-cutsize__cutqty' );
-      var qty   = qtyEl ? ( parseInt( qtyEl.value, 10 ) || 0 ) : 1;
-      // Cuts are entered in mm only; the unit select is kept optional
-      // here so any legacy markup still resolves rather than throwing.
+      var sizeEl = tr.querySelector( '.dt-cutsize__size' );
+      var qtyEl  = tr.querySelector( '.dt-cutsize__cutqty' );
+      var size   = parseFloat( sizeEl ? sizeEl.value : '' ) || 0;
+      var qty    = qtyEl ? ( parseInt( qtyEl.value, 10 ) || 0 ) : 1;
       var unitEl = tr.querySelector( '.dt-cutsize__unit' );
-      if ( size > 0 && qty > 0 ) { any = true; sum += toMm( size, unitEl ? unitEl.value : 'mm' ) * qty; }
+      if ( size > 0 && qty > 0 ) {
+        var mm = toMm( size, unitEl ? unitEl.value : 'mm' );
+        cuts.push( { mm: mm, qty: qty, total: mm * qty } );
+        sum += mm * qty;
+      }
     } );
+    return { cuts: cuts, sum: sum };
+  }
+
+  function round1( n ) {
+    return Math.round( n * 10 ) / 10;
+  }
+
+  /* The client's own example: "610, 305 and 150 leaves 155". The number is
+     shown twice on purpose, as text beside the boxes being typed into and
+     as the pale end of the roll bar, because it is the thing customers get
+     wrong and the video showed the machine displaying it too. */
+  function renderDiagram() {
+    if ( ! diagram || ! diagramRows ) return;
+
+    // Without a stated roll width there is nothing to draw the cuts against.
+    if ( ! ( currentMax > 0 ) ) {
+      diagram.hidden = true;
+      rolls.forEach( function ( roll ) {
+        var left = roll.cell.querySelector( '.dt-cutsize__roll-left' );
+        if ( left ) left.textContent = '';
+      } );
+      return;
+    }
+
+    diagram.hidden = false;
+    diagramRows.textContent = '';
+
+    rolls.forEach( function ( roll, index ) {
+      var read = readCuts( roll.rows );
+      var over = read.sum > currentMax;
+      var left = Math.max( 0, currentMax - read.sum );
+
+      var leftEl = roll.cell.querySelector( '.dt-cutsize__roll-left' );
+      if ( leftEl ) {
+        leftEl.textContent = over
+          ? round1( read.sum - currentMax ) + 'mm over'
+          : round1( left ) + 'mm left';
+        leftEl.classList.toggle( 'dt-cutsize__roll-left--bad', over );
+      }
+
+      var row = document.createElement( 'div' );
+      row.className = 'dt-cutsize__bar-row';
+
+      var label = document.createElement( 'span' );
+      label.className = 'dt-cutsize__bar-label';
+      label.textContent = 'Roll ' + ( index + 1 );
+      row.appendChild( label );
+
+      var bar = document.createElement( 'div' );
+      bar.className = 'dt-cutsize__bar' + ( over ? ' dt-cutsize__bar--over' : '' );
+      bar.setAttribute( 'role', 'img' );
+
+      // One block per physical cut, which is what the roll actually comes
+      // back as. Beyond a dozen the blocks are too thin to read, so past
+      // that each size becomes a single block covering all its cuts.
+      var pieces = 0;
+      read.cuts.forEach( function ( cut ) { pieces += cut.qty; } );
+      var perPiece = pieces > 0 && pieces <= 12;
+      var described = [];
+
+      read.cuts.forEach( function ( cut ) {
+        var blocks = perPiece ? cut.qty : 1;
+        var each   = perPiece ? cut.mm : cut.total;
+        described.push( ( cut.qty > 1 ? cut.qty + ' x ' : '' ) + round1( cut.mm ) + 'mm' );
+        for ( var i = 0; i < blocks; i++ ) {
+          var piece = document.createElement( 'span' );
+          piece.className = 'dt-cutsize__bar-piece';
+          // Over-long cut lists still have to fit the bar, so the scale is
+          // the roll width or the cuts, whichever is larger.
+          piece.style.flexGrow = String( each );
+          piece.textContent = round1( each ) + 'mm';
+          bar.appendChild( piece );
+        }
+      } );
+
+      if ( left > 0 ) {
+        var rest = document.createElement( 'span' );
+        rest.className = 'dt-cutsize__bar-rest';
+        rest.style.flexGrow = String( left );
+        rest.textContent = round1( left ) + 'mm left';
+        bar.appendChild( rest );
+      }
+
+      bar.setAttribute(
+        'aria-label',
+        'Roll ' + ( index + 1 ) + ' of ' + currentMax + 'mm: '
+          + ( described.length ? described.join( ', ' ) : 'no cuts yet' )
+          + ( over
+            ? ', ' + round1( read.sum - currentMax ) + 'mm more than the roll holds'
+            : ', ' + round1( left ) + 'mm left' )
+      );
+
+      row.appendChild( bar );
+      diagramRows.appendChild( row );
+    } );
+  }
+  function validateRoll( rows ) {
+    // Cuts are entered in mm only; readCuts() keeps the optional legacy unit
+    // select resolving rather than throwing.
+    var read    = readCuts( rows );
+    var sum     = read.sum;
+    var any     = read.cuts.length > 0;
     var invalid = any && currentMax > 0 && sum > currentMax;
     rows.forEach( function ( tr, idx ) {
       tr.classList.toggle( 'dt-cutsize__row--invalid', invalid );
@@ -163,6 +273,8 @@ export function initCutRows() {
         : '';
     }
     if ( cut > total ) ok = false;
+
+    renderDiagram();
 
     // Nothing to add a roll for once every ordered roll has one.
     if ( addRollBtn ) addRollBtn.disabled = rolls.length >= total;

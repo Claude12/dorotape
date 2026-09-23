@@ -65,6 +65,14 @@ $color-warning: oklch(0.85 0.15 88);
 $color-danger: oklch(0.72 0.19 25); // destructive, as text on the canvas
 $color-info: $color-cyan;
 
+// The quantity-break highlight: the active row of the QUANTITY PRICING table
+// and the saving badge beside the price. This was $color-success, and the
+// client asked for brand colour instead of green (17 Sept), offering cyan
+// #009ee3, lilac #d5a6d9 or yellow #face00. Those are the brand's own three,
+// already in the palette above to within a shade, so the choice is this one
+// line: $color-cyan, $color-lilac or $color-yellow.
+$color-tier: $color-cyan;
+
 // Signature gradients: the Aurora ramp. `aurora-soft` is the same ramp with
 // transparency mixed in for overlaying imagery; `line` is the hairline rule
 // used between homepage sections.

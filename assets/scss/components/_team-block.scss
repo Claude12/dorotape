@@ -95,11 +95,22 @@
     background-color: var(--color-surface);
   }
 
+  &__card:hover,
+  &__card:focus-within {
+    @include aurora-ring-visible;
+  }
+
   &__photo {
     display: block;
     width: 100%;
     height: 224px;
     object-fit: cover;
+    transition: transform $transition-slow ease;
+  }
+
+  &__card:hover &__photo,
+  &__card:focus-within &__photo {
+    transform: scale(1.05);
   }
 
   &__body {
@@ -111,7 +122,9 @@
 
   &__name {
     margin: 0;
-    font-size: $font-size-xl;
+    // The design's text-xl, which is 20px, not the 24px card title the
+    // CTA cards use.
+    font-size: $font-size-lg;
     font-weight: $font-weight-bold;
     line-height: $line-height-snug;
   }
@@ -134,63 +147,53 @@
   }
 
   &__contact {
+    // The design stacks the two actions left aligned, LinkedIn above the
+    // email link, each with the same 16px step off what precedes it.
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacer-12);
-    margin-top: var(--spacer-20);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacer-16);
+    margin-top: var(--spacer-16);
   }
 
-  &__email {
-    // Same 24px target rule as the banner breadcrumb: a card action on its own
-    // line, so the line box alone leaves it at 21px.
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--spacer-24);
-    gap: var(--spacer-6);
-    color: var(--color-cyan);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
-    text-decoration: none;
-
-    &:hover .team-block__arrow,
-    &:focus-visible .team-block__arrow {
-      transform: translateX(3px);
-    }
-  }
-
-  &__arrow {
-    width: 14px;
-    height: 14px;
-    transition: transform $transition-fast ease;
+  // The email action is `.link .link--arrow` from components/_buttons.scss.
+  // The design drives its arrow off the card's hover as well as its own.
+  &__card:hover &__email .link__icon,
+  &__card:focus-within &__email .link__icon {
+    transform: translateX(var(--spacer-4));
   }
 
   &__linkedin {
+    // 24px square, as the design has it. That is exactly the WCAG 2.5.8
+    // minimum target, so it cannot shrink any further.
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--spacer-24);
+    height: var(--spacer-24);
     flex-shrink: 0;
-    margin-left: auto;
     border-radius: var(--radius-md);
     background-color: var(--color-white);
-    color: var(--color-ink);
-    transition: background-color $transition-fast ease;
+    // The mark is a cutout: its rounded square is currentColor and the glyph is
+    // knocked out of it in the card's surface. White on white reads as a plain
+    // white chip until hover turns the square cyan, which is what the design
+    // does with `bg-white text-white hover:text-cyan`.
+    color: var(--color-white);
+    transition: color $transition-fast ease;
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
     }
 
     &:hover,
     &:focus-visible {
-      background-color: var(--color-cyan);
+      color: var(--color-cyan);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    &__arrow {
+    &__photo {
       transition: none;
     }
   }

@@ -9,10 +9,26 @@
 - PHP 8.0+ with strict types and full type hints
 
 ## Design Source of Truth
-- The signed off homepage design is at `wp-content/themes/v2 Final Homepage Design` (built on lovable.dev, TanStack Router + Tailwind v4)
-- Every design token in the theme came from `v2 Final Homepage Design/src/styles.css`. That file is the reference when a colour, radius or gradient is in question
-- Compare rendered blocks against the design components in `v2 Final Homepage Design/src/components/` for spacing, colour, typography and responsive behaviour
+- The signed off designs live at `wp-content/themes/final designs` (built on lovable.dev, TanStack Router + Tailwind v4), one folder per page: `homepage`, `about`, `main category`, `top level category`, `product page`
+- **The code folders are the source of truth, the PNG screenshots are a sanity check.** When the two disagree, the code wins
+- Every design token in the theme came from `final designs/homepage/src/styles.css`. That file is the reference when a colour, radius or gradient is in question
+- Compare rendered blocks against the design components in `final designs/<page>/src/components/site/` for spacing, colour, typography and responsive behaviour
 - Flag design ambiguities before building. Do not guess a value that is not in the design
+- The designs are per page exports of the same component library, so the same component can differ slightly between folders. Diff it across folders before treating one copy as the rule
+
+---
+
+## CONSISTENCY IS THE FIRST RULE
+
+**This is a component library, not a set of pages. Consistency across blocks outranks per page design fidelity, every time.** A block built for one page will be reused on the next five. If a value is right on the About page and wrong everywhere else, it is wrong.
+
+- **One behaviour, one place.** If two blocks do the same visual job they share the token, the mixin or the helper. Never copy a value into a second component, promote it
+- **Before adding anything, grep for it.** A new spacing value, heading size, radius, card, button, hover state, arrow icon or shape: search the theme first and reuse what is there. Introducing a second way to do an existing thing is a defect, not a feature
+- **The design's ad hoc variation is not a spec.** The designs step section padding, heading sizes and divider margins differently on almost every section because they were hand placed. The theme deliberately normalises these: one section padding rhythm, `$font-size-block-heading` for every block heading, dividers owned by the block rather than the page. Do not "fix" a block back to a one off design value
+- **When a design value and the theme's system genuinely conflict, stop and flag it.** Say which the design wants, which the system wants, and what the knock on effect is on the other blocks. Let me decide. Do not silently pick one
+- **Apply a fix everywhere it applies.** If a drift is found in one block, check every sibling block for the same drift in the same commit. A fix that leaves the same bug in four other blocks has made the codebase less consistent, not more
+- **Same field names, same block anatomy.** Blocks with a heading, eyebrow, intro, divider or background shape use those exact sub field names and the same markup order, so the editor experience is identical across every block
+- **Editor facing choices are enumerated, never free text.** A background shape, a colour or an alignment is an ACF select mapped to a modifier class, with the same choice labels on every block that offers it
 
 ---
 

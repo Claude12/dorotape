@@ -177,17 +177,28 @@ function dorotape_cube_tile_path(): string {
  * opacity: the cubes fill their section and fade only at the very top and
  * bottom, the triangles sit in a band and fade over a quarter of it.
  *
- * @param string $id   Id prefix, unique per instance.
- * @param bool   $right Whether the shape hugs the right edge.
- * @param float  $edge  Vertical fade offset, 0 to 0.5.
+ * The horizontal fade always runs from transparent at the outside of the
+ * section to solid at the edge the shape hugs, so it is mirrored by side.
+ * `$flip_stroke` says whether the colour ramp mirrors with it. The cubes are
+ * generated per instance and the design flips them, so the ramp ends on cyan
+ * at whichever edge they hug. The facets are one fixed drawing and the design
+ * never mirrors them, so their ramp stays put and reads magenta first.
+ *
+ * @param string $id          Id prefix, unique per instance.
+ * @param bool   $right       Whether the shape hugs the right edge.
+ * @param float  $edge        Vertical fade offset, 0 to 0.5.
+ * @param bool   $flip_stroke Whether the colour ramp mirrors with the side.
  * @return string Gradient markup for <defs>.
  */
-function dorotape_background_shape_gradients( string $id, bool $right, float $edge ): string {
+function dorotape_background_shape_gradients( string $id, bool $right, float $edge, bool $flip_stroke = true ): string {
 	$from = $right ? 0 : 1;
 	$to   = $right ? 1 : 0;
 
+	$stroke_from = $flip_stroke ? $from : 0;
+	$stroke_to   = $flip_stroke ? $to : 1;
+
 	return sprintf(
-		'<linearGradient id="%1$s-stroke" x1="%2$d" y1="0" x2="%3$d" y2="1">
+		'<linearGradient id="%1$s-stroke" x1="%6$d" y1="0" x2="%7$d" y2="1">
 			<stop offset="0" class="background-shape__stop background-shape__stop--magenta"/>
 			<stop offset="0.55" class="background-shape__stop background-shape__stop--indigo"/>
 			<stop offset="1" class="background-shape__stop background-shape__stop--cyan"/>
@@ -213,7 +224,9 @@ function dorotape_background_shape_gradients( string $id, bool $right, float $ed
 		$from,
 		$to,
 		esc_attr( (string) round( $edge, 2 ) ),
-		esc_attr( (string) round( 1 - $edge, 2 ) )
+		esc_attr( (string) round( 1 - $edge, 2 ) ),
+		$stroke_from,
+		$stroke_to
 	);
 }
 
@@ -258,7 +271,9 @@ function dorotape_background_shape_cubes( string $id, bool $right ): string {
  *
  * Unlike the cubes this is one fixed drawing, so it keeps a viewBox and is
  * sliced to the band. It is anchored to whichever edge it hugs rather than
- * flipped, so the stroke gradient still runs magenta to cyan either way.
+ * flipped, so the stroke gradient is not mirrored with it: the ramp runs
+ * magenta at the top left to cyan at the bottom right whichever side it sits
+ * on, as the design's one faceted wireframe does.
  *
  * @param string $id    Id prefix, unique per instance.
  * @param bool   $right Whether the shape hugs the right edge.
@@ -273,7 +288,7 @@ function dorotape_background_shape_triangles( string $id, bool $right ): string 
 			</g>
 		</svg>',
 		$right ? 'xMaxYMid' : 'xMinYMid',
-		dorotape_background_shape_gradients( $id, $right, 0.25 ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup built above from an escaped id and numbers.
+		dorotape_background_shape_gradients( $id, $right, 0.25, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup built above from an escaped id and numbers.
 		esc_attr( $id ),
 		esc_attr( DOROTAPE_FACET_LINES )
 	);

@@ -179,3 +179,4 @@ require get_template_directory() . '/inc/dispatch.php';
 require get_template_directory() . '/inc/address-book.php';
 require get_template_directory() . '/inc/address-book-account.php';
 require get_template_directory() . '/inc/address-book-checkout.php';
+require get_template_directory() . '/inc/rewards.php';

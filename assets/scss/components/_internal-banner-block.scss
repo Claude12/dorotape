@@ -121,8 +121,9 @@
     color: color-mix(in oklab, var(--color-foreground) 80%, transparent);
     font-size: $font-size-base;
 
+    // text-base then sm:text-lg, and the design's text-lg is 18px.
     @include min-breakpoint(mobile) {
-      font-size: $font-size-lg;
+      font-size: $font-size-md;
     }
   }
 

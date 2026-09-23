@@ -69,12 +69,22 @@
 
 // ── Presets ────────────────────────────────────────────────────────────────
 
+// Sticky, because a customer entering four rolls was scrolling back up to
+// the quick sizes for every one of them (client, 17 Sept). It sticks under
+// the site header, and the negative inline margins let the panel's own
+// background run edge to edge behind it so rows do not show through.
 .dt-cutsize__presets {
+  position: sticky;
+  top: var(--site-header-height, 0);
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacer-8);
-  margin: 0 0 var(--spacer-12);
+  margin: 0 calc(var(--spacer-16) * -1) var(--spacer-12);
+  padding: var(--spacer-8) var(--spacer-16);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .dt-cutsize__presets-label {
@@ -314,5 +324,128 @@
 
   &--bad {
     color: var(--color-danger);
+  }
+}
+
+// ── What is left on the roll ───────────────────────────────────────────────
+//
+// "Is it possible to display what is remaining on the roll" (client, 17
+// Sept): 610 + 305 + 150 off a 1220mm roll leaves 155mm. Shown twice, as
+// text in the roll cell where the sizes are being typed, and as the pale
+// end of that roll's bar below the table.
+
+.dt-cutsize__roll-left {
+  display: block;
+  margin-top: var(--spacer-4);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+
+  &:empty {
+    display: none;
+  }
+
+  &--bad {
+    color: var(--color-danger);
+  }
+}
+
+// ── Diagram ────────────────────────────────────────────────────────────────
+//
+// One bar per roll, across the roll's width, filling as cuts are entered:
+// the picture the client asked for after showing us the slitting machine's
+// own display. Drawn by cut-size-rows.js from the same inputs the form
+// posts, so it cannot show something the order does not say.
+
+.dt-cutsize__diagram {
+  margin-top: var(--spacer-16);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dt-cutsize__diagram-title {
+  margin: 0 0 var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.dt-cutsize__diagram-note {
+  margin: var(--spacer-8) 0 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+.dt-cutsize__bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+
+  & + & {
+    margin-top: var(--spacer-8);
+  }
+}
+
+.dt-cutsize__bar-label {
+  flex: 0 0 auto;
+  width: 52px;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+
+  @include min-breakpoint(mobile) {
+    width: 72px;
+  }
+}
+
+.dt-cutsize__bar {
+  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+  min-width: 0;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+}
+
+.dt-cutsize__bar-piece,
+.dt-cutsize__bar-rest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-basis: 0;
+  min-width: 0;
+  padding: 0 var(--spacer-4);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.dt-cutsize__bar-piece {
+  border-right: 1px solid var(--color-background);
+  background-color: color-mix(in oklab, var(--color-cyan) 30%, transparent);
+  color: var(--color-foreground);
+}
+
+// The tail of the roll: still on the roll, not cut.
+.dt-cutsize__bar-rest {
+  color: var(--color-muted-foreground);
+}
+
+// Cuts that do not fit. The row errors already say by how much; the bar
+// turning red is what makes it obvious at a glance.
+.dt-cutsize__bar--over {
+  border-color: var(--color-danger);
+
+  .dt-cutsize__bar-piece {
+    background-color: color-mix(in oklab, var(--color-danger) 30%, transparent);
   }
 }

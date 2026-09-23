@@ -143,8 +143,12 @@ add_action( 'woocommerce_product_options_advanced', function (): void {
 			'value'       => get_post_meta( $post->ID, '_dt_qty_step', true ) ?: '1',
 			'options'     => array(
 				'1'  => __( 'None (order any quantity)', 'dorotape' ),
+				'3'  => __( 'Jumps of 3', 'dorotape' ),
 				'5'  => __( 'Jumps of 5', 'dorotape' ),
 				'10' => __( 'Jumps of 10', 'dorotape' ),
+				'15' => __( 'Jumps of 15', 'dorotape' ),
+				'25' => __( 'Jumps of 25', 'dorotape' ),
+				'50' => __( 'Jumps of 50', 'dorotape' ),
 			),
 			'description' => __( 'Forces the quantity box on the product page to increment in steps (e.g. 5, 10, 15...) instead of one at a time.', 'dorotape' ),
 		)
@@ -156,7 +160,13 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 		return;
 	}
 	$step = wc_clean( wp_unslash( $_POST['_dt_qty_step'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	if ( in_array( $step, array( '5', '10' ), true ) ) {
+	/*
+	 * Every step the catalogue actually uses. The list is not cosmetic: a
+	 * value missing from it is deleted on save, so a product the migration
+	 * scripts set to 25 would quietly drop back to ordering one at a time
+	 * the first time somebody opened it in the editor and pressed Update.
+	 */
+	if ( in_array( $step, array( '3', '5', '10', '15', '25', '50' ), true ) ) {
 		$product->update_meta_data( '_dt_qty_step', $step );
 	} else {
 		$product->delete_meta_data( '_dt_qty_step' ); // '1' = default, nothing to store
@@ -441,7 +451,8 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 	}
 	$running = true;
 
-	$combined_qty = dorotape_combined_quick_add_qty( $cart );
+	$combined_qty  = dorotape_combined_quick_add_qty( $cart );
+	$combined_item = dorotape_combined_item_qty( $cart );
 
 	foreach ( $cart->get_cart() as $cart_item ) {
 		$product    = $cart_item['data'];
@@ -463,7 +474,12 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 			? (int) $cart_item['variation_id']
 			: $product_id;
 
-		$qty = isset( $combined_qty[ $product_id ] ) ? $combined_qty[ $product_id ] : (int) $cart_item['quantity'];
+		// Quick-add pools across the parent's rows; everything else pools the
+		// lines holding this exact item, so an order split by cut sizes still
+		// tiers on the rolls ordered rather than on each line.
+		$qty = $combined_qty[ $product_id ]
+			?? $combined_item[ dorotape_cart_item_tier_key( $cart_item ) ]
+			?? (int) $cart_item['quantity'];
 
 		$price = dorotape_get_tier_price( $qty, $lookup_id, $base_price );
 
@@ -678,6 +694,49 @@ function dorotape_combined_quick_add_qty( $cart = null ): array {
 }
 
 /**
+ * The cart key a tier quantity is pooled under: the exact item bought.
+ *
+ * Variation included, so 1220mm and 1370mm rolls of the same parent keep
+ * their own tiers, which matters because each variation stores its own
+ * _price_tiers. Quick-add is the deliberate exception and pools across the
+ * parent's variations instead (see dorotape_combined_quick_add_qty()).
+ *
+ * @param array $cart_item
+ * @return string
+ */
+function dorotape_cart_item_tier_key( array $cart_item ): string {
+	return (int) ( $cart_item['product_id'] ?? 0 ) . ':' . (int) ( $cart_item['variation_id'] ?? 0 );
+}
+
+/**
+ * Total quantity per item, across every cart line holding that same item.
+ *
+ * Cutting rolls splits one add-to-cart into a line per set of cut sizes
+ * (inc/cutsize.php), so "5 rolls, cut two ways" reaches the cart as a 3 and
+ * a 2, and each line on its own only reached the 1+ tier: the client's
+ * "the pricing is not cumulative... they are still being charged at the 1+
+ * price" (17 Sept). A tier is about how many rolls are being bought, not how
+ * many lines they arrive on, so the lines are added back up before a tier is
+ * picked. The same applies to a part-cut order, where the uncut balance is a
+ * line of its own.
+ *
+ * @param WC_Cart|null $cart
+ * @return array<string,int> dorotape_cart_item_tier_key() => combined quantity
+ */
+function dorotape_combined_item_qty( $cart = null ): array {
+	$cart = $cart instanceof WC_Cart ? $cart : ( function_exists( 'WC' ) ? WC()->cart : null );
+	if ( ! $cart instanceof WC_Cart ) {
+		return array();
+	}
+
+	$combined = array();
+	foreach ( $cart->get_cart() as $item ) {
+		$key              = dorotape_cart_item_tier_key( $item );
+		$combined[ $key ] = ( $combined[ $key ] ?? 0 ) + (int) $item['quantity'];
+	}
+	return $combined;
+}
+/**
  * The quantity a cart line's tier should be resolved against.
  *
  * For everything except quick-add this is simply the line quantity. For a
@@ -694,8 +753,11 @@ function dorotape_tier_qty_for_line( array $cart_item ): int {
 	$qty        = (int) ( $cart_item['quantity'] ?? 1 );
 	$product_id = (int) ( $cart_item['product_id'] ?? 0 );
 	$combined   = dorotape_combined_quick_add_qty();
+	$pooled     = dorotape_combined_item_qty();
 
-	return $combined[ $product_id ] ?? $qty;
+	return $combined[ $product_id ]
+		?? $pooled[ dorotape_cart_item_tier_key( $cart_item ) ]
+		?? $qty;
 }
 
 /**

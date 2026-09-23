@@ -1,0 +1,228 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Buttons and action links.
+//
+// Every button and CTA on the site is built here, so a change to a hover or a
+// radius happens once. Blocks own placement only: a margin, a position, or a
+// card level hover that re-triggers one of these.
+//
+// The design's own exports disagree with each other. Filled buttons dim to 90%
+// on the homepage and in the footer, swap to magenta in SpecialistFilms, and
+// swap to a transparent border on the product page; radii are `rounded-[20px]`
+// in most places and `rounded-full` in two. That is ad hoc variation, not a
+// spec, so the whole site dims to 90% at `--radius-2xl`.
+//
+// Types:
+//   .btn                solid magenta, the default
+//   .btn--cyan          solid cyan on navy text
+//   .btn--ghost         bordered and translucent, fills to secondary
+//   .btn--outline       bordered only, fills to magenta
+//   .btn--lg / --sm     px-7 py-3.5 / px-4 py-1.5 against the default px-6 py-3
+//   .btn__icon          a 16px leading or trailing icon, nudged on hover
+//   .link--underline    bold label on a cyan rule, turns cyan
+//   .link--arrow        bold cyan label, turns magenta
+//   .link__icon         the 16px icon inside either link type
+
+// ── Shape and size ───────────────────────────────────────────────────────
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacer-8);
+  border: 0;
+  border-radius: var(--radius-2xl);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-sm;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:disabled,
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// px-6 py-3 in the design: the footer signup, the datasheet dialog, Woo's own
+// buttons, and anything that does not ask for a size.
+@mixin button-size-md {
+  padding: var(--spacer-12) var(--spacer-24);
+}
+
+// px-7 py-3.5: the hero pair and the section level CTAs.
+@mixin button-size-lg {
+  padding: var(--spacer-14) var(--spacer-28);
+}
+
+// px-4 py-1.5: the label sized action inside a card.
+@mixin button-size-sm {
+  padding: var(--spacer-6) var(--spacer-16);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-xs;
+}
+
+// ── Fills ────────────────────────────────────────────────────────────────
+
+@mixin button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    // hover:bg-primary/90 in the design: the magenta thinned towards the navy
+    // behind it, not darkened with black.
+    background-color: color-mix(in oklab, var(--color-primary) 90%, transparent);
+    color: var(--color-primary-foreground);
+  }
+}
+
+@mixin button-cyan {
+  background-color: var(--color-cyan);
+  color: var(--color-background);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background-color: color-mix(in oklab, var(--color-cyan) 90%, transparent);
+    color: var(--color-background);
+  }
+}
+
+@mixin button-ghost {
+  border: 1px solid var(--color-border);
+  background-color: color-mix(in oklab, var(--color-background) 40%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--color-foreground);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background-color: var(--color-secondary);
+    color: var(--color-foreground);
+  }
+}
+
+@mixin button-outline {
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  color: var(--color-foreground);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}
+
+// ── Classes ──────────────────────────────────────────────────────────────
+//
+// The long selector list beside `.btn` catches the buttons WooCommerce,
+// WPForms and WordPress render for us, which we cannot add a class to.
+
+.btn,
+.button,
+.wp-element-button,
+button.single_add_to_cart_button,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+.wpforms-submit,
+input[type="submit"] {
+  @include button-base;
+  @include button-size-md;
+  @include button-primary;
+}
+
+.btn--lg {
+  @include button-size-lg;
+}
+
+.btn--sm {
+  @include button-size-sm;
+}
+
+.btn--cyan {
+  @include button-cyan;
+}
+
+.btn--ghost,
+.woocommerce a.button.wc-forward:not(.checkout):not(.checkout-button) {
+  @include button-ghost;
+}
+
+.btn--outline {
+  @include button-outline;
+}
+
+// A trailing arrow steps 4px towards its direction of travel on hover, which
+// is `group-hover:translate-x-1` in the design. A leading icon, such as the
+// envelope on a mailto, stays put.
+.btn__icon,
+.link__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.btn:hover .btn__icon:last-child,
+.btn:focus-visible .btn__icon:last-child,
+.link:hover .link__icon:last-child,
+.link:focus-visible .link__icon:last-child {
+  transform: translateX(var(--spacer-4));
+}
+
+// ── Action links ─────────────────────────────────────────────────────────
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.link--underline {
+  padding-bottom: var(--spacer-4);
+  border-bottom: 2px solid var(--color-cyan);
+  color: var(--color-foreground);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+}
+
+.link--arrow {
+  // The same 24px target floor the breadcrumb uses: a link on its own line is
+  // only as tall as its line box, which leaves it at 21px. The underlined
+  // variant already clears it on its padding and rule.
+  min-height: var(--spacer-24);
+  color: var(--color-cyan);
+  font-weight: $font-weight-bold;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-magenta);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn__icon,
+  .link__icon {
+    transition: none;
+  }
+}

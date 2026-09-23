@@ -63,6 +63,8 @@
 
     &:hover,
     &:focus-visible {
+      @include aurora-ring-visible;
+
       color: var(--color-cyan);
     }
   }

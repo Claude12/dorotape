@@ -49,7 +49,7 @@
 
 .dt-quickadd__tier {
   display: block;
-  color: var(--color-success);
+  color: var(--color-tier);
   font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
 }
@@ -64,7 +64,7 @@
   font-variant-numeric: tabular-nums;
 
   &--discount {
-    color: var(--color-success);
+    color: var(--color-tier);
   }
 
   &[hidden] {
@@ -99,7 +99,7 @@
   margin: 0 0 var(--spacer-12);
   padding: var(--spacer-12);
   border-radius: var(--radius);
-  background-color: color-mix(in oklab, var(--color-success) 14%, transparent);
+  background-color: color-mix(in oklab, var(--color-tier) 14%, transparent);
   font-size: $font-size-sm;
 }
 
@@ -113,7 +113,7 @@
   color: var(--color-muted-foreground);
 
   &--hit {
-    color: var(--color-success);
+    color: var(--color-tier);
     font-weight: $font-weight-semibold;
   }
 }
@@ -153,10 +153,10 @@
   font-variant-numeric: tabular-nums;
   cursor: default;
 
-  // Green once the combined quantity qualifies for a break.
+  // Picked out once the combined quantity qualifies for a break.
   &--hit {
-    border-color: var(--color-success);
-    color: var(--color-success);
+    border-color: var(--color-tier);
+    color: var(--color-tier);
     font-weight: $font-weight-bold;
   }
 }

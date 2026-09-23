@@ -93,16 +93,14 @@ $dt_stats = is_array( $dt_stats ) ? $dt_stats : array();
 			<?php if ( ! empty( $dt_primary['url'] ) || ! empty( $dt_secondary['url'] ) ) : ?>
 				<div class="hero-block__actions">
 					<?php if ( ! empty( $dt_primary['url'] ) ) : ?>
-						<a class="hero-block__button hero-block__button--primary" href="<?php echo esc_url( $dt_primary['url'] ); ?>" target="<?php echo esc_attr( $dt_primary['target'] ? $dt_primary['target'] : '_self' ); ?>">
+						<a class="btn btn--lg" href="<?php echo esc_url( $dt_primary['url'] ); ?>" target="<?php echo esc_attr( $dt_primary['target'] ? $dt_primary['target'] : '_self' ); ?>">
 							<?php echo esc_html( $dt_primary['title'] ); ?>
-							<svg class="hero-block__button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M5 12h14M12 5l7 7-7 7" />
-							</svg>
+							<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 						</a>
 					<?php endif; ?>
 
 					<?php if ( ! empty( $dt_secondary['url'] ) ) : ?>
-						<a class="hero-block__button hero-block__button--secondary" href="<?php echo esc_url( $dt_secondary['url'] ); ?>" target="<?php echo esc_attr( $dt_secondary['target'] ? $dt_secondary['target'] : '_self' ); ?>">
+						<a class="btn btn--lg btn--ghost" href="<?php echo esc_url( $dt_secondary['url'] ); ?>" target="<?php echo esc_attr( $dt_secondary['target'] ? $dt_secondary['target'] : '_self' ); ?>">
 							<?php echo esc_html( $dt_secondary['title'] ); ?>
 						</a>
 					<?php endif; ?>

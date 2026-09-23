@@ -70,8 +70,9 @@ $dt_classes = 'intro-columns-block' . dorotape_background_shape_class( $dt_shape
 				<?php endif; ?>
 
 				<?php if ( $dt_link && ! empty( $dt_link['url'] ) ) : ?>
-					<a class="intro-columns-block__link" href="<?php echo esc_url( $dt_link['url'] ); ?>"<?php echo $dt_link['target'] ? ' target="' . esc_attr( $dt_link['target'] ) . '" rel="noopener"' : ''; ?>>
+					<a class="link link--underline intro-columns-block__link" href="<?php echo esc_url( $dt_link['url'] ); ?>"<?php echo $dt_link['target'] ? ' target="' . esc_attr( $dt_link['target'] ) . '" rel="noopener"' : ''; ?>>
 						<?php echo esc_html( $dt_link['title'] ? $dt_link['title'] : __( 'Read more', 'dorotape' ) ); ?>
+						<svg class="link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 					</a>
 				<?php endif; ?>
 			</div>
