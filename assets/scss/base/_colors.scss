@@ -90,6 +90,17 @@ $gradient-aurora-soft: linear-gradient(
   color-mix(in oklab, #{$color-cyan} 80%, transparent) 100%
 );
 $gradient-line: linear-gradient(90deg, transparent, #{$color-magenta}, #{$color-cyan}, transparent);
+// The wash behind the single product page's gallery and summary. The same
+// ramp again, thrown from the bottom left corner instead of across the
+// section, which is how the product page design opens
+// (--gradient-aurora-radial-soft in its styles.css).
+$gradient-aurora-radial: radial-gradient(
+  circle at bottom left,
+  color-mix(in oklab, #{$color-magenta} 55%, transparent) 0%,
+  color-mix(in oklab, oklch(0.42 0.19 320) 40%, transparent) 35%,
+  color-mix(in oklab, #{$color-indigo} 30%, transparent) 65%,
+  color-mix(in oklab, #{$color-cyan} 35%, transparent) 100%
+);
 
 // Testimonial shard art: the six translucent panes behind the quote, and the
 // near-black vignette laid over them to keep the text legible. The design

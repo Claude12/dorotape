@@ -12,8 +12,9 @@ declare( strict_types=1 );
  *
  * The design's products are placeholders; these are live WooCommerce
  * products, chosen by rule (newest, featured, on sale, best sellers) or by
- * hand. Prices come from get_price_html(), so they match the shop exactly:
- * unit suffix, POA, trade prices and all. Helpers are in inc/product-row.php.
+ * hand. Which products a row shows is decided in inc/product-row.php; the card
+ * itself is inc/product-card.php, shared with Related products on the single
+ * product page.
  *
  * @package dorotape
  */
@@ -77,57 +78,16 @@ $dt_classes = 'product-row-block' . dorotape_background_shape_class( $dt_shape )
 
 		<ul class="product-row-block__track">
 			<?php foreach ( $dt_products as $dt_product ) : ?>
-				<?php
-				$dt_saving = dorotape_product_row_saving( $dt_product );
-				$dt_tag    = $dt_saving ? '-' . $dt_saving . '%' : (string) $dt_badge;
-				$dt_meta   = dorotape_product_row_meta( $dt_product );
-				$dt_price  = $dt_product->get_price_html();
-				?>
 				<li class="product-row-block__item">
-					<a class="product-row-block__card" href="<?php echo esc_url( $dt_product->get_permalink() ); ?>">
-						<div class="product-row-block__media">
-							<?php if ( $dt_product->get_image_id() ) : ?>
-								<?php
-								// Empty alt: the product name is the link text just
-								// below, so screen readers would say it twice.
-								echo wp_get_attachment_image(
-									$dt_product->get_image_id(),
-									'medium_large',
-									false,
-									array(
-										'class'    => 'product-row-block__image',
-										'alt'      => '',
-										'loading'  => 'lazy',
-										'decoding' => 'async',
-										'sizes'    => '(min-width: 1024px) 330px, (min-width: 576px) 46vw, 74vw',
-									)
-								);
-								?>
-							<?php else : ?>
-								<span class="product-row-block__image product-row-block__image--empty"></span>
-							<?php endif; ?>
-
-							<?php if ( '' !== $dt_tag ) : ?>
-								<span class="product-row-block__tag"><?php echo esc_html( $dt_tag ); ?></span>
-							<?php endif; ?>
-
-							<?php if ( $dt_hover_label ) : ?>
-								<span class="product-row-block__cta" aria-hidden="true"><?php echo esc_html( $dt_hover_label ); ?></span>
-							<?php endif; ?>
-						</div>
-
-						<div class="product-row-block__body">
-							<h3 class="product-row-block__name"><?php echo esc_html( $dt_product->get_name() ); ?></h3>
-
-							<?php if ( $dt_meta ) : ?>
-								<p class="product-row-block__meta"><?php echo esc_html( $dt_meta ); ?></p>
-							<?php endif; ?>
-
-							<?php if ( $dt_price ) : ?>
-								<p class="product-row-block__price"><?php echo wp_kses_post( $dt_price ); ?></p>
-							<?php endif; ?>
-						</div>
-					</a>
+					<?php
+					dorotape_product_card(
+						$dt_product,
+						array(
+							'badge'       => (string) $dt_badge,
+							'hover_label' => (string) $dt_hover_label,
+						)
+					);
+					?>
 				</li>
 			<?php endforeach; ?>
 		</ul>

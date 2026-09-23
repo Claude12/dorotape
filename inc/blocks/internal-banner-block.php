@@ -47,7 +47,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 // Rank Math owns the trail so that it always agrees with the BreadcrumbList
 // schema. inc/breadcrumbs.php falls back to the page's own ancestors when
 // Rank Math is not there.
-$dt_trail = $dt_breadcrumb ? dorotape_breadcrumb_trail() : array();
+// The markup is shared with the product page, so it comes from there too.
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>">
@@ -89,26 +89,8 @@ $dt_trail = $dt_breadcrumb ? dorotape_breadcrumb_trail() : array();
 				<p class="internal-banner-block__intro"><?php echo esc_html( $dt_intro ); ?></p>
 			<?php endif; ?>
 
-			<?php if ( $dt_trail ) : ?>
-				<nav class="internal-banner-block__breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'dorotape' ); ?>">
-					<ol class="internal-banner-block__trail">
-						<?php foreach ( $dt_trail as $dt_index => $dt_crumb ) : ?>
-							<?php if ( $dt_index ) : ?>
-								<li class="internal-banner-block__separator" aria-hidden="true">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
-								</li>
-							<?php endif; ?>
-
-							<li class="internal-banner-block__crumb">
-								<?php if ( $dt_crumb['url'] ) : ?>
-									<a class="internal-banner-block__crumb-link" href="<?php echo esc_url( $dt_crumb['url'] ); ?>"><?php echo esc_html( $dt_crumb['label'] ); ?></a>
-								<?php else : ?>
-									<span class="internal-banner-block__crumb-current" aria-current="page"><?php echo esc_html( $dt_crumb['label'] ); ?></span>
-								<?php endif; ?>
-							</li>
-						<?php endforeach; ?>
-					</ol>
-				</nav>
+			<?php if ( $dt_breadcrumb ) : ?>
+				<?php dorotape_breadcrumb_nav( 'internal-banner-block__breadcrumb' ); ?>
 			<?php endif; ?>
 
 		</div>

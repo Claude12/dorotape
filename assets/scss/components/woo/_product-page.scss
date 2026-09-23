@@ -1,0 +1,587 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// The single product page (inc/single-product.php).
+//
+// Four bands, each painting its own full-bleed background and bringing its
+// own .container, exactly like the ACF blocks a page is built from. That is
+// why the page takes over WooCommerce's content wrapper: on the width-capped
+// .site-main none of this could reach the edge.
+//
+// The buying controls themselves are not styled here. The quantity stepper,
+// tier table, cut-size rows, quick-add table, swatches, stock line and POA
+// form are components of their own under components/woo/, signed off in
+// Sprint 1, and they look the same wherever they appear.
+
+// WooCommerce's notices, the one thing above the hero.
+.single-product__notices:not(:empty) {
+  padding-top: var(--spacer-24);
+}
+
+// ── Band 1: hero ───────────────────────────────────────────────────────────
+//
+// Gallery and summary side by side on a radial wash thrown from the bottom
+// left, with the cube lattice over it. Like the homepage hero and the
+// internal page banner, it starts behind the transparent sticky header and
+// pads itself clear of it, measured from --site-header-height because the
+// header is 80px, 117px or 166px depending on how many rows are showing.
+
+.product-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: calc(-1 * var(--site-header-height));
+  padding: calc(var(--site-header-height) + var(--spacer-40)) 0 var(--spacer-64);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: calc(var(--site-header-height) + var(--spacer-56)) 0 var(--spacer-96);
+  }
+
+  // The wash fades in from the top, out at the bottom and out to the right,
+  // so it reads as light spilling into the corner rather than a panel with
+  // edges. Two masks intersecting, which needs the -webkit- pair as well:
+  // Safari still ships the prefixed properties and its own composite keyword.
+  &__wash {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background-image: var(--gradient-aurora-radial);
+    opacity: 0.5;
+    pointer-events: none;
+    mask-image:
+      linear-gradient(to bottom, transparent 0%, black 48%, black 88%, transparent 100%),
+      linear-gradient(to right, black 70%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0%, black 48%, black 88%, transparent 100%),
+      linear-gradient(to right, black 70%, transparent 100%);
+    -webkit-mask-composite: source-in;
+
+    @include min-breakpoint(desktop) {
+      right: 50%;
+    }
+  }
+
+  &__inner {
+    position: relative;
+    z-index: z(base);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-48);
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-64);
+    }
+  }
+
+  // The category chip over the title. The same "most specific category" the
+  // product card shows, so a product is labelled the same way in a row on the
+  // homepage and on its own page.
+  &__category {
+    display: inline-block;
+    margin: 0;
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  // Placement only. The trail itself is components/_breadcrumb.scss, shared
+  // with the internal page banner.
+  &__breadcrumb {
+    margin-top: var(--spacer-16);
+  }
+}
+
+// WooCommerce's product wrapper spans both bands, so it is a plain block: the
+// hero grid is inside it, not on it.
+.single-product div.product {
+  margin: 0;
+}
+
+// ── Gallery ────────────────────────────────────────────────────────────────
+
+.woocommerce-product-gallery {
+  position: relative;
+  // The zoom plugin lays a magnified copy of the image over the original at
+  // its natural size, which is wider than the column. Clipped here rather
+  // than relying on the band to do it, so it can never reach the summary.
+  overflow: hidden;
+
+  // WooCommerce's own stylesheet positions the zoom trigger, and that
+  // stylesheet is not loaded, so without this the icon sits above the image.
+  &__trigger {
+    position: absolute;
+    top: var(--spacer-12);
+    right: var(--spacer-12);
+    z-index: z(base);
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    font-size: $font-size-base;
+    line-height: $line-height-single;
+    text-decoration: none;
+  }
+
+  &__trigger img,
+  &__trigger .emoji {
+    width: 18px;
+    height: 18px;
+  }
+
+  &__wrapper {
+    margin: 0;
+  }
+
+  // object-fit: contain, not cover. Much of this catalogue is a roll or a
+  // flat swatch photographed to the edge of the frame, and cover was cutting
+  // the ends off them.
+  &__image img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-2xl);
+    object-fit: contain;
+  }
+
+  // A product with no image of its own. WooCommerce prints a white
+  // "awaiting product image" graphic, which glares on the navy canvas, so the
+  // square becomes the same quiet surface panel the product card already
+  // shows in place of a missing image.
+  &__image--placeholder {
+    aspect-ratio: 1;
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface-2);
+  }
+
+  &__image--placeholder img {
+    display: none;
+  }
+
+  // Flexslider builds this list from the gallery images.
+  .flex-control-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-12);
+    margin: var(--spacer-16) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // The 2px inset is the ring: transparent at rest, cyan on the active thumb
+  // and the brand ramp on hover, with the image itself inset inside it.
+  .flex-control-thumbs li {
+    width: 80px;
+    height: 80px;
+    padding: 2px;
+    border-radius: var(--radius-xl);
+    background-color: transparent;
+    transition: background-color var(--transition-fast);
+  }
+
+  .flex-control-thumbs li:hover {
+    background-image: var(--gradient-aurora);
+  }
+
+  .flex-control-thumbs li:has(.flex-active) {
+    background-color: var(--color-cyan);
+    background-image: none;
+  }
+
+  .flex-control-thumbs img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    object-fit: contain;
+    cursor: pointer;
+  }
+}
+
+// ── Summary column ─────────────────────────────────────────────────────────
+//
+// Spacing is set on each piece rather than with a flex gap, because the
+// pieces are hooked in by half a dozen different files and a gap would give
+// the same distance to a tier table and a one-line note.
+
+.single-product .entry-summary {
+  margin: 0;
+}
+
+.single-product .product_title {
+  margin: var(--spacer-20) 0 0;
+  font-size: $font-size-page-title;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-tight;
+  line-height: $line-height-tight;
+}
+
+.single-product .entry-summary > .price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacer-12);
+  margin: var(--spacer-20) 0 0;
+  color: var(--color-cyan);
+  font-size: $font-size-30;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-single;
+
+  del {
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+    font-weight: $font-weight-regular;
+  }
+
+  ins {
+    text-decoration: none;
+  }
+
+  // "ex VAT", and the per-metre or per-roll unit the shop appends.
+  .woocommerce-price-suffix,
+  small {
+    color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.woocommerce-product-details__short-description {
+  max-width: 36rem;
+  margin-top: var(--spacer-24);
+  color: color-mix(in oklab, var(--color-foreground) 90%, transparent);
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-relaxed;
+}
+
+// ── Buying controls ────────────────────────────────────────────────────────
+
+.single-product form.cart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-16);
+  margin: var(--spacer-32) 0 0;
+}
+
+// A variable product stacks its attribute rows above the same quantity and
+// button row, which keeps its own layout inside .woocommerce-variation-*.
+.single-product .variations_form.cart,
+.single-product .single_variation_wrap {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.woocommerce-variation-add-to-cart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-16);
+}
+
+// A product with no step increment gets a plain number field rather than the
+// stepper in components/woo/_qty-step.scss. Same height and pill ends, so the
+// two kinds of product put the same shaped control beside the same button.
+.single-product .quantity input[type="number"]:not(.dt-qty--stepped) {
+  width: 88px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  text-align: center;
+  font-weight: $font-weight-extrabold;
+  font-variant-numeric: tabular-nums;
+}
+
+// Attribute picker: label above select, no table chrome.
+.single-product table.variations {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0 0 var(--spacer-12);
+    border: 0;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  // Lined up with the middle of the select beside it rather than with the
+  // middle of the cell. WooCommerce keeps the reset link in flow below the
+  // last select and only hides it with visibility, so that row is a line
+  // taller than the others and a centred caption would sit under its own
+  // control. This holds whether the link is showing or not.
+  th.label {
+    padding-top: 10px;
+    padding-right: var(--spacer-16);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    vertical-align: top;
+  }
+
+  td.value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacer-12);
+  }
+
+  // Every attribute gets the same width of control, whatever its longest
+  // option happens to be. Left to size themselves, "Roll size" and "Choose
+  // Finish Below" come out different widths under one another, which reads
+  // as a mistake rather than as two of the same thing. The reset link wraps
+  // below rather than stealing from the select.
+  td.value select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+.single-product .reset_variations {
+  color: var(--color-cyan);
+  font-size: $font-size-sm;
+}
+
+// ── Assurances ─────────────────────────────────────────────────────────────
+//
+// Authored once in Theme Settings > Product Pages, so the delivery promise
+// cannot end up saying two different things on two products. Stock is not one
+// of them: it has its own three-state line in components/woo/_stock.scss,
+// which a tick would flatten.
+
+.product-assurances {
+  display: grid;
+  gap: var(--spacer-8);
+  margin: var(--spacer-24) 0 0;
+  padding: 0;
+  list-style: none;
+  color: color-mix(in oklab, var(--color-foreground) 75%, transparent);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-8);
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--color-cyan);
+  }
+}
+
+// ── Meta ───────────────────────────────────────────────────────────────────
+
+// The SKU and category line (inc/single-product.php, dorotape_product_meta).
+//
+// A definition list, as the design has it: a row per fact, the label extrabold
+// against the value regular, and the rule above setting the whole block apart
+// from the buying controls.
+.single-product .dt-product-meta {
+  margin: var(--spacer-32) 0 0;
+  padding-top: var(--spacer-24);
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+  color: color-mix(in oklab, var(--color-foreground) 70%, transparent);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  // Unwrapped, so a long category list runs on under its own label rather
+  // than dropping to a line of its own and leaving the label stranded: at
+  // 390 that read as two separate rows instead of one label and its value.
+  &__row {
+    display: flex;
+    gap: var(--spacer-8);
+
+    & + & {
+      margin-top: var(--spacer-8);
+    }
+  }
+
+  &__label {
+    flex-shrink: 0;
+    color: color-mix(in oklab, var(--color-foreground) 90%, transparent);
+    font-weight: $font-weight-extrabold;
+  }
+
+  &__value {
+    // min-width: 0 is what lets the text wrap inside the flex row instead of
+    // pushing the row wider than the column.
+    min-width: 0;
+    margin: 0;
+  }
+
+  // The design draws these as plain text. Underlining every category turns the
+  // line into a row of rules; the cyan on hover is the affordance instead.
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-cyan);
+      text-decoration: underline;
+    }
+  }
+}
+
+// ── Band 2: tabs ───────────────────────────────────────────────────────────
+
+.product-tabs {
+  padding: var(--spacer-32) 0 var(--spacer-64);
+  background-color: var(--color-background);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-40) 0 var(--spacer-80);
+  }
+}
+
+.woocommerce-tabs {
+  ul.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    list-style: none;
+  }
+
+  ul.tabs li a {
+    display: block;
+    margin-bottom: -1px;
+    padding: var(--spacer-12) var(--spacer-20);
+    border-bottom: 2px solid transparent;
+    color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+  }
+
+  ul.tabs li a:hover {
+    color: var(--color-foreground);
+  }
+
+  ul.tabs li.active a {
+    border-bottom-color: var(--color-magenta);
+    color: var(--color-foreground);
+  }
+
+  .woocommerce-Tabs-panel {
+    max-width: 48rem;
+    margin-top: var(--spacer-32);
+    color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
+    font-size: $font-size-base;
+    line-height: $line-height-relaxed;
+  }
+
+  // The panel heading repeats the tab that was just clicked.
+  .woocommerce-Tabs-panel > h2:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+.woocommerce-product-attributes {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: var(--spacer-8) var(--spacer-12);
+    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+    text-align: left;
+  }
+
+  th {
+    width: 30%;
+    color: var(--color-muted-foreground);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// ── Band 3: related products ───────────────────────────────────────────────
+//
+// The cards are the shared .product-card, in its grid mode. This is the band
+// around them: heading, background shape, and the four-up grid.
+
+.product-grid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--spacer-64) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-96) 0;
+  }
+
+  &__inner {
+    position: relative;
+    z-index: z(base);
+  }
+
+  &__eyebrow {
+    margin: 0 0 var(--spacer-8);
+    color: var(--color-magenta);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-widest;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__items {
+    display: grid;
+    gap: var(--spacer-20);
+    margin: var(--spacer-40) 0 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__item {
+    display: flex;
+  }
+}

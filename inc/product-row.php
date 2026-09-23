@@ -128,66 +128,6 @@ function dorotape_product_row_products( string $source, int $count, array $ids )
 	return array_values( array_filter( array_map( 'wc_get_product', $query->posts ) ) );
 }
 
-/**
- * The short line under a card's product name: its most specific category,
- * e.g. "ASLAN Blockout Films" rather than the top-level range it sits in.
- *
- * @param WC_Product $product
- * @return string Empty when the product has no category.
- */
-function dorotape_product_row_meta( WC_Product $product ): string {
-	$terms = get_the_terms( $product->get_id(), 'product_cat' );
-
-	if ( ! is_array( $terms ) || ! $terms ) {
-		return '';
-	}
-
-	$best       = null;
-	$best_depth = -1;
-
-	foreach ( $terms as $term ) {
-		$depth = count( get_ancestors( $term->term_id, 'product_cat', 'taxonomy' ) );
-
-		if ( $depth > $best_depth ) {
-			$best       = $term;
-			$best_depth = $depth;
-		}
-	}
-
-	return $best ? $best->name : '';
-}
-
-/**
- * The largest saving on a product that is on sale, as a whole percentage.
- * For a variable product that is the best saving across its variations.
- *
- * @param WC_Product $product
- * @return int 0 when the product is not on sale.
- */
-function dorotape_product_row_saving( WC_Product $product ): int {
-	if ( ! $product->is_on_sale() ) {
-		return 0;
-	}
-
-	$pairs = array();
-
-	if ( $product instanceof WC_Product_Variable ) {
-		$prices = $product->get_variation_prices();
-
-		foreach ( $prices['regular_price'] as $variation_id => $regular ) {
-			$pairs[] = array( (float) $regular, (float) ( $prices['sale_price'][ $variation_id ] ?? $regular ) );
-		}
-	} else {
-		$pairs[] = array( (float) $product->get_regular_price(), (float) $product->get_sale_price() );
-	}
-
-	$best = 0;
-
-	foreach ( $pairs as [ $regular, $sale ] ) {
-		if ( $regular > 0 && $sale < $regular ) {
-			$best = max( $best, (int) round( ( $regular - $sale ) / $regular * 100 ) );
-		}
-	}
-
-	return $best;
-}
+// The card itself, and the meta and saving it shows, live in
+// inc/product-card.php: Related products on the single product page draws the
+// same card, so it is a component rather than part of this block.

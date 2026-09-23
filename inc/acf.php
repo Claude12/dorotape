@@ -38,14 +38,17 @@ if ( ! function_exists( 'dorotape_render_flexible_content' ) ) :
 	 * get_sub_field() for every field, (3) add a matching SCSS partial under
 	 * assets/scss/components/ and @use it in style.scss.
 	 *
-	 * @param int|string|null $post_id Post to read the field from. Defaults to the current post.
+	 * @param int|string|null $post_id     Post to read the field from. Defaults to the current post.
+	 * @param int             $first_index Index the block counter starts at. Blocks read it to
+	 *                                     decide eager vs lazy image loading, so a set of sections
+	 *                                     that is never first on the page passes 1.
 	 */
-	function dorotape_render_flexible_content( $post_id = null ): void {
+	function dorotape_render_flexible_content( $post_id = null, int $first_index = 0 ): void {
 		if ( ! function_exists( 'have_rows' ) ) {
 			return;
 		}
 
-		$block_index = 0;
+		$block_index = $first_index;
 
 		while ( have_rows( 'content_sections', $post_id ) ) :
 			the_row();
@@ -64,7 +67,7 @@ if ( ! function_exists( 'dorotape_render_flexible_content' ) ) :
 		// block, so the last section has nothing to hang a closing rule from.
 		// The About page ends on one, the homepage does not, so it is a
 		// page-level choice rather than something the renderer decides.
-		if ( $block_index > 0 && get_field( 'content_sections_end_rule', $post_id ) ) {
+		if ( $block_index > $first_index && get_field( 'content_sections_end_rule', $post_id ) ) {
 			echo '<div class="aurora-rule" aria-hidden="true"></div>';
 		}
 	}

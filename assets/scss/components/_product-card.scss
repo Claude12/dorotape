@@ -1,0 +1,209 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// The product card.
+//
+// Shared by the Product Row block on the homepage and by Related products on
+// a single product page, so it is styled here rather than inside either of
+// them. Markup is inc/product-card.php.
+//
+// The two places differ in one way each. A row card is a single link, so the
+// whole card is the hover target and a "Shop now" pill rises over the image.
+// A related card carries an add to cart button, so the link is on the name
+// and the card is a column with the button pinned to the bottom, which is
+// what --grid does.
+
+.product-card {
+  display: flex;
+  width: 100%;
+
+  // The card surface. Both modes get it, one as the link itself and one as
+  // the article that holds the links.
+  &,
+  &__link {
+    @include aurora-ring;
+
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  // The link mode nests one inside the other, so only the inner one draws.
+  &:has(&__link) {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  &__link {
+    display: block;
+    width: 100%;
+  }
+
+  &:hover,
+  &:focus-within,
+  &__link:hover,
+  &__link:focus-visible {
+    @include aurora-ring-visible;
+  }
+
+  &__media-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &__media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 192px;
+    object-fit: cover;
+    transition: transform var(--transition-md);
+  }
+
+  &__image--empty {
+    background-color: var(--color-surface-2);
+  }
+
+  &:hover &__image,
+  &:focus-within &__image {
+    transform: scale(1.05);
+  }
+
+  &__tag {
+    position: absolute;
+    top: var(--spacer-12);
+    left: var(--spacer-12);
+    padding: var(--spacer-4) var(--spacer-12);
+    border-radius: var(--radius-pill);
+    background-image: var(--gradient-aurora);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-11;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-base;
+    text-transform: uppercase;
+  }
+
+  // "Shop now": rises into place over the image while the card is hovered.
+  &__cta {
+    position: absolute;
+    bottom: var(--spacer-12);
+    left: 50%;
+    padding: var(--spacer-6) var(--spacer-16);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-magenta);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xs;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, var(--spacer-12));
+    transition: opacity var(--transition), transform var(--transition), background-color var(--transition);
+  }
+
+  &:hover &__cta,
+  &:focus-within &__cta {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  &__body {
+    padding: var(--spacer-20);
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $font-size-base;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-base;
+  }
+
+  &__name-link {
+    color: inherit;
+    text-decoration: none;
+
+    // The link is the accessible name of the card, so its focus ring is
+    // drawn around the whole card rather than the few words of the title.
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  &__meta {
+    margin: var(--spacer-4) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    line-height: $line-height-xs;
+  }
+
+  // get_price_html() markup: amounts, unit suffix, and on a sale the old
+  // price in a <del>, which steps back so the price paid reads first.
+  &__price {
+    margin: var(--spacer-12) 0 0;
+    color: var(--color-cyan);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+
+    del {
+      color: var(--color-muted-foreground);
+      font-weight: $font-weight-regular;
+    }
+
+    ins {
+      text-decoration: none;
+    }
+  }
+
+  // ── Grid mode ────────────────────────────────────────────────────────────
+  //
+  // Related products. A square image rather than the row's fixed 192px,
+  // because the grid puts four cards side by side and a row of different
+  // heights reads as a mistake, and a body that stretches so every button in
+  // the row lines up. The crop stays object-fit: cover, the same as the row,
+  // so a product looks the same wherever its card is drawn.
+
+  &--grid {
+    flex-direction: column;
+  }
+
+  &--grid &__media-link {
+    flex-shrink: 0;
+  }
+
+  &--grid &__image {
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  &--grid &__body {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+  }
+
+  // Pinned to the bottom so the buttons line up across a row of cards of
+  // different name lengths. Shape and fill come from components/_buttons.scss,
+  // which already catches WooCommerce's own `a.button`.
+  &--grid &__button {
+    width: 100%;
+    margin-top: var(--spacer-16);
+    justify-content: center;
+  }
+
+  &--grid &__price {
+    margin-bottom: auto;
+  }
+}

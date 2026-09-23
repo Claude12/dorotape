@@ -3595,6 +3595,13 @@
                 "operator": "==",
                 "value": "page"
             }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-product-sections"
+            }
         ]
     ],
     "menu_order": 0,
@@ -3604,7 +3611,7 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": true,
-    "description": "Flexible content blocks for pages. Layout name maps to inc/blocks/{name}.php.",
+    "description": "Flexible content blocks. Layout name maps to inc/blocks/{name}.php. Shown on Pages, and on Theme Settings > Product Pages, where the sections are shared by every product.",
     "show_in_rest": 0,
-    "modified": 1790147873
+    "modified": 1790172292
 }

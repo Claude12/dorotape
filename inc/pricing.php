@@ -112,10 +112,17 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
  * Name the unit above the quantity box, so "3" is unambiguous at the point of
  * ordering. Runs on the product page only; the loop's add-to-cart buttons and
  * the cart table have their own wording.
+ *
+ * Printed inside the .quantity wrapper rather than before it, at priority 5 so
+ * it lands above the stepper's minus button. Outside the wrapper it was a flex
+ * item of the add-to-cart row, and on a product with a tall sibling in that row
+ * (the cut-size panel) the row centred the box well below its own caption.
+ * is_product() because this hook also fires for the cart table's quantity
+ * inputs, where the caption would be repeated on every line.
  */
-add_action( 'woocommerce_before_add_to_cart_quantity', function (): void {
+add_action( 'woocommerce_before_quantity_input_field', function (): void {
 	$product = dorotape_stepped_qty_product();
-	if ( ! $product ) {
+	if ( ! $product || ! is_product() ) {
 		return;
 	}
 	$u = dorotape_unit_strings( dorotape_price_unit( $product->get_id() ) );
@@ -123,7 +130,7 @@ add_action( 'woocommerce_before_add_to_cart_quantity', function (): void {
 		'<span class="dt-qty-label">%s</span>',
 		esc_html( $u['qty_label'] )
 	);
-} );
+}, 5 );
 
 // ─── Quantity input step ──────────────────────────────────────────────────────
 

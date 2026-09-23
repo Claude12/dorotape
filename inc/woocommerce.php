@@ -168,8 +168,9 @@ add_filter( 'woocommerce_single_product_image_thumbnail_html', function ( string
 
 /**
  * Show a "volume discounts available" nudge on variable products before the
- * user has selected a variation. Rendered at priority 12 so it sits between
- * the price range (10) and the hidden tier table (15).
+ * user has selected a variation. Rendered at priority 21 so it opens the
+ * pricing group: the design puts the short description (20) above it and the
+ * tier table (22) directly below.
  * JS hides this once a variation is chosen and restores it on reset.
  */
 add_action( 'woocommerce_single_product_summary', function (): void {
@@ -244,14 +245,15 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 			$attr_label
 		) )
 	);
-}, 12 );
+}, 21 );
 
 // ─── Single product tier table ────────────────────────────────────────────────
 
 /**
  * Render a "Quantity Pricing" table on the single product page when the product
  * has price_tiers configured. Output is plain HTML so it degrades without JS.
- * Placed at priority 15 (after title/price, before add-to-cart form).
+ * Placed at priority 22: after the short description (20), before the
+ * add-to-cart form (30), which is the order the design shows.
  */
 add_action( 'woocommerce_single_product_summary', function (): void {
 	global $post, $product;
@@ -322,7 +324,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</tbody></table>';
 	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
-}, 15 );
+}, 22 );
 
 /**
  * Detect which variation is selected via URL attribute parameters (server-side).
@@ -469,7 +471,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '</tbody></table>';
 	echo '<p class="dt-tier-pricing__note">' . esc_html( $u['note'] ) . '</p>';
 	echo '</div>';
-}, 15 );
+}, 22 );
 
 /**
  * Emit a hidden data source so the live running total works on products that
@@ -515,7 +517,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	}
 
 	echo '<div id="dt_live_price" hidden' . $attrs . '></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped above.
-}, 16 );
+}, 23 );
 
 
 // ─── Custom product tabs (from Kryptronic tabonecontent / tabtwocontent) ─────

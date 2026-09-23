@@ -17,6 +17,12 @@
 @use "components/background-shape";
 @use "components/buttons";
 @use "components/tables";
+
+// Shared between the page blocks and the single product page: the
+// breadcrumb trail, and the product card the homepage rows and Related
+// products both draw.
+@use "components/breadcrumb";
+@use "components/product-card";
 @use "components/rte";
 @use "components/rte-block";
 @use "components/hero-block";
@@ -49,6 +55,11 @@
 @use "components/woo/stock";
 @use "components/woo/swatch";
 @use "components/woo/spec-table";
+
+// The single product page's own layout: the bands inc/single-product.php
+// builds, and the WooCommerce markup sitting inside them. Last in this
+// list because it places the components above rather than restyling them.
+@use "components/woo/product-page";
 
 @use "layout/header";
 @use "layout/site-main";

@@ -9,6 +9,9 @@
 // link over a strip of product cards that scrolls sideways and snaps card by
 // card. An optional background shape (inc/background-shape.php) sits behind
 // one side, shared with every other content block.
+//
+// This file is the section and the strip. The cards inside it are the shared
+// .product-card component.
 
 .product-row-block {
   position: relative;
@@ -115,124 +118,6 @@
     }
   }
 
-  // The whole card is the link.
-  &__card {
-    @include aurora-ring;
-
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
-    border-radius: var(--radius-2xl);
-    background-color: var(--color-surface);
-    color: var(--color-foreground);
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-      @include aurora-ring-visible;
-    }
-  }
-
-  &__media {
-    position: relative;
-    overflow: hidden;
-  }
-
-  &__image {
-    display: block;
-    width: 100%;
-    height: 192px;
-    object-fit: cover;
-    transition: transform var(--transition-md);
-  }
-
-  &__image--empty {
-    background-color: var(--color-surface-2);
-  }
-
-  &__card:hover &__image,
-  &__card:focus-visible &__image {
-    transform: scale(1.05);
-  }
-
-  &__tag {
-    position: absolute;
-    top: var(--spacer-12);
-    left: var(--spacer-12);
-    padding: var(--spacer-4) var(--spacer-12);
-    border-radius: var(--radius-pill);
-    background-image: var(--gradient-aurora);
-    color: var(--color-primary-foreground);
-    font-size: $font-size-11;
-    font-weight: $font-weight-extrabold;
-    letter-spacing: $letter-spacing-wide;
-    line-height: $line-height-base;
-    text-transform: uppercase;
-  }
-
-  // "Shop now": rises into place over the image while the card is hovered.
-  &__cta {
-    position: absolute;
-    bottom: var(--spacer-12);
-    left: 50%;
-    padding: var(--spacer-6) var(--spacer-16);
-    border-radius: var(--radius-2xl);
-    background-color: var(--color-magenta);
-    color: var(--color-primary-foreground);
-    font-size: $font-size-xs;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-xs;
-    white-space: nowrap;
-    opacity: 0;
-    transform: translate(-50%, var(--spacer-12));
-    transition: opacity var(--transition), transform var(--transition), background-color var(--transition);
-
-    &:hover {
-      background-color: var(--color-cyan);
-    }
-  }
-
-  &__card:hover &__cta,
-  &__card:focus-visible &__cta {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
-  &__body {
-    padding: var(--spacer-20);
-  }
-
-  &__name {
-    margin: 0;
-    font-size: $font-size-base;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-base;
-  }
-
-  &__meta {
-    margin: var(--spacer-4) 0 0;
-    color: var(--color-muted-foreground);
-    font-size: $font-size-xs;
-    line-height: $line-height-xs;
-  }
-
-  // get_price_html() markup: amounts, unit suffix, and on a sale the old
-  // price in a <del>, which steps back so the price paid reads first.
-  &__price {
-    margin: var(--spacer-12) 0 0;
-    color: var(--color-cyan);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-sm;
-
-    del {
-      color: var(--color-muted-foreground);
-      font-weight: $font-weight-regular;
-    }
-
-    ins {
-      text-decoration: none;
-    }
-  }
+  // The card itself is components/_product-card.scss, shared with Related
+  // products on the single product page.
 }

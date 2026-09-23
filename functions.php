@@ -149,13 +149,16 @@ function dorotape_disable_emojis() {
 }
 add_action( 'init', 'dorotape_disable_emojis' );
 
+require get_template_directory() . '/inc/icons.php';
 require get_template_directory() . '/inc/acf.php';
+require get_template_directory() . '/inc/product-sections.php';
 require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/setup.php';
 require get_template_directory() . '/inc/header.php';
 require get_template_directory() . '/inc/footer.php';
 require get_template_directory() . '/inc/background-shape.php';
+require get_template_directory() . '/inc/product-card.php';
 require get_template_directory() . '/inc/product-row.php';
 require get_template_directory() . '/inc/breadcrumbs.php';
 require get_template_directory() . '/inc/rollsize.php';
@@ -163,6 +166,7 @@ require get_template_directory() . '/inc/pricing.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
+require get_template_directory() . '/inc/single-product.php';
 require get_template_directory() . '/inc/stock.php';
 require get_template_directory() . '/inc/poa.php';
 require get_template_directory() . '/inc/cutsize.php';

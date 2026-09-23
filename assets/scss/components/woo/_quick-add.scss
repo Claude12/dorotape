@@ -8,8 +8,10 @@
 // and the running mix total tells the customer how close the combined
 // quantity is to the next break, which is the whole reason the grid exists.
 
+// The same distance below the short description that form.cart takes on every
+// other product, because it stands in the same slot.
 .dt-quickadd {
-  margin: var(--spacer-16) 0;
+  margin: var(--spacer-32) 0 0;
 }
 
 .dt-quickadd__table {
@@ -124,8 +126,9 @@
 // because that is the point of it: the grid had removed the control people
 // look for. It is readonly, so like .dt-qty--stepped it takes no focus ring.
 
+// Sits directly under the headline price it keeps in step with.
 .dt-quickadd-total {
-  margin: 0 0 var(--spacer-16);
+  margin: var(--spacer-24) 0 0;
 }
 
 .dt-quickadd-total__row {
@@ -140,7 +143,10 @@
   font-weight: $font-weight-semibold;
 }
 
-.dt-quickadd-total__input {
+// The element selector is carried so this beats the width: 100% that
+// base/_forms.scss gives every input[type="text"]: a running total is three
+// digits, not a field to type a sentence into.
+input.dt-quickadd-total__input {
   width: 70px;
   padding: var(--spacer-8);
   border: 1px solid var(--color-input);

@@ -122,3 +122,59 @@ function dorotape_ancestor_crumbs(): array {
 
 	return $crumbs;
 }
+
+/**
+ * The trail as markup.
+ *
+ * The design draws the same chevron-separated list wherever a trail appears:
+ * on an internal page banner, and on a product page inside the summary column.
+ * The two differ only in where they sit, so the markup lives here once and the
+ * caller passes a placement class rather than restating the list.
+ *
+ * Prints nothing when there is no trail, so a caller does not have to test
+ * first.
+ *
+ * @param string $class Extra class for the <nav>, for placement only.
+ */
+function dorotape_breadcrumb_nav( string $class = '' ): void {
+	$trail = dorotape_breadcrumb_trail();
+
+	if ( ! $trail ) {
+		return;
+	}
+
+	$classes = 'breadcrumb' . ( '' !== $class ? ' ' . $class : '' );
+
+	printf(
+		'<nav class="%1$s" aria-label="%2$s"><ol class="breadcrumb__trail">',
+		esc_attr( $classes ),
+		esc_attr__( 'Breadcrumb', 'dorotape' )
+	);
+
+	foreach ( $trail as $index => $crumb ) {
+		if ( $index ) {
+			echo '<li class="breadcrumb__separator" aria-hidden="true">'
+				. '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m9 18 6-6-6-6"/></svg>'
+				. '</li>';
+		}
+
+		echo '<li class="breadcrumb__crumb">';
+
+		if ( $crumb['url'] ) {
+			printf(
+				'<a class="breadcrumb__link" href="%1$s">%2$s</a>',
+				esc_url( $crumb['url'] ),
+				esc_html( $crumb['label'] )
+			);
+		} else {
+			printf(
+				'<span class="breadcrumb__current" aria-current="page">%s</span>',
+				esc_html( $crumb['label'] )
+			);
+		}
+
+		echo '</li>';
+	}
+
+	echo '</ol></nav>';
+}

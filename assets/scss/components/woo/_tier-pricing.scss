@@ -10,15 +10,26 @@
 // picked, which explains that breaks exist at all.
 
 .dt-tier-pricing {
-  margin: var(--spacer-16) 0 var(--spacer-8);
+  // The quantity pricing card from the product page design: a surface panel
+  // with a magenta header bar, the breaks as bordered rows, and the unit note
+  // as a footer bar. overflow hidden is what lets the rows meet the rounded
+  // corners cleanly.
+  margin: var(--spacer-32) 0 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
 
   &__title {
-    margin-bottom: var(--spacer-8);
-    color: var(--color-muted-foreground);
+    margin: 0;
+    padding: var(--spacer-12) var(--spacer-20);
+    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    color: var(--color-magenta);
     font-size: $font-size-xs;
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xs;
     text-transform: uppercase;
-    letter-spacing: $letter-spacing-label;
+    letter-spacing: $letter-spacing-widest;
   }
 
   &__table {
@@ -29,15 +40,24 @@
 
     th,
     td {
-      padding: var(--spacer-8) var(--spacer-12);
-      border: 1px solid var(--color-border);
+      padding: var(--spacer-12) var(--spacer-20);
+      border: 0;
+      border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
       text-align: left;
     }
 
+    // The card's own border closes the table off, so the last row does not
+    // draw a second line just inside it.
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
     thead th {
-      background-color: var(--color-surface-2);
-      color: var(--color-foreground);
+      color: var(--color-muted-foreground);
+      font-size: $font-size-xs;
       font-weight: $font-weight-bold;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
     }
   }
 
@@ -48,13 +68,16 @@
   }
 
   &__row:hover td {
-    background-color: var(--color-surface);
+    background-color: var(--color-surface-2);
   }
 
   &__note {
-    margin-top: var(--spacer-8);
-    color: var(--color-muted-foreground);
+    margin: 0;
+    padding: var(--spacer-12) var(--spacer-20);
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
     font-size: $font-size-xs;
+    line-height: $line-height-xs;
   }
 }
 
@@ -79,15 +102,19 @@
 }
 
 // Shown until a variation is chosen, then faded out by the pricing script.
+// It stands in the slot the card above will fill, so it takes the same shell:
+// same surface, same border, same corners, and the same distance below the
+// short description. The magenta rule down its left edge is what marks it as
+// the temporary one of the two.
 .dt-discount-hint {
   display: flex;
   align-items: center;
   gap: var(--spacer-12);
-  margin-bottom: var(--spacer-16);
-  padding: var(--spacer-12) var(--spacer-16);
-  border: 1px solid var(--color-border);
+  margin: var(--spacer-32) 0 0;
+  padding: var(--spacer-16) var(--spacer-20);
+  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
   border-left: 4px solid var(--color-magenta);
-  border-radius: var(--radius);
+  border-radius: var(--radius-2xl);
   background-color: var(--color-surface);
   transform-origin: top;
   transition:

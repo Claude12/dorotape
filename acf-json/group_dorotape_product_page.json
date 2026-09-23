@@ -1,0 +1,213 @@
+{
+    "key": "group_dorotape_product_page",
+    "title": "Product Page",
+    "fields": [
+        {
+            "key": "field_dtprod0002",
+            "label": "Hero background shape",
+            "name": "product_hero_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint line-work behind the gallery and summary. The design uses cubes on the right.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtprod0003",
+            "label": "Related products background shape",
+            "name": "product_related_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Behind the Related products grid. The design uses cubes on the left.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-left",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtprod0004",
+            "label": "Related products eyebrow",
+            "name": "product_related_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The small magenta line above the Related products heading. Leave empty to hide it.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "You may also need",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0005",
+            "label": "Related products heading",
+            "name": "product_related_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Leave empty to hide the heading.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Related products",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0010",
+            "label": "Assurances",
+            "name": "product_assurances",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "The ticked lines under the add to cart button, on every product. Stock is added automatically above them, so it does not need a row here.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 4,
+            "collapsed": "field_dtprod0012",
+            "button_label": "Add line",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_dtprod0011",
+                    "label": "Icon",
+                    "name": "icon",
+                    "aria-label": "",
+                    "type": "select",
+                    "instructions": "From the shared set in inc/icons.php, the same icons the USP strip draws.",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "30",
+                        "class": "",
+                        "id": ""
+                    },
+                    "choices": {
+                        "truck": "Truck",
+                        "lightbulb": "Lightbulb",
+                        "calendar": "Calendar",
+                        "swatch": "Swatch",
+                        "globe": "Globe",
+                        "shield": "Shield",
+                        "award": "Award",
+                        "check": "Check",
+                        "clock": "Clock",
+                        "scissors": "Scissors"
+                    },
+                    "default_value": "check",
+                    "return_format": "value",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "ui": 0,
+                    "ajax": 0,
+                    "placeholder": "",
+                    "create_options": 0,
+                    "save_options": 0
+                },
+                {
+                    "key": "field_dtprod0012",
+                    "label": "Text",
+                    "name": "text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "One short line, e.g. “Free UK delivery on trade orders over £150”.",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "70",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-product-sections"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Settings the single product page reads on every product: the two background shapes, the Related products headings, and the assurance lines under add to cart.",
+    "show_in_rest": 0,
+    "modified": 1790172769
+}

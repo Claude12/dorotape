@@ -8,6 +8,23 @@
 // readonly, which is why it does not use the shared field styling in
 // base/_forms.scss: a focus ring on a control you cannot type into is a lie.
 
+// Room for the caption above, which is taken out of flow: left in flow it is
+// wider than the box, and because the wrapper is a flex item of the
+// add-to-cart row it would then size to the text rather than to the control,
+// opening a gap before the button beside it. In flow it also made the row
+// centre the button against the caption and the box together, so the button
+// sat above the middle of the box it belongs to.
+.quantity:has(.dt-qty-label) {
+  position: relative;
+  padding-top: var(--spacer-24);
+  // Matched below as well as above, even where only the stepped control has a
+  // note to put there. The wrapper is a flex item of a centre-aligned row, so
+  // padding on one side only would centre the row on the wrapper while the box
+  // inside it sat lower, leaving the add-to-cart button beside it out of line
+  // with the box it belongs to.
+  padding-bottom: var(--spacer-24);
+}
+
 .quantity:has(.dt-qty-step) {
   display: inline-flex;
   align-items: center;
@@ -15,10 +32,19 @@
   gap: 0;
 }
 
+// The three parts share one border and one surface so the group reads as the
+// single rounded control the design draws. Only the outer edges carry a left
+// or right border; the seams between them are left open, which is why the
+// input below takes a top and bottom border and nothing else.
+//
+// The surface is the shared field one rather than the design's bg-surface, so
+// the box matches the variation select sitting directly above it and the
+// quick-add quantity boxes on the products that have those instead. One kind
+// of control, one surface, is worth more here than the exact swatch.
 .dt-qty-step {
   flex: 0 0 auto;
-  width: 38px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--color-input);
   background-color: var(--color-surface-2);
   color: var(--color-foreground);
@@ -26,28 +52,38 @@
   line-height: $line-height-single;
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--transition-fast);
+  transition: color var(--transition-fast);
 
+  // The design lights the sign itself rather than the button behind it, the
+  // same as every other icon-only control on the site.
   &:hover {
-    background-color: var(--color-surface);
+    color: var(--color-cyan);
   }
 
   &--down {
     border-right: 0;
-    border-radius: var(--radius) 0 0 var(--radius);
+    border-radius: var(--radius-pill) 0 0 var(--radius-pill);
   }
 
   &--up {
     border-left: 0;
-    border-radius: 0 var(--radius) var(--radius) 0;
+    border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
   }
 }
 
 .quantity input[type="number"].dt-qty--stepped {
   width: 72px;
-  height: 42px;
+  height: 44px;
+  // No side borders, so the pill has no seams. Wider than the design's 48px
+  // because these are cut lengths: a quantity here runs to three and four
+  // digits where the design only ever drew a single one.
+  border: 1px solid var(--color-input);
+  border-right: 0;
+  border-left: 0;
   border-radius: 0;
+  background-color: var(--color-surface-2);
   text-align: center;
+  font-weight: $font-weight-extrabold;
   font-variant-numeric: tabular-nums;
   cursor: default;
 
@@ -63,19 +99,38 @@
 }
 
 // Names the unit above the quantity box, so a bare "3" is unambiguous.
+//
+// It sits in the room the wrapper's padding-top reserves, for the reason given
+// there, and is pinned to both edges so text-align has the full width of the
+// control to centre within. Centred rather than ranged left because the box is
+// narrow enough that a left-aligned caption reads as belonging to whatever is
+// further left rather than to the box under it.
 .dt-qty-label {
-  flex: 0 0 100%;
-  margin-bottom: var(--spacer-4);
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
   color: var(--color-muted-foreground);
   font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
+  line-height: $line-height-xs;
   letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
 }
 
-// Sits outside the button group, on its own line under the control.
+// Sits under the control, on its own line.
+//
+// Out of flow, because in flow it is the widest thing in the box and the box
+// is a flex item: the wrapper then sized to the sentence rather than to the
+// three buttons, leaving a gap between the quantity and the add-to-cart
+// button beside it.
 .dt-qty-step__note {
-  flex: 0 0 100%;
-  margin-top: var(--spacer-8);
+  position: absolute;
+  bottom: 0;
+  left: 0;
   color: var(--color-muted-foreground);
   font-size: $font-size-xs;
+  line-height: $line-height-xs;
+  white-space: nowrap;
 }

@@ -71,6 +71,12 @@ $font-size-3xl: clamp(36px, min(11.2381px + 6.3492vw, 24px + 4.6875vw), 72px);
 // shallower of the pair below 768, so it takes max() where the hero takes min().
 $font-size-internal-banner: clamp(36px, max(23.619px + 3.1746vw, 12px + 4.6875vw), 60px);
 
+// The single product page's H1 (text-4xl md:text-5xl): 36 at a 390px phone,
+// 48 from 768. That is the internal banner's lower ramp stopped one step
+// early, which is deliberate: a product title should not read larger than
+// the page banner that a category landing page opens with.
+$font-size-page-title: clamp(36px, 23.619px + 3.1746vw, 48px);
+
 // Every ACF flexible-content block's own section heading uses this one
 // size. Consistency across blocks outranks per-block design fidelity here
 // Don't give a block its own bespoke heading clamp, change this token.
