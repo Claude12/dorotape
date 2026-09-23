@@ -36,6 +36,23 @@
     );
   }
 
+  // A second glow, for the category pages.
+  //
+  // The homepage grid is two rows and its design fills the corner behind them.
+  // A category can have twenty ranges, and the same glow sized to a section
+  // five rows tall floods the lower half of the page with magenta. The
+  // category design draws a smaller, weaker bloom centred on the right edge
+  // instead, which is what this is, so the wash stays beside the grid however
+  // long the grid gets.
+  &--glow-soft::before {
+    background-image: radial-gradient(
+      100% 80% at 75% 50%,
+      color-mix(in oklab, var(--color-magenta) 60%, transparent) 0%,
+      color-mix(in oklab, var(--color-magenta) 20%, transparent) 40%,
+      var(--color-background) 65%
+    );
+  }
+
   // With the hairline on, the section stands off the block above by a
   // margin for the line to sit in. Without it there is nothing to separate,
   // so the block above's own bottom padding is the gap.
@@ -181,5 +198,17 @@
     border-color: var(--color-primary);
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);
+  }
+
+  // The arrow steps forward with the fill, from anywhere on the card.
+  //
+  // components/_buttons.scss nudges a trailing icon on the button's own hover,
+  // but the pill here is a span inside the card's link: on its own it would
+  // only move when the pointer was directly over it, while the fill around it
+  // had already fired. This is the `group-hover:translate-x-1` the design
+  // draws, re-fired from the card for the same reason the fill above is.
+  &__card:hover &__button .btn__icon,
+  &__card:focus-visible &__button .btn__icon {
+    transform: translateX(var(--spacer-4));
   }
 }

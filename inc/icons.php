@@ -32,6 +32,7 @@ function dorotape_icon_paths(): array {
 		'award'     => '<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',
 		'check'     => '<path d="M20 6 9 17l-5-5"/>',
 		'clock'     => '<path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/>',
+		'phone'     => '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
 		'scissors'  => '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
 	);
 }
@@ -74,5 +75,29 @@ function dorotape_icon( string $name, string $class = '', string $stroke = '1.5'
 		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : '',
 		esc_attr( $stroke ),
 		$paths[ $name ]
+	);
+}
+
+/**
+ * The trailing arrow used on every button and action link.
+ *
+ * Deliberately not a key in dorotape_icon_paths(). That map is the set an
+ * editor picks from, and an arrow is not a thing a USP bullet or an assurance
+ * row is ever about: it is chrome, chosen by the design rather than by the
+ * person filling the block. Keeping it out means adding it here cannot leak
+ * "Arrow-right" into a content icon select.
+ *
+ * Stroke 2 rather than the set's 1.5, because at 16px the design draws this
+ * one heavier than the icons beside a line of text.
+ *
+ * @param string $class Class attribute for the <svg>. `btn__icon` inside a
+ *                      button, `link__icon` inside an action link: both are
+ *                      sized and nudged by components/_buttons.scss.
+ * @return string Markup, safe to echo.
+ */
+function dorotape_arrow_icon( string $class = 'btn__icon' ): string {
+	return sprintf(
+		'<svg%1$s viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : ''
 	);
 }

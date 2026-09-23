@@ -132,4 +132,47 @@
   &__breadcrumb {
     margin-top: var(--spacer-32);
   }
+
+  // Category pages put a photograph beside the text. The grid only splits at
+  // desktop, because below it the photo would either squash the text into a
+  // column too narrow for the heading or push the ranges grid off the first
+  // screenful for no gain.
+  &__grid {
+    display: grid;
+    align-items: center;
+    gap: var(--spacer-40);
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-48);
+    }
+  }
+
+  // Hidden until there is a second column to put it in, rather than stacked
+  // above or below the text: the design never shows it on a narrow screen.
+  &__media {
+    display: none;
+    margin: 0;
+
+    @include min-breakpoint(desktop) {
+      display: block;
+    }
+  }
+
+  // One height at one breakpoint, because the column it sits in only exists
+  // at desktop. No drop shadow: the design puts one here and nowhere else on
+  // the site, and no other image on any page carries one.
+  &__image {
+    display: block;
+    width: 100%;
+    height: 20rem;
+    border-radius: var(--radius-2xl);
+    object-fit: cover;
+  }
+
+  // Closes the banner rather than opening the band below it, so the line sits
+  // inside the wash and the section under it starts on the page background.
+  &__rule {
+    margin-top: var(--spacer-48);
+  }
 }

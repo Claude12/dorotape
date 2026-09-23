@@ -65,7 +65,7 @@ $dt_secondary_is_email = $dt_has_secondary && 0 === stripos( (string) $dt_button
 						<?php if ( $dt_has_primary ) : ?>
 							<a class="btn btn--lg btn--cyan" href="<?php echo esc_url( $dt_button['url'] ); ?>"<?php echo $dt_button['target'] ? ' target="' . esc_attr( $dt_button['target'] ) . '" rel="noopener"' : ''; ?>>
 								<?php echo esc_html( $dt_button['title'] ); ?>
-								<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+								<?php echo dorotape_arrow_icon( 'btn__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?>
 							</a>
 						<?php endif; ?>
 
@@ -76,7 +76,7 @@ $dt_secondary_is_email = $dt_has_secondary && 0 === stripos( (string) $dt_button
 								<?php endif; ?>
 								<?php echo esc_html( $dt_button_2['title'] ); ?>
 								<?php if ( ! $dt_secondary_is_email ) : ?>
-									<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+									<?php echo dorotape_arrow_icon( 'btn__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?>
 								<?php endif; ?>
 							</a>
 						<?php endif; ?>

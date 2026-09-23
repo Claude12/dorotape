@@ -1,0 +1,138 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Category intro band.
+//
+// Opens both category designs under the banner: a cyan outline pill across the
+// top, then the heading, standfirst and call to action on the left with a
+// ticked checklist beside them.
+//
+// The top padding is small because the banner above closes on an aurora line,
+// and the design lets this band sit close under it rather than opening the
+// usual 80px. The bottom padding is the usual one, because what follows is the
+// ranges grid opening its own.
+.category-intro-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-16) 0 var(--spacer-64);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-32) 0 var(--spacer-80);
+  }
+
+  // The same pill the intro columns block uses, so the two bands agree where
+  // they appear on the same page.
+  &__eyebrow {
+    display: inline-block;
+    margin: 0;
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-48);
+    margin-top: var(--spacer-24);
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-64);
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__standfirst {
+    margin: var(--spacer-24) 0 0;
+    color: color-mix(in oklab, var(--color-foreground) 90%, transparent);
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-relaxed;
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-md;
+    }
+  }
+
+  &__cta {
+    margin-top: var(--spacer-32);
+  }
+
+  // Two columns from 576px up rather than at desktop, so the eight rows stop
+  // being a long single file on a tablet while the text beside them is still
+  // stacked above. Aligned to the top of the row so the list does not stretch
+  // to match a taller left column.
+  &__list {
+    display: grid;
+    gap: var(--spacer-12);
+    align-content: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacer-12);
+    height: 100%;
+    padding: var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 15%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: color-mix(in oklab, var(--color-surface) 15%, transparent);
+    color: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+  }
+
+  // Only a row with somewhere to go lights up, so a plain list never looks
+  // like something the visitor failed to click.
+  &__row--link {
+    @include aurora-ring;
+
+    transition:
+      border-color var(--transition),
+      background-color var(--transition),
+      color var(--transition);
+
+    // The ring replaces the border and the tint rather than sitting outside
+    // them, which is how the design draws it: the row empties out and the
+    // gradient becomes its edge.
+    &:hover,
+    &:focus-visible {
+      @include aurora-ring-visible;
+
+      border-color: transparent;
+      background-color: transparent;
+      color: var(--color-cyan);
+    }
+  }
+
+  &__tick {
+    flex: 0 0 auto;
+    width: var(--spacer-16);
+    height: var(--spacer-16);
+    // Nudged down so the tick sits on the cap height of the first line rather
+    // than above it, which is what mt-0.5 is doing in the design.
+    margin-top: 2px;
+    color: var(--color-cyan);
+  }
+}

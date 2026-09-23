@@ -124,7 +124,7 @@ add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 									/* translators: %s: team member's first name. */
 									echo esc_html( sprintf( __( 'Email %s', 'dorotape' ), $dt_name ) );
 									?>
-									<svg class="link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+									<?php echo dorotape_arrow_icon( 'link__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?>
 								</a>
 							<?php endif; ?>
 						</div>

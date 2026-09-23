@@ -1,0 +1,119 @@
+{
+    "key": "group_dorotape_category_settings",
+    "title": "Category Page Defaults",
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-category-sections"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "What every product category page shows unless that category overrides it: the banner eyebrow, and the wording and background shape of the ranges grid.",
+    "show_in_rest": 0,
+    "fields": [
+        {
+            "key": "field_dtcatset0001",
+            "label": "Banner eyebrow",
+            "name": "category_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small capitals above the title on every category banner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Products",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcatset0002",
+            "label": "Ranges background shape",
+            "name": "category_ranges_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the grid of sub-categories.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtcatset0003",
+            "label": "Ranges note",
+            "name": "category_ranges_note",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Follows the counted opening, so \"22 ranges in this category, \" and then this. Ends with a full stop.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "stocked in the UK and dispatched across the UK and Ireland.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcatset0004",
+            "label": "Ranges button label",
+            "name": "category_ranges_button",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The small outlined button on each sub-category card.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "View all",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ]
+}

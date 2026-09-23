@@ -975,6 +975,248 @@
                     "min": "",
                     "max": ""
                 },
+                "layout_dtcint000001": {
+                    "key": "layout_dtcint000001",
+                    "name": "category_intro_block",
+                    "label": "Category intro",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtcint000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtcint000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading. Usually the category name.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcint000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcint000104",
+                            "label": "Standfirst",
+                            "name": "lead",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "The bolder opening paragraph, under the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcint000105",
+                            "label": "Call to action",
+                            "name": "link",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "Optional button below the standfirst. A phone number goes in as tel:01858431642 with no spaces.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "70",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dtcint000106",
+                            "label": "Call to action icon",
+                            "name": "link_icon",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Outline icon shown before the button label.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "30",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "phone": "Telephone",
+                                "truck": "Delivery van",
+                                "lightbulb": "Lightbulb",
+                                "calendar": "Calendar",
+                                "swatch": "Swatch book",
+                                "globe": "Globe",
+                                "shield": "Shield",
+                                "award": "Award"
+                            },
+                            "default_value": "phone",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dtcint000107",
+                            "label": "Checklist",
+                            "name": "items",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "The ticked list beside the text. Rows without a label are skipped. Give a row a link and it becomes a card the visitor can click.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 0,
+                            "collapsed": "field_dtcint000108",
+                            "button_label": "Add item",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtcint000108",
+                                    "label": "Label",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "Keep it to a few words so the rows stay the same height.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtcint000109",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "Optional. Leave it empty for a plain ticked row.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "50",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "allow_in_bindings": 0
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtcint000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
                 "layout_dtcatg000001": {
                     "key": "layout_dtcatg000001",
                     "name": "category_grid_block",
@@ -3601,6 +3843,20 @@
                 "param": "options_page",
                 "operator": "==",
                 "value": "dorotape-product-sections"
+            }
+        ],
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "product_cat"
+            }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-category-sections"
             }
         ]
     ],

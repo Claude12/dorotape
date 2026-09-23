@@ -121,7 +121,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 							<h3 class="category-grid-block__title"><?php echo esc_html( $dt_card['title'] ); ?></h3>
 
 							<?php if ( $dt_button_label ) : ?>
-								<span class="btn btn--sm btn--outline category-grid-block__button"><?php echo esc_html( $dt_button_label ); ?></span>
+								<span class="btn btn--sm btn--outline category-grid-block__button"><?php echo esc_html( $dt_button_label ); ?><?php echo dorotape_arrow_icon(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?></span>
 							<?php endif; ?>
 						</div>
 					</a>

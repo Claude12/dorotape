@@ -116,7 +116,7 @@ $dt_count = is_array( $dt_columns ) ? count( $dt_columns ) : 0;
 						<?php if ( ! empty( $dt_column['link']['url'] ) ) : ?>
 							<a class="link link--underline image-text-block__link" href="<?php echo esc_url( $dt_column['link']['url'] ); ?>" target="<?php echo esc_attr( $dt_column['link']['target'] ? $dt_column['link']['target'] : '_self' ); ?>">
 								<?php echo esc_html( $dt_column['link']['title'] ); ?>
-								<svg class="link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+								<?php echo dorotape_arrow_icon( 'link__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?>
 							</a>
 						<?php endif; ?>
 
