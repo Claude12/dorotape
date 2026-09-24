@@ -1,11 +1,15 @@
 <?php
 declare( strict_types=1 );
 /**
- * The product card.
+ * The product card, and the grid that holds a list of them.
  *
  * One card, used by the Product Row block on the homepage and by Related
  * products on a single product page. It was written for the row first; this
  * file is that markup lifted out unchanged so the two places cannot drift.
+ *
+ * dorotape_product_list_open() at the foot is the same idea one level up: the
+ * shop, the search page, a category and Related products all put these cards
+ * in the same columns, so the elements around them are written once here.
  *
  * Two link modes, because the two places need different insides:
  *
@@ -233,4 +237,90 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 		</article>
 	<?php endif; ?>
 	<?php
+}
+
+/**
+ * Build an attribute string from a name => value map.
+ *
+ * A value of '' writes the name on its own, which is what `hidden` and the
+ * `data-` flags the filter script looks for need.
+ *
+ * @param array<string, string> $attributes Attributes to write.
+ * @return string Leading space included when there is anything to write.
+ */
+function dorotape_product_list_attributes( array $attributes ): string {
+	$out = '';
+
+	foreach ( $attributes as $name => $value ) {
+		$out .= ' ' . esc_attr( $name );
+
+		if ( '' !== $value ) {
+			$out .= '="' . esc_attr( $value ) . '"';
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Open a grid of product cards.
+ *
+ * The one place this markup is written. The shop, the search page, a category
+ * and Related products all showed the same cards in the same columns, and
+ * each had its own copy of the two elements around them, which is how the
+ * shop ended up stepping to three columns at a different width from the rest.
+ *
+ * Cards go inside as <li class="product-list__item">, or with the class from
+ * dorotape_product_list_item_class() where WooCommerce owns the element.
+ *
+ * @param array{panel?:bool, attributes?:array<string, string>} $args
+ *     panel:      true when the 280px filter panel sits beside the grid, which
+ *                 makes it three columns rather than four.
+ *     attributes: extra attributes for the <ul>, e.g. the filter script's.
+ * @return string
+ */
+function dorotape_product_list_open( array $args = array() ): string {
+	$panel      = (bool) ( $args['panel'] ?? false );
+	$attributes = (array) ( $args['attributes'] ?? array() );
+
+	$classes = 'product-list__items' . ( $panel ? ' product-list__items--panel' : '' );
+
+	return '<div class="product-list"><ul class="' . esc_attr( $classes ) . '"' . dorotape_product_list_attributes( $attributes ) . '>';
+}
+
+/**
+ * Close it.
+ *
+ * @param string $after Markup to put after the grid and inside the wrapper,
+ *                      which is where the empty message belongs when it ships
+ *                      hidden alongside a full grid.
+ * @return string
+ */
+function dorotape_product_list_close( string $after = '' ): string {
+	return '</ul>' . $after . '</div>';
+}
+
+/**
+ * The class for one card's <li>.
+ *
+ * Given its own function because WooCommerce writes that element itself in
+ * its loop, so two of the four callers add the class through a filter rather
+ * than writing the tag.
+ */
+function dorotape_product_list_item_class(): string {
+	return 'product-list__item';
+}
+
+/**
+ * The message shown in place of the grid.
+ *
+ * No results, an empty category, or a filter combination that matches
+ * nothing. It is the same box in all of them.
+ *
+ * @param string                $message    Already-translated text.
+ * @param array<string, string> $attributes Extra attributes, e.g. `hidden`.
+ * @return string
+ */
+function dorotape_product_list_message( string $message, array $attributes = array() ): string {
+	return '<p class="product-list__empty"' . dorotape_product_list_attributes( $attributes ) . '>' . esc_html( $message ) . '</p>';
 }

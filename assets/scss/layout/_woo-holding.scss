@@ -108,7 +108,14 @@ ul.products {
   }
 }
 
-li.product {
+// Only where WooCommerce is still drawing its own loop card. Where the theme
+// has put its own in the item instead, this dress fought it: a second border
+// and surface drew a box around the card's own, `flex-direction: column` left
+// the card at its content height so the buttons in a row no longer lined up,
+// and the `.button` rule below reached into the card and inset it. See
+// dorotape_product_list_open() in inc/product-card.php for the markup, and
+// components/_product-list.scss for what dresses it instead.
+li.product:not(:has(> .product-card)) {
   position: relative;
   display: flex;
   flex-direction: column;

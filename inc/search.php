@@ -271,7 +271,7 @@ function dorotape_search_empty(): void {
 	<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>" animate="fade-in-up">
 		<?php dorotape_search_band_shape(); ?>
 		<div class="container">
-			<p class="category-shop__empty"><?php echo esc_html( $message ); ?></p>
+			<?php echo dorotape_product_list_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 		</div>
 	</section>
 	<?php
@@ -425,15 +425,16 @@ function dorotape_search_loop_after(): void {
 /**
  * The grid, in place of Woo's products list.
  *
- * The leaf category's grid class, so a search result sits in the same columns
- * at the same gaps as the same product does inside its category.
+ * The shared one (inc/product-card.php), so a search result sits in the same
+ * columns at the same gaps as the same product does inside its category.
+ * Nothing is beside it here, so it is the full width four.
  *
  * @param string $loop_html The <ul> that would have opened the list.
  */
 function dorotape_search_loop_start( string $loop_html ): string {
 	remove_filter( 'woocommerce_product_loop_start', 'dorotape_search_loop_start' );
 
-	return '<div class="category-shop__products"><ul class="category-shop__grid category-shop__grid--wide">';
+	return dorotape_product_list_open();
 }
 
 /**
@@ -444,7 +445,7 @@ function dorotape_search_loop_start( string $loop_html ): string {
 function dorotape_search_loop_end( string $loop_html ): string {
 	remove_filter( 'woocommerce_product_loop_end', 'dorotape_search_loop_end' );
 
-	return '</ul></div>';
+	return dorotape_product_list_close();
 }
 
 /**
@@ -459,7 +460,7 @@ function dorotape_search_loop_end( string $loop_html ): string {
  * @return array<int, string>
  */
 function dorotape_search_post_class( array $classes, $product = null ): array {
-	$classes[] = 'category-shop__item';
+	$classes[] = dorotape_product_list_item_class();
 
 	return $classes;
 }

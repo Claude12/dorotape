@@ -529,8 +529,9 @@
 
 // ── Band 3: related products ───────────────────────────────────────────────
 //
-// The cards are the shared .product-card, in its grid mode. This is the band
-// around them: heading, background shape, and the four-up grid.
+// The cards are the shared .product-card, in its grid mode, in the shared
+// .product-list grid. This is only the band around them: heading, spacing and
+// background shape.
 
 .product-grid {
   position: relative;
@@ -565,23 +566,10 @@
     line-height: $line-height-block-heading;
   }
 
-  &__items {
-    display: grid;
-    gap: var(--spacer-20);
-    margin: var(--spacer-40) 0 0;
-    padding: 0;
-    list-style: none;
-
-    @include min-breakpoint(mobile) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    @include min-breakpoint(desktop) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  &__item {
-    display: flex;
+  // The grid under the heading is .product-list, the same one the shop and
+  // the search page use (components/_product-list.scss). Only the space
+  // between the heading and it belongs to this band.
+  .product-list {
+    margin-top: var(--spacer-40);
   }
 }

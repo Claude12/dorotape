@@ -599,14 +599,22 @@ function dorotape_category_filter_header( int $count ): void {
  * Related products makes, so a product looks the same wherever it is shown.
  *
  * @param array<int, int> $product_ids Products to show.
+ * @param bool             $panel       True when the filter panel is beside
+ *                                      it, which makes the grid three columns
+ *                                      rather than the full width four.
  */
-function dorotape_category_filter_grid( array $product_ids ): void {
+function dorotape_category_filter_grid( array $product_ids, bool $panel ): void {
 	$empty = dorotape_category_page_field( 'category_products_empty', __( 'No products match those filters. Try clearing them.', 'dorotape' ) );
 	?>
-	<div class="category-shop__products">
-
-		<ul class="category-shop__grid" data-filter-grid>
-			<?php foreach ( $product_ids as $dt_product_id ) : ?>
+	<?php
+	echo dorotape_product_list_open( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+		array(
+			'panel'      => $panel,
+			'attributes' => array( 'data-filter-grid' => '' ),
+		)
+	);
+	?>
+		<?php foreach ( $product_ids as $dt_product_id ) : ?>
 				<?php
 				$dt_product = wc_get_product( $dt_product_id );
 
@@ -616,9 +624,9 @@ function dorotape_category_filter_grid( array $product_ids ): void {
 
 				$dt_tokens = dorotape_category_filter_tokens( $dt_product );
 				?>
-				<li
-					class="category-shop__item"
-					data-filter-item
+			<li
+				class="<?php echo esc_attr( dorotape_product_list_item_class() ); ?>"
+				data-filter-item
 					data-facets="<?php echo esc_attr( $dt_tokens['facets'] ); ?>"
 					data-stock="<?php echo esc_attr( $dt_tokens['stock'] ); ?>"
 					data-search="<?php echo esc_attr( $dt_tokens['search'] ); ?>"
@@ -649,13 +657,18 @@ function dorotape_category_filter_grid( array $product_ids ): void {
 					);
 					?>
 				</li>
-			<?php endforeach; ?>
-		</ul>
-
-		<p class="category-shop__empty" data-filter-empty hidden><?php echo esc_html( $empty ); ?></p>
-
-	</div>
+		<?php endforeach; ?>
 	<?php
+	echo dorotape_product_list_close( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+		dorotape_product_list_message(
+			$empty,
+			array(
+				'data-filter-empty' => '',
+				'hidden'            => '',
+			)
+		)
+	);
+
 	unset( $GLOBALS['product'] );
 }
 
@@ -716,16 +729,14 @@ function dorotape_category_shop(): void {
 			<?php endif; ?>
 
 			<?php if ( ! $product_ids ) : ?>
-				<p class="category-shop__empty">
-					<?php
-					echo esc_html(
-						dorotape_category_page_field(
-							'category_products_none',
-							__( 'There is nothing in this category at the moment. Call us on 01858 431642 and we will point you to the nearest material.', 'dorotape' )
-						)
-					);
-					?>
-				</p>
+				<?php
+				echo dorotape_product_list_message( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+					dorotape_category_page_field(
+						'category_products_none',
+						__( 'There is nothing in this category at the moment. Call us on 01858 431642 and we will point you to the nearest material.', 'dorotape' )
+					)
+				);
+				?>
 			<?php else : ?>
 				<div class="category-shop<?php echo $filters ? '' : ' category-shop--plain'; ?>">
 					<?php if ( $filters ) : ?>
@@ -746,7 +757,7 @@ function dorotape_category_shop(): void {
 						<?php dorotape_category_filter_panel( $term, $facets, count( $product_ids ) ); ?>
 					<?php endif; ?>
 
-					<?php dorotape_category_filter_grid( $product_ids ); ?>
+					<?php dorotape_category_filter_grid( $product_ids, (bool) $filters ); ?>
 				</div>
 			<?php endif; ?>
 		</div>

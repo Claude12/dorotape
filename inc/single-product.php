@@ -367,10 +367,10 @@ function dorotape_product_grid( array $products, string $eyebrow, string $headin
 				<h2 class="product-grid__heading"><?php echo esc_html( $heading ); ?></h2>
 			<?php endif; ?>
 
-			<ul class="product-grid__items">
+			<?php echo dorotape_product_list_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 				<?php foreach ( $products as $dt_item ) : ?>
 					<?php $product = $dt_item; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restored below. ?>
-					<li class="product-grid__item">
+					<li class="<?php echo esc_attr( dorotape_product_list_item_class() ); ?>">
 						<?php
 						dorotape_product_card(
 							$dt_item,
@@ -384,7 +384,7 @@ function dorotape_product_grid( array $products, string $eyebrow, string $headin
 						?>
 					</li>
 				<?php endforeach; ?>
-			</ul>
+			<?php echo dorotape_product_list_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 		</div>
 	</section>
 	<?php

@@ -1,0 +1,82 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// A grid of product cards.
+//
+// Every list of products on the site: the shop, a search, a category, and
+// Related products and upsells on a product page. Markup is
+// dorotape_product_list_open() in inc/product-card.php, which is the only
+// place that writes it, so a change here reaches all five at once.
+//
+// The cards themselves are .product-card in its grid mode
+// (components/_product-card.scss). This file is only the columns around them.
+
+.product-list {
+  // The column wrapper. It carries no look of its own: it exists so the grid
+  // and the empty message are one child of the two column .category-shop
+  // layout rather than two, and so the empty message can replace the grid
+  // without the column moving.
+
+  // Four across at desktop, the same step at the same breakpoint as the
+  // category card grid (components/_category-grid-block.scss), so a card is
+  // the same size wherever the site shows one.
+  &__items {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacer-16);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(tablet) {
+      gap: var(--spacer-20);
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  // Three across, for a grid with the 280px filter panel beside it.
+  //
+  // The panel takes the first 280px of the row from desktop up, so four cards
+  // in what is left would be narrower than a product card is anywhere else.
+  // Three steps in at the same breakpoint the panel appears at, rather than
+  // waiting for xl: until it did, the shop showed two cards a third wider
+  // than the search page showed four of at the same window width.
+  &__items--panel {
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  // The card stretches to the row, which is what lines the Add to cart
+  // buttons up across names of different lengths. See --grid in
+  // components/_product-card.scss for the other half of it.
+  &__item {
+    display: flex;
+  }
+
+  // Beats the display above, so a card the filter hides is really gone.
+  &__item[hidden] {
+    display: none;
+  }
+
+  // Shown in place of the grid: no results, an empty category, or a filter
+  // combination that matches nothing.
+  &__empty {
+    margin: 0;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    padding: var(--spacer-32);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+  }
+}

@@ -72,25 +72,23 @@ $dt_button = dorotape_search_field( 'search_button', __( 'Read more', 'dorotape'
 				<?php if ( $dt_products ) : ?>
 					<?php dorotape_search_band_header( dorotape_search_field( 'search_products_heading', __( 'Products', 'dorotape' ) ) ); ?>
 
-					<div class="category-shop__products">
-						<ul class="category-shop__grid category-shop__grid--wide">
-							<?php foreach ( $dt_products as $dt_product ) : ?>
-								<li class="category-shop__item">
-									<?php
-									/*
-									 * Set per card because this is not the
-									 * WooCommerce loop: it is what makes the add to
-									 * cart button pick the right label and behaviour
-									 * for each product type.
-									 */
-									$GLOBALS['product'] = $dt_product; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Required by WooCommerce loop templates.
+					<?php echo dorotape_product_list_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
+						<?php foreach ( $dt_products as $dt_product ) : ?>
+							<li class="<?php echo esc_attr( dorotape_product_list_item_class() ); ?>">
+								<?php
+								/*
+								 * Set per card because this is not the
+								 * WooCommerce loop: it is what makes the add to
+								 * cart button pick the right label and behaviour
+								 * for each product type.
+								 */
+								$GLOBALS['product'] = $dt_product; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Required by WooCommerce loop templates.
 
-									dorotape_product_card( $dt_product, dorotape_search_card_args( $dt_product ) );
-									?>
-								</li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
+								dorotape_product_card( $dt_product, dorotape_search_card_args( $dt_product ) );
+								?>
+							</li>
+						<?php endforeach; ?>
+					<?php echo dorotape_product_list_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 					<?php unset( $GLOBALS['product'] ); ?>
 				<?php endif; ?>
 

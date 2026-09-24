@@ -550,20 +550,8 @@ function dorotape_shop_panel_facets(): array {
  * shop applies when a category has no attributes to filter on.
  */
 function dorotape_shop_columns_start(): void {
-	$active = count( dorotape_shop_chosen_categories() );
-
-	foreach ( dorotape_shop_chosen_attributes() as $dt_data ) {
-		$active += count( (array) ( $dt_data['terms'] ?? array() ) );
-	}
-
-	/*
-	 * Facets, or failing that something to undo. A combination that matches
-	 * nothing leaves no facet with two values to offer, so the panel used to
-	 * disappear at exactly the moment it was needed: an empty grid, no word
-	 * about what had been filtered, and no way back but the browser's own
-	 * button. The chips are inside the panel, so the panel has to stay.
-	 */
-	$has_panel = (bool) dorotape_shop_panel_facets() || $active > 0;
+	$active    = dorotape_shop_active_count();
+	$has_panel = dorotape_shop_has_panel();
 	?>
 	<div class="category-shop<?php echo $has_panel ? '' : ' category-shop--plain'; ?>">
 		<?php if ( $has_panel ) : ?>
@@ -582,6 +570,35 @@ function dorotape_shop_columns_start(): void {
 			<?php dorotape_shop_panel(); ?>
 		<?php endif; ?>
 	<?php
+}
+
+/**
+ * How many filters are on, counted the way the drawer's badge shows them.
+ */
+function dorotape_shop_active_count(): int {
+	$active = count( dorotape_shop_chosen_categories() );
+
+	foreach ( dorotape_shop_chosen_attributes() as $dt_data ) {
+		$active += count( (array) ( $dt_data['terms'] ?? array() ) );
+	}
+
+	return $active;
+}
+
+/**
+ * True when the filter panel is drawn beside the grid.
+ *
+ * Facets, or failing that something to undo. A combination that matches
+ * nothing leaves no facet with two values to offer, so the panel used to
+ * disappear at exactly the moment it was needed: an empty grid, no word about
+ * what had been filtered, and no way back but the browser's own button. The
+ * chips are inside the panel, so the panel has to stay.
+ *
+ * The grid asks too, since three columns or four depends on whether the panel
+ * has taken the first 280px of the row.
+ */
+function dorotape_shop_has_panel(): bool {
+	return (bool) dorotape_shop_panel_facets() || dorotape_shop_active_count() > 0;
 }
 
 /**
@@ -715,15 +732,15 @@ function dorotape_shop_loop_after(): void {
 /**
  * The grid, in place of Woo's products list.
  *
- * Three columns rather than the search page's four, because the panel has
- * taken the first 280px of the row.
+ * The shared one (inc/product-card.php), told that the panel is beside it so
+ * it draws three columns rather than four.
  *
  * @param string $loop_html The <ul> that would have opened the list.
  */
 function dorotape_shop_loop_start( string $loop_html ): string {
 	remove_filter( 'woocommerce_product_loop_start', 'dorotape_shop_loop_start' );
 
-	return '<div class="category-shop__products"><ul class="category-shop__grid">';
+	return dorotape_product_list_open( array( 'panel' => dorotape_shop_has_panel() ) );
 }
 
 /**
@@ -734,7 +751,7 @@ function dorotape_shop_loop_start( string $loop_html ): string {
 function dorotape_shop_loop_end( string $loop_html ): string {
 	remove_filter( 'woocommerce_product_loop_end', 'dorotape_shop_loop_end' );
 
-	return '</ul></div>';
+	return dorotape_product_list_close();
 }
 
 /**
@@ -757,8 +774,8 @@ function dorotape_shop_empty(): void {
 			<?php dorotape_shop_band_header(); ?>
 			<?php dorotape_shop_toolbar(); ?>
 			<?php dorotape_shop_columns_start(); ?>
-				<div class="category-shop__products">
-					<p class="category-shop__empty"><?php echo esc_html( $message ); ?></p>
+				<div class="product-list">
+					<?php echo dorotape_product_list_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 				</div>
 			</div>
 		</div>

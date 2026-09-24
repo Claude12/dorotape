@@ -65,59 +65,8 @@
     font-weight: $font-weight-extrabold;
   }
 
-  &__grid {
-    display: grid;
-    gap: var(--spacer-16);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-
-    @include min-breakpoint(mobile) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--spacer-20);
-    }
-
-    @include min-breakpoint(xl) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  // Four across, for a grid with no filter panel beside it.
-  //
-  // The three column rule above is sized for the column left over next to the
-  // 280px panel. Without one the row is a third wider, and three cards in it
-  // are larger than a product card is anywhere else on the site. Four is what
-  // the ranges grid does at the same width, so a full width grid of cards is
-  // a full width grid of cards wherever it appears.
-  &__grid--wide {
-    @include min-breakpoint(desktop) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    @include min-breakpoint(xl) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  &__item {
-    display: flex;
-  }
-
-  // Beats the display above, so a card the filter hides is really gone.
-  &__item[hidden] {
-    display: none;
-  }
-
-  &__empty {
-    margin: 0;
-    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
-    border-radius: var(--radius-2xl);
-    background-color: var(--color-surface);
-    padding: var(--spacer-32);
-    color: var(--color-muted-foreground);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
-  }
+  // The grid itself is .product-list, shared with the search page and with
+  // Related products: components/_product-list.scss.
 }
 
 .category-filters {
