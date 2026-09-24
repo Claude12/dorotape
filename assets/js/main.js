@@ -5,6 +5,7 @@ import { initTierTable } from './lib/tier-table';
 import { initVariationPriceSwap } from './lib/variation-price';
 import { initFilterBar } from './lib/filter-bar';
 import { initCategoryFilters } from './lib/category-filters';
+import { initShopFilters } from './lib/shop-filters';
 import { initCutRows } from './lib/cut-size-rows';
 import { initQuickAdd } from './lib/quick-add';
 import { initQtyStep } from './lib/qty-step';
@@ -23,6 +24,7 @@ const features = [
   initVariationPriceSwap,
   initFilterBar,
   initCategoryFilters,
+  initShopFilters,
   initCutRows,
   initQuickAdd,
   initQtyStep,

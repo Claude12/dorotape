@@ -145,14 +145,18 @@
     background-color: var(--color-surface);
     padding: var(--spacer-20);
 
-    // The panel can outgrow a short laptop screen, and a sticky element taller
-    // than the viewport pins its own bottom out of reach. Scrolling inside it
-    // keeps the last facet and the Clear button reachable at every height.
+    // The panel outgrows the screen at both ends. As a sticky sidebar it is a
+    // short laptop that pins its own bottom out of reach; as a drawer it is the
+    // shop's seven facets, which unfold to some four thousand pixels of
+    // checkboxes above the first product. Scrolling inside it keeps the last
+    // facet, the count and the Apply button reachable at every height.
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    scrollbar-color: color-mix(in oklab, var(--color-border) 90%, transparent) transparent;
+    scrollbar-width: thin;
+
     @include min-breakpoint(desktop) {
       max-height: calc(100vh - 13rem);
-      overflow-y: auto;
-      scrollbar-color: color-mix(in oklab, var(--color-border) 90%, transparent) transparent;
-      scrollbar-width: thin;
     }
 
     // A track that is always drawn, as the design draws it. macOS hides its
@@ -167,6 +171,79 @@
       border-radius: var(--radius-pill);
       background-color: color-mix(in oklab, var(--color-border) 90%, transparent);
     }
+  }
+
+  // What is currently filtered, at the top of both panels: server rendered
+  // links on the shop (inc/shop.php), built by the script on a leaf category.
+  // With the shop's facets shut by default the box a filter came from can be
+  // three collapsed headings away, and on an empty result it can be a facet
+  // the panel has stopped drawing at all, so taking a filter off should never
+  // mean finding its box again.
+  &__active {
+    margin: 0 0 var(--spacer-24);
+  }
+
+  // Same reason as the Clear button further down: the leaf panel ships this
+  // container empty and hidden, and display would otherwise show it anyway.
+  &__active[hidden] {
+    display: none;
+  }
+
+  &__active-label {
+    margin: 0 0 var(--spacer-8);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // Magenta, like a ticked pill, because it is the same choice: shown again
+  // where it can be undone. It is a link on the shop and a button on a leaf
+  // category, so it carries its own font and border rather than inheriting a
+  // button's.
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-6);
+    border: 1px solid var(--color-magenta);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-magenta);
+    padding: var(--spacer-6) var(--spacer-12);
+    color: var(--color-primary-foreground);
+    font-family: inherit;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast);
+
+    &:hover {
+      border-color: var(--color-cyan);
+      background-color: var(--color-cyan);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-cyan);
+      outline-offset: 2px;
+    }
+  }
+
+  &__chip-icon {
+    flex-shrink: 0;
+    width: 0.75rem;
+    height: 0.75rem;
   }
 
   &__group {
@@ -192,6 +269,70 @@
     font-size: $font-size-sm;
     font-weight: $font-weight-extrabold;
     line-height: $line-height-sm;
+  }
+
+  // The shop panel's facet headings (inc/shop.php), which fold. Seven facets
+  // unfolded is four thousand pixels of checkboxes above the first product,
+  // so they ship shut, and <details> opens them with no script at all: the
+  // shop's form is built to work without one, and a heading that only opens
+  // for customers who have JavaScript would be the first part of it that did
+  // not. A rule under each one, so a column of shut headings reads as a list
+  // of things to open rather than as a paragraph.
+  // Stacked flush against each other with a rule between, the way an accordion
+  // reads, rather than floating 24px apart like the leaf panel's fieldsets: a
+  // column of shut headings needs to look like a list of things to open.
+  &__group--fold {
+    margin-bottom: 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  }
+
+  // No rule on the last one. The footer draws its own a little below, and two
+  // hairlines that close together read as a mistake.
+  &__group--fold:last-of-type {
+    border-bottom: 0;
+  }
+
+  &__group--fold[open] {
+    padding-bottom: var(--spacer-16);
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-12);
+    // The heading carries __legend too, whose 12px sits under the label. A
+    // shut facet has nothing for that gap to separate it from, so it is given
+    // back below only once the facet is open.
+    margin-bottom: 0;
+    // The label is 20px tall on its own, which is under the 24px minimum for
+    // a target and a long way under what a thumb expects. The padding takes
+    // the row to 44px and makes the whole width of it the hit area, so a
+    // heading is opened by aiming at the row rather than at the word.
+    padding: var(--spacer-12) 0;
+    cursor: pointer;
+    list-style: none;
+
+    // Safari draws its own triangle from the shadow DOM, which list-style
+    // does not reach, and it would sit beside the chevron.
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  &__group--fold[open] &__summary {
+    margin-bottom: var(--spacer-4);
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    transition: transform var(--transition-fast);
+  }
+
+  &__group--fold[open] &__chevron {
+    transform: rotate(180deg);
   }
 
   // The wrapper carries the border and the padding, and the icon sits beside
@@ -409,6 +550,22 @@
   &__clear-icon {
     width: 0.875rem;
     height: 0.875rem;
+  }
+
+  // The shop panel's Apply button (inc/shop.php). The leaf panel has no such
+  // button because it filters in the browser and there is nothing to submit;
+  // the shop filters on the server, so this is how the form is sent without
+  // JavaScript, and it is also what the drawer keeps instead of auto-applying.
+  // Its own row under the count and the Clear link, which the footer's
+  // flex-wrap gives it as soon as it is full width.
+  &__apply {
+    width: 100%;
+  }
+
+  // Same reason as the Clear button above: .btn sets a display of its own, so
+  // the user agent's [hidden] rule cannot hide this on its own.
+  &__apply[hidden] {
+    display: none;
   }
 
   &__browse {

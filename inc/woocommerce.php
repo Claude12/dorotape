@@ -16,9 +16,13 @@ add_filter( 'pre_option_woocommerce_category_archive_display', function () {
 	return 'subcategories';
 } );
 
-// Main Shop page also shows top-level categories rather than a flat product list.
+// The Shop page lists products, not categories. The categories are the main
+// navigation and the homepage's own grid already, so a third copy of them would
+// have left the site with no page that answers "show me everything", which is
+// what the homepage hero's button and both "View all" links promise. An empty
+// value is Woo's own "show products". See inc/shop.php.
 add_filter( 'pre_option_woocommerce_shop_page_display', function () {
-	return 'subcategories';
+	return '';
 } );
 
 // Breadcrumb delimiter and home label

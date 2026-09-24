@@ -316,6 +316,28 @@ function dorotape_category_filter_panel( WP_Term $term, array $facets, int $tota
 	<aside class="category-filters" data-category-filters hidden>
 		<form class="category-filters__panel" id="dt-filter-panel" method="get" action="">
 
+			<?php
+			/*
+			 * What is currently filtered, built by the script as boxes are
+			 * ticked. Empty and hidden in the markup because nothing can be
+			 * ticked before the script runs: the panel itself is hidden until
+			 * then. Each chip takes its own value off, which on a twelve colour
+			 * list is the difference between undoing a filter and hunting for
+			 * the box it came from.
+			 */
+			?>
+			<div
+				class="category-filters__active"
+				data-filter-chips
+				hidden
+				data-chip-remove="<?php echo esc_attr( __( 'Remove the {facet} filter {name}', 'dorotape' ) ); ?>"
+				data-chip-search="<?php esc_attr_e( 'Search', 'dorotape' ); ?>"
+				data-chip-stock="<?php esc_attr_e( 'Availability', 'dorotape' ); ?>"
+			>
+				<p class="category-filters__active-label"><?php esc_html_e( 'Filtering by', 'dorotape' ); ?></p>
+				<ul class="category-filters__chips" data-filter-chip-list></ul>
+			</div>
+
 			<div class="category-filters__group">
 				<label class="category-filters__legend" for="dt-filter-search">
 					<?php esc_html_e( 'Search this range', 'dorotape' ); ?>

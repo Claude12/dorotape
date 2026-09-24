@@ -100,6 +100,134 @@ function scheduler(run) {
   };
 }
 
+/** The close glyph, matching dorotape_ui_icon( 'x' ) so the two panels agree. */
+function closeIcon() {
+  return (
+    '<svg class="category-filters__chip-icon" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
+  );
+}
+
+/**
+ * One chip: its own value off, and nothing else touched.
+ *
+ * @param {Element}  box   The chips container, which carries the wording.
+ * @param {string}   facet What the value belongs to, for the screen reader.
+ * @param {string}   name  The value as the panel spells it.
+ * @param {Function} undo  Takes this one filter off.
+ */
+function chipButton(box, facet, name, undo) {
+  const li = document.createElement('li');
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.className = 'category-filters__chip';
+  button.innerHTML =
+    '<span class="category-filters__chip-label"></span>' +
+    closeIcon() +
+    '<span class="screen-reader-text"></span>';
+
+  /*
+   * The wording comes off the container rather than out of this file, the
+   * same way the result line's two plural forms do: a sentence built here
+   * would be the one string on the page that never reaches a translator.
+   */
+  const template = box.getAttribute('data-chip-remove') || '';
+
+  button.querySelector('.category-filters__chip-label').textContent = name;
+  button.querySelector('.screen-reader-text').textContent = template
+    .replace('{facet}', facet)
+    .replace('{name}', name);
+  button.addEventListener('click', undo);
+
+  li.appendChild(button);
+
+  return li;
+}
+
+/**
+ * Redraw the strip of what is currently filtered.
+ *
+ * Rebuilt rather than reconciled: a dozen chips is nothing to build, and the
+ * alternative is keeping a second copy of the panel's state in step with the
+ * first. Read off the controls themselves, so the search box and the stock box
+ * earn a chip on the same terms as an attribute: all three are reasons the grid
+ * is short, and the chips are the only place that says so above the fold.
+ *
+ * @param {HTMLFormElement} panel The filter form.
+ * @param {Function}        rerun What to call once a chip has undone its filter.
+ */
+function renderChips(panel, rerun) {
+  const box = panel.querySelector('[data-filter-chips]');
+  const list = panel.querySelector('[data-filter-chip-list]');
+  if (!box || !list) return;
+
+  const chips = document.createDocumentFragment();
+  let count = 0;
+
+  panel.querySelectorAll('[data-filter-facet]').forEach((input) => {
+    if (!input.checked) return;
+
+    const label = input.parentNode.querySelector(
+      '.category-filters__check-label, .category-filters__pill-label'
+    );
+    const group = input.closest('.category-filters__group');
+    const legend = group ? group.querySelector('.category-filters__legend') : null;
+
+    chips.appendChild(
+      chipButton(
+        box,
+        legend ? legend.textContent.trim() : '',
+        label ? label.textContent.trim() : input.value,
+        () => {
+          input.checked = false;
+          rerun();
+        }
+      )
+    );
+    count += 1;
+  });
+
+  const search = panel.querySelector('[data-filter-search]');
+  if (search && search.value.trim()) {
+    chips.appendChild(
+      chipButton(box, box.getAttribute('data-chip-search') || '', search.value.trim(), () => {
+        search.value = '';
+        rerun();
+      })
+    );
+    count += 1;
+  }
+
+  /*
+   * The stock box sits in a group of its own with no legend, so its facet
+   * name is given to the container alongside the search one.
+   */
+  const stock = panel.querySelector('[data-filter-stock]');
+  if (stock && stock.checked) {
+    const label = stock.parentNode.querySelector('.category-filters__check-label');
+
+    chips.appendChild(
+      chipButton(
+        box,
+        box.getAttribute('data-chip-stock') || '',
+        label ? label.textContent.trim() : '',
+        () => {
+          stock.checked = false;
+          rerun();
+        }
+      )
+    );
+    count += 1;
+  }
+
+  list.textContent = '';
+  list.appendChild(chips);
+  box.hidden = 0 === count;
+}
+
 /** Read the panel's controls into the shape the matcher wants. */
 function readState(panel) {
   const facets = {};
@@ -296,6 +424,8 @@ export function initCategoryFilters() {
       Object.keys(state.facets).length + (state.stock ? 1 : 0) + (state.search ? 1 : 0);
 
     if (clear) clear.hidden = active === 0;
+
+    renderChips(panel, apply);
 
     if (activeCount) {
       activeCount.hidden = active === 0;

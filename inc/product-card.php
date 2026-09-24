@@ -123,6 +123,10 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 	$dt_pills       = is_array( $args['pills'] ?? null ) ? $args['pills'] : array();
 	$dt_classes     = 'product-card' . ( ! empty( $args['modifier'] ) ? ' ' . $args['modifier'] : '' );
 	$dt_url         = $product->get_permalink();
+	// Thirty-nine of the catalogue's products carry no photo. A grid of flat
+	// grey panels reads as broken, so they borrow the same Theme Settings
+	// picture the link cards use rather than each card type deciding alone.
+	$dt_image_id    = dorotape_card_image_id( (int) $product->get_image_id() );
 	$dt_name        = $product->get_name();
 	?>
 
@@ -143,12 +147,12 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 	<?php endif; ?>
 
 				<div class="product-card__media">
-					<?php if ( $product->get_image_id() ) : ?>
+					<?php if ( $dt_image_id ) : ?>
 						<?php
 						// Empty alt: the product name is the link text just
 						// below, so screen readers would say it twice.
 						echo wp_get_attachment_image(
-							$product->get_image_id(),
+							$dt_image_id,
 							'medium_large',
 							false,
 							array(

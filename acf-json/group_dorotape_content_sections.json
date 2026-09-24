@@ -4407,6 +4407,13 @@
                 "operator": "==",
                 "value": "dorotape-error-page"
             }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-shop-page"
+            }
         ]
     ],
     "menu_order": 0,

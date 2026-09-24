@@ -171,6 +171,8 @@ require get_template_directory() . '/inc/single-product.php';
 require get_template_directory() . '/inc/product-category.php';
 require get_template_directory() . '/inc/category-filters.php';
 require get_template_directory() . '/inc/link-card.php';
+require get_template_directory() . '/inc/shop-filters.php';
+require get_template_directory() . '/inc/shop.php';
 require get_template_directory() . '/inc/search.php';
 require get_template_directory() . '/inc/404.php';
 require get_template_directory() . '/inc/stock.php';
