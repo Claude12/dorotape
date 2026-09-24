@@ -116,10 +116,12 @@ runs:
           # themselves when content is saved, not when theme files change
           # under them, so a git deploy has to ask.
           #
-          # A site can have more than one layer - dev runs W3 Total Cache
-          # on top of SiteGround's nginx cache - so flush every one that is
-          # present rather than stopping at the first. Flushing a cache
-          # that turns out to be empty costs nothing.
+          # Flush every cache that is present rather than stopping at the
+          # first; flushing an empty one costs nothing. A host-level cache
+          # like SiteGround's nginx layer can only be purged through its
+          # plugin, so without one the page cache is untouched. On
+          # 2026-09-24 dev had W3 Total Cache but no SiteGround Optimizer,
+          # and deploys kept serving a morning copy until the plugin went in.
           #
           # The theme sits at <root>/wp-content/themes/<name>, three levels
           # below the WordPress root that WP-CLI needs.
@@ -141,6 +143,10 @@ runs:
               wpc sg purge \
                 && echo "Purged the SiteGround cache." \
                 || echo "::warning::SiteGround Optimizer is active but did not purge."
+            fi
+            if ! wpc plugin is-active w3-total-cache 2>/dev/null \
+              && ! wpc plugin is-active sg-cachepress 2>/dev/null; then
+              echo "::warning::No page-cache plugin active; a host cache (e.g. SiteGround) was not purged."
             fi
             wpc cache flush || echo "::warning::Object cache did not flush."
           fi
