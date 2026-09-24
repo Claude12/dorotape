@@ -37,6 +37,16 @@
     border: 0;
     border-radius: 0;
     background-color: transparent;
+
+    // The ring has to stop drawing too, not just the border. It takes
+    // `border-radius: inherit` from the mixin, so on this element it inherited
+    // the 0 above and drew a square ring around a card with 20px corners,
+    // outside the rounded one the link was already drawing. Removing the
+    // pseudo-element is what the rest of this block is doing for the other
+    // three properties.
+    &::before {
+      content: none;
+    }
   }
 
   &__link {

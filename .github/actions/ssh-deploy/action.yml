@@ -109,6 +109,32 @@ runs:
           fi
 
           git -C "$THEME_PATH" reset --hard FETCH_HEAD
+
+          # Purge the page cache, or logged-out visitors keep getting the
+          # pre-deploy HTML. Hosts like SiteGround cache whole pages at the
+          # nginx layer and skip that cache for logged-in users, so a stale
+          # deploy looks fine to whoever checks it from wp-admin. That cache
+          # purges itself when content is saved, not when theme files change
+          # under it, so a git deploy has to ask.
+          #
+          # The theme sits at <root>/wp-content/themes/<name>, three levels
+          # below the WordPress root that WP-CLI needs.
+          #
+          # A failed purge only warns. The code is already live, and failing
+          # here would send the retry job off to redeploy something that
+          # deployed fine.
+          WP_ROOT="$(cd "$THEME_PATH/../../.." && pwd)"
+          if ! command -v wp >/dev/null 2>&1; then
+            echo "::warning::WP-CLI not found on the server; page cache not purged."
+          elif wp --path="$WP_ROOT" sg purge 2>/dev/null; then
+            echo "Purged the SiteGround page cache."
+          elif wp --path="$WP_ROOT" cache flush; then
+            # Only the object cache. A host-level page cache without a
+            # WP-CLI command of its own still needs flushing by hand.
+            echo "::warning::No SiteGround Optimizer; flushed the object cache only."
+          else
+            echo "::warning::Could not purge any cache; flush it on the host."
+          fi
       env:
         THEME_PATH: ${{ inputs.theme-path }}
         GIT_REMOTE: ${{ inputs.git-remote }}
