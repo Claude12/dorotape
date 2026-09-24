@@ -110,12 +110,16 @@ runs:
 
           git -C "$THEME_PATH" reset --hard FETCH_HEAD
 
-          # Purge the page cache, or logged-out visitors keep getting the
-          # pre-deploy HTML. Hosts like SiteGround cache whole pages at the
-          # nginx layer and skip that cache for logged-in users, so a stale
-          # deploy looks fine to whoever checks it from wp-admin. That cache
-          # purges itself when content is saved, not when theme files change
-          # under it, so a git deploy has to ask.
+          # Purge the page caches, or logged-out visitors keep getting the
+          # pre-deploy HTML. Page caches skip logged-in users, so a stale
+          # deploy looks fine to whoever checks it from wp-admin. They purge
+          # themselves when content is saved, not when theme files change
+          # under them, so a git deploy has to ask.
+          #
+          # A site can have more than one layer - dev runs W3 Total Cache
+          # on top of SiteGround's nginx cache - so flush every one that is
+          # present rather than stopping at the first. Flushing a cache
+          # that turns out to be empty costs nothing.
           #
           # The theme sits at <root>/wp-content/themes/<name>, three levels
           # below the WordPress root that WP-CLI needs.
@@ -125,15 +129,20 @@ runs:
           # deployed fine.
           WP_ROOT="$(cd "$THEME_PATH/../../.." && pwd)"
           if ! command -v wp >/dev/null 2>&1; then
-            echo "::warning::WP-CLI not found on the server; page cache not purged."
-          elif wp --path="$WP_ROOT" sg purge 2>/dev/null; then
-            echo "Purged the SiteGround page cache."
-          elif wp --path="$WP_ROOT" cache flush; then
-            # Only the object cache. A host-level page cache without a
-            # WP-CLI command of its own still needs flushing by hand.
-            echo "::warning::No SiteGround Optimizer; flushed the object cache only."
+            echo "::warning::WP-CLI not found on the server; caches not purged."
           else
-            echo "::warning::Could not purge any cache; flush it on the host."
+            wpc() { wp --path="$WP_ROOT" "$@"; }
+            if wpc plugin is-active w3-total-cache 2>/dev/null; then
+              wpc w3-total-cache flush all \
+                && echo "Flushed W3 Total Cache." \
+                || echo "::warning::W3 Total Cache is active but did not flush."
+            fi
+            if wpc plugin is-active sg-cachepress 2>/dev/null; then
+              wpc sg purge \
+                && echo "Purged the SiteGround cache." \
+                || echo "::warning::SiteGround Optimizer is active but did not purge."
+            fi
+            wpc cache flush || echo "::warning::Object cache did not flush."
           fi
       env:
         THEME_PATH: ${{ inputs.theme-path }}
