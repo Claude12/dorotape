@@ -114,6 +114,100 @@
             "placeholder": "",
             "prepend": "",
             "append": ""
+        },
+        {
+            "key": "field_dtcatset0005",
+            "label": "Products background shape",
+            "name": "category_products_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the product grid and its filters.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtcatset0006",
+            "label": "Products note ending",
+            "name": "category_products_note",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Closing half of the counted sentence beside the product grid heading, after \"12 products in this range,\".",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "stocked in the UK and dispatched across the UK and Ireland.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcatset0007",
+            "label": "No results message",
+            "name": "category_products_empty",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown when the filters leave no products.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "No products match those filters. Try clearing them.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcatset0008",
+            "label": "Empty category message",
+            "name": "category_products_none",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown on a category that has no products in it at all, in place of the grid.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "There is nothing in this category at the moment. Call us on 01858 431642 and we will point you to the nearest material.",
+            "allow_in_bindings": 0,
+            "rows": 3,
+            "new_lines": ""
         }
-    ]
+    ],
+    "modified": 1790198428
 }

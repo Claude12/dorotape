@@ -81,9 +81,11 @@ $font-size-page-title: clamp(36px, 23.619px + 3.1746vw, 48px);
 // size. Consistency across blocks outranks per-block design fidelity here
 // Don't give a block its own bespoke heading clamp, change this token.
 //
-// Anchored like the tiers above, on the design's most common section heading
-// (text-3xl md:text-4xl): 30 at a 390px phone, 36 from 768.
-$font-size-block-heading: clamp(30px, 23.8095px + 1.5873vw, 36px);
+// The design's section headings are text-3xl md:text-5xl: 30 at a 390px
+// phone, 48 from 768. That is $font-size-2xl above, so this is an alias
+// rather than a second copy of the same ramp, and the one place to change
+// if every section heading on the site should move again.
+$font-size-block-heading: $font-size-2xl;
 
 // Font weights, named as Tailwind names them (font-extrabold is 800). The
 // design leans heavy: headings are 800 and even body labels sit at 600-700.
@@ -117,8 +119,9 @@ $line-height-30: math.div(36, 30); // text-3xl
 $line-height-36: math.div(40, 36); // text-4xl; text-5xl and up use $line-height-single
 
 // Partner to $font-size-block-heading, on the same ramp: text-3xl's 36px
-// line at 390, text-4xl's 40px from 768.
-$line-height-block-heading: clamp(36px, 31.873px + 1.0582vw, 40px);
+// line at 390, and text-5xl's leading-none from 768, which at 48px is a 48px
+// line box. Given in px rather than as a ratio so the pair ramp together.
+$line-height-block-heading: clamp(36px, 23.619px + 3.1746vw, 48px);
 
 // Letter spacing
 $letter-spacing-wide: 0.025em; // tracking-wide, the 50/50 eyebrow chip

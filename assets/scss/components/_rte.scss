@@ -25,8 +25,15 @@
     @include heading-character;
 
     color: var(--color-foreground);
-    font-size: $font-size-block-heading;
-    line-height: $line-height-block-heading;
+    /*
+     * Prose, not a section heading. This is editor written and migrated tab
+     * copy inside a product description, where the block heading's 48px would
+     * outrank the page's own H1. text-3xl flat is the design's smallest
+     * heading tier and reads as a subheading, which is what an H2 in a body
+     * of copy is.
+     */
+    font-size: $font-size-30;
+    line-height: $line-height-30;
     margin: 0 0 var(--spacer-16);
   }
 

@@ -288,7 +288,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	$u          = dorotape_unit_strings( $unit );
 
 	echo '<div class="dt-tier-pricing" data-unit="' . esc_attr( $unit ) . '">';
-	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
+	// h2, not h3: this is the first heading after the product H1, and a level
+	// skipped there is a screen reader being told a section is missing. The
+	// size comes from the class, so the tag change is invisible on screen.
+	echo '<h2 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h2>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';
@@ -436,7 +439,10 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
 		. ' data-unit="' . esc_attr( $unit ) . '"'
 		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
-	echo '<h3 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h3>';
+	// h2, not h3: this is the first heading after the product H1, and a level
+	// skipped there is a screen reader being told a section is missing. The
+	// size comes from the class, so the tag change is invisible on screen.
+	echo '<h2 class="dt-tier-pricing__title">' . esc_html__( 'Quantity Pricing', 'dorotape' ) . '</h2>';
 	echo '<table class="dt-tier-pricing__table">';
 	echo '<thead><tr>';
 	echo '<th>' . esc_html__( 'Quantity', 'dorotape' ) . '</th>';

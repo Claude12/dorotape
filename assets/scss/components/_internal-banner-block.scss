@@ -172,7 +172,21 @@
 
   // Closes the banner rather than opening the band below it, so the line sits
   // inside the wash and the section under it starts on the page background.
+  //
+  // Flush to the banner's bottom edge, as CategoryBanner draws it: the design
+  // puts the banner's closing space above the line and nothing below it, so
+  // the gap a reader sees is the next block's own top padding and nothing
+  // else. Carrying the banner's bottom padding under the line as well added
+  // 56px of empty band, which on a category with no intro section read as a
+  // block that had failed to render. The negative margin is that padding,
+  // cancelled: the section keeps it for the case where nothing follows.
   &__rule {
-    margin-top: var(--spacer-48);
+    margin-top: calc(var(--spacer-40) + var(--spacer-48));
+    margin-bottom: calc(-1 * var(--spacer-40));
+
+    @include min-breakpoint(tablet) {
+      margin-top: calc(var(--spacer-56) + var(--spacer-48));
+      margin-bottom: calc(-1 * var(--spacer-56));
+    }
   }
 }

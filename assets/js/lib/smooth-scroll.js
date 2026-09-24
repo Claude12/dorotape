@@ -1,7 +1,29 @@
-// Sticky header height, shared with shop-archive-scroll.js so both modules
-// land content at the same spot just below the header, not two independently
-// tuned magic numbers.
+// Fallback sticky header height, for the moment before the header is in the
+// DOM or if it ever stops being sticky. Everything should prefer
+// headerOffset() below, which measures the real thing.
 export const HEADER_SCROLL_OFFSET = 123;
+
+/**
+ * How much of the top of the screen the sticky header is covering, right now.
+ *
+ * Measured rather than tuned. The header is 166px on a desktop and shorter on
+ * a phone, and the constant above had drifted behind a redesign, so anchored
+ * content was landing 43px underneath it. Reading the height keeps every
+ * module that scrolls something into place correct at all three breakpoints
+ * and after the next header change.
+ */
+export function headerOffset() {
+  const header = document.querySelector('.js-site-header');
+
+  if (!header) return HEADER_SCROLL_OFFSET;
+
+  const position = window.getComputedStyle(header).position;
+
+  // A header that scrolls away with the page is not covering the target.
+  if (position !== 'sticky' && position !== 'fixed') return 0;
+
+  return Math.round(header.getBoundingClientRect().height);
+}
 
 function smoothScroll() {
   const scrollToTop = document.getElementById('scroll-to-top');
@@ -28,7 +50,7 @@ function smoothScroll() {
       }
       if (!target) return;
 
-      const top = target.getBoundingClientRect().top + window.scrollY - HEADER_SCROLL_OFFSET;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset();
       window.scrollTo({ top, behavior: 'smooth' });
     });
   });

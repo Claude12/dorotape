@@ -79,16 +79,54 @@ function dorotape_icon( string $name, string $class = '', string $stroke = '1.5'
 }
 
 /**
+ * Chrome glyphs: the icons the design places, rather than the ones an editor
+ * chooses.
+ *
+ * Deliberately a second map, not more keys in dorotape_icon_paths(). That one
+ * is the set an ACF select offers, and none of these is a thing a USP bullet
+ * or an assurance row is ever about. Keeping them apart means adding a search
+ * icon here cannot leak "Search" into a content icon select.
+ *
+ * @return array<string, string> Icon key => inner SVG markup, verbatim from Lucide.
+ */
+function dorotape_ui_icon_paths(): array {
+	return array(
+		'arrow-right' => '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+		'search'      => '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+		'x'           => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+		'info'        => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+	);
+}
+
+/**
+ * One chrome glyph as an <svg>, or an empty string when the key is unknown.
+ *
+ * Stroke 2 rather than the content set's 1.5, because at 16px the design
+ * draws these heavier than the icons beside a line of text.
+ *
+ * @param string $name  Icon key from dorotape_ui_icon_paths().
+ * @param string $class Class attribute for the <svg>.
+ * @return string Markup, safe to echo.
+ */
+function dorotape_ui_icon( string $name, string $class = '' ): string {
+	$paths = dorotape_ui_icon_paths();
+
+	if ( ! isset( $paths[ $name ] ) ) {
+		return '';
+	}
+
+	return sprintf(
+		'<svg%1$s viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%2$s</svg>',
+		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : '',
+		$paths[ $name ]
+	);
+}
+
+/**
  * The trailing arrow used on every button and action link.
  *
- * Deliberately not a key in dorotape_icon_paths(). That map is the set an
- * editor picks from, and an arrow is not a thing a USP bullet or an assurance
- * row is ever about: it is chrome, chosen by the design rather than by the
- * person filling the block. Keeping it out means adding it here cannot leak
- * "Arrow-right" into a content icon select.
- *
- * Stroke 2 rather than the set's 1.5, because at 16px the design draws this
- * one heavier than the icons beside a line of text.
+ * Named separately because it is on six blocks and a grid card, and a name
+ * reads better at those call sites than a string key.
  *
  * @param string $class Class attribute for the <svg>. `btn__icon` inside a
  *                      button, `link__icon` inside an action link: both are
@@ -96,8 +134,5 @@ function dorotape_icon( string $name, string $class = '', string $stroke = '1.5'
  * @return string Markup, safe to echo.
  */
 function dorotape_arrow_icon( string $class = 'btn__icon' ): string {
-	return sprintf(
-		'<svg%1$s viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
-		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : ''
-	);
+	return dorotape_ui_icon( 'arrow-right', $class );
 }

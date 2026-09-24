@@ -99,13 +99,17 @@ function dorotape_product_card_saving( WC_Product $product ): int {
  *     hover_label?:string,
  *     add_to_cart?:bool,
  *     sizes?:string,
- *     modifier?:string
+ *     modifier?:string,
+ *     pills?:array<int, array{label:string, tone?:string}>
  * } $args link: 'card' (default) or 'title'. badge: fallback tag text, used
  *         only when the product is not on sale. hover_label: the pill that
  *         rises over the image on hover, 'card' mode only. add_to_cart:
  *         append WooCommerce's own loop button, 'title' mode only. sizes: the
  *         image sizes attribute, since the card is a different width in each
- *         place. modifier: extra class on the card wrapper.
+ *         place. modifier: extra class on the card wrapper. pills: small
+ *         labels shown in place of the category line, with tone 'cyan' for
+ *         the lit one; a leaf category uses these, where every card sits in
+ *         the same category and naming it on each one says nothing.
  */
 function dorotape_product_card( WC_Product $product, array $args = array() ): void {
 	$dt_link        = 'title' === ( $args['link'] ?? 'card' ) ? 'title' : 'card';
@@ -116,6 +120,7 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 	$dt_hover_label = 'card' === $dt_link ? (string) ( $args['hover_label'] ?? '' ) : '';
 	$dt_add_to_cart = 'title' === $dt_link && ! empty( $args['add_to_cart'] );
 	$dt_sizes       = (string) ( $args['sizes'] ?? '(min-width: 1024px) 330px, (min-width: 576px) 46vw, 74vw' );
+	$dt_pills       = is_array( $args['pills'] ?? null ) ? $args['pills'] : array();
 	$dt_classes     = 'product-card' . ( ! empty( $args['modifier'] ) ? ' ' . $args['modifier'] : '' );
 	$dt_url         = $product->get_permalink();
 	$dt_name        = $product->get_name();
@@ -181,7 +186,15 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 						<?php endif; ?>
 					</h3>
 
-					<?php if ( '' !== $dt_meta ) : ?>
+					<?php if ( $dt_pills ) : ?>
+						<ul class="product-card__pills">
+							<?php foreach ( $dt_pills as $dt_pill ) : ?>
+								<li class="product-card__pill<?php echo 'cyan' === ( $dt_pill['tone'] ?? '' ) ? ' product-card__pill--cyan' : ''; ?>">
+									<?php echo esc_html( $dt_pill['label'] ); ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					<?php elseif ( '' !== $dt_meta ) : ?>
 						<p class="product-card__meta"><?php echo esc_html( $dt_meta ); ?></p>
 					<?php endif; ?>
 

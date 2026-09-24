@@ -147,6 +147,33 @@
     line-height: $line-height-xs;
   }
 
+  // Stock state and item number, in the line the category name uses
+  // elsewhere. See inc/product-card.php for why they take its place.
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-6);
+    margin: var(--spacer-8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__pill {
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    padding: var(--spacer-4) var(--spacer-10);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    white-space: nowrap;
+
+    &--cyan {
+      border-color: color-mix(in oklab, var(--color-cyan) 45%, transparent);
+      color: var(--color-cyan);
+    }
+  }
+
   // get_price_html() markup: amounts, unit suffix, and on a sale the old
   // price in a <del>, which steps back so the price paid reads first.
   &__price {

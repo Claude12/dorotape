@@ -1,0 +1,416 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// The leaf category shop: filter panel beside the product grid.
+//
+// Follows final designs/main category. The band around it is
+// components/_category-grid-block.scss, reused whole, so only the two column
+// layout and the panel itself live here.
+//
+// The panel is a sticky sidebar from desktop and a drawer below it. On a phone
+// a twelve colour checkbox list above the grid would push every product off
+// the screen, so it collapses behind a Filters button instead, and the grid
+// stays the first thing under the heading.
+
+.category-shop {
+  display: grid;
+  gap: var(--spacer-24);
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: var(--spacer-40);
+    align-items: start;
+  }
+
+  // No panel, no column for it. A short category with no attributes has
+  // nothing to filter by, so the grid takes the whole width rather than
+  // leaving a quarter of the row empty. See inc/category-filters.php.
+  &--plain {
+    @include min-breakpoint(desktop) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  // The drawer handle. The panel is already in the page and already usable at
+  // desktop, so this exists only while the two do not fit side by side.
+  &__toggle {
+    justify-self: start;
+
+    @include min-breakpoint(desktop) {
+      display: none;
+    }
+  }
+
+  // The browser's own [hidden] rule only sets display: none at the user agent
+  // level, so any component rule that sets display beats it. Both of these
+  // ship hidden and are unhidden by the script, so without this the Filters
+  // button would appear with no script to open the panel, and its badge would
+  // read "0" with nothing filtered.
+  &__toggle[hidden],
+  &__toggle-count[hidden] {
+    display: none;
+  }
+
+  &__toggle-count {
+    display: inline-flex;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-magenta);
+    color: var(--color-primary-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-16);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-20);
+    }
+
+    @include min-breakpoint(xl) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__item {
+    display: flex;
+  }
+
+  // Beats the display above, so a card the filter hides is really gone.
+  &__item[hidden] {
+    display: none;
+  }
+
+  &__empty {
+    margin: 0;
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    padding: var(--spacer-32);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.category-filters {
+  // Clears the sticky header plus the band's own top padding, so a heading
+  // scrolled to the top of the screen does not sit under the navigation.
+  @include min-breakpoint(desktop) {
+    position: sticky;
+    top: 11.5rem;
+    align-self: start;
+  }
+
+  // Closed on a phone until the Filters button opens it. Desktop never reads
+  // this rule, so the panel there is simply always open.
+  &:not(.is-open) &__panel {
+    display: none;
+
+    @include min-breakpoint(desktop) {
+      display: block;
+    }
+  }
+
+  &__panel {
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    padding: var(--spacer-20);
+
+    // The panel can outgrow a short laptop screen, and a sticky element taller
+    // than the viewport pins its own bottom out of reach. Scrolling inside it
+    // keeps the last facet and the Clear button reachable at every height.
+    @include min-breakpoint(desktop) {
+      max-height: calc(100vh - 13rem);
+      overflow-y: auto;
+      scrollbar-color: color-mix(in oklab, var(--color-border) 90%, transparent) transparent;
+      scrollbar-width: thin;
+    }
+
+    // A track that is always drawn, as the design draws it. macOS hides its
+    // overlay scrollbars until something scrolls, and a panel that silently
+    // clips the last facet reads as a bug rather than as a list with more
+    // below it.
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: var(--radius-pill);
+      background-color: color-mix(in oklab, var(--color-border) 90%, transparent);
+    }
+  }
+
+  &__group {
+    margin: 0 0 var(--spacer-24);
+    border: 0;
+    padding: 0;
+
+    // :last-child, not :last-of-type. The class sits on a <div> for the
+    // search and the in-stock rows and on a <fieldset> for every facet, and
+    // :last-of-type counts each element type separately: it stripped the gap
+    // under the last fieldset, leaving "In stock only" crammed against the
+    // Width pills.
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__legend {
+    display: block;
+    margin: 0 0 var(--spacer-12);
+    padding: 0;
+    color: var(--color-magenta);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-sm;
+  }
+
+  // The wrapper carries the border and the padding, and the icon sits beside
+  // the field rather than over it.
+  //
+  // The design draws an icon inside the field, which usually means absolute
+  // positioning and a left padding wide enough to clear it. base/_forms.scss
+  // styles every input on the site by element selector, for the plugin fields
+  // the theme never sees the markup of, and it sets padding; a field that
+  // depends on out-padding-winning-that one puts the icon on top of the
+  // placeholder the moment it does not. Laid out as a row, the two cannot
+  // overlap whatever the cascade does to the input.
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-background);
+    padding: var(--spacer-10) var(--spacer-12);
+
+    &:focus-within {
+      border-color: var(--color-cyan);
+    }
+  }
+
+  &__search-icon {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-muted-foreground);
+  }
+
+  // Two classes, not one.
+  //
+  // base/_forms.scss reaches this field through input[type="search"], which is
+  // a type plus an attribute and so outranks a single class: on its own,
+  // .category-filters__input loses every declaration here to it, border and
+  // padding included. The wrapper in front of it settles that without an
+  // !important and without touching the site-wide rule.
+  &__search &__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    padding: 0;
+    color: var(--color-foreground);
+    font-family: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-8);
+  }
+
+  &__pill {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacer-6) var(--spacer-16);
+    color: var(--color-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+    }
+  }
+
+  // The tick itself is off screen rather than hidden, so the control keeps its
+  // keyboard focus and its announced state; the pill around it is the visible
+  // control.
+  &__pill-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  &__pill:has(&__pill-input:checked) {
+    border-color: var(--color-magenta);
+    background-color: var(--color-magenta);
+    color: var(--color-primary-foreground);
+  }
+
+  &__pill:has(&__pill-input:focus-visible) {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 2px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-cyan);
+    }
+  }
+
+  &__checkbox {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--color-magenta);
+    cursor: pointer;
+  }
+
+  &__check-label {
+    flex: 1 1 auto;
+  }
+
+  // A count of nothing dims the row rather than removing it: a colour
+  // disappearing from the list as you tick another one is disorienting, and
+  // the greyed row still says the colour exists.
+  &__check.is-empty {
+    color: var(--color-muted-foreground);
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  &__count {
+    flex: 0 0 auto;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Pinned to the foot of the panel's own scroll area. The panel can outrun a
+  // laptop screen, and the count and the Clear button are the two controls a
+  // customer reaches for most: leaving them at the bottom of an inner scroll
+  // would hide the answer to the question the filters just asked.
+  &__footer {
+    position: sticky;
+    bottom: calc(var(--spacer-20) * -1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-12);
+    margin-top: var(--spacer-24);
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    background-color: var(--color-surface);
+    padding-top: var(--spacer-16);
+    padding-bottom: var(--spacer-20);
+  }
+
+  &__result {
+    margin: 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+  }
+
+  &__clear {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-6);
+    border: 0;
+    background: none;
+    padding: 0;
+    color: var(--color-cyan);
+    font-family: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-magenta);
+    }
+  }
+
+  // Same reason as the Filters badge above: the display here would otherwise
+  // keep a Clear button on screen with nothing to clear.
+  &__clear[hidden] {
+    display: none;
+  }
+
+  &__clear-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  &__browse {
+    margin-top: var(--spacer-24);
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    padding-top: var(--spacer-16);
+
+    // Room for the pinned footer to sit over, rather than on top of, the last
+    // link in this list.
+    & + .category-filters__footer {
+      margin-top: var(--spacer-16);
+    }
+  }
+
+  &__browse-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__browse-link {
+    color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-cyan);
+    }
+  }
+}

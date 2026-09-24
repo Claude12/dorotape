@@ -169,6 +169,7 @@ require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/woocommerce.php';
 require get_template_directory() . '/inc/single-product.php';
 require get_template_directory() . '/inc/product-category.php';
+require get_template_directory() . '/inc/category-filters.php';
 require get_template_directory() . '/inc/stock.php';
 require get_template_directory() . '/inc/poa.php';
 require get_template_directory() . '/inc/cutsize.php';

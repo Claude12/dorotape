@@ -181,6 +181,48 @@
             "rows": 2,
             "placeholder": "",
             "new_lines": ""
+        },
+        {
+            "key": "field_dtcat0012",
+            "label": "Products heading",
+            "name": "category_products_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Heading above the product grid, on a category that lists products rather than ranges. Leave empty for \"Select your product\".",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcat0013",
+            "label": "Products note",
+            "name": "category_products_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Short line beside that heading. Leave empty for the counted sentence set under Theme Settings, Category Pages.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "placeholder": "",
+            "new_lines": ""
         }
     ]
 }

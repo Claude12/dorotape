@@ -74,6 +74,17 @@ function dorotape_is_parent_product_category(): bool {
 }
 
 /**
+ * True on a category archive that lists products rather than ranges.
+ *
+ * The two are exclusive: a category either has children to show or it does
+ * not. Woo itself makes the same split, showing subcategory tiles above the
+ * loop, and the designs follow it, so one test decides which page is drawn.
+ */
+function dorotape_is_leaf_product_category(): bool {
+	return dorotape_category_term() instanceof WP_Term && ! dorotape_is_parent_product_category();
+}
+
+/**
  * Read a field saved against the category being viewed.
  *
  * @param string $name    Field name.
@@ -147,6 +158,90 @@ add_action(
 );
 
 /**
+ * The same, for a category that lists products.
+ *
+ * The shared half of the page is shared literally: the wrapper, the banner,
+ * the term's own sections and the tail are the parent page's functions,
+ * called from here unchanged. Only the band in the middle differs, which is
+ * the whole of the difference between the two designs.
+ */
+add_action(
+	'template_redirect',
+	function (): void {
+		if ( ! dorotape_is_leaf_product_category() ) {
+			return;
+		}
+
+		// Woo's own chrome, and the theme's select based filter bar with it.
+		// Sorting, the result count and pagination all describe a paginated
+		// loop, and this page has none: it renders the category once and
+		// filters it in the browser.
+		remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+		remove_action( 'woocommerce_shop_loop_header', 'woocommerce_product_taxonomy_archive_header', 10 );
+		remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+		remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+		remove_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
+		remove_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 10 );
+		remove_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
+		remove_action( 'woocommerce_sidebar', 'dorotape_woocommerce_sidebar', 10 );
+
+		add_action( 'woocommerce_before_main_content', 'dorotape_category_wrapper_start', 10 );
+		add_action( 'woocommerce_after_main_content', 'dorotape_category_wrapper_end', 90 );
+		remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
+		remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );
+
+		add_action( 'woocommerce_before_main_content', 'dorotape_category_banner', 20 );
+		add_action( 'woocommerce_before_main_content', 'dorotape_category_term_sections', 30 );
+
+		/*
+		 * The archive loop is emptied and the shop drawn in its place.
+		 *
+		 * Woo's loop paginates, and nothing on this page can: a filter that
+		 * only searched the visible page would be worse than no filter. So the
+		 * main query is given nothing to find, which sends Woo down its
+		 * "no products" path, and the shop is rendered there from its own
+		 * query instead. It is the same hook the ranges band is drawn on one
+		 * file up, so both category designs replace the loop the same way.
+		 */
+		remove_action( 'woocommerce_no_products_found', 'wc_no_products_found', 10 );
+		add_action( 'woocommerce_no_products_found', 'dorotape_category_shop', 10 );
+
+		add_action( 'woocommerce_after_main_content', 'dorotape_render_category_sections', 10 );
+	},
+	20
+);
+
+/**
+ * Give a leaf category's archive query nothing to return.
+ *
+ * Hooked at file load, not from the template_redirect block above, because the
+ * main query has already run by the time template_redirect fires: a filter
+ * registered there would never be reached. The leaf test is therefore made
+ * against the query rather than the page conditionals, which are not set yet
+ * either.
+ *
+ * @param WP_Query $query The product query WooCommerce built.
+ */
+function dorotape_category_empty_loop( WP_Query $query ): void {
+	if ( ! $query->is_main_query() || ! $query->is_tax( 'product_cat' ) ) {
+		return;
+	}
+
+	$term = $query->get_queried_object();
+
+	// A category with ranges under it keeps Woo's loop: the top level design
+	// draws its own band from woocommerce_product_loop_start instead.
+	if ( ! $term instanceof WP_Term || dorotape_category_children( $term ) ) {
+		return;
+	}
+
+	$query->set( 'post__in', array( 0 ) );
+	$query->set( 'no_found_rows', true );
+}
+
+add_action( 'woocommerce_product_query', 'dorotape_category_empty_loop' );
+
+/**
  * Open the page.
  */
 function dorotape_category_wrapper_start(): void {
@@ -177,10 +272,19 @@ function dorotape_category_banner(): void {
 		return;
 	}
 
-	$eyebrow = dorotape_category_field(
-		'category_banner_eyebrow',
-		dorotape_category_page_field( 'category_eyebrow', __( 'Products', 'dorotape' ) )
-	);
+	/*
+	 * The eyebrow names where you are, one level up. The design puts the
+	 * parent category above a child's heading ("Signmaking Vinyl" over the
+	 * Optima range) and the generic word above a top level one, which has no
+	 * parent to name. Deriving it saves the client typing it on every
+	 * category, and the ACF field still wins where they want something else.
+	 */
+	$parent  = $term->parent > 0 ? get_term( $term->parent, 'product_cat' ) : null;
+	$default = $parent instanceof WP_Term
+		? $parent->name
+		: dorotape_category_page_field( 'category_eyebrow', __( 'Products', 'dorotape' ) );
+
+	$eyebrow = dorotape_category_field( 'category_banner_eyebrow', $default );
 	$title   = dorotape_category_field( 'category_banner_title', $term->name );
 	$intro   = dorotape_category_field( 'category_banner_intro', trim( wp_strip_all_tags( $term->description ) ) );
 
@@ -257,6 +361,26 @@ function dorotape_category_banner(): void {
  * the fold, so nothing here should claim eager image loading or the page's
  * <h1>.
  */
+/**
+ * Whether this category has any sections of its own between the banner and the
+ * grid below it.
+ *
+ * The grid draws a rule above itself to divide it from what came before. With
+ * nothing in between it lands a hundred or so pixels under the banner's own
+ * rule, and the pair read as two lines around an empty band rather than as one
+ * divider. Most categories have not been given an intro yet, so this is the
+ * common case rather than the edge case.
+ */
+function dorotape_category_has_term_sections(): bool {
+	$term = dorotape_category_term();
+
+	if ( ! $term instanceof WP_Term || ! function_exists( 'get_field' ) ) {
+		return false;
+	}
+
+	return (bool) get_field( 'content_sections', 'term_' . $term->term_id );
+}
+
 function dorotape_category_term_sections(): void {
 	$term = dorotape_category_term();
 
@@ -355,11 +479,16 @@ function dorotape_category_ranges(): void {
 	$shape   = dorotape_background_shape_value( dorotape_category_page_field( 'category_ranges_shape', 'cubes-right' ) );
 	// --glow-soft because a category can run to twenty ranges: the homepage's
 	// own corner glow is sized for the two rows it has there.
-	$classes = 'category-grid-block category-grid-block--divider category-grid-block--glow-soft' . dorotape_background_shape_class( $shape );
+	$classes  = 'category-grid-block category-grid-block--glow-soft';
+	$has_sections = dorotape_category_has_term_sections();
+	$classes     .= $has_sections ? ' category-grid-block--divider' : '';
+	$classes .= dorotape_background_shape_class( $shape );
 	?>
 	<section id="ranges" class="<?php echo esc_attr( $classes ); ?>" animate="fade-in-up">
 		<?php dorotape_background_shape( $shape ); ?>
-		<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>
+		<?php if ( $has_sections ) : ?>
+			<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>
+		<?php endif; ?>
 
 		<div class="container">
 

@@ -78,10 +78,10 @@ $dt_classes = 'trust-bar-block' . dorotape_background_shape_class( $dt_shape );
 				<li class="trust-bar-block__item">
 					<?php if ( $dt_logo['link'] ) : ?>
 						<a class="trust-bar-block__link" href="<?php echo esc_url( $dt_logo['link'] ); ?>">
-							<?php echo $dt_image; ?>
+							<?php echo $dt_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() output. ?>
 						</a>
 					<?php else : ?>
-						<?php echo $dt_image; ?>
+						<?php echo $dt_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() output. ?>
 					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>
