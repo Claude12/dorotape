@@ -46,6 +46,31 @@
             "preview_size": "medium"
         },
         {
+            "key": "field_dorotape_card_fallback_image",
+            "label": "Card fallback image",
+            "name": "card_fallback_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Shown on a card that has no picture of its own, so a grid never falls back to an empty panel. Used by the 404 page's destination cards and by the page results on the search page. Landscape, around 800 by 450.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "id",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "png, jpg, jpeg, webp",
+            "preview_size": "medium"
+        },
+        {
             "key": "field_dorotape_tab_header",
             "label": "Header",
             "name": "",
@@ -601,5 +626,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1789589751
+    "modified": 1790245329
 }

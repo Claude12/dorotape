@@ -1,0 +1,149 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Embed.
+//
+// A band holding whatever a shortcode or an iframe returned: a map on the
+// contact page, and whatever comes after it. Markup is
+// inc/blocks/embed-block.php.
+//
+// The frame is a ratio box rather than a height, so a map is the same shape
+// on a phone as on a desktop and never arrives as a letterbox. The min-height
+// is the floor under that: 21/9 across a 358px phone column is 153px, which
+// is a map you cannot read. The max-height is the ceiling: 16/9 across the
+// full 1352px container is 760px, which is a map you have to scroll past.
+// Between the two the ratio holds, which is every width that matters.
+//
+// The embed sits on a plate rather than flush inside its border. A map is
+// the one thing on the site that arrives in someone else's colours, and a
+// bright tile butted straight against the navy reads as a hole in the page:
+// the inset gives it an edge of our own surface to sit on, and the corners
+// round twice, once on the plate and once on the map inside it.
+
+.embed-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-64) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-96) 0;
+  }
+
+  &__header {
+    max-width: 44rem;
+    margin-bottom: var(--spacer-32);
+
+    @include min-breakpoint(tablet) {
+      margin-bottom: var(--spacer-48);
+    }
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    margin: 0;
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__heading {
+    margin: var(--spacer-20) 0 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    margin: var(--spacer-16) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+    line-height: $line-height-relaxed;
+  }
+
+  &__frame {
+    overflow: hidden;
+    padding: var(--spacer-8);
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-glow);
+  }
+
+  // Carried by a frame that was given a ratio. An embed left on "auto" brings
+  // its own height and gets neither this nor a ratio below.
+  &__frame--ratio {
+    position: relative;
+    // Definite, not auto. With an auto width the min-height below is the
+    // definite axis instead, and aspect-ratio transfers it back the other
+    // way: a 21/9 frame came out 653px wide inside a 390px phone.
+    width: 100%;
+    min-height: 280px;
+    max-height: 520px;
+  }
+
+  &__frame--16-9 {
+    aspect-ratio: 16 / 9;
+  }
+
+  &__frame--4-3 {
+    aspect-ratio: 4 / 3;
+  }
+
+  &__frame--21-9 {
+    aspect-ratio: 21 / 9;
+  }
+
+  // The embed fills the ratio box rather than setting the box's height, so
+  // the width and height attributes pasted with it stop mattering. The inset
+  // is the plate's padding: an absolutely positioned child resolves `inset`
+  // against the padding box, so the padding above does not reach it and has
+  // to be repeated here. The size is spelled out rather than left to the
+  // insets because an iframe is a replaced element: on `width: auto` it takes
+  // its intrinsic 300x150 and ignores the far inset entirely.
+  &__frame--ratio iframe,
+  &__frame--ratio embed,
+  &__frame--ratio object {
+    position: absolute;
+    inset: var(--spacer-8);
+    width: calc(100% - 2 * var(--spacer-8));
+    height: calc(100% - 2 * var(--spacer-8));
+    border: 0;
+    border-radius: var(--radius);
+  }
+
+  // An embed sizing itself still needs the border dropped and the width taken.
+  &__frame iframe {
+    display: block;
+    max-width: 100%;
+    border: 0;
+  }
+
+  // Edge to edge. The rounded corners and the side borders go with the
+  // gutter, and so does the plate: a frame that reaches the viewport has no
+  // edges left to draw, and an inset would read as a stripe rather than a
+  // border.
+  &--full &__frame {
+    padding: 0;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  &--full &__frame--ratio iframe,
+  &--full &__frame--ratio embed,
+  &--full &__frame--ratio object {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}

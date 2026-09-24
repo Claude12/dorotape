@@ -59,7 +59,7 @@
   &__tag--link {
     @include aurora-ring;
 
-    transition: color $transition-fast ease;
+    transition: color var(--transition-fast);
 
     &:hover,
     &:focus-visible {

@@ -1,0 +1,215 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Contact.
+//
+// No design covers the contact page, so every measurement here is borrowed
+// rather than invented. The section padding, the eyebrow chip, the heading
+// size and the column gap are intro_columns_block's. The method cards are the
+// category grid card at list size. The form panel is the CTA card's surface.
+//
+// The one decision this block makes on its own is the column split: the form
+// gets seven twelfths and the details five, because the form is what the page
+// is for and a two-line address does not need half a screen.
+
+.contact-block {
+  position: relative;
+  isolation: isolate;
+  padding: var(--spacer-80) 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-112) 0;
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--spacer-48);
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: 5fr 7fr;
+      align-items: start;
+      gap: var(--spacer-64);
+    }
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    margin: 0;
+    padding: var(--spacer-6) var(--spacer-16);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-2xl);
+    color: var(--color-cyan);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__heading {
+    margin: var(--spacer-20) 0 0;
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+  }
+
+  &__intro {
+    margin: var(--spacer-24) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-base;
+    line-height: $line-height-relaxed;
+  }
+
+  // ── The ways to reach them ─────────────────────────────────────────────
+
+  &__methods {
+    display: grid;
+    gap: var(--spacer-12);
+    margin: var(--spacer-32) 0 0;
+    padding: 0;
+    list-style: none;
+
+    // Two across only while the column is the full page width. From desktop
+    // the details column is five twelfths, and two cards inside that are
+    // narrower than the phone layout they came from.
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__method {
+    @include aurora-ring;
+
+    display: flex;
+    gap: var(--spacer-12);
+    padding: var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+  }
+
+  // focus-within rather than a hover on the card: the card is not the link,
+  // the value inside it is, so the ring lights from the keyboard too.
+  &__method:hover,
+  &__method:focus-within {
+    @include aurora-ring-visible;
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius);
+    background-color: color-mix(in oklab, var(--color-magenta) 18%, transparent);
+    color: var(--color-magenta);
+  }
+
+  &__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__method-body {
+    min-width: 0;
+  }
+
+  &__label {
+    margin: 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    display: block;
+    margin: var(--spacer-4) 0 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-snug;
+    overflow-wrap: anywhere;
+  }
+
+  // Only the anchor form of the value, so a plain address does not read as
+  // something that can be clicked.
+  a#{&}__value {
+    // A 20px line box is under the 24px a finger needs, and the number and
+    // the inbox are the two things a phone visitor actually taps. The
+    // margin moves into the padding so the gap under the label is unchanged.
+    margin-top: 0;
+    padding-block: var(--spacer-4);
+    color: var(--color-foreground);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  a#{&}__value:hover,
+  a#{&}__value:focus-visible {
+    color: var(--color-cyan);
+  }
+
+  &__note {
+    margin: var(--spacer-20) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    line-height: $line-height-relaxed;
+  }
+
+  // ── The form panel ─────────────────────────────────────────────────────
+
+  &__panel {
+    padding: var(--spacer-24);
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+
+    @include min-breakpoint(tablet) {
+      padding: var(--spacer-32);
+    }
+  }
+
+  &__panel-heading {
+    margin: 0;
+    font-size: $font-size-lg;
+    line-height: $line-height-lg;
+  }
+
+  &__panel-intro {
+    margin: var(--spacer-8) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  &__form {
+    margin-top: var(--spacer-24);
+  }
+}
+
+// ── WPForms, inside the panel ────────────────────────────────
+//
+// The form itself is dressed in base/_forms.scss and its button in
+// components/_buttons.scss, both of them once for every form on the site.
+// What is left here is the two things that are true of this panel and no
+// other: the plugin's own outer margin, which the panel's padding already
+// provides, and a button that runs the full width of a column rather than
+// sitting beside a field.
+
+.contact-block__form .wpforms-container.wpforms-container-full {
+  margin: 0;
+}
+
+.contact-block__form .wpforms-container-full .wpforms-form .wpforms-submit[type="submit"] {
+  width: 100%;
+}

@@ -1,0 +1,264 @@
+{
+    "key": "group_dorotape_error_page",
+    "title": "404 Page",
+    "fields": [
+        {
+            "key": "field_dt4040001",
+            "label": "Banner eyebrow",
+            "name": "error_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small capitals above the heading on the 404 banner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Error 404",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dt4040002",
+            "label": "Banner background shape",
+            "name": "error_banner_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the banner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dt4040003",
+            "label": "Banner heading",
+            "name": "error_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The page's <h1>. Plain language beats a joke here: whoever reads it is already lost.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "We cannot find that page",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dt4040004",
+            "label": "Banner standfirst",
+            "name": "error_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "One or two sentences under the heading, saying what to do next.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "The link may be out of date, or the page may have moved. Search at the top of this page, or carry on from one of the places below.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_dt4040005",
+            "label": "Destinations heading",
+            "name": "error_links_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The <h2> above the cards. Leave empty to hide it.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Where to go next",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dt4040006",
+            "label": "Destinations background shape",
+            "name": "error_links_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the cards.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dt4040007",
+            "label": "Card button label",
+            "name": "error_button",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The label on every destination card's button. Leave empty for no button.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Go there",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dt4040008",
+            "label": "Destinations",
+            "name": "error_links",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "The cards under the banner. Leave empty and the page falls back to Home and All products, so a 404 is never a dead end.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 8,
+            "collapsed": "field_dt4040009",
+            "button_label": "Add destination",
+            "rows_per_page": 20,
+            "allow_in_bindings": 0,
+            "sub_fields": [
+                {
+                    "key": "field_dt4040009",
+                    "label": "Link",
+                    "name": "error_link",
+                    "aria-label": "",
+                    "type": "link",
+                    "instructions": "Where the card goes. The link's own text is the card's title.",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array",
+                    "allow_in_bindings": 0
+                },
+                {
+                    "key": "field_dt404001a",
+                    "label": "Image",
+                    "name": "error_image",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "Optional. Without one the card uses Theme Settings > General > Card fallback image.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "id",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "",
+                    "allow_in_bindings": 0,
+                    "preview_size": "medium",
+                    "uploader": "",
+                    "acfe_thumbnail": 0
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-error-page"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The wording, background shapes and destination cards on the 404 page.",
+    "show_in_rest": 0,
+    "modified": 1790245368
+}

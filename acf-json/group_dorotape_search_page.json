@@ -1,0 +1,232 @@
+{
+    "key": "group_dorotape_search_page",
+    "title": "Search Page",
+    "fields": [
+        {
+            "key": "field_dtsearch0001",
+            "label": "Banner eyebrow",
+            "name": "search_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small capitals above the heading on the search results banner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Search",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0002",
+            "label": "Banner background shape",
+            "name": "search_banner_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the banner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtsearch0003",
+            "label": "Banner heading",
+            "name": "search_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The page's heading. {query} is replaced with what the customer typed.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Results for “{query}”",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0004",
+            "label": "Banner standfirst",
+            "name": "search_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The line under the heading. {n} is replaced with the number of results, {query} with what was typed. Hidden when nothing was found.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "{n} matches across our products, ranges and guides.",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtsearch0005",
+            "label": "Products heading",
+            "name": "search_products_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the grid of matching products.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Products",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0006",
+            "label": "Pages heading",
+            "name": "search_pages_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the grid of matching pages and guides. Only ever seen on a site-wide search, not on a product search from the header.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Pages and guides",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0007",
+            "label": "Results background shape",
+            "name": "search_results_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the results.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtsearch0008",
+            "label": "Page card button label",
+            "name": "search_button",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The small outlined button on each page or guide card.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Read more",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0009",
+            "label": "No results message",
+            "name": "search_empty",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown in place of the results when a search found nothing. {query} is replaced with what was typed.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Nothing matched “{query}”. Try a shorter term or an item number, or call us on 01858 431642 and we will point you to the right material.",
+            "allow_in_bindings": 0,
+            "rows": 3,
+            "new_lines": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-search-page"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The wording and background shapes on the search results page. Both routes use it: the product search the header's box submits, and a site-wide search that also finds pages.",
+    "show_in_rest": 0,
+    "modified": 1790241505
+}

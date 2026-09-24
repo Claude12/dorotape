@@ -105,7 +105,7 @@
     width: 100%;
     height: 224px;
     object-fit: cover;
-    transition: transform $transition-slow ease;
+    transition: transform var(--transition-slow);
   }
 
   &__card:hover &__photo,
@@ -179,7 +179,7 @@
     // white chip until hover turns the square cyan, which is what the design
     // does with `bg-white text-white hover:text-cyan`.
     color: var(--color-white);
-    transition: color $transition-fast ease;
+    transition: color var(--transition-fast);
 
     svg {
       width: 14px;

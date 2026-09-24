@@ -118,6 +118,14 @@
     transform: translate(-50%, 0);
   }
 
+  // The design's own `hover:bg-cyan` on the pill, which is what the
+  // background-color in the transition above was declared for and nothing was
+  // yet changing. The pill is aria-hidden decoration over a link that is
+  // already hovered, so this is the pointer landing on the pill itself.
+  &__cta:hover {
+    background-color: var(--color-cyan);
+  }
+
   &__body {
     padding: var(--spacer-20);
   }
@@ -167,6 +175,13 @@
     font-weight: $font-weight-bold;
     line-height: $line-height-xs;
     white-space: nowrap;
+
+    // A category name can be longer than the card is wide, and a pill that
+    // wraps to two lines stops reading as a pill. It keeps its shape and
+    // loses its tail instead. The full name is a click away on the product.
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &--cyan {
       border-color: color-mix(in oklab, var(--color-cyan) 45%, transparent);

@@ -113,6 +113,7 @@
       a {
         color: var(--color-foreground);
         text-decoration: none;
+        transition: color var(--transition-fast);
 
         &:hover {
           color: var(--color-cyan);

@@ -45,7 +45,7 @@
   min-height: var(--spacer-24);
   color: inherit;
   text-decoration: none;
-  transition: color $transition-fast ease;
+  transition: color var(--transition-fast);
 
   &:hover,
   &:focus-visible {

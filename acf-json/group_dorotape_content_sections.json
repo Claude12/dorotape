@@ -3802,6 +3802,541 @@
                     ],
                     "min": "",
                     "max": ""
+                },
+                "layout_dtcont000001": {
+                    "key": "layout_dtcont000001",
+                    "name": "contact_block",
+                    "label": "Contact",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtcont000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtcont000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcont000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcont000104",
+                            "label": "Standfirst",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "One or two sentences under the heading, before the contact details.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcont000105",
+                            "label": "Ways to get in touch",
+                            "name": "methods",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "One row per phone number, address or inbox. Rows with no label and no value are skipped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 0,
+                            "max": 6,
+                            "collapsed": "field_dtcont000107",
+                            "button_label": "Add a way to get in touch",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtcont000106",
+                                    "label": "Icon",
+                                    "name": "icon",
+                                    "aria-label": "",
+                                    "type": "select",
+                                    "instructions": "Outline icon in the tile beside the row.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "30",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "phone": "Phone",
+                                        "mail": "Envelope",
+                                        "map-pin": "Map pin",
+                                        "clock": "Clock",
+                                        "truck": "Delivery van",
+                                        "globe": "Globe",
+                                        "shield": "Shield"
+                                    },
+                                    "default_value": false,
+                                    "return_format": "value",
+                                    "multiple": 0,
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 0,
+                                    "ajax": 0,
+                                    "placeholder": "",
+                                    "create_options": 0,
+                                    "save_options": 0
+                                },
+                                {
+                                    "key": "field_dtcont000107",
+                                    "label": "Label",
+                                    "name": "label",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "The kind of contact this is, in a couple of words. Shown in small capitals.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "70",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtcont000108",
+                                    "label": "Value",
+                                    "name": "value",
+                                    "aria-label": "",
+                                    "type": "textarea",
+                                    "instructions": "The number, address or inbox itself. Line breaks are kept, so an address can sit on several lines.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "rows": 3,
+                                    "placeholder": "",
+                                    "new_lines": ""
+                                },
+                                {
+                                    "key": "field_dtcont000109",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "Optional. Makes the value clickable. Use tel: for a phone number and mailto: for an inbox.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "allow_in_bindings": 0
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtcont000110",
+                            "label": "Small print",
+                            "name": "note",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Optional line under the contact details, for opening hours or response times.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcont000111",
+                            "label": "Form heading",
+                            "name": "form_heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Heading at the top of the form panel.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcont000112",
+                            "label": "Form standfirst",
+                            "name": "form_intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Optional sentence under the form heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtcont000113",
+                            "label": "Form shortcode",
+                            "name": "form_shortcode",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "The shortcode for the form, copied from the form plugin. WPForms gives you one that looks like [wpforms id=\"123\"].",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcont000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_dtembd000001": {
+                    "key": "layout_dtembd000001",
+                    "name": "embed_block",
+                    "label": "Embed / map",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtembd000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtembd000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading. Leave the eyebrow, heading and standfirst empty for an embed with no heading over it.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtembd000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtembd000104",
+                            "label": "Standfirst",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtembd000105",
+                            "label": "Shortcode or embed code",
+                            "name": "embed_code",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Either a shortcode, or the embed code from the service itself. For a Google map, use Share then Embed a map and paste the whole <iframe>. Only https embeds are kept; anything else is dropped.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 6,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtembd000106",
+                            "label": "Width",
+                            "name": "width",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Edge to edge drops the side borders and the rounded corners, for a map that runs the full width of the page.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "Inside the page width",
+                                "full": "Edge to edge"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dtembd000107",
+                            "label": "Shape",
+                            "name": "ratio",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "The box the embed is drawn into, so it is the same shape on a phone as on a desktop. Choose the last one only when the embed sets its own height.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "16-9": "Widescreen (16:9)",
+                                "4-3": "Landscape (4:3)",
+                                "21-9": "Letterbox (21:9)",
+                                "auto": "Whatever the embed asks for"
+                            },
+                            "default_value": "16-9",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dtembd000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
                 }
             },
             "min": "",
@@ -3858,6 +4393,20 @@
                 "operator": "==",
                 "value": "dorotape-category-sections"
             }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-search-page"
+            }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-error-page"
+            }
         ]
     ],
     "menu_order": 0,
@@ -3867,7 +4416,7 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": true,
-    "description": "Flexible content blocks. Layout name maps to inc/blocks/{name}.php. Shown on Pages, and on Theme Settings > Product Pages, where the sections are shared by every product.",
+    "description": "Flexible content blocks. Layout name maps to inc/blocks/{name}.php. Shown on Pages, on product and category terms, and on Theme Settings > Product Pages, Category Pages, Search Page and 404 Page, where the sections are shared by every page of that kind.",
     "show_in_rest": 0,
-    "modified": 1790172292
+    "modified": 1790243687
 }

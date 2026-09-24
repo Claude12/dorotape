@@ -53,6 +53,22 @@
     );
   }
 
+  // Straight under a banner, with nothing between them.
+  //
+  // The band's own top padding assumes something above it: on a category page
+  // the banner's hairline and often an intro sit in that space. The search
+  // page has neither, so the full step leaves the heading floating a long way
+  // below the breadcrumb with nothing in between. This keeps the band's
+  // bottom padding, so the heading and the last row of cards still sit about
+  // the same distance from their edges.
+  &--tight {
+    padding-top: var(--spacer-32);
+
+    @include min-breakpoint(tablet) {
+      padding-top: var(--spacer-48);
+    }
+  }
+
   // With the hairline on, the section stands off the block above by a
   // margin for the line to sit in. Without it there is nothing to separate,
   // so the block above's own bottom padding is the gap.
@@ -86,6 +102,18 @@
     justify-content: space-between;
     gap: var(--spacer-16);
     margin-bottom: var(--spacer-48);
+  }
+
+  // A second heading inside the same band, as the search page has when it
+  // has both products and pages to show. The band's own top padding opens the
+  // first one; this opens the ones after it by the same amount, so the two
+  // groups read as two subjects rather than one long grid.
+  &__header--stacked {
+    margin-top: var(--spacer-64);
+
+    @include min-breakpoint(tablet) {
+      margin-top: var(--spacer-80);
+    }
   }
 
   &__heading {

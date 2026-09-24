@@ -28,7 +28,7 @@
     width: 100%;
     height: 288px;
     object-fit: cover;
-    transition: transform $transition-slow ease;
+    transition: transform var(--transition-slow);
 
     @include min-breakpoint(tablet) {
       height: 384px;

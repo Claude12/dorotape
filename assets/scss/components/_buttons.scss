@@ -143,6 +143,49 @@ input[type="submit"] {
   @include button-primary;
 }
 
+// The WPForms submit, at the weight the plugin renders it.
+//
+// `.wpforms-submit` is in the list above and gives this button its type, but
+// the plugin's own `div.wpforms-container-full button[type=submit]` is two
+// selectors heavier and loads after the theme, so the paint it sets has to be
+// answered here rather than there. Everything the plugin drives from its own
+// variables is handed the right value in base/_forms.scss; this is the rest:
+// the weight, the dim on hover, and the design's trailing arrow.
+//
+// It is one rule for every form on the site, so the newsletter, the contact
+// page and the POA enquiry all submit with the same button.
+.wpforms-container-full .wpforms-form .wpforms-submit[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacer-8);
+  font-family: inherit;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-sm;
+  transition: background-color var(--transition-fast);
+
+  // The plugin dims by laying 20% black over the fill. The site dims the fill
+  // itself, which is what every other button here does.
+  &:hover,
+  &:active {
+    background: color-mix(in oklab, var(--color-primary) 90%, transparent);
+  }
+
+  // WPForms swaps the button's text while it submits, which would wipe an
+  // icon placed in the markup, so the arrow is drawn here. ::before rather
+  // than ::after because the plugin uses ::after for its focus ring, and
+  // `order` puts it back behind the label.
+  &::before {
+    content: "";
+    order: 1;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}
+
 .btn--lg {
   @include button-size-lg;
 }

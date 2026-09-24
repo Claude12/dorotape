@@ -102,6 +102,9 @@
   font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
   cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
 
   &:hover:not(:disabled) {
     border-color: var(--color-cyan);
@@ -239,6 +242,9 @@
   font-size: $font-size-md;
   line-height: $line-height-single;
   cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .dt-cutsize__addcut:hover {
@@ -274,6 +280,9 @@
   font: inherit;
   font-weight: $font-weight-semibold;
   cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
 
   &:hover:not(:disabled) {
     border-color: var(--color-cyan);

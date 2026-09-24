@@ -82,6 +82,23 @@
     }
   }
 
+  // Four across, for a grid with no filter panel beside it.
+  //
+  // The three column rule above is sized for the column left over next to the
+  // 280px panel. Without one the row is a third wider, and three cards in it
+  // are larger than a product card is anywhere else on the site. Four is what
+  // the ranges grid does at the same width, so a full width grid of cards is
+  // a full width grid of cards wherever it appears.
+  &__grid--wide {
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @include min-breakpoint(xl) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   &__item {
     display: flex;
   }
@@ -246,7 +263,12 @@
     font-size: $font-size-xs;
     font-weight: $font-weight-bold;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+    // transition-colors in the design, which is Tailwind's 150ms, not the
+    // 200ms this was written with. On the scale like everything else.
+    transition:
+      border-color var(--transition-fast),
+      color var(--transition-fast),
+      background-color var(--transition-fast);
 
     &:hover {
       border-color: var(--color-cyan);
@@ -293,6 +315,7 @@
     font-weight: $font-weight-bold;
     line-height: $line-height-sm;
     cursor: pointer;
+    transition: color var(--transition-fast);
 
     &:hover {
       color: var(--color-cyan);
@@ -349,8 +372,9 @@
   &__result {
     margin: 0;
     color: var(--color-muted-foreground);
-    font-size: $font-size-sm;
+    font-size: $font-size-xs;
     font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
   }
 
   &__clear {
@@ -360,14 +384,19 @@
     border: 0;
     background: none;
     padding: 0;
-    color: var(--color-cyan);
+    color: inherit;
     font-family: inherit;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-xs;
     cursor: pointer;
+    transition: color var(--transition-fast);
 
+    // Cyan on hover, as every other text link on the site does, and as the
+    // design draws it. It used to sit cyan and go magenta, which made it the
+    // one control that moved the opposite way.
     &:hover {
-      color: var(--color-magenta);
+      color: var(--color-cyan);
     }
   }
 
@@ -408,6 +437,7 @@
     font-size: $font-size-sm;
     font-weight: $font-weight-bold;
     text-decoration: none;
+    transition: color var(--transition-fast);
 
     &:hover {
       color: var(--color-cyan);

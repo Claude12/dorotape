@@ -118,3 +118,52 @@ add_filter( 'rest_endpoints', function( $endpoints ) {
 	}
 	return $endpoints;
 } );
+
+// ─── WPForms ──────────────────────────────────────────────────────────────────
+
+/**
+ * One `#wpforms-error-noscript` per page, not one per form.
+ *
+ * The modern WPForms renderer prints its no-JavaScript warning twice: once as
+ * a <noscript> carrying a class, which may legitimately repeat, and once as a
+ * hidden <div> carrying a fixed id. The id exists only so a Page Break field's
+ * next/previous buttons can point an aria-describedby at it.
+ *
+ * A fixed id is fine for one form and invalid for two, and every page on this
+ * site has two: whatever the page itself shows, plus the footer newsletter. So
+ * every page shipped a duplicate id, and an aria-describedby pointing at a
+ * duplicate resolves to whichever came first, which is not necessarily the one
+ * belonging to the form the button is in.
+ *
+ * The plugin hard-codes the markup, so the message is the only part that can be
+ * filtered, and returning an empty string suppresses the whole block. Keeping
+ * the first and dropping the rest leaves exactly one id on the page for the
+ * aria-describedby to resolve to, and leaves the warning on the page's own
+ * form rather than on the footer's.
+ *
+ * The count only advances when the plugin would actually print, which is why
+ * the fields check below repeats the one in WPForms\Frontend\Frontend::head().
+ * Counting a fieldless form would suppress the warning on the first real one.
+ *
+ * @param string|mixed $message   The no-JavaScript warning.
+ * @param array|mixed  $form_data Form data and settings.
+ * @return string The message for the first form on the page, otherwise ''.
+ */
+function dorotape_wpforms_single_noscript( $message, $form_data ): string {
+	static $shown = false;
+
+	$message = (string) $message;
+
+	if ( '' === $message || empty( $form_data['fields'] ) ) {
+		return $message;
+	}
+
+	if ( $shown ) {
+		return '';
+	}
+
+	$shown = true;
+
+	return $message;
+}
+add_filter( 'wpforms_frontend_noscript_error_message', 'dorotape_wpforms_single_noscript', 10, 2 );
