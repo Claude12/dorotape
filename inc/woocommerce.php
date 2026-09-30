@@ -288,10 +288,27 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	} );
 
 	$base_price = (float) $product->get_regular_price();
+	$step       = max( 1, dorotape_qty_step( $product ) );
 	$unit       = dorotape_price_unit( $post->ID );
 	$u          = dorotape_unit_strings( $unit );
 
-	echo '<div class="dt-tier-pricing" data-unit="' . esc_attr( $unit ) . '">';
+	// A band starting at or below the quantity step is not a choice the
+	// customer has: the quantity box will not go below the step, so that
+	// band's price IS the price at the step. Fold it into the base row
+	// rather than listing it underneath. ASLAN TF200 is sold in tens and
+	// priced from five, and the table was reading backwards because of it:
+	// "10+ £40.60" above "5+ £36.54".
+	foreach ( $tiers as $tier ) {
+		if ( (int) $tier['min_qty'] <= $step && (float) ( $tier['tier_price'] ?? 0 ) > 0 ) {
+			$base_price = (float) $tier['tier_price'];
+		}
+	}
+
+	$tiers = array_values( array_filter( $tiers, static function ( array $t ) use ( $step ): bool {
+		return (int) $t['min_qty'] > $step;
+	} ) );
+
+	echo '<div class="dt-tier-pricing" data-unit="' . esc_attr( $unit ) . '" data-qty-step="' . esc_attr( (string) $step ) . '">';
 	// h2, not h3: this is the first heading after the product H1, and a level
 	// skipped there is a screen reader being told a section is missing. The
 	// size comes from the class, so the tag change is invisible on screen.
@@ -308,7 +325,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 	// the quantity step rather than 1 where one applies — Ri-Jet C50 steps in
 	// 5s, so "1m+" would advertise a quantity the quantity box refuses.
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
-	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . esc_html( $step . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>&ndash;</td>';
 	echo '</tr>';
@@ -407,9 +424,25 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		if ( dorotape_user_has_role_price( $var_obj ) ) {
 			continue;
 		}
-		$var_objects[ (int) $var_id ]  = $var_obj;
+		$var_objects[ (int) $var_id ] = $var_obj;
+
+		// Same fold as the simple table, done here so the JSON the JS
+		// rebuilds from on a variation change is already correct.
+		$var_step = max( 1, dorotape_qty_step( $var_obj ) );
+		$var_base = (float) $var_obj->get_regular_price();
+
+		foreach ( $tiers as $tier ) {
+			if ( (int) $tier['min_qty'] <= $var_step && (float) ( $tier['tier_price'] ?? 0 ) > 0 ) {
+				$var_base = (float) $tier['tier_price'];
+			}
+		}
+
+		$tiers = array_values( array_filter( $tiers, static function ( array $t ) use ( $var_step ): bool {
+			return (int) $t['min_qty'] > $var_step;
+		} ) );
+
 		$variation_tiers[ (int) $var_id ] = array(
-			'base_price' => (float) $var_obj->get_regular_price(),
+			'base_price' => $var_base,
 			'tiers'      => array_map(
 				static function ( array $t ): array {
 					return array(
@@ -442,6 +475,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
 		. ' data-unit="' . esc_attr( $unit ) . '"'
+		. ' data-qty-step="' . esc_attr( (string) max( 1, dorotape_qty_step( $product ) ) ) . '"'
 		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
 	// h2, not h3: this is the first heading after the product H1, and a level
 	// skipped there is a screen reader being told a section is missing. The
@@ -1143,3 +1177,69 @@ add_filter( 'woocommerce_variable_price_html', function ( string $price, WC_Prod
 		esc_html( $unit_text )
 	);
 }, 10, 2 );
+
+// ─── Archive buttons for products that still need a choice ────────────────────
+
+/**
+ * True when a product cannot sensibly be ordered from an archive card.
+ *
+ * WooCommerce picks the archive button on product type alone: variable gets
+ * "Select options" and links to the page, simple gets "Add to cart" and puts
+ * one unit straight in the basket. That split does not fit this catalogue,
+ * which is what the client meant by "there are still quite a few product
+ * categories with 'Add to cart' in stead of 'Select options'" (25 Sept).
+ *
+ * A simple product here still needs its page when:
+ *
+ *   - the cut sizes box is on, so the cuts have to be entered first
+ *   - it sells in steps (5m, 10m, 25m), so the 1 the button adds is not a
+ *     quantity the product can even be bought in
+ *   - it is priced by the metre, where 1 means one metre off a roll and is
+ *     almost never what was meant
+ *
+ * Anything sold as a single thing, an accessory or a whole roll, keeps its
+ * add to cart button, because there one click really is the whole order.
+ *
+ * @param WC_Product $product
+ * @return bool
+ */
+function dorotape_needs_product_page( WC_Product $product ): bool {
+	if ( ! $product->is_type( 'simple' ) || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return false;
+	}
+	if ( dorotape_has_cutsize( $product ) ) {
+		return true;
+	}
+	if ( dorotape_qty_step( $product ) > 1 ) {
+		return true;
+	}
+	return 'metre' === dorotape_price_unit( $product->get_id() );
+}
+
+/**
+ * Send those products to their page instead, under WooCommerce's own label so
+ * the catalogue reads the same whether a product is simple or variable.
+ *
+ * The card's own classes are carried over from $args, minus the ajax ones,
+ * which would otherwise try to add the product in the background.
+ */
+add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $link, WC_Product $product, array $args = array() ): string {
+	if ( ! dorotape_needs_product_page( $product ) ) {
+		return $link;
+	}
+
+	$classes = array_filter(
+		explode( ' ', (string) ( $args['class'] ?? 'button' ) ),
+		static function ( string $class ): bool {
+			return '' !== $class && 'ajax_add_to_cart' !== $class && 'add_to_cart_button' !== $class;
+		}
+	);
+	$classes[] = 'dt-btn-options';
+
+	return sprintf(
+		'<a href="%s" class="%s">%s</a>',
+		esc_url( $product->get_permalink() ),
+		esc_attr( implode( ' ', array_unique( $classes ) ) ),
+		esc_html__( 'Select options', 'woocommerce' )
+	);
+}, 20, 3 );

@@ -262,7 +262,11 @@ function dorotape_product_meta(): void {
 	$rows = array();
 
 	if ( $product->get_sku() ) {
-		$rows[] = array( __( 'SKU:', 'dorotape' ), esc_html( $product->get_sku() ) );
+		// The sku class, inside product_meta below, is what WooCommerce's own
+		// variation script rewrites when an option is picked, which is how the
+		// code on screen follows the chosen variation (client, 25 Sept: "I
+		// notice that the SKU does not change though?").
+		$rows[] = array( __( 'SKU:', 'dorotape' ), esc_html( $product->get_sku() ), 'sku' );
 	}
 
 	$categories = wc_get_product_category_list( $product->get_id(), ', ' );
@@ -287,13 +291,15 @@ function dorotape_product_meta(): void {
 		return;
 	}
 
-	echo '<dl class="dt-product-meta">';
+	echo '<dl class="dt-product-meta product_meta">';
 
-	foreach ( $rows as list( $label, $value ) ) {
+	foreach ( $rows as $row ) {
+		list( $label, $value ) = $row;
+		$extra = isset( $row[2] ) ? ' ' . $row[2] : '';
 		echo '<div class="dt-product-meta__row">';
 		echo '<dt class="dt-product-meta__label">' . esc_html( $label ) . '</dt>';
 		// Term lists are WooCommerce's own anchor markup, already escaped.
-		echo '<dd class="dt-product-meta__value">' . $value . '</dd>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_get_product_*_list() escapes.
+		echo '<dd class="dt-product-meta__value' . esc_attr( $extra ) . '">' . $value . '</dd>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_get_product_*_list() escapes.
 		echo '</div>';
 	}
 

@@ -10,6 +10,12 @@
 // uncut unless somebody asks.
 
 .dt-cutsize {
+  // form.cart is a flex container and a flex item's min-width is auto, so
+  // without this the box refuses to shrink below the table's own min-content
+  // width and pushes out of the page instead. With it the box takes the width
+  // it is given and .dt-cutsize__table-wrap scrolls the table inside itself,
+  // so on a narrow phone the far column is a swipe away rather than gone.
+  min-width: 0;
   margin: var(--spacer-16) 0;
   padding: var(--spacer-16);
   border: 1px solid var(--color-border);
@@ -69,14 +75,13 @@
 
 // ── Presets ────────────────────────────────────────────────────────────────
 
-// Sticky, because a customer entering four rolls was scrolling back up to
-// the quick sizes for every one of them (client, 17 Sept). It sticks under
-// the site header, and the negative inline margins let the panel's own
-// background run edge to edge behind it so rows do not show through.
+// The quick sizes were sticking under the site header, because a customer
+// entering four rolls was scrolling back up to them for every one (client,
+// 17 Sept). They now ride inside the table instead, in a row of their own
+// directly above the roll being worked on, which keeps them in view without
+// leaving the roll they belong to (Scott, 25 Sept). The JS moves the row;
+// these styles only have to make a table row read as a bar.
 .dt-cutsize__presets {
-  position: sticky;
-  top: var(--site-header-height, 0);
-  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -85,6 +90,19 @@
   padding: var(--spacer-8) var(--spacer-16);
   border-bottom: 1px solid var(--color-border);
   background-color: var(--color-surface);
+}
+
+.dt-cutsize__presetrow-cell {
+  padding: 0;
+  border: 0;
+}
+
+// Inside the table the cell already provides the full width and the rule
+// between rolls, so the bar drops its own spacing and sits flush.
+.dt-cutsize__presetrow .dt-cutsize__presets {
+  margin: 0;
+  border-bottom: 0;
+  background-color: color-mix(in oklab, var(--color-cyan) 8%, transparent);
 }
 
 .dt-cutsize__presets-label {
@@ -129,9 +147,16 @@
 
   th,
   td {
-    padding: var(--spacer-8);
+    // Four columns carrying 16px of side padding each is 64px of the width,
+    // which is the difference between the table fitting a phone and needing to
+    // be swiped sideways. Narrow gutters below 576px, the usual ones above.
+    padding: var(--spacer-8) var(--spacer-4);
     text-align: left;
     vertical-align: top;
+
+    @include min-breakpoint(mobile) {
+      padding: var(--spacer-8);
+    }
   }
 
   thead th {
@@ -155,12 +180,22 @@
   }
 }
 
+// 90px from tablet up, where there is room for the "QTY" heading to sit on one
+// line, but on a phone the four columns together were wider than the screen.
 .dt-cutsize__cutqty-col {
-  width: 90px;
+  width: 68px;
+
+  @include min-breakpoint(mobile) {
+    width: 90px;
+  }
 }
 
 .dt-cutsize__action-col {
-  width: 76px;
+  width: 68px;
+
+  @include min-breakpoint(mobile) {
+    width: 76px;
+  }
 }
 
 .dt-cutsize__roll-cell {
@@ -181,31 +216,49 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.dt-cutsize__cutqty,
-.dt-cutsize__size,
-.dt-cutsize__unit {
-  padding: var(--spacer-8) var(--spacer-12);
-  border: 1px solid var(--color-input);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-surface-2);
-  color: var(--color-foreground);
-  font: inherit;
-}
+// Scoped to the box on purpose. base/_forms.scss dresses every
+// input[type="number"] on the site as the newsletter field: full width, a 20px
+// pill, 12px/20px of padding. input[type="number"] is an element plus an
+// attribute, so it outranks a lone class and was winning here, and these two
+// boxes sit in a fixed-width table cell rather than across a form. On a phone
+// that left the cut size box 42px wide with 40px of padding inside it: the
+// number you had just typed was clipped out of sight, which on the feature the
+// client likes most is the worst place for it. Two classes settle it.
+.dt-cutsize {
+  .dt-cutsize__cutqty,
+  .dt-cutsize__size,
+  .dt-cutsize__unit {
+    padding: var(--spacer-8);
+    border: 1px solid var(--color-input);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+    font: inherit;
 
-.dt-cutsize__cutqty {
-  width: 60px;
-  font-weight: $font-weight-semibold;
-
-  @include min-breakpoint(mobile) {
-    width: 72px;
+    // Roomier once there is width to spare for it.
+    @include min-breakpoint(mobile) {
+      padding: var(--spacer-8) var(--spacer-12);
+    }
   }
-}
 
-.dt-cutsize__size {
-  width: 80px;
+  .dt-cutsize__cutqty {
+    width: 48px;
+    font-weight: $font-weight-semibold;
 
-  @include min-breakpoint(mobile) {
-    width: 100px;
+    @include min-breakpoint(mobile) {
+      width: 72px;
+    }
+  }
+
+  // 62px holds a four-digit width (the widest roll on the site is 1400mm) with
+  // room to spare, and keeps the whole table inside a 390px phone without a
+  // sideways swipe.
+  .dt-cutsize__size {
+    width: 62px;
+
+    @include min-breakpoint(mobile) {
+      width: 100px;
+    }
   }
 }
 
@@ -269,6 +322,18 @@
 
 .dt-cutsize--multi .dt-cutsize__removegroup {
   display: inline-block;
+}
+
+/* One roll to describe, so there is nothing to number and no second roll to
+   remove. The cell stays in the markup because cut-size-rows.js clones it as
+   the template for every roll it builds; hiding the column rather than dropping
+   it from the template keeps that one code path for both modes, and hands the
+   table back ~52px, a sixth of a 320px screen. */
+.dt-cutsize--one-roll {
+  .dt-cutsize__roll-col,
+  .dt-cutsize__roll-cell {
+    display: none;
+  }
 }
 
 .dt-cutsize__addgroup {
@@ -349,7 +414,13 @@
   color: var(--color-muted-foreground);
   font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
-  white-space: nowrap;
+
+  // "1095mm left" on one line sets the floor for the whole roll column, and on
+  // a phone that is width the cut sizes need more. Kept on one line from the
+  // point there is room for it.
+  @include min-breakpoint(mobile) {
+    white-space: nowrap;
+  }
 
   &:empty {
     display: none;

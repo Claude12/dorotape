@@ -1,0 +1,678 @@
+{
+    "key": "group_dorotape_cut_size",
+    "title": "Cut Sizes",
+    "fields": [
+        {
+            "key": "field_dtcut0001",
+            "label": "Panel",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtcut0002",
+            "label": "Toggle, rolls",
+            "name": "cutsize_toggle_rolls",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The line the customer clicks to open the box, on products sold by the roll.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Do you need your rolls cutting?",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0003",
+            "label": "Toggle, sold by the metre",
+            "name": "cutsize_toggle_single",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The same line on products sold by the metre, where the order is one roll to cut rather than several.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Do you need this cutting to width?",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0004",
+            "label": "Toggle badge",
+            "name": "cutsize_toggle_hint",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small word beside the toggle. It tells the customer the box can be left alone.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Optional",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0005",
+            "label": "Instructions, rolls",
+            "name": "cutsize_hint_rolls",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The paragraph above the table on products sold by the roll.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Select which roll you would like to cut/convert/slit. Enter size you would like and how many at that size. Use the + to add more cut sizes to that roll.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0006",
+            "label": "Instructions, sold by the metre",
+            "name": "cutsize_hint_single",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The same paragraph on products sold by the metre.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Tell us how to cut/convert/slit across the width. Enter the size you would like and how many at that size. Use the + to add more cut sizes.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0007",
+            "label": "Roll width note",
+            "name": "cutsize_max_note",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown after the instructions once the roll width is known. %s is replaced by the width, e.g. 1220mm.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Maximum cuts total up to %s.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0008",
+            "label": "Table",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtcut0009",
+            "label": "Quick add label",
+            "name": "cutsize_presets_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Sits before the quick add buttons.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Quick add:",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0010",
+            "label": "Quick add sizes",
+            "name": "cutsize_presets",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The sizes offered as buttons, in millimetres, separated by commas. Anything that is not a whole number is ignored.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "150, 305, 610",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0011",
+            "label": "Column: roll",
+            "name": "cutsize_col_roll",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Heading over the roll number. Hidden on products sold by the metre.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Roll",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0012",
+            "label": "Column: cut size",
+            "name": "cutsize_col_size",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Heading over the size boxes.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "34",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Cut size (mm)",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0013",
+            "label": "Column: quantity",
+            "name": "cutsize_col_qty",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Heading over how many cuts at that size.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Qty",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0014",
+            "label": "Size box placeholder",
+            "name": "cutsize_size_placeholder",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The grey prompt inside an empty size box.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Size in mm",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0015",
+            "label": "Add another roll button",
+            "name": "cutsize_add_roll",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button under the table. Only ever shown on products sold by the roll.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "+ CLICK HERE FOR NEXT ROLL TO CUT/CONVERT/SLIT",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0016",
+            "label": "Diagram",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtcut0017",
+            "label": "Diagram heading, rolls",
+            "name": "cutsize_diagram_title_rolls",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the picture of the cuts, on products sold by the roll.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "How each roll will be cut",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0018",
+            "label": "Diagram heading, sold by the metre",
+            "name": "cutsize_diagram_title_single",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The same heading on products sold by the metre.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "How your roll will be cut",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0019",
+            "label": "Diagram note, rolls",
+            "name": "cutsize_diagram_note_rolls",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Explains the picture on products sold by the roll.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Each bar is one roll across its width. Shaded blocks are your cuts, the pale end is what is left on the roll.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0020",
+            "label": "Diagram note, sold by the metre",
+            "name": "cutsize_diagram_note_single",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The same note on products sold by the metre.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "The bar is the roll across its width. Shaded blocks are your cuts, the pale end is what is left on the roll.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0021",
+            "label": "Messages",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtcut0022",
+            "label": "Width left over",
+            "name": "cutsize_msg_left",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Under the table while the cuts still fit. %1$s is the width left, %2$s the roll width.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "%1$smm of the %2$smm width left over.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0023",
+            "label": "Wider than the roll",
+            "name": "cutsize_msg_over",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Replaces the line above once the cuts are too wide. %s is how much too wide.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "%smm more than the roll holds.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0024",
+            "label": "Row warning",
+            "name": "cutsize_msg_row_error",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Beside the cut sizes when they are too wide. %1$s is the total, %2$s the roll width.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Cuts add up to %1$smm, wider than the roll (%2$smm)",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0025",
+            "label": "Remaining width, short",
+            "name": "cutsize_msg_roll_left",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The pale block at the end of the diagram bar. %s is the width left.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "%smm left",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0026",
+            "label": "Over width, short",
+            "name": "cutsize_msg_roll_over",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The same block when the cuts are too wide. %s is how much too wide.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "%smm over",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0027",
+            "label": "Diagram bar label",
+            "name": "cutsize_label_roll",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Beside each bar in the diagram. %s is the roll number.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Roll %s",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0028",
+            "label": "More rolls than ordered",
+            "name": "cutsize_msg_too_many",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown when cut sizes have been entered for more rolls than the customer is buying. %1$s is the rolls described, %2$s the quantity ordered. Products sold by the metre never see this.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "You have entered cut sizes for %1$s rolls but are only ordering %2$s. Remove a roll, or order more.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0029",
+            "label": "Too wide, numbered roll",
+            "name": "cutsize_error_width_numbered",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Refuses the add to basket when one of several rolls is too wide. %1$s is the roll number, %2$s the total, %3$s the roll width.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Roll %1$s: cuts add up to %2$smm, wider than the roll (%3$smm). Please adjust.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0030",
+            "label": "Too wide, one roll",
+            "name": "cutsize_error_width",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The same refusal when there is only one roll. %1$s is the total, %2$s the roll width.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your cuts add up to %1$smm, wider than the roll (%2$smm). Please adjust.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtcut0031",
+            "label": "Added to basket",
+            "name": "cutsize_added_one",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Confirmation after a successful add.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Added to your basket.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcut0032",
+            "label": "Added as several lines",
+            "name": "cutsize_added_many",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Confirmation when rolls cut differently became separate basket lines. %s is how many.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Added to your basket in %s lines, one per set of cut sizes.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-cut-sizes"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Every word in the cut size box on product pages, including the messages it shows as a customer types.",
+    "show_in_rest": 0,
+    "modified": 1790690994
+}

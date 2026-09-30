@@ -59,8 +59,8 @@ export function initTierTable() {
     if ( ! newId ) return; // 0 or empty = variation deselected, keep current table
     if ( table && tierContainer ) {
       var varData = variationTiers[ String( newId ) ];
-      if ( varData && varData.tiers && varData.tiers.length ) {
-        rebuildTbody( table, varData.tiers, varData.base_price || 0 );
+      if ( varData ) {
+        rebuildTbody( table, varData.tiers || [], varData.base_price || 0 );
         currentTiers = tiersFromTable( table );
       }
     }
@@ -74,6 +74,14 @@ export function initTierTable() {
     setTimeout( refresh, 0 );
     setTimeout( refresh, 160 );
   } );
+}
+
+/* The quantity step the product is sold in, off the table's container.
+ * Mirrors dorotape_qty_step() in inc/pricing.php; 1 means no step. */
+function qtyStep( table ) {
+  var holder = table.closest( '.dt-tier-pricing' );
+  var step   = holder ? parseInt( holder.dataset.qtyStep, 10 ) : 1;
+  return step > 1 ? step : 1;
 }
 
 /* Build the tier list from data attributes in a rendered table (incl. the
@@ -92,6 +100,7 @@ function tiersFromTable( table ) {
 /* Replace the tbody rows with updated prices, preserving the thead. */
 function rebuildTbody( table, tiers, basePrice ) {
   var unit      = tableUnit( table );
+  var step      = qtyStep( table );
   // Mirrors dorotape_unit_strings() in inc/pricing.php, keep in step.
   var suffix    = 'metre' === unit ? '/m' : ( 'roll' === unit ? '/roll' : '' );
   var qtySuffix = 'metre' === unit ? 'm+' : '+';
@@ -104,7 +113,7 @@ function rebuildTbody( table, tiers, basePrice ) {
   var html = '';
 
   html += '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' + basePrice + '">'
-    + '<td>1' + qtySuffix + '</td>'
+    + '<td>' + step + qtySuffix + '</td>'
     + '<td>' + ( basePrice > 0 ? fmt( basePrice ) : '&ndash;' ) + '</td>'
     + '<td>&ndash;</td>'
     + '</tr>';

@@ -73,6 +73,16 @@
   &__grid {
     display: grid;
     gap: var(--spacer-48);
+    // A grid item's min-width is auto, so a track sized auto cannot shrink
+    // below its content and any wide child pushes the column past the
+    // container. The hero clips with overflow: hidden, so that content is not
+    // merely off to the side, it is gone with no way to scroll to it. The
+    // two-column rule below already guards against this with minmax(0, 1fr);
+    // the single column above it had no track sizing at all, which is where
+    // the cut size table (fixed-width inputs, so a wide min-content) pushed
+    // the summary to 375px inside a 320px screen and lost the quantity field
+    // and the add and remove buttons off the right edge.
+    grid-template-columns: minmax(0, 1fr);
 
     @include min-breakpoint(desktop) {
       grid-template-columns: repeat(2, minmax(0, 1fr));

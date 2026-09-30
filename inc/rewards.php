@@ -149,6 +149,33 @@ function dorotape_product_earns_points( $product ): bool {
 	return $product instanceof WC_Product && 'yes' === $product->get_meta( '_dt_reward_points' );
 }
 
+/**
+ * How many times over a product earns points.
+ *
+ * Fifteen products paid double on the old site (loyaltypoints 2 in
+ * ecom_pricemap_dataexport.csv, against 1 for the other fifty), and the client
+ * asked for that to carry over: "Yes, let's keep it that way please" (25 Sept).
+ * RewardsWP has one earning rate for the whole shop and no per-product rate
+ * below its paid tier, so the weighting is applied to the qualifying total
+ * instead: a line that earns double is counted twice towards the order's
+ * points, which comes to the same number of points.
+ *
+ * Stored as _dt_reward_multiplier on the parent product, so variations inherit
+ * it the way the earning flag does.
+ *
+ * @param mixed $product
+ * @return float 1.0 unless the product is weighted.
+ */
+function dorotape_reward_multiplier( $product ): float {
+	if ( ! $product instanceof WC_Product ) {
+		return 1.0;
+	}
+
+	$id         = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
+	$multiplier = (float) get_post_meta( $id, '_dt_reward_multiplier', true );
+
+	return $multiplier > 1 ? $multiplier : 1.0;
+}
 // ─── Admin field (Product data → Advanced) ───────────────────────────────────
 
 add_action( 'woocommerce_product_options_advanced', function (): void {
@@ -170,6 +197,21 @@ add_action( 'woocommerce_product_options_advanced', function (): void {
 			'desc_tip'    => false,
 		)
 	);
+
+	woocommerce_wp_text_input(
+		array(
+			'id'                => '_dt_reward_multiplier',
+			'label'             => __( 'Points multiplier', 'dorotape' ),
+			'description'       => __( 'Leave at 1 for the normal rate. 2 means this product earns double points.', 'dorotape' ),
+			'desc_tip'          => false,
+			'type'              => 'number',
+			'value'             => get_post_meta( $post->ID, '_dt_reward_multiplier', true ) ?: '1',
+			'custom_attributes' => array(
+				'min'  => '1',
+				'step' => '1',
+			),
+		)
+	);
 } );
 
 add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $product ): void {
@@ -181,6 +223,14 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 		$product->update_meta_data( '_dt_reward_points', 'yes' );
 	} else {
 		$product->delete_meta_data( '_dt_reward_points' ); // Not earning is the default.
+	}
+
+	$multiplier = isset( $_POST['_dt_reward_multiplier'] ) ? (float) wp_unslash( $_POST['_dt_reward_multiplier'] ) : 1.0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+	if ( $multiplier > 1 ) {
+		$product->update_meta_data( '_dt_reward_multiplier', $multiplier );
+	} else {
+		$product->delete_meta_data( '_dt_reward_multiplier' ); // The normal rate is the default.
 	}
 } );
 
@@ -207,8 +257,10 @@ add_filter(
 		$qualifying = 0.0;
 
 		foreach ( $order->get_items() as $item ) {
-			if ( dorotape_product_earns_points( $item->get_product() ) ) {
-				$qualifying += (float) $item->get_total();
+			$item_product = $item->get_product();
+
+			if ( dorotape_product_earns_points( $item_product ) ) {
+				$qualifying += (float) $item->get_total() * dorotape_reward_multiplier( $item_product );
 			}
 		}
 
@@ -251,9 +303,33 @@ add_action( 'wp', function (): void {
 				function () use ( $callback ): void {
 					global $product;
 
-					if ( dorotape_product_earns_points( $product ) ) {
-						call_user_func( $callback );
+					if ( ! dorotape_product_earns_points( $product ) ) {
+						return;
 					}
+
+					/*
+					 * The plugin counts the notice's points from the price on
+					 * screen and offers no filter on the number, so a weighted
+					 * product is shown the price it earns as, for the length of
+					 * that one call. Without this the page would promise half
+					 * the points the order goes on to award.
+					 */
+					$multiplier = dorotape_reward_multiplier( $product );
+
+					if ( $multiplier <= 1 ) {
+						call_user_func( $callback );
+						return;
+					}
+
+					$weight = static function ( $price ) use ( $multiplier ) {
+						return '' === $price ? $price : (float) $price * $multiplier;
+					};
+
+					add_filter( 'woocommerce_product_get_price', $weight, 99 );
+					add_filter( 'woocommerce_product_variation_get_price', $weight, 99 );
+					call_user_func( $callback );
+					remove_filter( 'woocommerce_product_get_price', $weight, 99 );
+					remove_filter( 'woocommerce_product_variation_get_price', $weight, 99 );
 				},
 				$priority
 			);

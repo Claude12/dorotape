@@ -80,3 +80,61 @@
     height: auto;
   }
 }
+
+// Imported description images. The old site sized them with a <style> block
+// carrying a single `.responsive` rule, sitting inside the description
+// itself. WordPress strips <style> out of post content whenever the post is
+// saved by anyone without unfiltered_html, so that rule was one edit away
+// from vanishing, and on eighteen products it already had: the CSS was
+// showing on the page as text and the image beside it was running full
+// width. Keeping it here means an editor saving a product cannot break it.
+//
+// The old rule was global. It is scoped to the tab panel here, and the two
+// widths the import used other than 50% get a modifier apiece rather than
+// their own stray rule. Only the 20% one has images on it today; the 100%
+// one is kept so the cleanup script and this file agree on what it writes.
+.woocommerce-Tabs-panel {
+  .responsive {
+    width: 50%;
+    height: auto;
+  }
+
+  .responsive--20 {
+    width: 20%;
+  }
+
+  .responsive--100 {
+    width: 100%;
+  }
+}
+
+// The A-board spec tables (#673 and the six products beside it). Same story:
+// a <style> block in the description, this one styling a table by its id.
+// The imported look was light grey on white with a cyan hover, which is the
+// old site's palette and unreadable on this one, so it is reproduced in the
+// current tokens instead: the brand cyan it already used for hover stays.
+.woocommerce-Tabs-panel #data {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacer-16) 0;
+
+  th,
+  td {
+    padding: var(--spacer-8);
+    border: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  th {
+    background-color: var(--color-surface-2);
+    font-weight: $font-weight-semibold;
+  }
+
+  tr:nth-child(even) td {
+    background-color: color-mix(in oklab, var(--color-surface) 60%, transparent);
+  }
+
+  tr:hover td {
+    background-color: color-mix(in oklab, var(--color-cyan) 16%, transparent);
+  }
+}

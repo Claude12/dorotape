@@ -21,6 +21,44 @@ export function initCutRows() {
   try { widthMap = JSON.parse( box.dataset.maxWidths || '{}' ); } catch { /* malformed data attribute, keep the empty default above */ }
   var currentMax = parseInt( box.dataset.maxWidth, 10 ) || 0;
 
+  /* One roll to describe, not a roll per unit ordered. Set by PHP on a product
+     priced by the metre (or by a stepped quantity), where the quantity box
+     holds a length rather than a count of rolls, so "roll 2 of 50" means
+     nothing and the server will not split the add either. */
+  const singleRoll = '1' === box.dataset.singleRoll;
+
+  /* Everything this script writes into the page is editable in Theme Settings >
+     Cut Sizes and arrives on the box as JSON, beside the roll widths. The
+     defaults repeat the shipped wording so the box still reads correctly if the
+     attribute is missing or malformed. */
+  var STR = {
+    left:      '%1$smm of the %2$smm width left over.',
+    over:      '%smm more than the roll holds.',
+    rowError:  'Cuts add up to %1$smm, wider than the roll (%2$smm)',
+    rollLeft:  '%smm left',
+    rollOver:  '%smm over',
+    tooMany:   'You have entered cut sizes for %1$s rolls but are only ordering %2$s. Remove a roll, or order more.',
+    rollLabel: 'Roll %s'
+  };
+  try {
+    var fromPhp = JSON.parse( box.dataset.strings || '{}' );
+    Object.keys( STR ).forEach( function ( k ) {
+      if ( 'string' === typeof fromPhp[ k ] && fromPhp[ k ] ) STR[ k ] = fromPhp[ k ];
+    } );
+  } catch { /* malformed data attribute, keep the defaults above */ }
+
+  /* PHP's placeholders, so one field reads the same whether the server or this
+     script fills it in: %1$s..%9$s by position, and a bare %s or %d taking the
+     next argument in turn. */
+  function fmt( tpl ) {
+    var args = Array.prototype.slice.call( arguments, 1 );
+    var next = 0;
+    return String( tpl ).replace( /%(\d+)\$s|%[sd]/g, function ( whole, pos ) {
+      var v = pos ? args[ parseInt( pos, 10 ) - 1 ] : args[ next++ ];
+      return undefined === v ? whole : String( v );
+    } );
+  }
+
   /* Most customers take the roll uncut, so the cut form starts collapsed
      behind "Do you need your rolls cutting?" and only those who need it
      open it. Collapsed is also the safe default for validation: with no
@@ -54,6 +92,12 @@ export function initCutRows() {
   function getQty() {
     const input = form.querySelector( '.quantity input[type="number"], input.qty' );
     return input ? Math.max( 1, parseInt( input.value, 10 ) || 1 ) : 1;
+  }
+
+  /* How many rolls the table may grow to. Ordering 50 metres is not an order
+     for 50 rolls, so in single-roll mode the quantity has no say in it. */
+  function maxRolls() {
+    return singleRoll ? 1 : getQty();
   }
 
   // Every future row and roll cell is built from the initial PHP-rendered
@@ -90,6 +134,44 @@ export function initCutRows() {
   // rolls[r] = { cell: <td>, rows: [<tr>, ...] }, in on-screen order.
   var rolls = [ { cell: firstRollCell, rows: [ firstRow ] } ];
 
+  /* The roll quick add is working on. Everything a customer can do to say
+     "I am on this roll now" keeps it up to date: typing in a size, adding a
+     cut, adding a roll, or a quick add that has run out of room and moved on. */
+  var activeRoll = 0;
+
+  /* Quick add moves down the table to sit above whichever roll that is,
+     instead of staying at the top where a customer cutting their third roll
+     could not see it (Scott, 25 Sept: "when starting cuts on the next roll,
+     the feature automatically bounces above the next roll"). It is the same
+     element and the same buttons, carried into a row of its own. */
+  const presetBar = box.querySelector( '.dt-cutsize__presets' );
+  var presetRow   = null;
+
+  if ( presetBar ) {
+    var columns = box.querySelectorAll( '.dt-cutsize__table thead th' ).length || 4;
+    presetRow   = document.createElement( 'tr' );
+    presetRow.className = 'dt-cutsize__presetrow';
+    var presetCell = document.createElement( 'td' );
+    presetCell.className = 'dt-cutsize__presetrow-cell';
+    presetCell.colSpan   = columns;
+    presetCell.appendChild( presetBar );
+    presetRow.appendChild( presetCell );
+  }
+
+  function rollIndexOfRow( tr ) {
+    for ( var i = 0; i < rolls.length; i++ ) {
+      if ( -1 !== rolls[ i ].rows.indexOf( tr ) ) return i;
+    }
+    return -1;
+  }
+
+  function placePresets() {
+    if ( ! presetRow ) return;
+    if ( activeRoll >= rolls.length ) activeRoll = rolls.length - 1;
+    if ( activeRoll < 0 ) activeRoll = 0;
+    body.insertBefore( presetRow, rolls[ activeRoll ].rows[ 0 ] );
+  }
+
   function render() {
     rolls.forEach( function ( roll ) {
       roll.rows.forEach( function ( tr ) { body.appendChild( tr ); } ); // re-attaches or reorders in place
@@ -112,6 +194,7 @@ export function initCutRows() {
       } );
     } );
     box.classList.toggle( 'dt-cutsize--multi', rolls.length > 1 );
+    placePresets();
     validateAll();
   }
 
@@ -167,18 +250,20 @@ export function initCutRows() {
       var leftEl = roll.cell.querySelector( '.dt-cutsize__roll-left' );
       if ( leftEl ) {
         leftEl.textContent = over
-          ? round1( read.sum - currentMax ) + 'mm over'
-          : round1( left ) + 'mm left';
+          ? fmt( STR.rollOver, round1( read.sum - currentMax ) )
+          : fmt( STR.rollLeft, round1( left ) );
         leftEl.classList.toggle( 'dt-cutsize__roll-left--bad', over );
       }
 
       var row = document.createElement( 'div' );
       row.className = 'dt-cutsize__bar-row';
 
-      var label = document.createElement( 'span' );
-      label.className = 'dt-cutsize__bar-label';
-      label.textContent = 'Roll ' + ( index + 1 );
-      row.appendChild( label );
+      if ( ! singleRoll ) {
+        var label = document.createElement( 'span' );
+        label.className = 'dt-cutsize__bar-label';
+        label.textContent = fmt( STR.rollLabel, index + 1 );
+        row.appendChild( label );
+      }
 
       var bar = document.createElement( 'div' );
       bar.className = 'dt-cutsize__bar' + ( over ? ' dt-cutsize__bar--over' : '' );
@@ -211,13 +296,13 @@ export function initCutRows() {
         var rest = document.createElement( 'span' );
         rest.className = 'dt-cutsize__bar-rest';
         rest.style.flexGrow = String( left );
-        rest.textContent = round1( left ) + 'mm left';
+        rest.textContent = fmt( STR.rollLeft, round1( left ) );
         bar.appendChild( rest );
       }
 
       bar.setAttribute(
         'aria-label',
-        'Roll ' + ( index + 1 ) + ' of ' + currentMax + 'mm: '
+        ( singleRoll ? 'Roll of ' : 'Roll ' + ( index + 1 ) + ' of ' ) + currentMax + 'mm: '
           + ( described.length ? described.join( ', ' ) : 'no cuts yet' )
           + ( over
             ? ', ' + round1( read.sum - currentMax ) + 'mm more than the roll holds'
@@ -240,7 +325,7 @@ export function initCutRows() {
       var error = tr.querySelector( '.dt-cutsize__row-error' );
       if ( ! error ) return;
       error.textContent = ( invalid && idx === rows.length - 1 )
-        ? 'Cuts add up to ' + ( Math.round( sum * 10 ) / 10 ) + 'mm, wider than the roll (' + currentMax + 'mm)'
+        ? fmt( STR.rowError, Math.round( sum * 10 ) / 10, currentMax )
         : '';
     } );
     return ! invalid;
@@ -265,14 +350,30 @@ export function initCutRows() {
     rolls.forEach( function ( roll ) { if ( ! validateRoll( roll.rows ) ) ok = false; } );
 
     var cut   = cutRollCount();
-    var total = getQty();
-    if ( allocNote ) {
-      allocNote.classList.toggle( 'dt-cutsize__alloc--bad', cut > total );
-      allocNote.textContent = cut > total
-        ? 'You have entered cut sizes for ' + cut + ' rolls but are only ordering ' + total + '. Remove a roll, or order more.'
-        : '';
+    var total = maxRolls();
+
+    /* Per roll the note warns about describing more rolls than are on order.
+       With one roll that cannot happen, so it carries the thing that can: how
+       much of the width is still free. That reading lived in the Roll column,
+       which single-roll mode hides, and the diagram's pale end is too thin to
+       read off once only a few mm are left. */
+    var note = { text: '', bad: false };
+    if ( singleRoll ) {
+      var free = rolls.length ? rollLeft( rolls[ 0 ] ) : Infinity;
+      if ( isFinite( free ) && readCuts( rolls[ 0 ].rows ).sum > 0 ) {
+        note = free < 0
+          ? { text: fmt( STR.over, round1( -free ) ), bad: true }
+          : { text: fmt( STR.left, round1( free ), currentMax ), bad: false };
+      }
+    } else if ( cut > total ) {
+      note = { text: fmt( STR.tooMany, cut, total ), bad: true };
+      ok = false;
     }
-    if ( cut > total ) ok = false;
+
+    if ( allocNote ) {
+      allocNote.classList.toggle( 'dt-cutsize__alloc--bad', note.bad );
+      allocNote.textContent = note.text;
+    }
 
     renderDiagram();
 
@@ -284,27 +385,80 @@ export function initCutRows() {
     return ok;
   }
 
-  /* Preset sizes are a shortcut into the same size inputs, never a
-     separate source of truth: a click fills the box the customer last
-     touched, else the first empty one, else a fresh cut row. Everything
-     downstream (validation, what gets posted) is unchanged. */
+  /* Preset sizes are a shortcut into the same size inputs, never a separate
+     source of truth. A click fills the box the customer last touched, else the
+     first empty box on the roll they are working on, else a fresh cut row on
+     that same roll.
+
+     The roll matters, and used to be ignored: the search started at roll 1
+     every time, so a second 610 added while working on roll 2 jumped back up
+     to roll 1 (Scott, 25 Sept). Cuts now stay on the roll in hand for as long
+     as it has the width for them, which is also how customers read it: two
+     610s come off one 1220 roll, and only the third starts the next one. */
   var lastSize = null;
   body.addEventListener( 'focusin', function ( e ) {
-    if ( e.target.classList.contains( 'dt-cutsize__size' ) ) lastSize = e.target;
+    if ( ! e.target.classList.contains( 'dt-cutsize__size' ) ) return;
+    lastSize = e.target;
+    var index = rollIndexOfRow( e.target.closest( 'tr' ) );
+    if ( -1 !== index && index !== activeRoll ) {
+      activeRoll = index;
+      placePresets();
+    }
   } );
 
-  function presetTarget() {
-    if ( lastSize && body.contains( lastSize ) && ! lastSize.value ) return lastSize;
+  // What is left of a roll's width. No stated width means no limit to test.
+  function rollLeft( roll ) {
+    if ( ! ( currentMax > 0 ) ) return Infinity;
+    return currentMax - readCuts( roll.rows ).sum;
+  }
+
+  function presetTarget( sizeMm ) {
+    if ( activeRoll >= rolls.length ) activeRoll = rolls.length - 1;
+    if ( activeRoll < 0 ) activeRoll = 0;
+
+    // The roll in hand first, then the ones after it, then a new roll if the
+    // order is for more rolls than the table shows.
+    var index = -1;
+    for ( var i = activeRoll; i < rolls.length; i++ ) {
+      // A hair of tolerance, so 2 x 610 still counts as fitting 1220.
+      if ( rollLeft( rolls[ i ] ) + 0.001 >= sizeMm ) {
+        index = i;
+        break;
+      }
+    }
+
+    if ( -1 === index && rolls.length < maxRolls() ) {
+      rolls.push( { cell: newRollCell(), rows: [ newRow() ] } );
+      index = rolls.length - 1;
+    }
+
+    // Nowhere left to put it: keep it on the roll in hand, where the
+    // "wider than the roll" message explains itself.
+    if ( -1 === index ) index = activeRoll;
+
+    activeRoll = index;
+    var roll   = rolls[ index ];
+
+    if (
+      lastSize && body.contains( lastSize ) && ! lastSize.value
+      && rollIndexOfRow( lastSize.closest( 'tr' ) ) === index
+    ) {
+      render();
+      return lastSize;
+    }
+
     var empty = null;
-    rolls.forEach( function ( roll ) {
-      roll.rows.forEach( function ( tr ) {
-        var input = tr.querySelector( '.dt-cutsize__size' );
-        if ( ! empty && input && ! input.value ) empty = input;
-      } );
+    roll.rows.forEach( function ( tr ) {
+      var input = tr.querySelector( '.dt-cutsize__size' );
+      if ( ! empty && input && ! input.value ) empty = input;
     } );
-    if ( empty ) return empty;
-    var roll = rolls[ rolls.length - 1 ];
-    var row  = newRow();
+
+    if ( empty ) {
+      render();
+      return empty;
+    }
+
+    var row = newRow();
     roll.rows.push( row );
     render();
     return row.querySelector( '.dt-cutsize__size' );
@@ -320,7 +474,7 @@ export function initCutRows() {
   box.addEventListener( 'click', function ( e ) {
     var btn = e.target.closest( '.dt-cutsize__preset' );
     if ( ! btn ) return;
-    var target = presetTarget();
+    var target = presetTarget( parseInt( btn.dataset.size, 10 ) || 0 );
     if ( ! target ) return;
     target.value = btn.dataset.size;
     target.focus();
@@ -336,9 +490,10 @@ export function initCutRows() {
     const addBtn = e.target.closest( '.dt-cutsize__addcut' );
     if ( addBtn ) {
       const tr   = addBtn.closest( 'tr' );
-      const roll = rolls.find( function ( r ) { return -1 !== r.rows.indexOf( tr ); } );
-      if ( roll ) {
-        roll.rows.push( newRow() );
+      const index = rollIndexOfRow( tr );
+      if ( -1 !== index ) {
+        activeRoll = index;
+        rolls[ index ].rows.push( newRow() );
         render();
       }
       return;
@@ -369,14 +524,16 @@ export function initCutRows() {
       if ( idx === -1 ) return;
       rolls[ idx ].rows.forEach( function ( tr ) { tr.remove(); } );
       rolls.splice( idx, 1 );
+      if ( activeRoll >= idx ) activeRoll = Math.max( 0, activeRoll - 1 );
       render();
     }
   } );
 
   if ( addRollBtn ) {
     addRollBtn.addEventListener( 'click', function () {
-      if ( rolls.length >= getQty() ) return;
+      if ( rolls.length >= maxRolls() ) return;
       rolls.push( { cell: newRollCell(), rows: [ newRow() ] } );
+      activeRoll = rolls.length - 1;
       render();
     } );
   }
