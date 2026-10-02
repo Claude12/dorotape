@@ -22,6 +22,8 @@ $dorotape_phone      = dorotape_header_phone();
 $dorotape_cart_count = dorotape_header_cart_count();
 $dorotape_account    = dorotape_header_wc_url( 'account' );
 $dorotape_cart       = dorotape_header_wc_url( 'cart' );
+$dorotape_wishlist   = dorotape_header_wishlist_url();
+$dorotape_wish_count = dorotape_header_wishlist_count();
 $dorotape_notice     = dorotape_header_notice();
 $dorotape_trade      = dorotape_setting_link( 'header_trade_account' );
 $dorotape_quote      = dorotape_setting_link( 'header_quote' );
@@ -76,16 +78,9 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 						<?php is_user_logged_in() ? esc_html_e( 'My account', 'dorotape' ) : esc_html_e( 'Login', 'dorotape' ); ?>
 					</a>
 
-					<a class="site-header__utility-link site-header__utility-link--strong" href="<?php echo esc_url( $dorotape_cart ); ?>">
-						<?php echo dorotape_header_icon( 'cart', 'site-header__utility-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php
-						printf(
-							/* translators: %d: number of items in the basket. */
-							esc_html__( 'Basket (%d)', 'dorotape' ),
-							(int) $dorotape_cart_count
-						);
-						?>
-					</a>
+					<?php dorotape_header_count_link( 'wishlist', $dorotape_wishlist, $dorotape_wish_count, true ); ?>
+
+					<?php dorotape_header_count_link( 'basket', $dorotape_cart, $dorotape_cart_count, true ); ?>
 				</div>
 			</div>
 		</div><!-- .site-header__utility -->
@@ -235,16 +230,9 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 						<?php is_user_logged_in() ? esc_html_e( 'My account', 'dorotape' ) : esc_html_e( 'Login', 'dorotape' ); ?>
 					</a>
 
-					<a class="site-header__utility-link" href="<?php echo esc_url( $dorotape_cart ); ?>">
-						<?php echo dorotape_header_icon( 'cart', 'site-header__utility-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php
-						printf(
-							/* translators: %d: number of items in the basket. */
-							esc_html__( 'Basket (%d)', 'dorotape' ),
-							(int) $dorotape_cart_count
-						);
-						?>
-					</a>
+					<?php dorotape_header_count_link( 'wishlist', $dorotape_wishlist, $dorotape_wish_count, false ); ?>
+
+					<?php dorotape_header_count_link( 'basket', $dorotape_cart, $dorotape_cart_count, false ); ?>
 				</div>
 			</div>
 		</div><!-- .site-header__drawer -->

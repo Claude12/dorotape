@@ -1,0 +1,749 @@
+@use "abstracts/mixins" as *;
+@use "base/forms" as *;
+@use "base/typography" as *;
+@use "components/buttons" as *;
+
+// WooCommerce Blocks, the parts the basket and the checkout share.
+//
+// Both pages are built from the plugin's blocks (the client's own choice,
+// recorded in .cursorrules: blocks for Cart and Checkout, the classic
+// shortcode for My Account). That means the markup is the plugin's and so is
+// the stylesheet that paints it, and that stylesheet was written for a light
+// theme: white fields, grey rules, a near-black label. On this navy canvas a
+// checkout field came out white with its label invisible against it.
+//
+// None of it needs !important, but source order is not on our side here. On
+// these two pages the block stylesheets are printed after the theme's, so a
+// selector of the same weight as the plugin's loses rather than wins. Where
+// the plugin already styles something, ours has to carry one class more than
+// its selector does, or set a property its rule cannot overrule: the coupon
+// button is sized with `height` because the plugin floors every button at
+// `min-height: 3em`, and the text inputs name `.is-active` because that is
+// where the plugin sets the padding the floating label used to sit in.
+//
+// Everything the plugin leaves alone still lands on weight alone.
+//
+// Every selector here is scoped to `.woo-page`, the class
+// inc/woo-pages.php puts on the band these pages' content sits in. Two
+// reasons. It keeps the rules off every other page on the site, and it is
+// what makes them land at all: WooCommerce prefixes its checkout rules with
+// `.wc-block-components-form`, so a bare block class is a weight short and
+// loses however late it is enqueued. One class of our own answers that
+// without a single !important.
+//
+// What lives here is what both pages draw: fields, selects, checkboxes,
+// radios, buttons, totals rows, panels, notices, the quantity stepper and the
+// two-column layout. The per-page pieces are in _cart.scss and _checkout.scss,
+// which place these rather than restyle them.
+
+// ── The two-column layout ──────────────────────────────────────────────────
+//
+// The plugin lays this out as flex with percentage widths and a percentage
+// gutter drawn as padding on the sidebar, switching at 782px. A grid instead,
+// at the theme's own desktop breakpoint, so the summary is a fixed column and
+// the line items take the rest: a basket row has a thumbnail, a name, a price
+// and a stepper in it and it is the part that needs the room.
+
+.woo-page .wc-block-components-sidebar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-32);
+  align-items: start;
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: var(--spacer-40);
+  }
+}
+
+// The plugin's widths and gutter, now that the grid sets both.
+.woo-page .wc-block-components-main,
+.woo-page .wc-block-components-sidebar {
+  width: auto;
+  max-width: none;
+  padding: 0;
+}
+
+// The summary column: the site's surface panel, the same one the product
+// page's spec table and the footer's cards sit on.
+.woo-page .wc-block-components-sidebar {
+  padding: var(--spacer-24);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+}
+
+// ── Headings ───────────────────────────────────────────────────────────────
+
+.woo-page .wc-block-components-title {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tight;
+}
+
+// ── Fields ─────────────────────────────────────────────────────────────────
+//
+// The plugin floats its label inside the field: it sits over the input at
+// rest and shrinks into the top edge once there is a value. Every other form
+// on this site puts the label above the field, including the classic account
+// screens and every WPForms form, so these do too. Consistency across the
+// site outranks the plugin's own pattern, and a static label is also the one
+// that survives a browser autofill.
+//
+// Flex with the label ordered first rather than markup order, because the
+// input comes first in the DOM and the validation error comes last: a
+// column-reverse would put the error at the top.
+
+.woo-page .wc-block-components-text-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+  margin-top: var(--spacer-16);
+}
+
+// `.is-active` is in the selector for the padding's sake. The plugin reserves
+// 24px at the top of a field for the floating label to drop into, it sets
+// that from an `.is-active` rule, and WooCommerce prints its block styles
+// after the theme's stylesheet on these two pages, so matching its weight is
+// not enough to take the reserved space back. The label is above the field
+// here, so the field gets even padding instead and stops looking like its
+// text has sunk.
+.woo-page .wc-block-components-text-input,
+.woo-page .wc-block-components-text-input.is-active {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"] {
+    @include field-base;
+
+    // The plugin sets a fixed height for the floating label to live in.
+    height: auto;
+    padding: var(--spacer-12) var(--spacer-20);
+
+    // And reserves that space a second time while the field has focus, from
+    // a rule of exactly the weight of the one answered above. A tie loses
+    // here, so the padding is restated through a selector that carries
+    // `.is-active` and `:focus` both, which the plugin's does not. Without
+    // this the field grows by 12px and its text drops the moment someone
+    // starts typing in it.
+    &:focus {
+      padding: var(--spacer-12) var(--spacer-20);
+    }
+  }
+
+  // Chrome paints an autofilled field white with black text, which makes the
+  // one field someone's browser filled in look like it came from another
+  // site. The fill itself cannot be set, so it is covered with an inset
+  // shadow, which is the only thing that reaches behind it.
+  input:-webkit-autofill {
+    padding: var(--spacer-12) var(--spacer-20);
+    box-shadow: inset 0 0 0 100px var(--color-background);
+    -webkit-text-fill-color: var(--color-foreground);
+    caret-color: var(--color-foreground);
+  }
+
+  input:-webkit-autofill:focus-visible {
+    box-shadow:
+      inset 0 0 0 100px var(--color-background),
+      0 0 0 3px color-mix(in oklab, var(--color-magenta) 25%, transparent);
+  }
+}
+
+.woo-page .wc-block-components-textarea {
+  @include field-base;
+
+  height: auto;
+}
+
+// `.is-active` is the plugin's "has a value" state, which is where the float
+// is drawn. Named here so the reset beats it without a heavier selector.
+.woo-page .wc-block-components-text-input label,
+.woo-page .wc-block-components-text-input.is-active label {
+  position: static;
+  order: -1;
+  max-width: none;
+  transform: none;
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+}
+
+// The same two for the country and state selects, which are a wrapper of
+// their own with their own label.
+.woo-page .wc-blocks-components-select__container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-6);
+  height: auto;
+  border: 0;
+  background: transparent;
+}
+
+.woo-page .wc-blocks-components-select__label {
+  position: static;
+  order: -1;
+  max-width: none;
+  transform: none;
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+}
+
+.woo-page .wc-blocks-components-select__select {
+  @include field-base;
+  @include field-select;
+
+  height: auto;
+}
+
+// The same trap the text input above fell into, and the same answer. The
+// plugin reserves room for its floating label a second time while the select
+// has focus, and thickens the border to 1.5px with it, from
+// `.wc-blocks-components-select .wc-blocks-components-select__select:focus`.
+// That weighs exactly what the rule above does, and a tie loses here, so
+// clicking the country list dropped its text 4px, pulled it 11px to the left
+// and grew the box by a pixel. Naming the two wrappers as well carries more
+// classes than any of the plugin's rules for this field, including the
+// `.has-dark-controls` variant it switches to on a dark background.
+.woo-page .wc-blocks-components-select .wc-blocks-components-select__container .wc-blocks-components-select__select:focus {
+  padding: var(--spacer-12) var(--spacer-44) var(--spacer-12) var(--spacer-20);
+  border-width: 1px;
+  border-color: var(--color-magenta);
+}
+
+.woo-page .wc-blocks-components-select {
+  margin-top: var(--spacer-16);
+}
+
+// "+ Add apartment, suite, etc." The plugin renders it as a bare span with a
+// button role, so it is given the site's action link by hand.
+.woo-page .wc-block-components-address-form__address_2-toggle {
+  @include action-link;
+
+  display: inline-block;
+  margin-top: var(--spacer-12);
+}
+
+.woo-page .wc-block-components-validation-error {
+  margin-top: var(--spacer-4);
+  color: var(--color-danger);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+
+  p {
+    margin: 0;
+  }
+}
+
+// ── Checkboxes ─────────────────────────────────────────────────────────────
+//
+// The box itself is the site's, drawn once in base/_forms.scss. All this does
+// is lay out the row it sits in and take the plugin's own tick off ours.
+
+.woo-page .wc-block-components-checkbox {
+  margin-top: var(--spacer-16);
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacer-10);
+    font-weight: $font-weight-regular;
+    cursor: pointer;
+  }
+}
+
+// The plugin styles its own box from a selector heavier than the element rule
+// in base/_forms.scss, so the shared box is included here rather than left to
+// land on its own. Nothing is redrawn: this is the same definition.
+.woo-page .wc-block-components-checkbox__input[type="checkbox"] {
+  @include checkbox-base;
+}
+
+.woo-page .wc-block-components-checkbox__mark {
+  // The plugin lays an inline SVG tick over the input. The shared box already
+  // carries one, and two ticks at slightly different sizes is worse than
+  // either, so this one goes.
+  display: none;
+}
+
+.woo-page .wc-block-components-checkbox__label {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+// ── Shipping options, and anything else offered as a radio ─────────────────
+//
+// Each option is a card rather than a row with a dot: the delivery choice is
+// the one decision on the checkout that costs money, and a card is both the
+// easier target and the clearer selected state.
+
+// Two selectors because there are two shapes of option. Shipping is a plain
+// label; a payment method is that label wrapped in an accordion, because a
+// method may unfold a form or a line of explanation beneath it. The card has
+// to sit on whichever element is the outer one, or the description would fall
+// outside the box it belongs to.
+.woo-page .wc-block-components-radio-control__option,
+.woo-page .wc-block-components-radio-control-accordion-option {
+  display: block;
+  margin: 0 0 var(--spacer-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--color-cyan) 60%, var(--color-border));
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// The padding is the label's either way: 48px on the left is the room the
+// plugin's absolutely positioned radio needs.
+.woo-page .wc-block-components-radio-control__option {
+  padding: var(--spacer-16) var(--spacer-16) var(--spacer-16) var(--spacer-48);
+}
+
+// And inside an accordion the label gives the card back up, or a payment
+// method would be a card drawn inside a card with its own hover.
+.woo-page .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__option {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+// The plugin draws a hairline across the top of each option, which is how a
+// list of rows is separated. These are cards with a gap between them, and the
+// line landed inside the rounded corner of the one below it.
+.woo-page .wc-block-components-radio-control__option::after {
+  content: none;
+}
+
+// The same line, on the payment list's outer element. One class heavier than
+// the rule above because the plugin draws this one from inside
+// .wc-block-checkout__payment-method and would otherwise match on a tie,
+// which the theme loses: our stylesheet is printed before theirs.
+.woo-page .wc-block-checkout__payment-method .wc-block-components-radio-control-accordion-option::after {
+  content: none;
+}
+
+// And a border around the whole group, for the same reason: a run of rows
+// reads as one control. These are separate cards, so that came out as a box
+// drawn around boxes, square-cornered at 4px while the cards inside it are
+// rounded at 20.
+.woo-page .wc-block-components-radio-control--highlight-checked::after {
+  content: none;
+}
+
+// The picked option is given 4px corners and a 1.5px inner ring of its own,
+// from a selector two classes heavier than the card rule above, so it alone
+// came out square among rounded ones. The card already says which option is
+// picked, in the brand's own colour, so this takes the plugin's version off
+// and leaves the shape every option shares.
+.woo-page .wc-block-components-radio-control--highlight-checked label.wc-block-components-radio-control__option--checked-option-highlighted,
+.woo-page .wc-block-components-radio-control--highlight-checked div.wc-block-components-radio-control-accordion-option {
+  border-radius: var(--radius-2xl);
+  box-shadow: none;
+}
+
+.woo-page .wc-block-components-radio-control__option-checked,
+.woo-page .wc-block-components-radio-control-accordion-option--checked-option-highlighted {
+  border-color: var(--color-magenta);
+  background-color: color-mix(in oklab, var(--color-magenta) 8%, var(--color-surface));
+}
+
+// What a chosen payment method says for itself: when it will be taken, and
+// that the order is held until it has been. It is set in the muted colour and
+// lined up under the label rather than under the radio, so it reads as a note
+// on the option above it and not as a second option.
+.woo-page .wc-block-components-radio-control-accordion-content {
+  padding: 0 var(--spacer-16) var(--spacer-16) var(--spacer-48);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+.woo-page .wc-block-components-radio-control__input[type="radio"] {
+  // The plugin absolutely positions this at 16px from the left edge, which is
+  // the padding the option reserves for it.
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 1px solid var(--color-input);
+  background-color: var(--color-background);
+  accent-color: var(--color-magenta);
+}
+
+// The dot inside it. The plugin draws it in black, which on a dark field is a
+// hole rather than a mark: the only sign that an option is picked was the
+// card behind it.
+.woo-page .wc-block-components-radio-control__input[type="radio"]:checked {
+  border-color: var(--color-magenta);
+}
+
+.woo-page .wc-block-components-radio-control__input[type="radio"]:checked::before {
+  background: var(--color-magenta);
+}
+
+.woo-page .wc-block-components-radio-control__label {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+}
+
+.woo-page .wc-block-components-radio-control__secondary-label,
+.woo-page .wc-block-components-radio-control__description {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+// "Free", where a price would otherwise be.
+.woo-page .wc-block-checkout__shipping-option--free {
+  color: var(--color-success);
+  font-weight: $font-weight-bold;
+}
+
+// ── Buttons ────────────────────────────────────────────────────────────────
+//
+// These carry `wp-element-button` as well, which components/_buttons.scss
+// already gives the primary fill. What is set here is what that list cannot
+// know: the plugin wraps the label in a div, which an inline-flex button
+// would otherwise stretch, and the full width both of these want.
+
+.woo-page .wc-block-components-button {
+  @include button-base;
+  @include button-size-md;
+  @include button-primary;
+}
+
+.woo-page .wc-block-components-button__text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+
+// ── Totals ─────────────────────────────────────────────────────────────────
+
+.woo-page .wc-block-components-totals-wrapper {
+  padding: var(--spacer-12) 0;
+
+  &::after {
+    // The plugin draws the rule between groups as an ::after with its own
+    // colour, which is a light grey. Retokenised rather than hidden and
+    // redrawn, so the groups stay where the plugin put them.
+    background-color: var(--color-border);
+  }
+}
+
+// The summary renders a wrapper per group whether or not the order has one:
+// an order with no discount and no fee still gets both, and each was 24px of
+// padding and a rule, which left a hole between the subtotal and the delivery.
+.woo-page .wc-block-components-totals-wrapper:empty {
+  display: none;
+}
+
+.woo-page .wc-block-components-totals-item {
+  padding: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+.woo-page .wc-block-components-totals-item__label {
+  color: var(--color-muted-foreground);
+}
+
+.woo-page .wc-block-components-totals-item__value {
+  color: var(--color-foreground);
+  font-weight: $font-weight-semibold;
+  font-variant-numeric: tabular-nums;
+}
+
+.woo-page .wc-block-components-totals-item__description {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+// The order total, which is the number someone is about to agree to.
+.woo-page .wc-block-components-totals-footer-item {
+  color: var(--color-foreground);
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+
+  .wc-block-components-totals-item__label,
+  .wc-block-components-totals-item__value {
+    color: var(--color-foreground);
+    font-size: $font-size-lg;
+    font-weight: $font-weight-extrabold;
+  }
+}
+
+// "Including £x.xx VAT", under the total.
+.woo-page .wc-block-components-totals-footer-item-tax {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-regular;
+}
+
+// Both pages draw their summary inside a bordered box of their own, which
+// sits a pixel inside the panel the sidebar already is.
+.woo-page .wp-block-woocommerce-checkout-order-summary-block,
+.woo-page .wp-block-woocommerce-cart-order-summary-block {
+  border: 0;
+  border-radius: 0;
+}
+
+// ── Panels (the coupon form) ───────────────────────────────────────────────
+
+.woo-page .wc-block-components-panel__button {
+  padding: 0 var(--spacer-32) 0 0;
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .wc-block-components-panel__button-icon {
+  fill: currentcolor;
+}
+
+.woo-page .wc-block-components-panel__content {
+  padding: var(--spacer-12) 0 0;
+}
+
+// The coupon form. The plugin lays the field and the button out as a stretched
+// flex row, which was drawn before the label moved out of the field: with a
+// label above it, the row is two lines tall and the button grew to match it.
+// Aligning to the bottom puts the button back beside the field it answers.
+.woo-page .wc-block-components-totals-coupon__form {
+  align-items: flex-end;
+  gap: var(--spacer-8);
+}
+
+.woo-page .wc-block-components-totals-coupon__input {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+// The field's own height, so the two read as one control. A height rather
+// than a min-height: the plugin floors every one of its buttons at 3em from a
+// selector heavier than anything sane to write here, and a height above that
+// floor is honoured whatever the weight.
+.woo-page .wc-block-components-totals-coupon__form .wc-block-components-totals-coupon__button {
+  @include button-size-sm;
+
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+// ── Notices ────────────────────────────────────────────────────────────────
+//
+// The banner notice stays a banner: it reports something about the page it is
+// on (a coupon that was not accepted, no payment method available) and has to
+// stay beside what it is about. Transient confirmations are a different thing
+// and they are toasts, in components/_toast.scss.
+
+.woo-page .wc-block-components-notice-banner {
+  align-items: flex-start;
+  margin: 0 0 var(--spacer-24);
+  padding: var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  > svg {
+    fill: var(--color-cyan);
+  }
+
+  &.is-error {
+    border-color: color-mix(in oklab, var(--color-danger) 50%, transparent);
+    background-color: color-mix(in oklab, var(--color-danger) 10%, var(--color-surface));
+
+    > svg {
+      fill: var(--color-danger);
+    }
+  }
+
+  &.is-success {
+    border-color: color-mix(in oklab, var(--color-success) 50%, transparent);
+    background-color: color-mix(in oklab, var(--color-success) 10%, var(--color-surface));
+
+    > svg {
+      fill: var(--color-success);
+    }
+  }
+}
+
+.woo-page .wc-block-components-notice-banner__content {
+  color: var(--color-foreground);
+
+  a {
+    color: var(--color-cyan);
+  }
+}
+
+// ── The quantity stepper ───────────────────────────────────────────────────
+//
+// Deliberately the same control as components/woo/_qty-step.scss, which is
+// the stepper on the product page and in the quick-add table. The markup is
+// the plugin's and cannot carry that component's classes, so the shape is
+// restated here at the same measurements.
+
+.woo-page .wc-block-components-quantity-selector {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+
+  &::after {
+    // The plugin draws its own border on top with this.
+    display: none;
+  }
+}
+
+.woo-page .wc-block-components-quantity-selector__input[type="number"] {
+  width: 44px;
+  min-width: 0;
+  padding: var(--spacer-8) 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+
+  &:focus {
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+.woo-page .wc-block-components-quantity-selector__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // 36px, which is the same target the product page's stepper uses.
+  width: var(--spacer-36);
+  height: var(--spacer-36);
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  opacity: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ── Product lines, in the basket table and the order summary ───────────────
+
+.woo-page .wc-block-components-product-name {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .wc-block-components-product-price {
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-variant-numeric: tabular-nums;
+}
+
+.woo-page .wc-block-components-product-price__value {
+  font-weight: $font-weight-bold;
+}
+
+.woo-page .wc-block-components-product-metadata,
+.woo-page .wc-block-components-product-details {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+// The short description, which on some of these products is a paragraph. In
+// a basket line it is a reminder of what was bought, not the copy again.
+.woo-page .wc-block-components-product-metadata__description {
+  @include truncate(2);
+}
+
+.woo-page .wc-block-components-product-badge {
+  border-color: var(--color-border);
+  color: var(--color-muted-foreground);
+}
+
+// WooCommerce's own "excluding VAT" suffix, which the trade prices carry
+// everywhere else on the site too.
+.woo-page .woocommerce-price-suffix {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-regular;
+}
+
+// ── Loading states ─────────────────────────────────────────────────────────
+//
+// The blocks render a grey skeleton while they fetch the basket, which on a
+// light theme is invisible and on this one is a flash of pale blocks.
+
+.woo-page .wc-block-components-skeleton__element,
+.woo-page .wc-block-components-loading-mask__children {
+  background-color: var(--color-surface-2);
+}
+
+.woo-page .wc-block-components-spinner::before {
+  border-color: var(--color-cyan);
+  border-top-color: transparent;
+}

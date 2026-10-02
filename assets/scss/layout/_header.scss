@@ -148,6 +148,17 @@
   flex-shrink: 0;
 }
 
+// The number inside "Basket (3)" and "Wishlist (2)".
+//
+// Its own element because something has to be able to replace just the number
+// when a product is added without a page load: WooCommerce swaps it as a cart
+// fragment and assets/js/lib/toast.js steps the wishlist's. Tabular figures so
+// the link does not shift sideways when the count goes from 9 to 10, which
+// would nudge every link to the left of it in the bar.
+.site-header__utility-count {
+  font-variant-numeric: tabular-nums;
+}
+
 // ── Main row ─────────────────────────────────────────────────────────────
 
 // Opaque in the design at all times, over the hero included.

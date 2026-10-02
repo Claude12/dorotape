@@ -224,8 +224,24 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 						 *
 						 * It reads the global, which the loop this runs inside
 						 * has already set to this product.
+						 *
+						 * The class is appended through the filter rather than
+						 * passed as an argument. An argument replaces
+						 * WooCommerce's whole class string, which is where
+						 * add_to_cart_button and ajax_add_to_cart live, and
+						 * without those its script never binds: every card in
+						 * every grid reloaded the page to add one item, and
+						 * the toast that confirms it only appeared after the
+						 * reload. Filtering for this one render is the same
+						 * shape as dorotape_header_search_field().
 						 */
-						woocommerce_template_loop_add_to_cart( array( 'class' => 'button product-card__button' ) );
+						$dt_card_button = static function ( array $dt_args ): array {
+							$dt_args['class'] = trim( ( $dt_args['class'] ?? '' ) . ' product-card__button' );
+							return $dt_args;
+						};
+						add_filter( 'woocommerce_loop_add_to_cart_args', $dt_card_button );
+						woocommerce_template_loop_add_to_cart();
+						remove_filter( 'woocommerce_loop_add_to_cart_args', $dt_card_button );
 						?>
 					<?php endif; ?>
 				</div>

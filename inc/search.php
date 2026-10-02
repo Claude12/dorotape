@@ -122,9 +122,10 @@ function dorotape_is_product_search(): bool {
 /**
  * The banner.
  *
- * inc/blocks/internal-banner-block.php's markup with the fields filled from
- * the options page instead of from a block, and no backdrop image: there is
- * one picture that could go here and it would be the same on every search.
+ * The shared internal banner (inc/page-banner.php) with the fields filled
+ * from the options page instead of from a block, and no backdrop image: there
+ * is one picture that could go here and it would be the same on every
+ * search.
  */
 function dorotape_search_banner(): void {
 	$count   = dorotape_search_found();
@@ -148,34 +149,15 @@ function dorotape_search_banner(): void {
 		$intro = '';
 	}
 
-	$shape   = dorotape_background_shape_value( dorotape_search_field( 'search_banner_shape', 'cubes-right' ) );
-	$classes = 'internal-banner-block internal-banner-block--overlap' . dorotape_background_shape_class( $shape );
-	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
-		<?php dorotape_background_shape( $shape ); ?>
-
-		<div class="container">
-			<div class="internal-banner-block__inner">
-
-				<?php if ( '' !== $eyebrow ) : ?>
-					<p class="internal-banner-block__eyebrow">
-						<span class="internal-banner-block__eyebrow-dot" aria-hidden="true"></span>
-						<?php echo esc_html( $eyebrow ); ?>
-					</p>
-				<?php endif; ?>
-
-				<h1 class="internal-banner-block__heading"><?php echo esc_html( $heading ); ?></h1>
-
-				<?php if ( '' !== $intro ) : ?>
-					<p class="internal-banner-block__intro"><?php echo esc_html( $intro ); ?></p>
-				<?php endif; ?>
-
-				<?php dorotape_breadcrumb_nav( 'internal-banner-block__breadcrumb' ); ?>
-
-			</div>
-		</div>
-	</section>
-	<?php
+	dorotape_page_banner(
+		array(
+			'eyebrow'    => $eyebrow,
+			'heading'    => $heading,
+			'intro'      => $intro,
+			'shape'      => dorotape_search_field( 'search_banner_shape', 'cubes-right' ),
+			'breadcrumb' => true,
+		)
+	);
 }
 
 /**

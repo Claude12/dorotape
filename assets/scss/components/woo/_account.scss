@@ -1,0 +1,1008 @@
+@use "abstracts/mixins" as *;
+@use "base/forms" as *;
+@use "base/typography" as *;
+@use "components/buttons" as *;
+
+// The account screens: everything behind /my-account/.
+//
+// Nine views off one page (inc/account-pages.php lists them), rendered by
+// WooCommerce's classic [woocommerce_my_account] shortcode rather than by
+// blocks, which is the client's own choice recorded in .cursorrules. So the
+// markup here is the plugin's templates, not ours, and no woocommerce/
+// override is taken: an override pins the markup to one WooCommerce version.
+//
+// Worth knowing before reading any of this: woocommerce.css,
+// woocommerce-layout.css and woocommerce-smallscreen.css are not enqueued on
+// this site. Nothing is being fought here, it is being written from nothing.
+// The one plugin sheet that does load on these pages is select2.css, and the
+// answer to it is in base/_forms.scss with the other field styling.
+//
+// Scoped to `.woo-page` and `.woo-page--account`, the classes
+// inc/account-pages.php puts on the band this content sits in, for the reason
+// components/woo/_blocks.scss sets out: it keeps the rules off the rest of
+// the site, and the classic templates hand out class names (.login, .title,
+// .clear, .edit) general enough that unscoped rules would land elsewhere.
+
+// ── The two columns ────────────────────────────────────────────────────────
+//
+// :has, and the child combinator, because a bare .woo-page .woocommerce also
+// matches FiboSearch's wrapper, and because when logged out there is no
+// navigation and nothing to put in a 240px column.
+
+.woo-page--account .entry-content > .woocommerce:has(> .woocommerce-MyAccount-navigation) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-24);
+  align-items: start;
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--spacer-40);
+  }
+}
+
+.woo-page .woocommerce-MyAccount-content {
+  min-width: 0;
+}
+
+// The float clears the classic forms put between their rows. They are empty
+// divs, and once those forms are grids they would each take a row of their
+// own.
+.woo-page--account .clear {
+  display: none;
+}
+
+// ── The navigation ─────────────────────────────────────────────────────────
+//
+// A scrolling row of pills on a phone and a panel down the side from desktop:
+// seven links is too many to stack above the content on a small screen and
+// too few to need a scroller on a large one.
+
+.woo-page .woocommerce-MyAccount-navigation {
+  min-width: 0;
+
+  ul {
+    display: flex;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0 0 var(--spacer-4);
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: none;
+  }
+
+  ul::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.woo-page .woocommerce-MyAccount-navigation a {
+  display: block;
+  padding: var(--spacer-8) var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    border-color: color-mix(in oklab, var(--color-cyan) 50%, transparent);
+    color: var(--color-foreground);
+  }
+}
+
+.woo-page .woocommerce-MyAccount-navigation-link.is-active a {
+  border-color: color-mix(in oklab, var(--color-magenta) 60%, transparent);
+  background-color: color-mix(in oklab, var(--color-magenta) 14%, var(--color-background));
+  color: var(--color-foreground);
+}
+
+// Logging out is the one link that undoes something, so it is the one link
+// that answers in the destructive colour rather than the brand one.
+.woo-page .woocommerce-MyAccount-navigation-link--customer-logout a:hover,
+.woo-page .woocommerce-MyAccount-navigation-link--customer-logout a:focus-visible {
+  border-color: color-mix(in oklab, var(--color-danger) 50%, transparent);
+  color: var(--color-danger);
+}
+
+@include min-breakpoint(desktop) {
+  .woo-page .woocommerce-MyAccount-navigation {
+    position: sticky;
+    top: calc(var(--site-header-height) + var(--spacer-24));
+    padding: var(--spacer-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+
+    ul {
+      display: block;
+      padding: 0;
+      overflow: visible;
+    }
+
+    li + li {
+      margin-top: var(--spacer-4);
+    }
+  }
+
+  .woo-page .woocommerce-MyAccount-navigation a {
+    padding: var(--spacer-10) var(--spacer-12);
+    border-color: transparent;
+    border-radius: var(--radius);
+    background-color: transparent;
+  }
+
+  // Inset rather than a border, so picking a link does not shift its label
+  // sideways by the width of the bar.
+  .woo-page .woocommerce-MyAccount-navigation-link.is-active a {
+    border-color: transparent;
+    background-color: var(--color-surface-2);
+    box-shadow: inset 2px 0 0 var(--color-magenta);
+  }
+}
+
+// ── Headings, inside the content ───────────────────────────────────────────
+
+.woo-page--account .woocommerce h2 {
+  margin: 0 0 var(--spacer-16);
+  color: var(--color-foreground);
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tight;
+}
+
+// ── Panels ─────────────────────────────────────────────────────────────────
+//
+// The surface panel the checkout's summary column and the product page's spec
+// table sit on. Five things on these screens are one: a sign-in form, a
+// register form, a saved address, an order's lines and an order's recipient.
+//
+// Scoped to `.woo-page` and not to `.woo-page--account`, because the sixth is
+// the order received page. An order's lines and the address it is going to
+// are the same markup from the same template whether someone is looking at an
+// order they placed months ago or one they placed thirty seconds ago, and
+// there is no reading of the brand under which those two should look
+// different.
+
+.woo-page .col2-set > .col-1,
+.woo-page .col2-set > .col-2,
+.woo-page .woocommerce-order-details,
+.woo-page .woocommerce-customer-details,
+.woo-page .woocommerce-MyAccount-content > form,
+.woo-page .woocommerce-ResetPassword {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--spacer-24);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+}
+
+.woo-page .col2-set {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-20);
+
+  @include min-breakpoint(tablet) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacer-24);
+  }
+}
+
+// ── Notices, and the screens with nothing on them yet ──────────────────────
+
+.woo-page--account .woocommerce-info,
+.woo-page--account .woocommerce-message,
+.woo-page--account .woocommerce-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-12) var(--spacer-16);
+  margin: 0 0 var(--spacer-24);
+  padding: var(--spacer-16) var(--spacer-20);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-cyan);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  color: var(--color-muted-foreground);
+  list-style: none;
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+}
+
+.woo-page--account .woocommerce-message {
+  border-left-color: var(--color-success);
+}
+
+.woo-page--account .woocommerce-error {
+  border-left-color: var(--color-danger);
+}
+
+// WooCommerce's notice template prints the button before the words that
+// explain it. The order is given back here rather than in a template
+// override, so the sentence is read first and the button answers it.
+.woo-page--account .woocommerce-info .button,
+.woo-page--account .woocommerce-message .button,
+.woo-page--account .woocommerce-error .button {
+  @include button-size-sm;
+
+  order: 1;
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────
+
+.woo-page--account-dashboard .woocommerce-MyAccount-content p {
+  max-width: 68ch;
+  margin: 0 0 var(--spacer-16);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-base;
+  line-height: $line-height-relaxed;
+
+  strong {
+    color: var(--color-foreground);
+    font-weight: $font-weight-bold;
+  }
+
+  // `:not(.button)` because WooCommerce and the address book both print a
+  // button inside a paragraph, and this rule is three selectors heavier than
+  // the shared .button, so without it the fill stays magenta and the words
+  // turn cyan.
+  a:not(.button) {
+    color: var(--color-cyan);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// The shortcut grid inc/account-pages.php hooks under the greeting. The
+// ranges grid's card, without a picture: one border, the aurora ring on
+// hover, and the arrow that steps forward with it.
+.account-shortcuts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-12);
+  margin-top: var(--spacer-24);
+
+  @include min-breakpoint(mobile) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include min-breakpoint(xl) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.account-shortcuts__card {
+  @include aurora-ring;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-12);
+  padding: var(--spacer-20);
+  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    @include aurora-ring-visible;
+  }
+
+  .link__icon {
+    color: var(--color-cyan);
+  }
+
+  &:hover .link__icon,
+  &:focus-visible .link__icon {
+    transform: translateX(var(--spacer-4));
+  }
+}
+
+.account-shortcuts__label {
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+}
+
+// ── Orders ─────────────────────────────────────────────────────────────────
+//
+// Cards first, the table from tablet up, for the reason the wishlist's table
+// is built the same way: five columns of order, date, status, total and two
+// buttons will not fit across a 390px screen, and a table that only scrolls
+// sideways is a table nobody reads.
+
+.woo-page .woocommerce-orders-table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background-color: transparent;
+  font-size: $font-size-sm;
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: block;
+  }
+}
+
+.woo-page .woocommerce-orders-table__row {
+  display: block;
+  padding: var(--spacer-20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+
+  & + & {
+    margin-top: var(--spacer-12);
+  }
+}
+
+.woo-page .woocommerce-orders-table__cell {
+  display: block;
+  padding: 0;
+  border: 0;
+  color: var(--color-muted-foreground);
+  font-weight: $font-weight-regular;
+  text-align: left;
+}
+
+.woo-page .woocommerce-orders-table__cell-order-number a {
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-tight;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .woocommerce-orders-table__cell-order-date {
+  margin-top: var(--spacer-4);
+  font-size: $font-size-xs;
+}
+
+.woo-page .woocommerce-orders-table__cell-order-total {
+  margin-top: var(--spacer-8);
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+// The status. A disc rather than a pill, because the status is a bare text
+// node inside its cell with nothing to wrap: a pseudo-element is the only
+// thing there is to colour, and a coloured dot beside a coloured word says
+// the same as a chip.
+.woo-page .woocommerce-orders-table__cell-order-status {
+  margin-top: var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: var(--spacer-8);
+    height: var(--spacer-8);
+    margin-right: var(--spacer-8);
+    border-radius: var(--radius-pill);
+    background-color: currentcolor;
+  }
+}
+
+.woo-page .woocommerce-orders-table__row--status-completed .woocommerce-orders-table__cell-order-status {
+  color: var(--color-success);
+}
+
+.woo-page .woocommerce-orders-table__row--status-processing .woocommerce-orders-table__cell-order-status,
+.woo-page .woocommerce-orders-table__row--status-pending .woocommerce-orders-table__cell-order-status {
+  color: var(--color-cyan);
+}
+
+.woo-page .woocommerce-orders-table__row--status-on-hold .woocommerce-orders-table__cell-order-status {
+  color: var(--color-warning);
+}
+
+.woo-page .woocommerce-orders-table__row--status-cancelled .woocommerce-orders-table__cell-order-status,
+.woo-page .woocommerce-orders-table__row--status-failed .woocommerce-orders-table__cell-order-status {
+  color: var(--color-danger);
+}
+
+.woo-page .woocommerce-orders-table__cell-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin-top: var(--spacer-16);
+}
+
+// Viewing the order is what the row is for, so it takes the fill. Ordering
+// it again is the second thing anyone does and takes the outline. Both are
+// secondary to the page, so both are the small button.
+.woo-page--account .woocommerce-orders-table .button,
+.woo-page--account .order-again .button {
+  @include button-size-sm;
+}
+
+.woo-page--account a.button.order-again,
+.woo-page--account .order-again .button {
+  @include button-outline;
+}
+
+@include min-breakpoint(tablet) {
+  .woo-page .woocommerce-orders-table {
+    display: table;
+
+    thead {
+      display: table-header-group;
+    }
+
+    tbody {
+      display: table-row-group;
+    }
+  }
+
+  .woo-page .woocommerce-orders-table__header {
+    padding: 0 var(--spacer-12) var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  .woo-page .woocommerce-orders-table__row {
+    display: table-row;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+
+    & + & {
+      margin-top: 0;
+    }
+  }
+
+  .woo-page .woocommerce-orders-table__cell {
+    display: table-cell;
+    margin: 0;
+    padding: var(--spacer-16) var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+
+  // 1% is how a table is told a column should be as narrow as its contents.
+  .woo-page .woocommerce-orders-table__cell-order-date,
+  .woo-page .woocommerce-orders-table__cell-order-status,
+  .woo-page .woocommerce-orders-table__cell-order-total,
+  .woo-page .woocommerce-orders-table__cell-order-actions {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .woo-page .woocommerce-orders-table__cell-order-actions {
+    display: table-cell;
+    text-align: right;
+  }
+
+  .woo-page .woocommerce-orders-table__cell-order-actions .button + .button {
+    margin-left: var(--spacer-8);
+  }
+
+  .woo-page .woocommerce-orders-table__cell-order-number a {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// ── One order ──────────────────────────────────────────────────────────────
+
+// The line WooCommerce opens with, which marks the number, the date and the
+// status. <mark> is a yellow highlighter everywhere by default, which on this
+// canvas is a stripe of daylight across the sentence.
+.woo-page--account mark {
+  background-color: transparent;
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+}
+
+.woo-page--account-view-order .woocommerce-MyAccount-content > p:first-of-type {
+  margin: 0 0 var(--spacer-24);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-base;
+  line-height: $line-height-relaxed;
+}
+
+.woo-page--account mark.order-status {
+  display: inline-block;
+  padding: var(--spacer-4) var(--spacer-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .woocommerce-order-details {
+  margin-bottom: var(--spacer-24);
+}
+
+.woo-page .order_details {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  background-color: transparent;
+  font-size: $font-size-sm;
+
+  th,
+  td {
+    padding: var(--spacer-12) 0;
+    border: 0;
+    vertical-align: top;
+  }
+}
+
+.woo-page .order_details thead th {
+  padding-top: 0;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .order_details .product-total,
+.woo-page .order_details tfoot td {
+  color: var(--color-foreground);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+// A figure never breaks across two lines, and everything else in the foot has
+// to be allowed to. The last row of it is the payment method, and ours are
+// whole sentences rather than the two words a gateway is usually named with,
+// so a cell that would not wrap pushed the table wider than a phone.
+.woo-page .order_details .product-total,
+.woo-page .order_details tfoot .woocommerce-Price-amount {
+  white-space: nowrap;
+}
+
+.woo-page .order_details tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.woo-page .order_details .product-name a {
+  color: var(--color-foreground);
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .order_details .product-quantity {
+  display: block;
+  margin-top: var(--spacer-4);
+  color: var(--color-muted-foreground);
+  font-weight: $font-weight-regular;
+}
+
+.woo-page .order_details tfoot th {
+  color: var(--color-muted-foreground);
+  font-weight: $font-weight-semibold;
+  text-align: left;
+}
+
+// The last row of the foot is the total, and it is the figure the page is
+// read for.
+.woo-page .order_details tfoot tr:last-child th,
+.woo-page .order_details tfoot tr:last-child td {
+  padding-bottom: 0;
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  font-weight: $font-weight-extrabold;
+}
+
+// WooCommerce prints its order actions twice, once as a row of the totals
+// table and once as a button under it. A row headed "Actions:" between a VAT
+// line and a payment method is the wrong place for a button, so the table
+// keeps the money and the button below it is the one that stays.
+.woo-page .order_details tfoot tr:has(.order-actions--heading) {
+  display: none;
+}
+
+.woo-page--account .order-again {
+  margin: var(--spacer-20) 0 0;
+}
+
+// Who it was sent to. An address element is italic by default, and the
+// template separates its lines with <br> rather than marking them up.
+.woo-page address {
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  font-style: normal;
+  line-height: $line-height-relaxed;
+}
+
+.woo-page .woocommerce-customer-details--phone,
+.woo-page .woocommerce-customer-details--email {
+  margin: var(--spacer-8) 0 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+}
+
+// ── Addresses ──────────────────────────────────────────────────────────────
+
+// Both address screens open on a line or two of explanation. The address book
+// is listed here as well as the addresses page because the two are the same
+// screen to a customer, and one of them had its paragraphs running together
+// and its button sitting on the last line of them.
+.woo-page--account-addresses .woocommerce-MyAccount-content > p,
+.woo-page--account-address-book .woocommerce-MyAccount-content > p {
+  margin: 0 0 var(--spacer-20);
+  max-width: 68ch;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+}
+
+// "Add an address", which is a button in a paragraph of its own at the end of
+// the list. The same gap a form's last row takes below the fields above it,
+// further down this file: a button that closes a block sits 20px under it.
+.woo-page--account-address-book .woocommerce-MyAccount-content > p:last-child {
+  margin: var(--spacer-20) 0 0;
+}
+
+.woo-page .woocommerce-Address-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-12);
+  margin-bottom: var(--spacer-16);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.woo-page .woocommerce-Address-title .edit {
+  @include button-base;
+  @include button-size-sm;
+  @include button-outline;
+}
+
+// ── The address book ───────────────────────────────────────────────────────
+//
+// The theme's own saved-address list, from inc/address-book-account.php. It is
+// the one screen behind the account whose markup is ours rather than a
+// plugin's, and it had no paint at all: a bulleted list with three magenta
+// buttons stacked down it. Drawn here as the card the rest of the account is
+// already made of, in the ranges grid's shape.
+
+.dorotape-address-book {
+  display: grid;
+  gap: var(--spacer-16);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include min-breakpoint(tablet) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dorotape-address-book__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacer-12);
+  padding: var(--spacer-20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+}
+
+.dorotape-address-book__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-10);
+  margin: 0;
+  font-size: $font-size-md;
+}
+
+// Delivery or Invoice. The badge the product card wears, in the quiet colours
+// rather than the aurora: this classifies an address, it does not sell one.
+.dorotape-address-book__type {
+  padding: var(--spacer-4) var(--spacer-12);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-11;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $letter-spacing-wide;
+  line-height: $line-height-base;
+  text-transform: uppercase;
+}
+
+.dorotape-address-book__item address {
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  font-style: normal;
+  line-height: $line-height-relaxed;
+}
+
+// Edit, Make default and Delete, on the bottom edge of the card however tall
+// the address above them is. `margin-top: auto` rather than a fixed gap so two
+// cards side by side end on the same line.
+.dorotape-address-book__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-8);
+  margin-top: auto;
+  padding-top: var(--spacer-4);
+}
+
+.dorotape-address-book__action {
+  margin: 0;
+}
+
+// Three filled buttons on one card is three things to do first. Editing is
+// what someone opened the card for, so it keeps the outline the Addresses page
+// gives its own Edit, and the other two step back to the ghost. All three are
+// the small size, like every other button inside an account panel.
+//
+// Scoped to the page rather than named on their own because the shared button
+// list in components/_buttons.scss reaches these through `.woocommerce
+// a.button` and `.woocommerce button.button`, which carry an element name and
+// so outweigh two classes. Three classes answers them.
+.woo-page--account .dorotape-address-book .button {
+  @include button-size-sm;
+}
+
+.woo-page--account .dorotape-address-book__actions > .button {
+  @include button-outline;
+}
+
+.woo-page--account .dorotape-address-book__action .button {
+  @include button-ghost;
+}
+
+// "Cancel", beside Save address.
+.woo-page--account .dorotape-address-form a {
+  @include action-link;
+}
+
+// ── Forms ──────────────────────────────────────────────────────────────────
+//
+// The classic form rows, which are the login, the register, the password
+// reset, the address form and the account details form. One description of a
+// row for all five.
+
+.woo-page--account .form-row {
+  margin: 0 0 var(--spacer-16);
+  padding: 0;
+
+  label {
+    display: block;
+    margin-bottom: var(--spacer-6);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+  }
+}
+
+.woo-page--account .woocommerce-input-wrapper {
+  display: block;
+}
+
+.woo-page--account .required {
+  color: var(--color-magenta);
+  text-decoration: none;
+}
+
+.woo-page--account .optional {
+  color: var(--color-muted-foreground);
+  font-weight: $font-weight-regular;
+}
+
+// The hint under the display name field.
+.woo-page--account .form-row em {
+  display: block;
+  margin-top: var(--spacer-6);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-style: normal;
+  line-height: $line-height-xs;
+}
+
+// Remember me, and anything else offered as a checkbox beside its label.
+//
+// The box is the site's own, drawn once in base/_forms.scss. This is the row
+// it sits in: the element is named with `label` because it is inside a
+// .form-row, whose own `label` rule above lays every label out as a block.
+// Without the tag name this rule is a weight short of it, the flex row never
+// applies, and the box ends up baseline-aligned 6px above its own words.
+.woo-page--account label.woocommerce-form__label-for-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-10);
+  margin: 0;
+  font-weight: $font-weight-regular;
+  cursor: pointer;
+
+  // The form-row rule above sets every input to the width of the row, which
+  // on a 20px box is the whole form, so the shared box is included here at a
+  // weight that answers it. The same definition, not a second one.
+  input[type="checkbox"] {
+    @include checkbox-base;
+  }
+}
+
+// The sign-in form puts Remember me and the Log in button in one row, with
+// two hidden fields between them and nothing else, so the button landed
+// directly under the tick box. `~` rather than `+` because of those hidden
+// fields. The gap is the one a form's last row takes, below.
+.woo-page--account label.woocommerce-form__label-for-checkbox ~ .button {
+  margin-top: var(--spacer-20);
+}
+
+.woo-page--account fieldset {
+  margin-top: var(--spacer-24);
+  padding-top: var(--spacer-24);
+  border-top: 1px solid var(--color-border);
+}
+
+.woo-page--account legend {
+  padding: 0;
+  margin-bottom: var(--spacer-16);
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+}
+
+// The row a form ends on, which holds its nonces and its button.
+.woo-page--account .woocommerce-MyAccount-content form > p:last-child,
+.woo-page--account .woocommerce-ResetPassword > p:last-of-type {
+  margin: var(--spacer-20) 0 0;
+}
+
+.woo-page--account .woocommerce-privacy-policy-text {
+  margin-bottom: var(--spacer-16);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    @include action-link($font-size-xs);
+  }
+}
+
+// Signing in and registering are the whole purpose of their panel, so their
+// buttons take its width rather than sitting in a corner of it.
+.woo-page .woocommerce-form-login__submit,
+.woo-page .woocommerce-form-register__submit {
+  width: 100%;
+}
+
+// "Lost your password?", under the sign-in button. It was the one secondary
+// link on these pages still wearing the browser's underline, which made it
+// read as a different kind of thing from Cancel, Log in and Edit.
+.woo-page .lost_password {
+  margin: var(--spacer-16) 0 0;
+  font-size: $font-size-sm;
+
+  a {
+    @include action-link;
+  }
+}
+
+// The address and account details forms, which are the two long ones. Names
+// pair up from tablet, everything else takes the width.
+.woo-page--account .woocommerce-ResetPassword {
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+.woo-page--account .woocommerce-ResetPassword > p:first-of-type {
+  margin: 0 0 var(--spacer-20);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+}
+
+.woo-page--account .woocommerce-MyAccount-content > form {
+  max-width: 720px;
+}
+
+@include min-breakpoint(tablet) {
+  .woo-page--account .woocommerce-address-fields__field-wrapper,
+  .woo-page--account .woocommerce-EditAccountForm {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--spacer-20);
+  }
+
+  .woo-page--account .woocommerce-address-fields__field-wrapper > *,
+  .woo-page--account .woocommerce-EditAccountForm > * {
+    grid-column: 1 / -1;
+  }
+
+  .woo-page--account .form-row-first {
+    grid-column: 1;
+  }
+
+  .woo-page--account .form-row-last {
+    grid-column: 2;
+  }
+}
+
+// ── The show-password toggle ───────────────────────────────────────────────
+//
+// WooCommerce positions this button and draws its eye from woocommerce.css,
+// which this site does not enqueue, so without the rules below it is an empty
+// sliver under the field. The icon is a mask rather than a background so it
+// takes a colour and can answer when the password is showing.
+
+.woo-page--account .password-input {
+  position: relative;
+  display: block;
+
+  input {
+    padding-right: var(--spacer-44);
+  }
+}
+
+.woo-page--account .show-password-input {
+  position: absolute;
+  top: 50%;
+  right: var(--spacer-8);
+  width: var(--spacer-32);
+  height: var(--spacer-32);
+  padding: 0;
+  border: 0;
+  background-color: var(--color-muted-foreground);
+  transform: translateY(-50%);
+  cursor: pointer;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / 20px no-repeat;
+
+  &.display-password {
+    background-color: var(--color-magenta);
+  }
+}

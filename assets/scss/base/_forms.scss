@@ -3,31 +3,22 @@
 
 // Form controls, site-wide.
 //
-// These are element selectors on purpose. WooCommerce, WPForms and the
-// comment form all render inputs the theme never sees the markup for, and
-// there is no class to hang styling on. Element selectors also carry the
-// lowest specificity of anything in the build, so a component that needs a
-// different field (the header's search, the cut-size table's number boxes)
-// overrides them with a single class and no fight.
-//
 // Nothing here was ported from the Sprint 1 scaffold: its fields were
 // dark text on white, and this is the same set of controls rebuilt for the
 // navy canvas.
 
-input[type="text"],
-input[type="email"],
-input[type="url"],
-input[type="password"],
-input[type="search"],
-input[type="number"],
-input[type="tel"],
-input[type="date"],
-textarea,
-select {
-  // The newsletter signup's field, which is the only one the design draws.
-  // Everything wearing a field on this site wears this one: the checkout, the
-  // account screens, the comment form, and through the variables below, every
-  // WPForms form as well.
+// The newsletter signup's field, which is the only one the design draws.
+// Everything wearing a field on this site wears this one: the checkout, the
+// account screens, the comment form, and through the variables below, every
+// WPForms form as well.
+//
+// A mixin as well as a rule, because WooCommerce's cart and checkout blocks
+// render their inputs inside their own wrappers and style them from their own
+// stylesheet, which outranks an element selector: their fields came out white
+// on the navy with placeholders invisible against them. Those selectors are
+// in components/woo/_blocks.scss and they include this, so there is one
+// description of a field on this site rather than two drifting apart.
+@mixin field-base {
   box-sizing: border-box;
   width: 100%;
   padding: var(--spacer-12) var(--spacer-20);
@@ -66,21 +57,64 @@ select {
   }
 }
 
+// The element selectors are on purpose. WooCommerce, WPForms and the comment
+// form all render inputs the theme never sees the markup for, and there is no
+// class to hang styling on. They also carry the lowest specificity of
+// anything in the build, so a component that needs a different field (the
+// header's search, the cut-size table's number boxes) overrides them with a
+// single class and no fight.
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+textarea,
+select {
+  @include field-base;
+}
+
 textarea {
   min-height: 120px;
   resize: vertical;
 }
 
+// A field the browser filled in. Chrome paints it white with black text and
+// will not take a background-color, so the fill is covered with an inset
+// shadow large enough to flood the box. Every form on the site gets this,
+// because every form on the site has a name or an email field in it.
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  box-shadow: inset 0 0 0 100px var(--color-background);
+  -webkit-text-fill-color: var(--color-foreground);
+  caret-color: var(--color-foreground);
+}
+
 // The native arrow is drawn by the OS in its own colours, and on some
 // platforms that is a dark glyph which disappears against the field. Drawn
 // here as a background image instead so it is always the muted foreground.
-select {
+//
+// A mixin for the same reason field-base is one: WooCommerce's country and
+// state selects are painted from the blocks stylesheet, which resets the
+// background and takes this arrow with it. The rule that answers that is in
+// components/woo/_blocks.scss and includes this, rather than carrying a
+// second copy of the glyph.
+@mixin field-select {
   padding-right: var(--spacer-44);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a0b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--spacer-20) center;
   background-size: 16px 16px;
   appearance: none;
+}
+
+select {
+  @include field-select;
 }
 
 // A select's own <option> list is painted by the OS, which on Windows and
@@ -104,7 +138,55 @@ fieldset {
   border: 0;
 }
 
-input[type="checkbox"],
+// The tick box, once, for every form on the site.
+//
+// A native checkbox on this canvas is a white square, which is the brightest
+// thing on a navy panel, and `accent-color` only paints the ticked state: the
+// empty box stays white. So the control is replaced with the field's own
+// border and fill at 20px, and the tick is drawn as a background image, which
+// a mask would take the box away with.
+//
+// 6px of radius, not --radius-sm. The smallest token is 8px, which on a 20px
+// box is most of the way to a circle, and a tick box has to be told apart
+// from a radio at a glance.
+//
+// A mixin as well as a rule, the way `field-base` above is, because both
+// WooCommerce and the account screens already style their own inputs from
+// selectors heavier than a bare element one: the checkout would keep the
+// plugin's 4px corners and the login box would stretch to the width of the
+// form row. Those two include this rather than redraw it.
+@mixin checkbox-base {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin: 0;
+  border: 1px solid var(--color-input);
+  border-radius: 6px;
+  background-color: var(--color-background);
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+
+  &:checked {
+    border-color: var(--color-magenta);
+    background: var(--color-magenta) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 13 4 4 10-10'/%3E%3C/svg%3E") center / 13px no-repeat;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-magenta) 25%, transparent);
+  }
+}
+
+input[type="checkbox"] {
+  @include checkbox-base;
+}
+
+// Radios keep the native control. The checkout draws its delivery options as
+// cards and nothing else on the site offers one, so there is no second shape
+// to keep in step.
 input[type="radio"] {
   accent-color: var(--color-magenta);
 }
@@ -241,4 +323,88 @@ div.wpforms-container-full form.wpforms-form textarea {
   p {
     margin: 0;
   }
+}
+
+// ── select2, the country and state pickers ───────────────────────────────
+//
+// WooCommerce replaces the country and state selects on the checkout and on
+// the account address form with select2, and select2.css is one of the few
+// plugin stylesheets this site does enqueue. Left alone it draws a 28px white
+// box with a grey triangle and a white dropdown: a light-theme control in the
+// middle of a dark form.
+//
+// Not scoped to a page, unlike the rest of the WooCommerce styling, because
+// the dropdown is appended to <body> rather than to the field it belongs to,
+// so there is no page class above it to hang a selector on. The selectors
+// below match the plugin's own weight and win on source order, which is why
+// several of them name more classes than they look as though they need.
+
+.select2-container--default .select2-selection--single {
+  @include field-base;
+  @include field-select;
+
+  display: flex;
+  align-items: center;
+  height: auto;
+  min-height: 46px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  padding: 0;
+  color: var(--color-foreground);
+  line-height: $line-height-sm;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: var(--color-muted-foreground);
+}
+
+// The plugin's arrow is a CSS triangle in a 20px box. field-select above has
+// already drawn the site's chevron on the field behind it.
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  display: none;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--color-magenta);
+}
+
+.select2-dropdown {
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius);
+  background-color: var(--color-popover);
+  color: var(--color-foreground);
+}
+
+.select2-search--dropdown {
+  padding: var(--spacer-8);
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  @include field-base;
+
+  padding: var(--spacer-8) var(--spacer-12);
+}
+
+.select2-container--default .select2-results > .select2-results__options {
+  max-height: 260px;
+}
+
+.select2-results__option {
+  padding: var(--spacer-10) var(--spacer-16);
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"],
+.select2-container--default .select2-results__option[data-selected="true"] {
+  background-color: var(--color-surface-2);
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted[data-selected] {
+  background-color: var(--color-magenta);
+  color: var(--color-primary-foreground);
 }

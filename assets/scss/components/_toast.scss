@@ -1,0 +1,258 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// Toasts: the site's transient feedback.
+//
+// "Added to your basket" used to print as a band across the top of the page,
+// which pushed the product hero down the screen to tell someone about
+// something that happened at the bottom of it. A toast says it where it
+// happened and takes the layout with it when it goes.
+//
+// Raised from assets/js/lib/toast.js, queued server-side by inc/toast.php.
+// Also worn by WooCommerce's own block snackbar on the cart and checkout
+// pages, which is the same idea in someone else's markup
+// (components/woo/_cart.scss).
+
+// The stack. Bottom-right on a desktop, where it is out of the way of both
+// the content and the header; across the bottom on a phone, where the right
+// hand corner is where the thumb is and a 320px card would be cut off.
+.toast-host {
+  position: fixed;
+  z-index: 100;
+  right: var(--spacer-16);
+
+  // Above the Rewards button, which the plugin fixes 24px off the bottom
+  // right corner at 48px tall, on every width (inc/rewards.php). 96 clears
+  // it by the same 24px it holds itself off the edge by.
+  bottom: var(--spacer-96);
+  left: var(--spacer-16);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacer-12);
+
+  // Empty for most of a session, and a full-width fixed element with nothing
+  // in it would swallow every click along the bottom of the page. The toasts
+  // themselves take their pointer events back.
+  pointer-events: none;
+
+  // A set width rather than one that shrinks to fit, so a stack of two does
+  // not step in and out at the left edge as each one is worded differently.
+  @include min-breakpoint(mobile) {
+    left: auto;
+    width: 380px;
+  }
+
+  @include min-breakpoint(desktop) {
+    right: var(--spacer-24);
+  }
+}
+
+.toast {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--spacer-12);
+  align-items: start;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+
+  // Opaque behind the blur: a toast lands over product photography as often
+  // as over the page background, and a translucent panel over a photograph
+  // is not readable.
+  background-color: color-mix(in oklab, var(--color-surface) 92%, var(--color-background));
+  backdrop-filter: blur(12px);
+  padding: var(--spacer-14) var(--spacer-16);
+  color: var(--color-foreground);
+  pointer-events: auto;
+
+  // Starts below and slightly small, so it reads as arriving from the corner
+  // rather than appearing in place. The vertical half of the transform is
+  // what gives a stack of two the sense of pushing each other up.
+  transform: translateY(var(--spacer-16)) scale(0.96);
+  opacity: 0;
+  transition:
+    transform var(--transition-md),
+    opacity var(--transition-md);
+
+
+  &.is-in {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  &.is-out {
+    transform: translateY(var(--spacer-8)) scale(0.96);
+    opacity: 0;
+  }
+}
+
+// The leading icon, in the colour of what happened.
+.toast__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+
+  // Optical: the icon lines up with the cap height of the first line of text
+  // rather than with the top of its line box.
+  margin-top: 1px;
+  color: var(--color-cyan);
+}
+
+.toast--success .toast__icon {
+  color: var(--color-success);
+}
+
+.toast--wishlist .toast__icon {
+  color: var(--color-magenta);
+  fill: currentcolor;
+}
+
+.toast--error .toast__icon {
+  color: var(--color-danger);
+}
+
+.toast__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-4);
+  min-width: 0;
+}
+
+.toast__title {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+}
+
+.toast__text {
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+
+  // A product name is editor content and some of them are long. Three lines
+  // is a toast; more than that is a paragraph that should have been a page.
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+// "View basket". On its own row under the message rather than beside it, so a
+// long product name is not squeezed into a column to make room for it.
+.toast__action {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: var(--spacer-4);
+  color: var(--color-cyan);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-magenta);
+  }
+}
+
+.toast__close {
+  // Pinned rather than left to flow. The action below takes the second row,
+  // and auto placement follows it there, which leaves the close button
+  // halfway down the side of a toast it is meant to sit at the top of.
+  grid-column: 3;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // 28px rather than the 24px floor the header's links use: this one is a
+  // small glyph with no label beside it to widen the target.
+  width: var(--spacer-28);
+  height: var(--spacer-28);
+  flex-shrink: 0;
+  margin: calc(var(--spacer-4) * -1) calc(var(--spacer-4) * -1) 0 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--color-surface-2);
+    color: var(--color-foreground);
+  }
+}
+
+.toast__close-icon {
+  width: 16px;
+  height: 16px;
+}
+
+// How long is left, drawn along the bottom edge. It is the only part of a
+// toast that tells you it is going to leave, which is what stops the
+// disappearance reading as a glitch.
+.toast__timer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  transform-origin: left;
+  background: var(--gradient-aurora);
+  animation: toast-timer 5000ms linear forwards;
+}
+
+.toast.is-paused .toast__timer {
+  animation-play-state: paused;
+}
+
+@keyframes toast-timer {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+// YITH writes its own confirmation into a box beside the wishlist button.
+// Once assets/js/lib/toast.js has read it and raised a toast, that box would
+// be the same sentence said twice in two places. The class is added by the
+// script, not written here, so the plugin's own message still shows on a page
+// where the bundle failed to load.
+// YITH writes its own message into a box beside the wishlist button, and that
+// message is now a toast instead. The class on the root element is set by
+// lib/toast.js, so if that bundle never loads the box is still shown and the
+// person still gets an answer.
+.has-toast-host .yith-wcwl-add-to-wishlist__feedback {
+  display: none;
+}
+
+// Reduced motion keeps the toast and loses the travel: it still appears and
+// still fades, because an element that blinks in and out with no transition
+// at all is harder to notice, not easier.
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transform: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .toast.is-in,
+  .toast.is-out {
+    transform: none;
+  }
+
+  .toast__timer {
+    animation: none;
+  }
+}

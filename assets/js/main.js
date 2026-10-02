@@ -10,6 +10,7 @@ import { initCutRows } from './lib/cut-size-rows';
 import { initQuickAdd } from './lib/quick-add';
 import { initQtyStep } from './lib/qty-step';
 import { initTestimonials } from './lib/testimonial';
+import { initToast } from './lib/toast';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -29,6 +30,7 @@ const features = [
   initQuickAdd,
   initQtyStep,
   initTestimonials,
+  initToast,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

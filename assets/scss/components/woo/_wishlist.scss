@@ -1,0 +1,369 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+@use "components/buttons" as *;
+
+// The wishlist (page 157, YITH's [yith_wcwl_wishlist] shortcode).
+//
+// Not a block like the basket and the checkout: this one is a classic
+// shop_table, and YITH ships a stylesheet written for a white page. Left
+// alone it is a white table on the navy with grey underlined links, a bare
+// "x" for remove, a plain text add to cart, and five share buttons in
+// Facebook blue, X black and Pinterest red.
+//
+// The table is dressed as the basket's line items are (components/woo/
+// _cart.scss), because that is what it is: a list of products with a price, a
+// stock state and a way to buy. Same thumbnail, same uppercase column labels,
+// same row rule.
+//
+// Scoped to `.woo-page` for the reason set out in _blocks.scss: it keeps
+// these rules on this page, and it is the weight the plugin's own selectors
+// have to be answered at.
+
+// YITH's own heading and its rename form. The banner above already carries
+// the page's h1, and this would be a second heading under it reading "My
+// wishlist", which is a list name this site never shows anyone: the toast and
+// the header link both just say wishlist. The rename form goes with it, since
+// a single unnamed list has nothing to rename.
+.woo-page .wishlist-title-container {
+  display: none;
+}
+
+.woo-page .yith-wcwl-form {
+  margin: 0;
+}
+
+// ── The table ──────────────────────────────────────────────────────────────
+//
+// Six columns do not fit a phone, and no page on this site may scroll
+// sideways at 390. So the table is a table from tablet up and a stack of
+// cards below it: thumbnail down the left, name, price, stock and the button
+// beside it, remove in the corner. Written in that order because the whole
+// stylesheet is mobile first.
+
+// YITH paints the table from three custom properties of its own, which
+// default to a white fill and #6d6c6c text. Setting them is the plugin's own
+// way in, and it beats its `.woocommerce table.shop_table.wishlist_table tr
+// td` selector without having to out-weigh it.
+.woo-page--wishlist {
+  --color-wishlist-table-background: transparent;
+  --color-wishlist-table-text: var(--color-foreground);
+  --color-wishlist-table-border: var(--color-border);
+}
+
+.woo-page .wishlist_table,
+.woo-page .wishlist_table tbody {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background-color: transparent;
+  font-size: $font-size-sm;
+}
+
+// Column labels belong to a table, and at this width there is not one.
+.woo-page .wishlist_table thead {
+  display: none;
+}
+
+.woo-page .wishlist_table tbody tr {
+  position: relative;
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: var(--spacer-8) var(--spacer-16);
+  padding: var(--spacer-20) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.woo-page .wishlist_table tbody td {
+  display: block;
+  grid-column: 2;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-foreground);
+
+  // YITH centres every cell, which is right for a table and wrong for a card:
+  // here the price, the stock and the button sit under the product name and
+  // should line up with it.
+  text-align: left;
+}
+
+// The thumbnail holds the left column for the whole card.
+.woo-page .wishlist_table td.product-thumbnail {
+  grid-column: 1;
+  grid-row: 1 / span 4;
+}
+
+.woo-page .wishlist_table td.product-thumbnail img {
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  object-fit: contain;
+}
+
+// Out of the flow, so the first cell in the markup is not the first thing on
+// the card. The name reserves the corner it sits in.
+//
+// The width is given back: YITH sets this cell to 0 and wraps the link in an
+// unclassed div it makes a flex container, which leaves the link a flex item
+// in a zero-width box and shrinks a 32px target down to the 11px its glyph
+// measures. The wrapper stops being a flex container for the same reason.
+.woo-page .wishlist_table td.product-remove {
+  position: absolute;
+  top: var(--spacer-12);
+  right: 0;
+  width: var(--spacer-32);
+}
+
+.woo-page .wishlist_table td.product-remove > div {
+  display: block;
+}
+
+.woo-page .wishlist_table td.product-name {
+  padding-right: var(--spacer-40);
+}
+
+.woo-page .wishlist_table td.product-name a {
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .wishlist_table td.product-price {
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// The stock state, as a pill. YITH prints the words in a green of its own,
+// which is the one green on the site that was not measured against the navy.
+//
+// The fill is mixed into the page background rather than into transparency:
+// the band's aurora passes behind this table, and a translucent chip took
+// that magenta with it and lost the green.
+.woo-page .wishlist-in-stock,
+.woo-page .wishlist-out-of-stock {
+  display: inline-block;
+  padding: var(--spacer-4) var(--spacer-10);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: $font-size-11;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-single;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+  white-space: nowrap;
+}
+
+.woo-page .wishlist-in-stock {
+  border-color: color-mix(in oklab, var(--color-success) 40%, transparent);
+  background-color: color-mix(in oklab, var(--color-success) 12%, var(--color-background));
+  color: var(--color-success);
+}
+
+.woo-page .wishlist-out-of-stock {
+  border-color: color-mix(in oklab, var(--color-danger) 40%, transparent);
+  background-color: color-mix(in oklab, var(--color-danger) 12%, var(--color-background));
+  color: var(--color-danger);
+}
+
+// Add to cart. YITH renders the loop button with no .button class on it, so
+// this is the one place on the site where that link has to be given its type
+// by hand rather than through the list in components/_buttons.scss.
+//
+// The !important answers one: the plugin ships `display: table !important` on
+// this link, which no weight of selector can take back, and under it the
+// label paints outside its own fill.
+.woo-page .wishlist_table td.product-add-to-cart .add_to_cart_button {
+  @include button-base;
+  @include button-size-sm;
+  @include button-primary;
+
+  display: inline-flex !important;
+  width: auto;
+  white-space: nowrap;
+}
+
+// Remove. YITH's markup is a link whose whole text is a multiplication sign,
+// so there is no label to replace: it is given a target and a hover that
+// says what it does instead.
+.woo-page .remove_from_wishlist {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacer-32);
+  height: var(--spacer-32);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-md;
+  line-height: $line-height-single;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    background-color: color-mix(in oklab, var(--color-danger) 15%, transparent);
+    color: var(--color-danger);
+  }
+}
+
+// ── The table, as a table ──────────────────────────────────────────────────
+//
+// From tablet up there is room for six columns, so the cards become rows
+// again. The three columns on the right size to their contents and the
+// product name takes what is left.
+
+@include min-breakpoint(tablet) {
+  .woo-page .wishlist_table {
+    display: table;
+  }
+
+  .woo-page .wishlist_table thead {
+    display: table-header-group;
+  }
+
+  .woo-page .wishlist_table tbody {
+    display: table-row-group;
+  }
+
+  .woo-page .wishlist_table tbody tr {
+    display: table-row;
+    position: static;
+    padding: 0;
+    border: 0;
+  }
+
+  .woo-page .wishlist_table thead th {
+    padding: 0 var(--spacer-12) var(--spacer-12);
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    background-color: transparent;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  .woo-page .wishlist_table tbody td {
+    display: table-cell;
+    padding: var(--spacer-20) var(--spacer-12);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+
+  // 1% is the way to say "as narrow as your contents" to a table that is
+  // 100% wide: the three columns on the right hold a price, a pill and a
+  // button, and the name should have everything they do not need.
+  .woo-page .wishlist_table td.product-price,
+  .woo-page .wishlist_table td.product-stock-status,
+  .woo-page .wishlist_table td.product-add-to-cart {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .woo-page .wishlist_table td.product-remove {
+    position: static;
+    width: var(--spacer-48);
+    padding-right: 0;
+  }
+
+  .woo-page .wishlist_table td.product-thumbnail {
+    width: 104px;
+  }
+
+  .woo-page .wishlist_table td.product-name {
+    padding-right: var(--spacer-12);
+  }
+}
+
+// ── The footer: share links ────────────────────────────────────────────────
+
+.woo-page .yith_wcwl_wishlist_footer {
+  margin-top: var(--spacer-32);
+}
+
+.woo-page .yith-wcwl-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-16);
+}
+
+.woo-page .yith-wcwl-share-title {
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .yith-wcwl-share ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Each service in its own brand colour is five more colours on a page that
+// has three. The same outline button the footer's social links use instead.
+.woo-page .yith-wcwl-share li.share-button a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacer-36);
+  height: var(--spacer-36);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: currentcolor;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-cyan);
+    background-color: color-mix(in oklab, var(--color-cyan) 12%, transparent);
+    color: var(--color-cyan);
+  }
+}
+
+// ── An empty wishlist ──────────────────────────────────────────────────────
+
+.woo-page .wishlist-empty {
+  margin: 0;
+  padding: var(--spacer-32);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+  color: var(--color-muted-foreground);
+  text-align: center;
+}

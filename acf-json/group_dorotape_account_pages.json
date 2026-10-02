@@ -1,0 +1,465 @@
+{
+    "key": "group_dorotape_account_pages",
+    "title": "Account pages",
+    "fields": [
+        {
+            "key": "field_dtacct0001",
+            "label": "Background",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "Shared by all nine screens, because they are one page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0003",
+            "label": "Content background shape",
+            "name": "account_content_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "The same line-work behind the screen itself.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtacct0004",
+            "label": "Sign in",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "What someone sees at /my-account/ before they are signed in.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0006",
+            "label": "Page heading",
+            "name": "account_login_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Sign in",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0008",
+            "label": "Lost password",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The password reset request form.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0010",
+            "label": "Page heading",
+            "name": "account_lost_password_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Reset your password",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0012",
+            "label": "Dashboard",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The first screen after signing in.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0014",
+            "label": "Page heading",
+            "name": "account_dashboard_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your account",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0016",
+            "label": "Orders",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The list of past orders.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0018",
+            "label": "Page heading",
+            "name": "account_orders_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your orders",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0020",
+            "label": "Single order",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "One order, opened from the list.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0022",
+            "label": "Page heading",
+            "name": "account_view_order_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Order details",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0024",
+            "label": "Downloads",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "Downloadable files bought with an order.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0026",
+            "label": "Page heading",
+            "name": "account_downloads_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your downloads",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0028",
+            "label": "Addresses",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The billing and delivery addresses, and the form that edits them.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0030",
+            "label": "Page heading",
+            "name": "account_addresses_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your addresses",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0040",
+            "label": "Address book",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The saved addresses a customer can pick from at checkout.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0042",
+            "label": "Page heading",
+            "name": "account_address_book_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your address book",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0032",
+            "label": "Account details",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "Name, email address and password.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0034",
+            "label": "Page heading",
+            "name": "account_details_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your details",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0036",
+            "label": "Payment methods",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "Saved cards.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0038",
+            "label": "Page heading",
+            "name": "account_payment_methods_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Saved payment methods",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-account-pages"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The wording and background shapes on the nine screens behind /my-account/. What is inside them is WooCommerce's own markup, so only the chrome around it is editable here.",
+    "show_in_rest": 0,
+    "modified": 1790948405
+}

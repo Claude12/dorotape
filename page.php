@@ -19,9 +19,16 @@ get_header();
 	// Block-built pages drop the main column's max-width and padding
 	// so each block can paint its own full-bleed background. The blocks bring
 	// their own .container for the inner measure.
-	$dt_is_blocks   = function_exists( 'dorotape_has_flexible_content' ) && dorotape_has_flexible_content( get_queried_object_id() );
+	$dt_is_blocks = function_exists( 'dorotape_has_flexible_content' ) && dorotape_has_flexible_content( get_queried_object_id() );
+
+	// The basket, checkout, order received, wishlist and account pages. Their
+	// content is a plugin's block or shortcode, but the chrome around it is
+	// ours and full bleed like a block-built page's, so they drop the content
+	// well too.
+	$dt_is_woo = function_exists( 'dorotape_woo_page' ) && '' !== dorotape_woo_page();
+
 	$dt_main_class  = 'site-main';
-	$dt_main_class .= $dt_is_blocks ? ' site-main--blocks' : '';
+	$dt_main_class .= ( $dt_is_blocks || $dt_is_woo ) ? ' site-main--blocks' : '';
 	?>
 
 	<main id="primary" class="<?php echo esc_attr( $dt_main_class ); ?>">
@@ -39,6 +46,8 @@ get_header();
 			 */
 			if ( $dt_is_blocks ) {
 				dorotape_render_flexible_content();
+			} elseif ( $dt_is_woo ) {
+				get_template_part( 'template-parts/content', 'woo' );
 			} else {
 				get_template_part( 'template-parts/content', 'page' );
 			}

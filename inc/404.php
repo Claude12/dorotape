@@ -76,9 +76,10 @@ function dorotape_error_field( string $name, string $default = '' ): string {
 /**
  * The banner.
  *
- * inc/blocks/internal-banner-block.php's markup with the fields filled from
- * the options page, and no backdrop image: a picture behind an apology is the
- * wrong kind of confident.
+ * The shared internal banner (inc/page-banner.php) with the fields filled
+ * from the options page, and no backdrop image: a picture behind an apology is
+ * the wrong kind of confident. No breadcrumb either, because a 404 is not
+ * anywhere in the tree to show a trail to.
  */
 function dorotape_error_banner(): void {
 	$eyebrow = dorotape_error_field( 'error_eyebrow', __( 'Error 404', 'dorotape' ) );
@@ -88,32 +89,15 @@ function dorotape_error_banner(): void {
 		__( 'The link may be out of date, or the page may have moved. Search at the top of this page, or carry on from one of the places below.', 'dorotape' )
 	);
 
-	$shape   = dorotape_background_shape_value( dorotape_error_field( 'error_banner_shape', 'cubes-right' ) );
-	$classes = 'internal-banner-block internal-banner-block--overlap' . dorotape_background_shape_class( $shape );
-	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
-		<?php dorotape_background_shape( $shape ); ?>
-
-		<div class="container">
-			<div class="internal-banner-block__inner">
-
-				<?php if ( '' !== $eyebrow ) : ?>
-					<p class="internal-banner-block__eyebrow">
-						<span class="internal-banner-block__eyebrow-dot" aria-hidden="true"></span>
-						<?php echo esc_html( $eyebrow ); ?>
-					</p>
-				<?php endif; ?>
-
-				<h1 class="internal-banner-block__heading"><?php echo esc_html( $heading ); ?></h1>
-
-				<?php if ( '' !== $intro ) : ?>
-					<p class="internal-banner-block__intro"><?php echo esc_html( $intro ); ?></p>
-				<?php endif; ?>
-
-			</div>
-		</div>
-	</section>
-	<?php
+	dorotape_page_banner(
+		array(
+			'eyebrow'    => $eyebrow,
+			'heading'    => $heading,
+			'intro'      => $intro,
+			'shape'      => dorotape_error_field( 'error_banner_shape', 'cubes-right' ),
+			'breadcrumb' => false,
+		)
+	);
 }
 
 /**

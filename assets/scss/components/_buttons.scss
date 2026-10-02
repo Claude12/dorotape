@@ -123,6 +123,32 @@
   }
 }
 
+// ── The action link ──────────────────────────────────────────────────────
+//
+// The site's secondary click: a cyan label that turns magenta, with nothing
+// underlining it at either state. `.link--arrow` below is its class form, and
+// this mixin is here because most of the places that wear it are inside
+// plugin markup we cannot put a class on, so the description has to be able
+// to travel to the selector instead of the selector coming to it.
+//
+// Buttons do not inherit the page's font size, and a few of these are
+// buttons, so the size is set rather than left alone. It is an argument
+// because the same link appears once in small print, under the register form.
+
+@mixin action-link($size: $font-size-sm) {
+  color: var(--color-cyan);
+  font-size: $size;
+  font-weight: $font-weight-bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-magenta);
+  }
+}
+
 // ── Classes ──────────────────────────────────────────────────────────────
 //
 // The long selector list beside `.btn` catches the buttons WooCommerce,
@@ -250,17 +276,12 @@ input[type="submit"] {
 }
 
 .link--arrow {
+  @include action-link;
+
   // The same 24px target floor the breadcrumb uses: a link on its own line is
   // only as tall as its line box, which leaves it at 21px. The underlined
   // variant already clears it on its padding and rule.
   min-height: var(--spacer-24);
-  color: var(--color-cyan);
-  font-weight: $font-weight-bold;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-magenta);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,33 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// The head of a WooCommerce page.
+//
+// The basket, the checkout, the order received page, the wishlist and the
+// nine account screens all open the same way, from
+// template-parts/content-woo.php: a breadcrumb, a heading, and then the
+// plugin's own markup.
+//
+// They used to open on the banner the internal pages wear, with an eyebrow, a
+// standfirst and a background shape above the fold. These pages are a job
+// someone came here to finish rather than a page to be introduced, so the
+// banner came off and this is what is left: the title, at the size the single
+// product page gives its own h1, and the way back out.
+
+.woo-page__header {
+  margin-bottom: var(--spacer-28);
+
+  @include min-breakpoint(tablet) {
+    margin-bottom: var(--spacer-40);
+  }
+}
+
+.woo-page__breadcrumb {
+  margin-bottom: var(--spacer-12);
+}
+
+.woo-page__title {
+  margin: 0;
+  font-size: $font-size-page-title;
+  line-height: $line-height-tight;
+}

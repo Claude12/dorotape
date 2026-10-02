@@ -226,9 +226,13 @@ function dorotape_render_address_list(): void {
 			);
 			printf( '<address>%s</address>', wp_kses( dorotape_format_address( $address ), array( 'br' => array() ) ) );
 
-			printf( '<a class="button" href="%s">%s</a> ', esc_url( $edit_url ), esc_html__( 'Edit', 'dorotape' ) );
+			// Wrapped because the last two are each a form of their own, so
+			// there is nothing else for the row they sit in to be drawn on.
+			echo '<div class="dorotape-address-book__actions">';
+			printf( '<a class="button" href="%s">%s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dorotape' ) );
 			dorotape_address_action_button( 'set_default', $address_id, __( 'Make default', 'dorotape' ) );
 			dorotape_address_action_button( 'delete', $address_id, __( 'Delete', 'dorotape' ), true );
+			echo '</div>';
 
 			echo '</li>';
 		}

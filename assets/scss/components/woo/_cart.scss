@@ -1,0 +1,202 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// The basket (page 8, the Cart block).
+//
+// Shared primitives are in _blocks.scss: fields, buttons, totals rows, the
+// quantity stepper, the summary panel. What is here is the line items table
+// and the few pieces only this page draws.
+//
+// Scoped to `.woo-page` for the reason set out in _blocks.scss: it keeps
+// these rules on this page, and it is the weight the plugin's own selectors
+// have to be answered at.
+
+// ── The line items table ───────────────────────────────────────────────────
+
+.woo-page .wc-block-cart-items {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  background-color: transparent;
+}
+
+// Column labels, in the site's uppercase label style rather than the
+// plugin's sentence case.
+.woo-page .wc-block-cart-items__header th {
+  padding: 0 0 var(--spacer-12);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .wc-block-cart-items__header-total {
+  text-align: right;
+}
+
+.woo-page .wc-block-cart-items__row {
+  border-bottom: 1px solid var(--color-border);
+
+  td {
+    padding: var(--spacer-20) 0;
+    border: 0;
+    vertical-align: top;
+  }
+}
+
+// ── A line ─────────────────────────────────────────────────────────────────
+
+.woo-page .wc-block-cart-item__image {
+  width: 80px;
+  padding-right: var(--spacer-16);
+
+  img {
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-surface);
+    object-fit: contain;
+  }
+
+  @include min-breakpoint(tablet) {
+    width: 104px;
+
+    img {
+      width: 104px;
+      height: 104px;
+    }
+  }
+}
+
+.woo-page .wc-block-cart-item__wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-8);
+}
+
+// The per-unit price, which on trade pricing is the number someone is
+// actually checking, so it is not dropped to the muted colour.
+.woo-page .wc-block-cart-item__prices {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+}
+
+// The stepper and the remove control, side by side under the name.
+.woo-page .wc-block-cart-item__quantity {
+  display: flex;
+  align-items: center;
+
+  // No wrap. At 390 the remove button dropped under the stepper on the row
+  // with the longer total beside it and stayed next to it on the other, so
+  // two rows of the same thing did not look alike.
+  gap: var(--spacer-8);
+  margin: 0;
+  padding: 0;
+}
+
+.woo-page .wc-block-cart-item__remove-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacer-36);
+  height: var(--spacer-36);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  // The plugin ships this as a text link in some layouts and an icon button
+  // in others. Either way the glyph takes the link's colour.
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: currentcolor;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background-color: color-mix(in oklab, var(--color-danger) 15%, transparent);
+    color: var(--color-danger);
+  }
+}
+
+.woo-page .wc-block-cart-item__total {
+  text-align: right;
+}
+
+.woo-page .wc-block-cart-item__total-price-and-sale-badge-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacer-4);
+
+  .wc-block-components-product-price__value {
+    font-size: $font-size-base;
+    font-weight: $font-weight-extrabold;
+  }
+}
+
+// ── The summary column ─────────────────────────────────────────────────────
+
+.woo-page .wc-block-cart__totals-title {
+  margin: 0 0 var(--spacer-8);
+  padding: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .wc-block-cart__submit-container {
+  padding: 0;
+}
+
+.woo-page .wc-block-cart__submit-button {
+  width: 100%;
+}
+
+// ── An empty basket ────────────────────────────────────────────────────────
+//
+// Reached by anyone who lands on /basket/ from a bookmark or a reminder
+// email, so it is a real page rather than a dead end: the heading, a line of
+// copy, and the way back to the shop.
+
+.woo-page .wp-block-woocommerce-empty-cart-block {
+  text-align: center;
+
+  .wc-block-cart__empty-cart__title {
+    margin: 0 0 var(--spacer-12);
+    color: var(--color-foreground);
+    font-size: $font-size-xl;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-tight;
+
+    &::before {
+      // The plugin draws a shopping bag glyph above the heading in a colour
+      // of its own, which lands near-black on the navy.
+      color: var(--color-muted-foreground);
+    }
+  }
+
+  p {
+    color: var(--color-muted-foreground);
+  }
+
+  // The products grid the block offers underneath is the site's own card
+  // row, styled in components/_product-card.scss.
+  h2 {
+    margin-top: var(--spacer-48);
+  }
+}

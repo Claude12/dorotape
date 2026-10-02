@@ -24,6 +24,7 @@
 @use "components/breadcrumb";
 @use "components/product-card";
 @use "components/product-list";
+@use "components/toast";
 @use "components/rte";
 @use "components/rte-block";
 @use "components/hero-block";
@@ -60,6 +61,19 @@
 @use "components/woo/stock";
 @use "components/woo/swatch";
 @use "components/woo/spec-table";
+
+// The basket, the checkout, the wishlist and the account screens. The plugins
+// own the markup on all four, so these retokenise someone else's stylesheet
+// rather than draw a layout: _page.scss holds the heading and breadcrumb all
+// of them open on, _blocks.scss what the two WooCommerce block pages share,
+// and the rest only what one page draws. Loaded before the pages that use
+// them, like the components above.
+@use "components/woo/page";
+@use "components/woo/account";
+@use "components/woo/blocks";
+@use "components/woo/cart";
+@use "components/woo/checkout";
+@use "components/woo/wishlist";
 
 // The single product page's own layout: the bands inc/single-product.php
 // builds, and the WooCommerce markup sitting inside them. Last in this
