@@ -54,11 +54,25 @@
     }
   }
 
+  // A link on the shop and a button on a leaf category, which clears in the
+  // page, so it carries its own font and box rather than a button's.
   &__clear {
+    border: 0;
+    background: none;
+    padding: 0;
     color: var(--color-cyan);
+    font-family: inherit;
     font-size: $font-size-sm;
     text-decoration: underline;
     white-space: nowrap;
+    cursor: pointer;
+  }
+
+  // The leaf category's bar ships hidden until its script can sort, and the
+  // display above would otherwise show it anyway. Its Clear link the same.
+  &[hidden],
+  &__clear[hidden] {
+    display: none;
   }
 
   // Hidden once the script takes over with auto-submit.

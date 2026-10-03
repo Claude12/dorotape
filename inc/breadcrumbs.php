@@ -87,20 +87,21 @@ function dorotape_rank_math_crumbs(): array {
 }
 
 /**
- * The trail worked out from the page's own ancestors.
+ * The trail worked out from WordPress itself.
  *
- * The fallback for a site without Rank Math. Pages are the only post type the
- * theme puts a banner on, so ancestors are the whole story.
+ * The fallback for a site without Rank Math. It goes by the queried object,
+ * not get_the_ID(): on an archive get_the_ID() is the first post in the loop,
+ * which put the first product's name at the end of the shop's trail.
  *
- * @return array<int, array{label: string, url: string}> Crumbs, or empty outside a singular view.
+ * - A page or post: its ancestors, then itself.
+ * - A product: the shop, its first category's ancestors and that category.
+ * - A term: the shop for product terms, then the term's ancestors and itself.
+ * - The shop, or a post type archive: the archive's own title.
+ * - A search: the search results.
+ *
+ * @return array<int, array{label: string, url: string}> Crumbs, or empty when there is nothing to show.
  */
 function dorotape_ancestor_crumbs(): array {
-	$post_id = get_the_ID();
-
-	if ( ! $post_id ) {
-		return array();
-	}
-
 	$crumbs = array(
 		array(
 			'label' => __( 'Home', 'dorotape' ),
@@ -108,16 +109,123 @@ function dorotape_ancestor_crumbs(): array {
 		),
 	);
 
-	foreach ( array_reverse( (array) get_post_ancestors( $post_id ) ) as $ancestor ) {
+	if ( is_search() ) {
 		$crumbs[] = array(
-			'label' => (string) get_the_title( $ancestor ),
-			'url'   => (string) get_permalink( $ancestor ),
+			'label' => __( 'Search results', 'dorotape' ),
+			'url'   => '',
 		);
+
+		return $crumbs;
+	}
+
+	if ( function_exists( 'is_shop' ) && is_shop() ) {
+		$crumbs[] = dorotape_shop_crumb();
+
+		return $crumbs;
+	}
+
+	if ( is_post_type_archive() ) {
+		$crumbs[] = array(
+			'label' => (string) post_type_archive_title( '', false ),
+			'url'   => '',
+		);
+
+		return $crumbs;
+	}
+
+	$object = get_queried_object();
+
+	if ( $object instanceof WP_Term ) {
+		if ( dorotape_is_product_taxonomy( $object->taxonomy ) ) {
+			$crumbs[] = dorotape_shop_crumb();
+		}
+
+		return array_merge( $crumbs, dorotape_term_crumbs( $object ) );
+	}
+
+	if ( ! $object instanceof WP_Post ) {
+		return array();
+	}
+
+	if ( 'product' === $object->post_type ) {
+		$crumbs[] = dorotape_shop_crumb();
+
+		$terms = get_the_terms( $object, 'product_cat' );
+
+		if ( is_array( $terms ) && $terms ) {
+			$crumbs = array_merge( $crumbs, dorotape_term_crumbs( $terms[0] ) );
+		}
+	} else {
+		foreach ( array_reverse( (array) get_post_ancestors( $object ) ) as $ancestor ) {
+			$crumbs[] = array(
+				'label' => (string) get_the_title( $ancestor ),
+				'url'   => (string) get_permalink( $ancestor ),
+			);
+		}
 	}
 
 	$crumbs[] = array(
-		'label' => (string) get_the_title( $post_id ),
+		'label' => (string) get_the_title( $object ),
 		'url'   => '',
+	);
+
+	return $crumbs;
+}
+
+/**
+ * Whether a taxonomy belongs to WooCommerce products.
+ */
+function dorotape_is_product_taxonomy( string $taxonomy ): bool {
+	$object = get_taxonomy( $taxonomy );
+
+	return $object && in_array( 'product', (array) $object->object_type, true );
+}
+
+/**
+ * The shop's crumb: the Woo shop page, or the product archive without one.
+ *
+ * @return array{label: string, url: string}
+ */
+function dorotape_shop_crumb(): array {
+	$page_id = function_exists( 'wc_get_page_id' ) ? (int) wc_get_page_id( 'shop' ) : 0;
+
+	if ( $page_id > 0 ) {
+		return array(
+			'label' => (string) get_the_title( $page_id ),
+			'url'   => (string) get_permalink( $page_id ),
+		);
+	}
+
+	return array(
+		'label' => __( 'Shop', 'dorotape' ),
+		'url'   => (string) get_post_type_archive_link( 'product' ),
+	);
+}
+
+/**
+ * A term and its ancestors, outermost first.
+ *
+ * @return array<int, array{label: string, url: string}>
+ */
+function dorotape_term_crumbs( WP_Term $term ): array {
+	$crumbs = array();
+
+	foreach ( array_reverse( get_ancestors( $term->term_id, $term->taxonomy, 'taxonomy' ) ) as $ancestor_id ) {
+		$ancestor = get_term( $ancestor_id, $term->taxonomy );
+
+		if ( $ancestor instanceof WP_Term ) {
+			$link     = get_term_link( $ancestor );
+			$crumbs[] = array(
+				'label' => $ancestor->name,
+				'url'   => is_wp_error( $link ) ? '' : $link,
+			);
+		}
+	}
+
+	$link     = get_term_link( $term );
+	$crumbs[] = array(
+		'label' => $term->name,
+		'url'   => is_wp_error( $link ) ? '' : $link,
 	);
 
 	return $crumbs;

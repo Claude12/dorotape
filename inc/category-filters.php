@@ -589,6 +589,86 @@ function dorotape_category_filter_header( int $count ): void {
 }
 
 /**
+ * The toolbar above the grid: what is showing, how it is sorted, and the way
+ * out of the filters.
+ *
+ * The shop's toolbar (dorotape_shop_toolbar()), so the two pages carry the
+ * same bar with the same options in the same place. The shop sorts on the
+ * server; here the whole category is already in the page, so the script
+ * reorders the cards instead (assets/js/lib/category-sort.js). That is also
+ * why it ships hidden: without the script there is nothing to sort with.
+ *
+ * Nothing to sort with one product, so there is no bar for one.
+ *
+ * @param int $total Products in the category.
+ */
+function dorotape_category_filter_toolbar( int $total ): void {
+	if ( $total < 2 ) {
+		return;
+	}
+
+	$one  = sprintf( /* translators: %s: number of products. */ _n( '%s product', '%s products', 1, 'dorotape' ), '{n}' );
+	$many = sprintf( /* translators: %s: number of products. */ _n( '%s product', '%s products', 2, 'dorotape' ), '{n}' );
+	?>
+	<div class="dt-filter-bar" data-filter-sort hidden>
+		<span class="dt-filter-bar__title" data-filter-bar-count data-result-one="<?php echo esc_attr( $one ); ?>" data-result-many="<?php echo esc_attr( $many ); ?>">
+			<?php
+			printf(
+				/* translators: %s: number of products. */
+				esc_html( _n( '%s product', '%s products', $total, 'dorotape' ) ),
+				esc_html( number_format_i18n( $total ) )
+			);
+			?>
+		</span>
+
+		<label class="dt-filter-bar__field">
+			<span class="dt-filter-bar__label"><?php esc_html_e( 'Sort by', 'dorotape' ); ?></span>
+			<select class="dt-filter-bar__select" data-filter-orderby>
+				<?php foreach ( dorotape_shop_orderby_options() as $dt_key => $dt_label ) : ?>
+					<option value="<?php echo esc_attr( $dt_key ); ?>"><?php echo esc_html( $dt_label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</label>
+
+		<button type="button" class="dt-filter-bar__clear" data-filter-clear-all hidden>
+			<?php esc_html_e( 'Clear filters', 'dorotape' ); ?>
+		</button>
+	</div>
+	<?php
+}
+
+/**
+ * What a card is sorted by, as data attributes on its <li>.
+ *
+ * The same columns WooCommerce sorts the shop by: total sales, the date the
+ * product was created, and price, the lowest a product sells at for low to
+ * high and the highest for high to low, which is how its price lookup table
+ * answers both. A product with no price (price on application) has neither,
+ * and the script puts it last either way.
+ *
+ * @param WC_Product $product Product on the card.
+ */
+function dorotape_category_sort_attributes( WC_Product $product ): string {
+	if ( $product instanceof WC_Product_Variable ) {
+		$min = $product->get_variation_price( 'min' );
+		$max = $product->get_variation_price( 'max' );
+	} else {
+		$min = $product->get_price();
+		$max = $min;
+	}
+
+	$created = $product->get_date_created();
+
+	return sprintf(
+		'data-sales="%1$d" data-date="%2$d" data-price-min="%3$s" data-price-max="%4$s"',
+		(int) $product->get_total_sales(),
+		$created ? $created->getTimestamp() : 0,
+		esc_attr( '' === (string) $min ? '' : (string) (float) $min ),
+		esc_attr( '' === (string) $max ? '' : (string) (float) $max )
+	);
+}
+
+/**
  * The product grid, the right hand column of the shop.
  *
  * Every product in the category, once, with the tokens each card is filtered
@@ -630,6 +710,7 @@ function dorotape_category_filter_grid( array $product_ids, bool $panel ): void 
 					data-facets="<?php echo esc_attr( $dt_tokens['facets'] ); ?>"
 					data-stock="<?php echo esc_attr( $dt_tokens['stock'] ); ?>"
 					data-search="<?php echo esc_attr( $dt_tokens['search'] ); ?>"
+					<?php echo dorotape_category_sort_attributes( $dt_product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
 				>
 					<?php
 					/*
@@ -740,6 +821,7 @@ function dorotape_category_shop(): void {
 		<div class="container">
 			<?php if ( $product_ids ) : ?>
 				<?php dorotape_category_filter_header( count( $product_ids ) ); ?>
+				<?php dorotape_category_filter_toolbar( count( $product_ids ) ); ?>
 			<?php endif; ?>
 
 			<?php if ( ! $product_ids ) : ?>

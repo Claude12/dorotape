@@ -301,6 +301,11 @@ function syncUrl(state) {
   if (state.stock) params.set('in-stock', '1');
   if (state.search) params.set('q', state.search);
 
+  // The Sort by's own parameter (category-sort.js), which is not the panel's
+  // to drop.
+  const orderby = new URLSearchParams(window.location.search).get('orderby');
+  if (orderby) params.set('orderby', orderby);
+
   const query = params.toString();
   const url = window.location.pathname + (query ? '?' + query : '') + window.location.hash;
 
@@ -350,6 +355,10 @@ export function initCategoryFilters() {
   const empty = document.querySelector('[data-filter-empty]');
   const result = panel.querySelector('[data-filter-result]');
   const clear = panel.querySelector('[data-filter-clear]');
+  // The toolbar above the grid repeats the count and the Clear link, so both
+  // stay in reach with the drawer shut.
+  const barCount = document.querySelector('[data-filter-bar-count]');
+  const clearAll = document.querySelector('[data-filter-clear-all]');
   const toggle = document.querySelector('[data-filter-toggle]');
   const activeCount = toggle ? toggle.querySelector('[data-filter-active]') : null;
   const resultOne = result ? result.getAttribute('data-result-one') || '' : '';
@@ -463,6 +472,14 @@ export function initCategoryFilters() {
       Object.keys(state.facets).length + (state.stock ? 1 : 0) + (state.search ? 1 : 0);
 
     if (clear) clear.hidden = active === 0;
+    if (clearAll) clearAll.hidden = active === 0;
+
+    if (barCount) {
+      const one = barCount.getAttribute('data-result-one') || '';
+      const many = barCount.getAttribute('data-result-many') || '';
+      const template = 1 === shown && one ? one : many;
+      if (template) barCount.textContent = template.replace('{n}', String(shown));
+    }
 
     renderChips(panel, apply);
 
@@ -492,12 +509,26 @@ export function initCategoryFilters() {
   // Nothing to submit to: the server already sent the whole category.
   panel.addEventListener('submit', (event) => event.preventDefault());
 
-  if (clear) {
-    clear.addEventListener('click', () => {
+  [clear, clearAll].forEach((button) => {
+    if (!button) return;
+    button.addEventListener('click', () => {
       panel.reset();
       apply();
     });
-  }
+  });
+
+  /*
+   * A new order from the Sort by. The records follow the cards' new places,
+   * since Show more counts its batch in that order, and the batch starts
+   * again so the first cards of the new order are the ones on screen.
+   */
+  grid.addEventListener('dt:sorted', () => {
+    items.sort((a, b) =>
+      a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+    );
+    limit = batch;
+    apply();
+  });
 
   if (moreButton) {
     moreButton.addEventListener('click', () => {
