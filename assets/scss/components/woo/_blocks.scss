@@ -1,7 +1,7 @@
 @use "abstracts/mixins" as *;
-@use "base/forms" as *;
+@use "abstracts/field-mixins" as *;
 @use "base/typography" as *;
-@use "components/buttons" as *;
+@use "abstracts/button-mixins" as *;
 
 // WooCommerce Blocks, the parts the basket and the checkout share.
 //

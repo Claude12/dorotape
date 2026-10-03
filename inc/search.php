@@ -250,7 +250,7 @@ function dorotape_search_empty(): void {
 		0
 	);
 	?>
-	<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>" animate="fade-in-up">
+	<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>">
 		<?php dorotape_search_band_shape(); ?>
 		<div class="container">
 			<?php echo dorotape_product_list_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper. ?>
@@ -390,7 +390,7 @@ add_action(
  */
 function dorotape_search_loop_before(): void {
 	?>
-	<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>" animate="fade-in-up" animate-offset="0">
+	<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>">
 		<?php dorotape_search_band_shape(); ?>
 		<div class="container">
 			<?php dorotape_search_band_header( dorotape_search_field( 'search_products_heading', __( 'Products', 'dorotape' ) ) ); ?>

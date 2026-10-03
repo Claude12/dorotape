@@ -56,7 +56,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 $dt_count = is_array( $dt_columns ) ? count( $dt_columns ) : 0;
 ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="container">
 

@@ -30,6 +30,31 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Loading attribute for the next card image on the page.
+ *
+ * On a listing (the shop, a category, search results, the 404, and the empty
+ * basket's suggestions) the grid is right under the heading, so its first
+ * row is on screen at load and lazy loading only makes those images wait for
+ * layout. The first four card
+ * images there, a desktop row, load eagerly; every other card, and every card
+ * anywhere else (the homepage row, Related products), stays lazy.
+ *
+ * Counts per request, so call it once per image, in page order.
+ */
+function dorotape_card_loading(): string {
+	static $count = 0;
+
+	$listing = is_search() || is_404()
+		|| ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_cart() ) );
+
+	if ( ! $listing ) {
+		return 'lazy';
+	}
+
+	return ++$count <= 4 ? 'eager' : 'lazy';
+}
+
+/**
  * The short line under a card's product name: its most specific category,
  * e.g. "ASLAN Blockout Films" rather than the top-level range it sits in.
  *
@@ -162,7 +187,7 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 							array(
 								'class'    => 'product-card__image',
 								'alt'      => '',
-								'loading'  => 'lazy',
+								'loading'  => dorotape_card_loading(),
 								'decoding' => 'async',
 								'sizes'    => $dt_sizes,
 							)

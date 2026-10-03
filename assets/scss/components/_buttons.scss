@@ -1,5 +1,7 @@
 @use "abstracts/mixins" as *;
 @use "base/typography" as *;
+@use "abstracts/button-mixins" as *;
+@forward "abstracts/button-mixins";
 
 // Buttons and action links.
 //
@@ -24,130 +26,8 @@
 //   .link--arrow        bold cyan label, turns magenta
 //   .link__icon         the 16px icon inside either link type
 
-// ── Shape and size ───────────────────────────────────────────────────────
-
-@mixin button-base {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacer-8);
-  border: 0;
-  border-radius: var(--radius-2xl);
-  font-family: inherit;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-extrabold;
-  line-height: $line-height-sm;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-
-  &:disabled,
-  &.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-// px-6 py-3 in the design: the footer signup, the datasheet dialog, Woo's own
-// buttons, and anything that does not ask for a size.
-@mixin button-size-md {
-  padding: var(--spacer-12) var(--spacer-24);
-}
-
-// px-7 py-3.5: the hero pair and the section level CTAs.
-@mixin button-size-lg {
-  padding: var(--spacer-14) var(--spacer-28);
-}
-
-// px-4 py-1.5: the label sized action inside a card.
-@mixin button-size-sm {
-  padding: var(--spacer-6) var(--spacer-16);
-  font-size: $font-size-xs;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-xs;
-}
-
-// ── Fills ────────────────────────────────────────────────────────────────
-
-@mixin button-primary {
-  background-color: var(--color-primary);
-  color: var(--color-primary-foreground);
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    // hover:bg-primary/90 in the design: the magenta thinned towards the navy
-    // behind it, not darkened with black.
-    background-color: color-mix(in oklab, var(--color-primary) 90%, transparent);
-    color: var(--color-primary-foreground);
-  }
-}
-
-@mixin button-cyan {
-  background-color: var(--color-cyan);
-  color: var(--color-background);
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    background-color: color-mix(in oklab, var(--color-cyan) 90%, transparent);
-    color: var(--color-background);
-  }
-}
-
-@mixin button-ghost {
-  border: 1px solid var(--color-border);
-  background-color: color-mix(in oklab, var(--color-background) 40%, transparent);
-  backdrop-filter: blur(8px);
-  color: var(--color-foreground);
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    background-color: var(--color-secondary);
-    color: var(--color-foreground);
-  }
-}
-
-@mixin button-outline {
-  border: 1px solid var(--color-border);
-  background-color: transparent;
-  color: var(--color-foreground);
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    border-color: var(--color-primary);
-    background-color: var(--color-primary);
-    color: var(--color-primary-foreground);
-  }
-}
-
-// ── The action link ──────────────────────────────────────────────────────
-//
-// The site's secondary click: a cyan label that turns magenta, with nothing
-// underlining it at either state. `.link--arrow` below is its class form, and
-// this mixin is here because most of the places that wear it are inside
-// plugin markup we cannot put a class on, so the description has to be able
-// to travel to the selector instead of the selector coming to it.
-//
-// Buttons do not inherit the page's font size, and a few of these are
-// buttons, so the size is set rather than left alone. It is an argument
-// because the same link appears once in small print, under the register form.
-
-@mixin action-link($size: $font-size-sm) {
-  color: var(--color-cyan);
-  font-size: $size;
-  font-weight: $font-weight-bold;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-magenta);
-  }
-}
+// The mixins (shapes, sizes, fills and the action link) are in
+// abstracts/_button-mixins.scss, forwarded from here.
 
 // ── Classes ──────────────────────────────────────────────────────────────
 //

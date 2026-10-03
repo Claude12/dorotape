@@ -40,7 +40,7 @@ add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php echo $dt_anchor ? ' id="' . esc_attr( $dt_anchor ) . '"' : ''; ?> animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php echo $dt_anchor ? ' id="' . esc_attr( $dt_anchor ) . '"' : ''; ?><?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 
 	<div class="container">
@@ -85,7 +85,7 @@ add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 								false,
 								array(
 									'class'    => 'team-block__photo',
-									'loading'  => 'lazy',
+									'loading'  => 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy',
 									'decoding' => 'async',
 									'sizes'    => '(min-width: 1280px) 320px, (min-width: 1024px) 30vw, (min-width: 576px) 45vw, 90vw',
 								)

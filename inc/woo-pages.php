@@ -190,3 +190,54 @@ function dorotape_woo_page_band_shape(): void {
 
 	dorotape_background_shape( dorotape_background_shape_value( dorotape_woo_pages_field( 'woo_' . $page . '_content_shape', 'none' ) ) );
 }
+
+/**
+ * The empty basket's "New in store" products, as the site's own cards.
+ *
+ * The Cart block's empty state holds WooCommerce's Newest Products block,
+ * which draws its own unstyled grid and shows the grey placeholder for every
+ * product without a photo. Its output is swapped for the card grid Related
+ * products uses, fed by the Product Row's "newest" source, which only picks
+ * products that have a photo. The heading above it stays in the page content.
+ *
+ * @param string $html  The block's own output.
+ * @param array  $block The parsed block.
+ * @return string
+ */
+function dorotape_empty_cart_products( string $html, array $block ): string {
+	if ( ! is_cart() ) {
+		return $html;
+	}
+
+	$count    = (int) ( $block['attrs']['columns'] ?? 4 ) * (int) ( $block['attrs']['rows'] ?? 1 );
+	$products = dorotape_product_row_products( 'newest', max( 1, $count ), array() );
+
+	if ( ! $products ) {
+		return $html;
+	}
+
+	// WooCommerce's loop button reads the global product.
+	$original = $GLOBALS['product'] ?? null;
+
+	ob_start();
+	echo dorotape_product_list_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+	foreach ( $products as $dt_item ) {
+		$GLOBALS['product'] = $dt_item; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restored below.
+		echo '<li class="' . esc_attr( dorotape_product_list_item_class() ) . '">';
+		dorotape_product_card(
+			$dt_item,
+			array(
+				'link'        => 'title',
+				'add_to_cart' => true,
+				'modifier'    => 'product-card--grid',
+				'sizes'       => '(min-width: 1024px) 320px, (min-width: 576px) 46vw, calc(100vw - 48px)',
+			)
+		);
+		echo '</li>';
+	}
+	echo dorotape_product_list_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+	$GLOBALS['product'] = $original; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restoring it.
+
+	return (string) ob_get_clean();
+}
+add_filter( 'render_block_woocommerce/product-new', 'dorotape_empty_cart_products', 10, 2 );

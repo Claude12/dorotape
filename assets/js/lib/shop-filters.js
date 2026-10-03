@@ -120,6 +120,14 @@ function initPanel(aside) {
       const open = aside.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
+
+    // Escape closes the drawer, as it does every other overlay on the site.
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !isDrawer() || !aside.classList.contains('is-open')) return;
+      aside.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    });
   }
 
   syncMode();

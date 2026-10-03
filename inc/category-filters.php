@@ -659,14 +659,28 @@ function dorotape_category_filter_grid( array $product_ids, bool $panel ): void 
 				</li>
 		<?php endforeach; ?>
 	<?php
-	echo dorotape_product_list_close( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper.
+	/*
+	 * The whole category is in the page so the filters answer instantly, but
+	 * a phone does not need to lay out ninety cards to show the first few.
+	 * The script shows a batch and this button adds the next, always counting
+	 * within what the filters match. Hidden until the script runs, so without
+	 * it every product is simply there.
+	 */
+	$batch = (int) dorotape_category_section_field( 'category_products_page' );
+	$more  = sprintf(
+		'<p class="product-list__more" data-filter-more hidden data-filter-batch="%1$d"><button type="button" class="btn btn--outline" data-more-label="%2$s"></button></p>',
+		$batch > 0 ? $batch : 24,
+		esc_attr( dorotape_category_page_field( 'category_products_more', __( 'Show {n} more', 'dorotape' ) ) )
+	);
+
+	echo dorotape_product_list_close( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the helper and above.
 		dorotape_product_list_message(
 			$empty,
 			array(
 				'data-filter-empty' => '',
 				'hidden'            => '',
 			)
-		)
+		) . $more
 	);
 
 	unset( $GLOBALS['product'] );
@@ -711,13 +725,13 @@ function dorotape_category_shop(): void {
 	?>
 	<?php
 	/*
-	 * animate-offset="0" because the reveal threshold is a fraction of the
-	 * element's own height, and this one grows with the category: at 54
-	 * products it is nearly ten thousand pixels tall, so the default tenth of
-	 * it could never fit on screen and the whole shop stayed at opacity 0.
+	 * No scroll reveal here: the grid is the page's main content and sits
+	 * just under the banner, so hiding it until footer JS runs only delays
+	 * the first paint. (It also grows to thousands of pixels tall, which
+	 * once left it stuck at opacity 0 under the default reveal threshold.)
 	 */
 	?>
-	<section id="products" class="<?php echo esc_attr( $classes ); ?>" animate="fade-in-up" animate-offset="0">
+	<section id="products" class="<?php echo esc_attr( $classes ); ?>">
 		<?php dorotape_background_shape( $shape ); ?>
 		<?php if ( $has_sections ) : ?>
 			<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>

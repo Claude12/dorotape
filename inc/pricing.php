@@ -296,7 +296,7 @@ add_action( 'woocommerce_before_quantity_input_field', function (): void {
 		return;
 	}
 	printf(
-		'<button type="button" class="dt-qty-step dt-qty-step--down" data-dt-qty="down" aria-label="%s" tabindex="-1">&minus;</button>',
+		'<button type="button" class="dt-qty-step dt-qty-step--down" data-dt-qty="down" aria-label="%s">&minus;</button>',
 		esc_attr__( 'Decrease quantity', 'dorotape' )
 	);
 } );
@@ -308,7 +308,7 @@ add_action( 'woocommerce_after_quantity_input_field', function (): void {
 	}
 	$step = dorotape_qty_step( $product );
 	printf(
-		'<button type="button" class="dt-qty-step dt-qty-step--up" data-dt-qty="up" aria-label="%s" tabindex="-1">+</button>',
+		'<button type="button" class="dt-qty-step dt-qty-step--up" data-dt-qty="up" aria-label="%s">+</button>',
 		esc_attr__( 'Increase quantity', 'dorotape' )
 	);
 	printf(

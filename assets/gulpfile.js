@@ -8,6 +8,14 @@ const cssnano = require('cssnano');
 const webpack = require('webpack-stream');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const browserSync = require('browser-sync').create();
+const { PassThrough } = require('stream');
+
+// Source maps are for local debugging only. dist/ is committed and deployed
+// by git pull, so a map written by `build` would be served from the live site
+// (about 900KB, and the full source with it). `watch` turns them on; `build`
+// leaves them off.
+let maps = false;
+const whenMaps = (stream) => (maps ? stream : new PassThrough({ objectMode: true }));
 
 // CSS task. Compiles scss/style.scss (and any other top-level entry) to
 // ../dist/css/. cssnano is told to leave colour values alone: the design
@@ -17,10 +25,10 @@ const browserSync = require('browser-sync').create();
 const css = () => {
   return gulp
     .src('scss/**/*.scss')
-    .pipe(sourcemaps.init())
+    .pipe(whenMaps(sourcemaps.init()))
     .pipe(sass({ errLogToConsole: true }))
     .pipe(postcss([autoprefixer, cssnano({ preset: ['default', { colormin: false }] })]))
-    .pipe(sourcemaps.write('.'))
+    .pipe(whenMaps(sourcemaps.write('.')))
     .pipe(gulp.dest('../dist/css/'))
     .pipe(browserSync.stream());
 };
@@ -37,7 +45,7 @@ const js = () => {
     .pipe(
       webpack({
         mode: 'production',
-        devtool: 'source-map',
+        devtool: maps ? 'source-map' : false,
         plugins: [new ESLintPlugin()],
       })
     )
@@ -57,5 +65,10 @@ const watchFiles = () => {
   gulp.watch('../**/*.php').on('change', browserSync.reload);
 };
 
-exports.watch = gulp.series(gulp.parallel(css, js), watchFiles);
+const enableMaps = (done) => {
+  maps = true;
+  done();
+};
+
+exports.watch = gulp.series(enableMaps, gulp.parallel(css, js), watchFiles);
 exports.build = gulp.parallel(css, js);

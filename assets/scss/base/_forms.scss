@@ -1,5 +1,7 @@
 @use "abstracts/mixins" as *;
 @use "base/typography" as *;
+@use "abstracts/field-mixins" as *;
+@forward "abstracts/field-mixins";
 
 // Form controls, site-wide.
 //
@@ -18,44 +20,7 @@
 // on the navy with placeholders invisible against them. Those selectors are
 // in components/woo/_blocks.scss and they include this, so there is one
 // description of a field on this site rather than two drifting apart.
-@mixin field-base {
-  box-sizing: border-box;
-  width: 100%;
-  padding: var(--spacer-12) var(--spacer-20);
-  border: 1px solid var(--color-input);
-  border-radius: var(--radius-2xl);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: inherit;
-  font-size: $font-size-sm;
-  line-height: $line-height-sm;
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
-
-  &::placeholder {
-    color: var(--color-muted-foreground);
-  }
-
-  // The border turning magenta is the design's focus, and it is all a pointer
-  // needs because the pointer is already on the field. A keyboard is not, so
-  // it keeps the ring: a 1px colour change is not enough to find a field with
-  // on its own.
-  &:focus {
-    outline: none;
-    border-color: var(--color-magenta);
-    box-shadow: none;
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-magenta) 25%, transparent);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
+// @mixin field-base lives in abstracts/_field-mixins.scss.
 
 // The element selectors are on purpose. WooCommerce, WPForms and the comment
 // form all render inputs the theme never sees the markup for, and there is no
@@ -104,14 +69,7 @@ select:-webkit-autofill {
 // background and takes this arrow with it. The rule that answers that is in
 // components/woo/_blocks.scss and includes this, rather than carrying a
 // second copy of the glyph.
-@mixin field-select {
-  padding-right: var(--spacer-44);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a0b0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--spacer-20) center;
-  background-size: 16px 16px;
-  appearance: none;
-}
+// @mixin field-select lives in abstracts/_field-mixins.scss.
 
 select {
   @include field-select;
@@ -155,30 +113,7 @@ fieldset {
 // selectors heavier than a bare element one: the checkout would keep the
 // plugin's 4px corners and the login box would stretch to the width of the
 // form row. Those two include this rather than redraw it.
-@mixin checkbox-base {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  margin: 0;
-  border: 1px solid var(--color-input);
-  border-radius: 6px;
-  background-color: var(--color-background);
-  appearance: none;
-  cursor: pointer;
-  transition:
-    border-color var(--transition-fast),
-    background-color var(--transition-fast);
-
-  &:checked {
-    border-color: var(--color-magenta);
-    background: var(--color-magenta) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 13 4 4 10-10'/%3E%3C/svg%3E") center / 13px no-repeat;
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-magenta) 25%, transparent);
-  }
-}
+// @mixin checkbox-base lives in abstracts/_field-mixins.scss.
 
 input[type="checkbox"] {
   @include checkbox-base;
@@ -239,6 +174,12 @@ input[type="radio"] {
   --wpforms-field-size-padding-h: var(--spacer-20);
   --wpforms-field-size-font-size: #{$font-size-sm};
   --wpforms-field-size-line-height: 20px;
+
+  // The touch-field-size mixin, for a field WPForms sizes from this variable.
+  @media (pointer: coarse) {
+    --wpforms-field-size-font-size: 16px;
+  }
+
   --wpforms-field-size-sublabel-spacing: var(--spacer-4);
   --wpforms-label-size-font-size: #{$font-size-sm};
   --wpforms-label-size-line-height: 20px;

@@ -177,7 +177,7 @@ function dorotape_error_destinations(): void {
 	$heading = dorotape_error_field( 'error_links_heading', __( 'Where to go next', 'dorotape' ) );
 	$button  = dorotape_error_field( 'error_button', __( 'Go there', 'dorotape' ) );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>" animate="fade-in-up" animate-offset="0">
+	<section class="<?php echo esc_attr( $classes ); ?>">
 		<?php dorotape_background_shape( $shape ); ?>
 
 		<div class="container">

@@ -38,6 +38,18 @@ $breakpoints: (
   }
 }
 
+// Text fields at 16px on touch screens.
+//
+// iOS zooms the whole page into any field under 16px when it is tapped, and
+// leaves it zoomed. The design's fields are 14px, which stays for mouse
+// users; only a coarse pointer gets the larger size. Anything typed into
+// (inputs, selects, textareas) should include this after its own font-size.
+@mixin touch-field-size {
+  @media (pointer: coarse) {
+    font-size: 16px;
+  }
+}
+
 // Truncate
 @mixin truncate($lines) {
   display: -webkit-box;

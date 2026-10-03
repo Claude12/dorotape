@@ -66,7 +66,6 @@ export function initQtyStep() {
     el.className = 'dt-qty-step dt-qty-step--' + direction;
     el.setAttribute( 'data-dt-qty', direction );
     el.setAttribute( 'aria-label', label );
-    el.tabIndex = -1;
     el.innerHTML = glyph;
     return el;
   }
@@ -117,6 +116,16 @@ export function initQtyStep() {
     if ( ! input ) return;
     e.preventDefault();
     nudge( input, 'up' === button.dataset.dtQty ? 1 : -1 );
+  } );
+
+  // The box is readonly, which also switches off the arrow keys a number
+  // field normally answers to. Give them back, on the step, so the field
+  // itself works from the keyboard as well as the buttons either side.
+  document.addEventListener( 'keydown', function ( e ) {
+    if ( 'ArrowUp' !== e.key && 'ArrowDown' !== e.key ) return;
+    if ( ! e.target.matches || ! e.target.matches( '.quantity input' ) || ! isStepped( e.target ) ) return;
+    e.preventDefault();
+    nudge( e.target, 'ArrowUp' === e.key ? 1 : -1 );
   } );
 
   document.addEventListener( 'blur', function ( e ) {

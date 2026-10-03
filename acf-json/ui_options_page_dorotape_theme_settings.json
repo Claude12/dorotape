@@ -18,6 +18,6 @@
     "capability": "edit_posts",
     "data_storage": "options",
     "post_id": "",
-    "autoload": false,
-    "modified": 1789587183
+    "autoload": true,
+    "modified": 1790930000
 }

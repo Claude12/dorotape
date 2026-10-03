@@ -68,7 +68,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="right-now-block__art" aria-hidden="true">
 		<?php for ( $dt_i = 1; $dt_i <= 5; $dt_i++ ) : ?>

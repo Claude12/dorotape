@@ -11,6 +11,7 @@ import { initQuickAdd } from './lib/quick-add';
 import { initQtyStep } from './lib/qty-step';
 import { initTestimonials } from './lib/testimonial';
 import { initToast } from './lib/toast';
+import { initVideo } from './lib/video';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -31,6 +32,7 @@ const features = [
   initQtyStep,
   initTestimonials,
   initToast,
+  initVideo,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

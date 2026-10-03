@@ -14,6 +14,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  // The small viewport: the height with the phone browser's toolbars showing,
+  // so a short page's footer does not start below the visible screen.
+  min-height: 100svh;
   background-color: var(--color-background);
 }
 

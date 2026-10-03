@@ -329,9 +329,17 @@ function bindWishlist() {
     });
   };
 
-  // The feedback box is rendered on demand, inside a container that is itself
-  // rendered on demand, so the whole document is watched rather than any one
-  // element of it.
+  /*
+   * A page without a wishlist button, which is most of them since
+   * functions.php only loads it on the product page, has nothing to hear and
+   * is not watched at all. The mounts are the React block's and the classic
+   * renderer's wrapper.
+   */
+  if (!document.querySelector('.yith-add-to-wishlist-button-block, .yith-wcwl-add-to-wishlist')) return;
+
+  // Where there is one, the whole document is watched: the feedback box is
+  // rendered on demand, in a popover the plugin appends to <body> rather than
+  // inside the button, so watching the button alone hears nothing.
   new MutationObserver((mutations) => {
     mutations.forEach((m) => {
       m.addedNodes.forEach((node) => {

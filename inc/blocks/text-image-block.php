@@ -46,7 +46,7 @@ $dt_secondary_is_email = $dt_has_secondary && 0 === stripos( (string) $dt_button
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="container">
 		<div class="text-image-block__grid">
@@ -98,7 +98,7 @@ $dt_secondary_is_email = $dt_has_secondary && 0 === stripos( (string) $dt_button
 						false,
 						array(
 							'class'    => 'text-image-block__image',
-							'loading'  => 'lazy',
+							'loading'  => 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy',
 							'decoding' => 'async',
 							'sizes'    => '(min-width: 1400px) 648px, (min-width: 768px) 614px, 100vw',
 						)

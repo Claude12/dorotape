@@ -71,7 +71,7 @@ $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape
 $dt_classes .= dorotape_background_shape_class( $dt_shape );
 ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 	<?php if ( $dt_divider ) : ?>
 		<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>

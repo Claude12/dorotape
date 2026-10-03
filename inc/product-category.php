@@ -484,7 +484,7 @@ function dorotape_category_ranges(): void {
 	$classes     .= $has_sections ? ' category-grid-block--divider' : '';
 	$classes .= dorotape_background_shape_class( $shape );
 	?>
-	<section id="ranges" class="<?php echo esc_attr( $classes ); ?>" animate="fade-in-up">
+	<section id="ranges" class="<?php echo esc_attr( $classes ); ?>">
 		<?php dorotape_background_shape( $shape ); ?>
 		<?php if ( $has_sections ) : ?>
 			<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>
@@ -520,7 +520,7 @@ function dorotape_category_ranges(): void {
 									array(
 										'class'    => 'category-grid-block__image',
 										'alt'      => '',
-										'loading'  => 'lazy',
+										'loading'  => $has_sections ? 'lazy' : dorotape_card_loading(),
 										'decoding' => 'async',
 										'sizes'    => '(min-width: 1024px) 25vw, 50vw',
 									)

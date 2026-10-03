@@ -124,6 +124,26 @@
 
 .woocommerce-product-gallery {
   position: relative;
+  // WooCommerce prints the gallery with an inline opacity: 0 and fades it in
+  // once flexslider has run, so the main image of the page (its largest
+  // paint) waited on the footer scripts: 6s on a slow phone. Shown straight
+  // away instead, which takes !important to beat the inline style. The rules
+  // below stand in for what the fade was hiding.
+  opacity: 1 !important;
+
+  // Until flexslider has built its viewport, only the first image shows, so
+  // the rest of the gallery does not flash up stacked underneath it. Under
+  // .js only: without scripts nothing builds the slider and every image
+  // stays visible.
+  :where(.js) &:not(:has(.flex-viewport)) .woocommerce-product-gallery__image:nth-child(n + 2) {
+    display: none;
+  }
+
+  // And the room the thumbnail row will take (80px thumbs, 16px above), so
+  // its arrival does not push the summary down on a phone.
+  :where(.js) &:not(:has(.flex-viewport)):has(.woocommerce-product-gallery__image:nth-child(2)) {
+    padding-bottom: calc(80px + var(--spacer-16));
+  }
   // The zoom plugin lays a magnified copy of the image over the original at
   // its natural size, which is wider than the column. Clipped here rather
   // than relying on the band to do it, so it can never reach the summary.
@@ -183,18 +203,23 @@
   }
 
   // Flexslider builds this list from the gallery images.
+  // One row, swiped sideways when there are more thumbs than fit. A phone
+  // fits three, and wrapping left a lone fourth on a second row, which also
+  // broke the single row of space reserved above while flexslider loads.
   .flex-control-thumbs {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--spacer-12);
     margin: var(--spacer-16) 0 0;
     padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
     list-style: none;
   }
 
   // The 2px inset is the ring: transparent at rest, cyan on the active thumb
   // and the brand ramp on hover, with the image itself inset inside it.
   .flex-control-thumbs li {
+    flex-shrink: 0;
     width: 80px;
     height: 80px;
     padding: 2px;

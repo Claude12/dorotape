@@ -1,6 +1,6 @@
 @use "abstracts/mixins" as *;
 @use "base/typography" as *;
-@use "components/buttons" as *;
+@use "abstracts/button-mixins" as *;
 
 // The wishlist (page 157, YITH's [yith_wcwl_wishlist] shortcode).
 //

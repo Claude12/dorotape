@@ -356,6 +356,21 @@ export function initCategoryFilters() {
   const resultMany = result ? result.getAttribute('data-result-many') || '' : '';
 
   /*
+   * Show more. The cards past the first batch are hidden like filtered ones,
+   * so their images never load and they stay out of the tab order until
+   * asked for. The batch counts matches, not cards: with a filter on, the
+   * first 24 are the first 24 that match. A new filter starts the count
+   * again, and the button only ever adds, so it never moves the page.
+   */
+  const more = grid.parentNode.querySelector('[data-filter-more]');
+  const moreButton = more ? more.querySelector('button') : null;
+  const moreLabel = moreButton ? moreButton.getAttribute('data-more-label') || '' : '';
+  const batch = more ? parseInt(more.getAttribute('data-filter-batch'), 10) || 24 : Infinity;
+  let limit = batch;
+  let lastKey = null;
+  let focusFrom = -1;
+
+  /*
    * Where a filtered grid is put back. The band's heading rather than the
    * grid itself, so the customer lands on "Select your colour" and the
    * result count above the cards, which is the sentence that explains why
@@ -378,10 +393,21 @@ export function initCategoryFilters() {
 
   const apply = scheduler(() => {
     const state = readState(panel);
+    const key = JSON.stringify(state);
+    const filtered = key !== lastKey;
     let shown = 0;
+    let focusTarget = null;
+
+    if (filtered) {
+      lastKey = key;
+      limit = batch;
+    }
 
     items.forEach((item) => {
-      const show = matches(item, state, null);
+      const match = matches(item, state, null);
+      const show = match && shown < limit;
+
+      if (show && shown === focusFrom) focusTarget = item.el;
 
       if (show !== item.shown) {
         item.shown = show;
@@ -392,8 +418,21 @@ export function initCategoryFilters() {
         item.el.hidden = !show;
       }
 
-      if (show) shown += 1;
+      if (match) shown += 1;
     });
+
+    if (more && moreButton) {
+      const left = Math.max(0, shown - limit);
+      more.hidden = left === 0;
+      moreButton.textContent = moreLabel.replace('{n}', String(Math.min(left, batch)));
+    }
+
+    // After Show more, carry keyboard focus on to the first card it added.
+    if (focusTarget) {
+      const link = focusTarget.querySelector('a[href]');
+      if (link) link.focus({ preventScroll: true });
+    }
+    focusFrom = -1;
 
     // What each unticked box would give, with everything else still applied.
     panel.querySelectorAll('[data-filter-facet]').forEach((input) => {
@@ -440,7 +479,7 @@ export function initCategoryFilters() {
      * has already updated. Closing the drawer is the moment they want the
      * cards, and the toggle handler below scrolls then.
      */
-    if (settled && !drawerOpen()) keepResultsInView(resultsTop);
+    if (settled && filtered && !drawerOpen()) keepResultsInView(resultsTop);
 
     settled = true;
   });
@@ -460,6 +499,14 @@ export function initCategoryFilters() {
     });
   }
 
+  if (moreButton) {
+    moreButton.addEventListener('click', () => {
+      focusFrom = limit;
+      limit += batch;
+      apply();
+    });
+  }
+
   if (toggle) {
     toggle.hidden = false;
     toggle.addEventListener('click', () => {
@@ -473,6 +520,14 @@ export function initCategoryFilters() {
        * controls cannot unfold somewhere off the top of the screen.
        */
       keepResultsInView(open ? aside : resultsTop);
+    });
+
+    // Escape closes the drawer the way it closes every other overlay on the
+    // site, through the button so the grid is brought back into view too.
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !drawerOpen()) return;
+      toggle.click();
+      toggle.focus();
     });
   }
 

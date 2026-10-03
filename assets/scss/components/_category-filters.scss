@@ -99,13 +99,19 @@
     // shop's seven facets, which unfold to some four thousand pixels of
     // checkboxes above the first product. Scrolling inside it keeps the last
     // facet, the count and the Apply button reachable at every height.
+    //
+    // dvh is the height actually visible, which on iOS moves as the toolbar
+    // comes and goes; vh is the toolbar-hidden height and put the bottom of
+    // the panel behind it. vh stays as the fallback.
     max-height: calc(100vh - 12rem);
+    max-height: calc(100dvh - 12rem);
     overflow-y: auto;
     scrollbar-color: color-mix(in oklab, var(--color-border) 90%, transparent) transparent;
     scrollbar-width: thin;
 
     @include min-breakpoint(desktop) {
       max-height: calc(100vh - 13rem);
+      max-height: calc(100dvh - 13rem);
     }
 
     // A track that is always drawn, as the design draws it. macOS hides its
@@ -333,6 +339,7 @@
     font-family: inherit;
     font-size: $font-size-sm;
     font-weight: $font-weight-bold;
+    @include touch-field-size;
 
     &:focus {
       outline: none;

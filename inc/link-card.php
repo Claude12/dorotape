@@ -94,7 +94,7 @@ function dorotape_link_card( array $args = array() ): void {
 					array(
 						'class'    => 'category-grid-block__image',
 						'alt'      => '',
-						'loading'  => 'lazy',
+						'loading'  => dorotape_card_loading(),
 						'decoding' => 'async',
 						'sizes'    => esc_attr( (string) $args['sizes'] ),
 					)

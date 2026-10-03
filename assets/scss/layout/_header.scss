@@ -340,6 +340,7 @@
   font-family: inherit;
   font-size: $font-size-sm;
   line-height: $line-height-sm;
+  @include touch-field-size;
 
   &::placeholder {
     color: var(--color-muted-foreground);
@@ -683,6 +684,7 @@
 .site-header__drawer {
   display: none;
   max-height: 70vh;
+  max-height: 70dvh; // the visible height, not the height behind the iOS toolbar
   overflow-y: auto;
   padding: var(--spacer-16) 0;
   border-bottom: 1px solid var(--color-border);

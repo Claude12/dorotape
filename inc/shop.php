@@ -686,7 +686,7 @@ add_action(
  */
 function dorotape_shop_loop_before(): void {
 	?>
-	<section id="products" class="<?php echo esc_attr( dorotape_shop_band_classes() ); ?>" animate="fade-in-up" animate-offset="0">
+	<section id="products" class="<?php echo esc_attr( dorotape_shop_band_classes() ); ?>">
 		<?php dorotape_shop_band_shape(); ?>
 		<div class="container">
 			<?php woocommerce_output_all_notices(); ?>
@@ -748,7 +748,7 @@ function dorotape_shop_empty(): void {
 		__( 'No products match those filters. Try clearing one of them, or call us on 01858 431642 and we will point you to the right material.', 'dorotape' )
 	);
 	?>
-	<section id="products" class="<?php echo esc_attr( dorotape_shop_band_classes() ); ?>" animate="fade-in-up">
+	<section id="products" class="<?php echo esc_attr( dorotape_shop_band_classes() ); ?>">
 		<?php dorotape_shop_band_shape(); ?>
 		<div class="container">
 			<?php woocommerce_output_all_notices(); ?>

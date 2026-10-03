@@ -136,7 +136,9 @@ add_filter( 'woocommerce_product_get_image', function ( string $html, WC_Product
 	if ( $product->get_image_id() ) {
 		return $html;
 	}
-	$hex = get_post_meta( $product->get_id(), 'colour_hex', true );
+	// Through sanitize_hex_color() as well as esc_attr(): this is printed into a
+	// style attribute, and an import can write anything into the meta.
+	$hex = sanitize_hex_color( (string) get_post_meta( $product->get_id(), 'colour_hex', true ) );
 	if ( ! $hex ) {
 		return $html;
 	}
@@ -157,7 +159,9 @@ add_filter( 'woocommerce_single_product_image_thumbnail_html', function ( string
 	if ( ! $product instanceof WC_Product ) {
 		return $html;
 	}
-	$hex = get_post_meta( $product->get_id(), 'colour_hex', true );
+	// Through sanitize_hex_color() as well as esc_attr(): this is printed into a
+	// style attribute, and an import can write anything into the meta.
+	$hex = sanitize_hex_color( (string) get_post_meta( $product->get_id(), 'colour_hex', true ) );
 	if ( ! $hex ) {
 		return $html;
 	}
@@ -675,6 +679,28 @@ function dorotape_strip_empty_paragraphs( string $content ): string {
 
 add_filter( 'the_content', 'dorotape_strip_empty_paragraphs', 11 );
 add_filter( 'woocommerce_short_description', 'dorotape_strip_empty_paragraphs', 11 );
+
+/**
+ * Lazy-load the imported images in product descriptions.
+ *
+ * WordPress only adds loading="lazy" to content images that carry a width and
+ * height, and the old shop's description images (manufacturer logos, the
+ * datasheet button) carry neither, so they load straight away even though the
+ * description sits well below the gallery. On a product page every
+ * description image is below the fold, so any without a loading attribute
+ * gets lazy here.
+ *
+ * @param string $filtered_image The img tag.
+ * @return string
+ */
+function dorotape_lazy_description_images( string $filtered_image ): string {
+	if ( ! is_product() || false !== stripos( $filtered_image, ' loading=' ) ) {
+		return $filtered_image;
+	}
+	return str_replace( '<img ', '<img loading="lazy" ', $filtered_image );
+}
+
+add_filter( 'wp_content_img_tag', 'dorotape_lazy_description_images' );
 
 // ─── Size options sorted narrow → wide ────────────────────────────────────────
 

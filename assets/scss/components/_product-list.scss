@@ -79,4 +79,15 @@
     font-size: $font-size-sm;
     font-weight: $font-weight-bold;
   }
+
+  // Show more, under a long category (inc/category-filters.php). The script
+  // unhides it only while there are more matching cards to show.
+  &__more {
+    margin: var(--spacer-32) 0 0;
+    text-align: center;
+
+    @include min-breakpoint(tablet) {
+      margin-top: var(--spacer-48);
+    }
+  }
 }

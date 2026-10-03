@@ -108,6 +108,21 @@ function dorotape_scripts() {
 	);
 
 	/*
+	 * The basket, checkout, wishlist and account screens' own CSS, about a
+	 * third of the theme's, which no other page uses. Built from
+	 * assets/scss/woo-pages.scss; after the main sheet so it keeps the
+	 * cascade position it had inside it.
+	 */
+	if ( function_exists( 'dorotape_woo_page' ) && '' !== dorotape_woo_page() ) {
+		wp_enqueue_style(
+			'dorotape-woo-pages',
+			get_template_directory_uri() . '/dist/css/woo-pages.css',
+			array( 'dorotape-design-system' ),
+			dorotape_asset_version( '/dist/css/woo-pages.css' )
+		);
+	}
+
+	/*
 	 * All frontend JS. Bundled by webpack from assets/js/main.js, which boots
 	 * each feature module in assets/js/lib/ independently so a throw in one
 	 * cannot stop the others from starting.
@@ -126,13 +141,93 @@ function dorotape_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'dorotape_scripts' );
 
-// Strip Gutenberg block library CSS from the frontend
+/*
+ * Marks the page as JS-capable before anything paints. The scroll reveal in
+ * utilities/_animations.scss only hides an [animate] section under `.js`, so
+ * without JS (or while main.js has failed) the content is simply visible
+ * instead of stuck at opacity 0.
+ */
+function dorotape_js_class() {
+	echo "<script>document.documentElement.classList.add('js')</script>\n";
+}
+add_action( 'wp_head', 'dorotape_js_class', 0 );
+
+/*
+ * The one font file, fetched alongside the stylesheet rather than after it
+ * has been parsed, so text paints in Nunito sooner and swaps less. The URL
+ * must match the @font-face src in base/_fonts.scss exactly (no version
+ * query), or the browser downloads it twice.
+ */
+function dorotape_preload_font() {
+	printf(
+		"<link rel=\"preload\" href=\"%s\" as=\"font\" type=\"font/woff2\" crossorigin>\n",
+		esc_url( get_template_directory_uri() . '/fonts/nunito-variable.woff2' )
+	);
+}
+add_action( 'wp_head', 'dorotape_preload_font', 1 );
+
+/*
+ * Strip Gutenberg's CSS from the frontend. classic-theme-styles is the
+ * default button and file block styling, which the theme replaces.
+ *
+ * global-styles is the preset sheet (about 9KB inline). Classic-editor pages
+ * never read it, so it goes there. A page built from blocks keeps it: the
+ * WooCommerce Cart and Checkout blocks size their text from its font-size
+ * presets, and without them the basket's product names grow a step. WordPress
+ * can enqueue it again from the footer, hence that hook goes too.
+ */
 function dorotape_remove_block_styles() {
 	wp_dequeue_style( 'wp-block-library' );
 	wp_dequeue_style( 'wp-block-library-theme' );
 	wp_dequeue_style( 'wc-blocks-style' );
+	wp_dequeue_style( 'classic-theme-styles' );
+
+	if ( ! ( is_singular() && has_blocks( get_queried_object_id() ) ) ) {
+		wp_dequeue_style( 'global-styles' );
+		remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'dorotape_remove_block_styles', 100 );
+
+/*
+ * YITH Wishlist enqueues its React add-to-wishlist button on every page,
+ * which pulls in react, react-dom, lodash, moment and a dozen wp-* packages
+ * (about 300KB of JS) and fires a REST call that 401s for guests. This site
+ * only shows that button on the single product page, so everywhere else it
+ * goes. The wishlist page itself runs on YITH's separate jQuery script and
+ * keeps it. Filter `dorotape_load_wishlist_button` to true on any other page
+ * that starts showing the button.
+ */
+function dorotape_trim_wishlist_assets() {
+	if ( apply_filters( 'dorotape_load_wishlist_button', function_exists( 'is_product' ) && is_product() ) ) {
+		return;
+	}
+	wp_dequeue_script( 'yith-wcwl-add-to-wishlist' );
+	wp_dequeue_style( 'yith-wcwl-add-to-wishlist' );
+}
+add_action( 'wp_enqueue_scripts', 'dorotape_trim_wishlist_assets', 100 );
+
+/*
+ * On the product page that button asks YITH for the visitor's lists, and YITH
+ * answers a guest who has never added anything with a 401, which shows as a
+ * console error on every product view. Such a guest has no lists, so answer
+ * that one case with the empty list YITH itself would return. Signed-in users
+ * and guests with a wishlist session still go to YITH as before.
+ */
+function dorotape_wishlist_guest_lists( $result, $server, $request ) {
+	if (
+		null !== $result
+		|| 'GET' !== $request->get_method()
+		|| ! preg_match( '#^/yith/wishlist/v1/lists/?$#', $request->get_route() )
+		|| is_user_logged_in()
+		|| ! function_exists( 'YITH_WCWL_Session' )
+		|| YITH_WCWL_Session()->maybe_get_session_id()
+	) {
+		return $result;
+	}
+	return rest_ensure_response( array( 'lists' => array() ) );
+}
+add_filter( 'rest_pre_dispatch', 'dorotape_wishlist_guest_lists', 10, 3 );
 
 // Disable WooCommerce default stylesheet — custom CSS only
 add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
@@ -154,6 +249,7 @@ require get_template_directory() . '/inc/acf.php';
 require get_template_directory() . '/inc/product-sections.php';
 require get_template_directory() . '/inc/category-sections.php';
 require get_template_directory() . '/inc/cleanup.php';
+require get_template_directory() . '/inc/webp.php';
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/setup.php';
 require get_template_directory() . '/inc/header.php';

@@ -51,7 +51,7 @@ $dt_classes = 'cta-cards-block' . dorotape_background_shape_class( $dt_shape );
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 	<div class="container">
 		<ul class="cta-cards-block__grid">
@@ -70,7 +70,7 @@ $dt_classes = 'cta-cards-block' . dorotape_background_shape_class( $dt_shape );
 									array(
 										'class'    => 'cta-cards-block__image',
 										'alt'      => '',
-										'loading'  => 'lazy',
+										'loading'  => 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy',
 										'decoding' => 'async',
 										'sizes'    => '(min-width: 1400px) 434px, (min-width: 768px) 31vw, 100vw',
 									)

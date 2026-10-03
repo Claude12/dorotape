@@ -73,6 +73,23 @@ if ( ! function_exists( 'dorotape_render_flexible_content' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'dorotape_animate_attr' ) ) :
+	/**
+	 * Prints the scroll-reveal attribute for a block section.
+	 *
+	 * The first two blocks on a page are on screen at load, and an [animate]
+	 * section stays invisible until main.js runs in the footer, which on a
+	 * slow phone holds back the first paint of the content people came for.
+	 * Those two render without it; everything below the fold still fades in.
+	 */
+	function dorotape_animate_attr(): void {
+		if ( (int) get_query_var( 'block_index', 2 ) < 2 ) {
+			return;
+		}
+		echo ' animate="fade-in-up"';
+	}
+endif;
+
 if ( ! function_exists( 'dorotape_has_flexible_content' ) ) :
 	/**
 	 * True when the given post has at least one flexible-content block.
@@ -108,6 +125,32 @@ endif;
 function dorotape_setting( string $name ) {
 	return function_exists( 'get_field' ) ? get_field( $name, 'option' ) : null;
 }
+
+/**
+ * Autoload the Theme Settings values.
+ *
+ * The header and footer read about 40 Theme Settings fields on every page,
+ * and with autoload off each one was its own query. The options page now has
+ * autoload on (acf-json), but ACF only applies that when a value is saved,
+ * and WordPress leaves an unchanged value's autoload flag alone, so the rows
+ * already there are switched over once here. About 2KB in all.
+ */
+function dorotape_autoload_theme_settings(): void {
+	if ( get_option( 'dorotape_settings_autoloaded' ) ) {
+		return;
+	}
+
+	global $wpdb;
+	$names = $wpdb->get_col(
+		"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'options\\_%' OR option_name LIKE '\\_options\\_%'"
+	);
+
+	if ( $names ) {
+		wp_set_option_autoload_values( array_fill_keys( $names, true ) );
+	}
+	update_option( 'dorotape_settings_autoloaded', '1', true );
+}
+add_action( 'init', 'dorotape_autoload_theme_settings' );
 
 /**
  * A link field from Theme Settings, normalised.

@@ -98,6 +98,7 @@ function dorotape_ui_icon_paths(): array {
 		'x'            => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
 		'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
 		'info'         => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+		'play'         => '<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>',
 	);
 }
 

@@ -109,7 +109,7 @@ if ( '' !== $dt_ratio && 'auto' !== $dt_ratio ) {
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>" animate="fade-in-up">
+<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 
 	<?php if ( $dt_has_header ) : ?>

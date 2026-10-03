@@ -204,6 +204,19 @@ function initDropdowns(header) {
     return;
   }
 
+  /*
+   * Tell assistive tech whether each panel is open. Hover is left out: it is
+   * a pointer affordance and a screen reader never produces it, so the state
+   * follows the keyboard classes alone.
+   */
+  function sync(item) {
+    const link = item.querySelector(':scope > .site-header__nav-link');
+    if (link) {
+      const open = item.classList.contains(STATE_OPEN) || item.classList.contains(STATE_FOCUSED);
+      link.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+  }
+
   parents.forEach(function (item) {
     // Pointer open/close is CSS (:hover). This only adds the keyboard path,
     // plus the .is-focused class that keeps a panel open while tabbing
@@ -214,9 +227,12 @@ function initDropdowns(header) {
       return;
     }
 
+    link.setAttribute('aria-expanded', 'false');
+
     link.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
-        item.classList.remove(STATE_OPEN);
+        item.classList.remove(STATE_OPEN, STATE_FOCUSED);
+        sync(item);
         link.focus();
         return;
       }
@@ -240,6 +256,7 @@ function initDropdowns(header) {
 
       e.preventDefault();
       item.classList.toggle(STATE_OPEN);
+      sync(item);
     });
   });
 
@@ -249,6 +266,7 @@ function initDropdowns(header) {
     function (e) {
       parents.forEach(function (item) {
         item.classList.toggle(STATE_FOCUSED, item.contains(e.target));
+        sync(item);
       });
     },
     true
@@ -258,6 +276,7 @@ function initDropdowns(header) {
     if (!nav.contains(e.relatedTarget)) {
       parents.forEach(function (item) {
         item.classList.remove(STATE_FOCUSED, STATE_OPEN);
+        sync(item);
       });
     }
   });
@@ -266,6 +285,7 @@ function initDropdowns(header) {
     if (!nav.contains(e.target)) {
       parents.forEach(function (item) {
         item.classList.remove(STATE_OPEN);
+        sync(item);
       });
     }
   });

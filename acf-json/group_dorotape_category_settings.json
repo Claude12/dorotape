@@ -190,6 +190,50 @@
             "append": ""
         },
         {
+            "key": "field_dtcatset0009",
+            "label": "Products per batch",
+            "name": "category_products_page",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "How many products a long category shows before the Show more button. The filters still search the whole category. A multiple of 12 fills every row at all screen sizes.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 24,
+            "min": 6,
+            "max": 120,
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "step": 1,
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtcatset0010",
+            "label": "Show more button",
+            "name": "category_products_more",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Label on the button under a long category. {n} becomes how many more it will show.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Show {n} more",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtcatset0008",
             "label": "Empty category message",
             "name": "category_products_none",
@@ -209,5 +253,5 @@
             "new_lines": ""
         }
     ],
-    "modified": 1790198428
+    "modified": 1790930100
 }

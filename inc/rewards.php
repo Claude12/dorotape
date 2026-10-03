@@ -663,3 +663,118 @@ function dorotape_rewards_handle_refund( $order_id ): void {
  * this runs first whichever status the order came from.
  */
 add_action( 'woocommerce_order_status_refunded', 'dorotape_rewards_handle_refund', 5 );
+
+/*
+ * ---------------------------------------------------------------------------
+ * The rewards panel, loaded after the page instead of inside it.
+ *
+ * RewardsWP prints its whole panel into wp_footer on every page, twice over
+ * (a mobile and a desktop copy inside Alpine x-if templates), which is about
+ * 500KB of HTML and 300 <template> elements the browser has to parse before
+ * the page finishes, for a launcher most visitors never open. It also carries
+ * the member's details, so a page cache cannot keep the page.
+ *
+ * Here the plugin's footer output is swapped for an empty slot, and once the
+ * page has loaded the same output is fetched from ?dt-rewards-panel=1 and put
+ * in the slot. The panel's custom element clones its template when it is
+ * connected and starts Alpine on its own shadow root, so arriving late is
+ * something it already handles. Nothing of the plugin is copied: the endpoint
+ * calls the plugin's own render method, so plugin updates carry through. If
+ * the plugin renames that method the lookup finds nothing and the plugin's
+ * footer output is left exactly as it was.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * The RewardsWP callback that prints the panel on wp_footer, if it is hooked.
+ *
+ * The plugin only hooks it on template_redirect, and only when its own
+ * visibility filter says the widget shows on this page, so finding it is also
+ * the answer to "does this page have the panel".
+ *
+ * @return array{0:object,1:string}|null
+ */
+function dorotape_rewards_panel_callback(): ?array {
+	global $wp_filter;
+
+	if ( empty( $wp_filter['wp_footer'] ) ) {
+		return null;
+	}
+
+	foreach ( $wp_filter['wp_footer']->callbacks as $callbacks ) {
+		foreach ( $callbacks as $callback ) {
+			$fn = $callback['function'];
+			if ( is_array( $fn ) && is_object( $fn[0] ) && 'render_template' === $fn[1]
+				&& str_ends_with( get_class( $fn[0] ), '\\AdvocateController' ) ) {
+				return $fn;
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Serve the panel on its own, or swap it out of the page for the loader.
+ *
+ * Priority 20 runs after RewardsWP's own template_redirect hook (10) has
+ * decided whether to add the panel.
+ */
+function dorotape_rewards_defer_panel(): void {
+	$callback = dorotape_rewards_panel_callback();
+
+	if ( ! $callback ) {
+		return;
+	}
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only fragment.
+	if ( isset( $_GET['dt-rewards-panel'] ) ) {
+		// Per-member content: never let a page cache keep it.
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		nocache_headers();
+		header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
+		header( 'X-Robots-Tag: noindex, nofollow' );
+		call_user_func( $callback );
+		exit;
+	}
+
+	$priority = has_action( 'wp_footer', $callback );
+	remove_action( 'wp_footer', $callback, $priority );
+	add_action( 'wp_footer', 'dorotape_rewards_panel_loader', $priority );
+}
+add_action( 'template_redirect', 'dorotape_rewards_defer_panel', 20 );
+
+/**
+ * The empty slot and the script that fills it once the page is idle.
+ */
+function dorotape_rewards_panel_loader(): void {
+	$url = add_query_arg( 'dt-rewards-panel', '1', home_url( '/' ) );
+	?>
+	<div id="dt-rewards-slot" hidden></div>
+	<script>
+	(function () {
+		var url = <?php echo wp_json_encode( esc_url_raw( $url ) ); ?>;
+		function fill() {
+			fetch(url, { credentials: 'same-origin' })
+				.then(function (r) { return r.ok ? r.text() : ''; })
+				.then(function (html) {
+					var slot = document.getElementById('dt-rewards-slot');
+					if (!html || !slot) return;
+					var t = document.createElement('template');
+					t.innerHTML = html;
+					slot.replaceWith(t.content);
+				})
+				.catch(function () {});
+		}
+		function idle() {
+			if ('requestIdleCallback' in window) requestIdleCallback(fill, { timeout: 3000 });
+			else setTimeout(fill, 300);
+		}
+		if (document.readyState === 'complete') idle();
+		else window.addEventListener('load', idle);
+	})();
+	</script>
+	<?php
+}

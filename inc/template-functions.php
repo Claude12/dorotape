@@ -64,3 +64,51 @@ function dorotape_menu_submenu_class( $classes, $args, $depth = 0 ) {
 	return $classes;
 }
 add_filter( 'nav_menu_submenu_css_class', 'dorotape_menu_submenu_class', 10, 3 );
+
+/**
+ * A video's embed markup and poster, from oEmbed, cached.
+ *
+ * wp_oembed_get() asks the provider over HTTP on every call and caches
+ * nothing outside post content, so the Video block was calling YouTube on
+ * every page view. This keeps the answer for a week (an hour when the
+ * provider fails, so a bad URL is not retried on every view either).
+ *
+ * The poster lets the block show a still and load the player only when it is
+ * played: the YouTube player is about 1MB of script. For YouTube the full-size
+ * still is used when the video has one, since oEmbed only offers 480px.
+ *
+ * @param string $url Video page URL, as pasted by the editor.
+ * @return array{html:string,title:string,thumb:string} html is '' when the URL cannot be embedded.
+ */
+function dorotape_video_embed( string $url ): array {
+	$key    = 'dt_video_' . md5( $url );
+	$cached = get_transient( $key );
+
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$oembed = _wp_oembed_get_object();
+	$args   = array( 'width' => 1200 );
+	$data   = $oembed->get_data( $url, $args );
+	$html   = $data ? (string) $oembed->data2html( $data, $url ) : '';
+	$html   = (string) apply_filters( 'oembed_result', $html, $url, $args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook, as wp_oembed_get() applies it.
+	$thumb  = $data && ! empty( $data->thumbnail_url ) ? (string) $data->thumbnail_url : '';
+
+	if ( preg_match( '#^https://i\.ytimg\.com/vi/([\w-]+)/#', $thumb, $m ) ) {
+		$full = 'https://i.ytimg.com/vi/' . $m[1] . '/maxresdefault.jpg';
+		if ( 200 === wp_remote_retrieve_response_code( wp_remote_head( $full ) ) ) {
+			$thumb = $full;
+		}
+	}
+
+	$video = array(
+		'html'  => $html,
+		'title' => $data && ! empty( $data->title ) ? (string) $data->title : '',
+		'thumb' => $thumb,
+	);
+
+	set_transient( $key, $video, '' !== $html ? WEEK_IN_SECONDS : HOUR_IN_SECONDS );
+
+	return $video;
+}

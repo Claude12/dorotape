@@ -1,0 +1,24 @@
+// The basket, the checkout, the wishlist and the account screens.
+//
+// A second stylesheet beside style.scss, enqueued by functions.php only when
+// dorotape_woo_page() names one of these pages. It is about a third of the
+// theme's CSS and no other page draws any of it: every rule here is scoped
+// to .woo-page, the band inc/woo-pages.php and inc/account-pages.php put
+// round them.
+//
+// The plugins own the markup on all four, so these retokenise someone else's
+// stylesheet rather than draw a layout: _page.scss holds the heading and
+// breadcrumb all of them open on, _blocks.scss what the two WooCommerce block
+// pages share, and the rest only what one page draws.
+//
+// Partials here may only @use modules that print nothing (abstracts/, and
+// base/typography for its variables). The button and field mixins are in
+// abstracts/ for that reason: @use-ing components/buttons or base/forms
+// would print the site-wide button and form CSS a second time.
+
+@use "components/woo/page";
+@use "components/woo/account";
+@use "components/woo/blocks";
+@use "components/woo/cart";
+@use "components/woo/checkout";
+@use "components/woo/wishlist";

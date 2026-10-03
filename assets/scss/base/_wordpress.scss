@@ -55,9 +55,10 @@ pre {
   font-size: $font-size-sm;
 }
 
-// The skip link moves focus to #primary. Outlining the whole content column
-// on arrival is noise, not a focus indicator.
-#primary[tabindex="-1"]:focus {
+// In-page links (the skip link included) move focus to their target, giving
+// it tabindex="-1" when it is not focusable. Outlining a whole section on
+// arrival is noise, not a focus indicator.
+[tabindex="-1"]:focus {
   outline: 0;
 }
 

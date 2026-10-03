@@ -131,15 +131,6 @@ $letter-spacing-widest: 0.2em; // the hero eyebrow chip, tracking-[0.2em]
 $letter-spacing-ultra: 0.25em; // the trust bar label, tracking-[0.25em]
 $letter-spacing-tight: -0.02em; // headings, the design sets this on h1-h3
 
-body {
-  font-family: $font-body;
-  font-size: $font-size-base;
-  line-height: $line-height-base;
-  color: var(--color-foreground);
-  background-color: var(--color-background);
-  -webkit-font-smoothing: antialiased;
-}
-
 // The design gives every heading the same heavy, tightened treatment. Sizes
 // stay with the component; this is the shared character only.
 //
@@ -151,13 +142,4 @@ body {
   font-weight: $font-weight-extrabold;
   letter-spacing: $letter-spacing-tight;
   line-height: $line-height-tight;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @include heading-character;
 }

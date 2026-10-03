@@ -15,6 +15,16 @@ yarn-error.log*
 # result alongside the SCSS/JS change that produced it.
 *.min.js
 *.min.css
+# Source maps. gulp build no longer writes them (only gulp watch does, for
+# local debugging), and a committed one would be served from the live site.
+*.map
+
+# Media
+# Raw video and design exports belong in the media library or the design
+# files, not the theme: anything committed here is served from the webroot.
+*.mov
+*.MOV
+*.mp4
 
 # Environment and secrets
 # Deploying is a git pull inside public_html, so anything committed here is a

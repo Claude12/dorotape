@@ -82,4 +82,44 @@
       border: 0;
     }
   }
+
+  // The still shown until the video is played (inc/blocks/video-block.php).
+  &__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &:hover .video-block__play-icon,
+    &:focus-visible .video-block__play-icon {
+      transform: scale(1.08);
+    }
+  }
+
+  &__play-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-image: var(--gradient-aurora);
+    color: var(--color-white);
+    transition: transform var(--transition-fast);
+
+    svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 4px; // the triangle's visual centre sits right of its box
+      fill: currentColor;
+    }
+  }
 }

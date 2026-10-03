@@ -64,7 +64,7 @@ $dt_button = dorotape_search_field( 'search_button', __( 'Read more', 'dorotape'
 		 * a change of subject.
 		 */
 		?>
-		<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>" animate="fade-in-up" animate-offset="0">
+		<section class="<?php echo esc_attr( dorotape_search_band_classes() ); ?>">
 			<?php dorotape_search_band_shape(); ?>
 
 			<div class="container">

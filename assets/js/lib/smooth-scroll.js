@@ -28,31 +28,51 @@ export function headerOffset() {
 function smoothScroll() {
   const scrollToTop = document.getElementById('scroll-to-top');
 
-  // Anchor links: native smooth scroll with header offset.
-  // Exclude [data-goto] links: header.js owns those with its own scroll + menu-close logic.
-  document.querySelectorAll('a[href^="#"]:not([data-goto])').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const hash = link.getAttribute('href');
+  // In-page links: smooth scroll with the header offset, then focus.
+  //
+  // Delegated, so links added after load are covered too. Links other code
+  // already answers are left alone: [data-goto] (header.js scrolls and closes
+  // the menu), WooCommerce's product tabs and its reviews link (both switch a
+  // tab before scrolling, and a second scroll here fought them), and anything
+  // acting as a tab or a toggle.
+  const owned = '[data-goto], .wc-tabs a, .woocommerce-review-link, [role="tab"], [aria-controls]';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-      // Always prevent default for hash links so the browser doesn't
-      // perform its own instant jump (including the bare "#" snap-to-top).
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!link || e.defaultPrevented || link.matches(owned)) return;
+
+    const hash = link.getAttribute('href');
+
+    // A bare "#" is a script-driven button, never a destination: stop the
+    // browser snapping to the top.
+    if (hash === '#') {
       e.preventDefault();
+      return;
+    }
 
-      if (hash === '#') return;
+    // querySelector throws SyntaxError for CSS-invalid IDs (spaces, colons,
+    // leading digits), so guard against one bad link crashing all others.
+    let target;
+    try {
+      target = document.querySelector(hash);
+    } catch {
+      return;
+    }
+    if (!target) return;
 
-      // querySelector throws SyntaxError for CSS-invalid IDs (spaces, colons,
-      // leading digits), so guard against one bad link crashing all others.
-      let target;
-      try {
-        target = document.querySelector(hash);
-      } catch {
-        return;
-      }
-      if (!target) return;
+    e.preventDefault();
 
-      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset();
-      window.scrollTo({ top, behavior: 'smooth' });
-    });
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset();
+    window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+
+    // Move focus with the view. Without it keyboard and screen reader users
+    // stay on the link: the skip link scrolled to the content and the next
+    // Tab carried on through the header. preventScroll keeps the smooth scroll.
+    if (!target.matches('a[href], button, input, select, textarea, [tabindex]')) {
+      target.setAttribute('tabindex', '-1');
+    }
+    target.focus({ preventScroll: true });
   });
 
   if (!scrollToTop) return;

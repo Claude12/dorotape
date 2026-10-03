@@ -1,0 +1,24 @@
+@use "base/typography" as *;
+
+// The body and heading rules the type scale in base/_typography.scss sets up.
+//
+// Apart from that file so it prints no CSS: the commerce stylesheet
+// (woo-pages.scss) uses its variables and would otherwise print these again.
+
+body {
+  font-family: $font-body;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include heading-character;
+}

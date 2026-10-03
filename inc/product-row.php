@@ -125,6 +125,17 @@ function dorotape_product_row_products( string $source, int $count, array $ids )
 
 	$shown = array_merge( $shown, array_map( 'intval', $query->posts ) );
 
+	// The query returns ids only, so each wc_get_product() below would load
+	// its post, meta and terms one product at a time, and each card's image
+	// the same again. Load them for the whole row in a handful of queries.
+	if ( $query->posts ) {
+		_prime_post_caches( $query->posts, true, true );
+		$thumbs = array_filter( array_map( 'get_post_thumbnail_id', $query->posts ) );
+		if ( $thumbs ) {
+			_prime_post_caches( $thumbs, false, true );
+		}
+	}
+
 	return array_values( array_filter( array_map( 'wc_get_product', $query->posts ) ) );
 }
 
