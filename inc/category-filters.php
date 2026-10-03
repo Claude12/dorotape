@@ -763,7 +763,7 @@ function dorotape_category_shop(): void {
 						 * on the page.
 						 */
 						?>
-						<button type="button" class="category-shop__toggle btn btn--sm btn--outline" data-filter-toggle aria-expanded="false" aria-controls="dt-filter-panel" hidden>
+						<button type="button" class="category-shop__toggle btn btn--outline" data-filter-toggle aria-expanded="false" aria-controls="dt-filter-panel" hidden>
 							<?php esc_html_e( 'Filters', 'dorotape' ); ?>
 							<span class="category-shop__toggle-count" data-filter-active hidden></span>
 						</button>

@@ -543,7 +543,7 @@ function dorotape_shop_columns_start(): void {
 			 * panel is already on the page and already open.
 			 */
 			?>
-			<button type="button" class="category-shop__toggle btn btn--sm btn--outline" data-shop-filter-toggle aria-expanded="true" aria-controls="dt-shop-filters" hidden>
+			<button type="button" class="category-shop__toggle btn btn--outline" data-shop-filter-toggle aria-expanded="true" aria-controls="dt-shop-filters" hidden>
 				<?php esc_html_e( 'Filters', 'dorotape' ); ?>
 				<span class="category-shop__toggle-count" data-shop-filter-active <?php echo $active ? '' : 'hidden'; ?>><?php echo esc_html( (string) $active ); ?></span>
 			</button>

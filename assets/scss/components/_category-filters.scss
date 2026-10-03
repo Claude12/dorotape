@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "abstracts/mixins" as *;
 @use "abstracts/variables" as *;
 @use "base/typography" as *;
@@ -34,8 +35,16 @@
 
   // The drawer handle. The panel is already in the page and already usable at
   // desktop, so this exists only while the two do not fit side by side.
+  //
+  // Full width on a phone, the width of the sort bar above it, at the standard
+  // button size: the small size was a 30px target with 12px text.
   &__toggle {
-    justify-self: start;
+    width: 100%;
+
+    @include min-breakpoint(tablet) {
+      justify-self: start;
+      width: auto;
+    }
 
     @include min-breakpoint(desktop) {
       display: none;
@@ -79,12 +88,34 @@
   }
 
   // Closed on a phone until the Filters button opens it. Desktop never reads
-  // this rule, so the panel there is simply always open.
-  &:not(.is-open) &__panel {
-    display: none;
+  // these rules, so the panel there is simply always open.
+  //
+  // Closed, the drawer still shows what is filtered, under the button, so the
+  // chips stay in view and each can be taken off without opening it. They are
+  // the panel's first child (the shop renders them, the leaf script fills
+  // them), so the panel loses its box and everything after them instead of
+  // the chips moving out of the form the script is wired to.
+  @media (width < #{map.get($breakpoints, desktop)}) {
+    &:not(.is-open) &__panel {
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      background-color: transparent;
 
-    @include min-breakpoint(desktop) {
-      display: block;
+      > :not(.category-filters__active) {
+        display: none;
+      }
+    }
+
+    &:not(.is-open) &__active {
+      margin: 0;
+    }
+
+    // Nothing filtered leaves nothing to show, and an empty grid row would
+    // still take its gap and double the space above the products.
+    &:not(.is-open):not(:has(.category-filters__active:not([hidden]))) {
+      display: none;
     }
   }
 
