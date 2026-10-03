@@ -194,9 +194,32 @@
     color: var(--color-muted-foreground);
   }
 
-  // The products grid the block offers underneath is the site's own card
-  // row, styled in components/_product-card.scss.
-  h2 {
-    margin-top: var(--spacer-48);
+  // The page content's dotted separator between the two. The section
+  // spacing below already separates them, as it does between blocks.
+  .wp-block-separator {
+    display: none;
+  }
+
+  // "New in store" over the products grid, which is the site's own card
+  // grid (inc/woo-pages.php). Set as a Product Row block's heading, so the
+  // empty basket reads like every other section on the site: the block
+  // heading size, left-aligned, the same gap above the cards, and a block's
+  // spacing between it and the empty-state message.
+  h2:not(.wc-block-cart__empty-cart__title) {
+    margin: var(--spacer-80) 0 var(--spacer-40);
+    color: var(--color-foreground);
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+    text-align: left;
+
+    @include min-breakpoint(tablet) {
+      margin-top: var(--spacer-96);
+    }
+  }
+
+  // The cards would otherwise inherit the empty state's centring; everywhere
+  // else they are set left.
+  .product-list {
+    text-align: left;
   }
 }
