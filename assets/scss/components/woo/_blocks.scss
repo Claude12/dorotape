@@ -551,7 +551,7 @@
 // selector heavier than anything sane to write here, and a height above that
 // floor is honoured whatever the weight.
 .woo-page .wc-block-components-totals-coupon__form .wc-block-components-totals-coupon__button {
-  @include button-size-sm;
+  @include button-size-md;
 
   height: 46px;
   flex: 0 0 auto;

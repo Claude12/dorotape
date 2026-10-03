@@ -534,7 +534,7 @@ function dorotape_category_ranges(): void {
 								<h3 class="category-grid-block__title"><?php echo esc_html( $child->name ); ?></h3>
 
 								<?php if ( '' !== $button ) : ?>
-									<span class="btn btn--sm btn--outline category-grid-block__button"><?php echo esc_html( $button ); ?><?php echo dorotape_arrow_icon(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?></span>
+									<span class="btn btn--outline category-grid-block__button"><?php echo esc_html( $button ); ?><?php echo dorotape_arrow_icon(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup. ?></span>
 								<?php endif; ?>
 							</div>
 						</a>

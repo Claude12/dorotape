@@ -234,8 +234,6 @@
 .woo-page--account .woocommerce-info .button,
 .woo-page--account .woocommerce-message .button,
 .woo-page--account .woocommerce-error .button {
-  @include button-size-sm;
-
   order: 1;
 }
 
@@ -434,10 +432,10 @@
 
 // Viewing the order is what the row is for, so it takes the fill. Ordering
 // it again is the second thing anyone does and takes the outline. Both are
-// secondary to the page, so both are the small button.
+// secondary to the page, but both are the site's standard button size.
 .woo-page--account .woocommerce-orders-table .button,
 .woo-page--account .order-again .button {
-  @include button-size-sm;
+  @include button-size-md;
 }
 
 .woo-page--account a.button.order-again,
@@ -692,7 +690,7 @@
 
 .woo-page .woocommerce-Address-title .edit {
   @include button-base;
-  @include button-size-sm;
+  @include button-size-md;
   @include button-outline;
 }
 
@@ -777,14 +775,14 @@
 // Three filled buttons on one card is three things to do first. Editing is
 // what someone opened the card for, so it keeps the outline the Addresses page
 // gives its own Edit, and the other two step back to the ghost. All three are
-// the small size, like every other button inside an account panel.
+// the standard size, like every other button on the site.
 //
 // Scoped to the page rather than named on their own because the shared button
 // list in components/_buttons.scss reaches these through `.woocommerce
 // a.button` and `.woocommerce button.button`, which carry an element name and
 // so outweigh two classes. Three classes answers them.
 .woo-page--account .dorotape-address-book .button {
-  @include button-size-sm;
+  @include button-size-md;
 }
 
 .woo-page--account .dorotape-address-book__actions > .button {

@@ -242,7 +242,7 @@ function dorotape_shop_toolbar(): void {
 			</select>
 		</label>
 
-		<button type="submit" class="dt-filter-bar__submit btn btn--sm btn--outline"><?php esc_html_e( 'Apply', 'dorotape' ); ?></button>
+		<button type="submit" class="dt-filter-bar__submit btn btn--outline"><?php esc_html_e( 'Apply', 'dorotape' ); ?></button>
 
 		<?php if ( dorotape_shop_is_filtered() ) : ?>
 			<a class="dt-filter-bar__clear" href="<?php echo esc_url( dorotape_shop_clear_url() ); ?>">
@@ -485,7 +485,7 @@ function dorotape_shop_panel(): void {
 				 */
 				?>
 				<?php if ( $facets ) : ?>
-					<button type="submit" class="category-filters__apply btn btn--sm">
+					<button type="submit" class="category-filters__apply btn">
 						<?php esc_html_e( 'Apply filters', 'dorotape' ); ?>
 					</button>
 				<?php endif; ?>

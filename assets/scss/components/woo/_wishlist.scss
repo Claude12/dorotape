@@ -187,7 +187,7 @@
 // label paints outside its own fill.
 .woo-page .wishlist_table td.product-add-to-cart .add_to_cart_button {
   @include button-base;
-  @include button-size-sm;
+  @include button-size-md;
   @include button-primary;
 
   display: inline-flex !important;

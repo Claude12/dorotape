@@ -214,11 +214,23 @@
     }
   }
 
-  // `.btn .btn--sm .btn--outline` from components/_buttons.scss. The design
+  // `.btn .btn--outline` from components/_buttons.scss. The design
   // fills it from the card's hover rather than its own, so the block re-fires
   // the outline type's hover from the card.
+  //
+  // The standard size. On a phone the cards are two to a row and too narrow
+  // for its side padding, so it spans the card, as a product card's Add to
+  // cart does, and gives up some padding rather than wrap the label.
   &__button {
     margin-top: var(--spacer-12);
+    width: 100%;
+    padding-inline: var(--spacer-12);
+    white-space: nowrap;
+
+    @include min-breakpoint(tablet) {
+      width: auto;
+      padding-inline: var(--spacer-24);
+    }
   }
 
   &__card:hover &__button,
