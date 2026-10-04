@@ -209,6 +209,21 @@ li.product:not(:has(> .product-card)) {
     border-radius: var(--radius-sm);
     color: var(--color-foreground);
     text-decoration: none;
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      color var(--transition-fast);
+
+    // The outline button's hover colour, but as a tint rather than a fill:
+    // the current page is already filled magenta, and a filled hover would
+    // make two pages look current at once. Links only, so the current page
+    // and the dots stay still.
+    &:is(a):hover,
+    &:is(a):focus-visible {
+      border-color: var(--color-primary);
+      background-color: color-mix(in oklab, var(--color-primary) 15%, transparent);
+      color: var(--color-primary);
+    }
 
     &.current {
       border-color: var(--color-magenta);

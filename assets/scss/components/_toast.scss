@@ -56,13 +56,18 @@
   align-items: start;
   width: 100%;
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in oklab, var(--color-foreground) 20%, transparent);
   border-radius: var(--radius-2xl);
 
   // Opaque behind the blur: a toast lands over product photography as often
   // as over the page background, and a translucent panel over a photograph
   // is not readable.
-  background-color: color-mix(in oklab, var(--color-surface) 92%, var(--color-background));
+  //
+  // A step lighter than the cards, with a lighter edge and a shadow, so it
+  // lifts off a page that is mostly cards on navy instead of reading as one
+  // more card among them.
+  background-color: color-mix(in oklab, var(--color-surface-2) 94%, var(--color-background));
+  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--color-navy) 80%, transparent);
   backdrop-filter: blur(12px);
   padding: var(--spacer-14) var(--spacer-16);
   color: var(--color-foreground);
@@ -130,7 +135,10 @@
 
 .toast__text {
   margin: 0;
-  color: var(--color-muted-foreground);
+
+  // White like the title, not muted: the line under the title is the product
+  // name, which is the part someone glances down to check.
+  color: var(--color-foreground);
   font-size: $font-size-sm;
   line-height: $line-height-sm;
 
@@ -235,6 +243,14 @@
 // lib/toast.js, so if that bundle never loads the box is still shown and the
 // person still gets an answer.
 .has-toast-host .yith-wcwl-add-to-wishlist__feedback {
+  display: none;
+}
+
+// The same for WooCommerce's "View cart", which it appends after a card's
+// Add to cart once an ajax add has gone through. The toast carries "View
+// basket" already, and the plugin's link lands as a bare underlined line
+// under the button that the card was never laid out for.
+.has-toast-host a.added_to_cart {
   display: none;
 }
 
