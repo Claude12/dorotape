@@ -112,3 +112,58 @@ function dorotape_video_embed( string $url ): array {
 
 	return $video;
 }
+
+/**
+ * The framed 16:9 player for a video URL, as the Video block draws it.
+ *
+ * Shared by the Video block and the Accordion block's panels. Until it is
+ * played the frame shows the provider's still with a play button, which is a
+ * link to the video, so it still works with scripts off; assets/js/lib/video.js
+ * swaps in the player from the <template>.
+ *
+ * @param string $url Video page URL, as pasted by the editor.
+ * @return string Frame markup, or '' when the URL cannot be embedded.
+ */
+function dorotape_video_frame( string $url ): string {
+	$video = dorotape_video_embed( $url );
+	$embed = $video['html'];
+
+	if ( '' === $embed ) {
+		return '';
+	}
+
+	// Provider markup does not go through wp_filter_content_tags(), so the
+	// iframe arrives with no loading attribute. A video embed pulls in a lot of
+	// third-party script, so it is deferred, as loading="lazy" in the design.
+	if ( false === strpos( $embed, ' loading=' ) ) {
+		$embed = str_replace( '<iframe ', '<iframe loading="lazy" ', $embed );
+	}
+
+	if ( '' === $video['thumb'] ) {
+		return '<div class="video-block__frame">' . $embed . '</div>';
+	}
+
+	// Played from the still, so start playing once the player has loaded.
+	$embed = (string) preg_replace_callback(
+		'#( src=")([^"]+)#',
+		static function ( array $m ): string {
+			return $m[1] . esc_url( add_query_arg( 'autoplay', '1', html_entity_decode( $m[2] ) ) );
+		},
+		$embed,
+		1
+	);
+
+	$label = '' !== $video['title']
+		/* translators: %s: video title. */
+		? sprintf( __( 'Play video: %s', 'dorotape' ), $video['title'] )
+		: __( 'Play video', 'dorotape' );
+
+	return sprintf(
+		'<div class="video-block__frame"><a class="video-block__play" href="%1$s" data-dt-video><img src="%2$s" alt="" loading="lazy" decoding="async"><span class="video-block__play-icon">%3$s</span><span class="screen-reader-text">%4$s</span></a><template data-dt-video-embed>%5$s</template></div>',
+		esc_url( $url ),
+		esc_url( $video['thumb'] ),
+		dorotape_ui_icon( 'play' ),
+		esc_html( $label ),
+		$embed
+	);
+}

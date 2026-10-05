@@ -26,31 +26,12 @@ if ( '' === $dt_url ) {
 	return;
 }
 
-$dt_video = dorotape_video_embed( $dt_url );
-$dt_embed = $dt_video['html'];
+// The player, framed (inc/template-functions.php). Empty when the URL cannot
+// be embedded, and then there is nothing to show.
+$dt_frame = dorotape_video_frame( $dt_url );
 
-if ( '' === $dt_embed ) {
+if ( '' === $dt_frame ) {
 	return;
-}
-
-// Provider markup does not go through wp_filter_content_tags(), so the iframe
-// arrives with no loading attribute. This block never sits above the fold and
-// a video embed pulls in a lot of third-party script, so it is deferred here,
-// as loading="lazy" in the design.
-if ( false === strpos( $dt_embed, ' loading=' ) ) {
-	$dt_embed = str_replace( '<iframe ', '<iframe loading="lazy" ', $dt_embed );
-}
-
-// Played from the still, so start playing once the player has loaded.
-if ( '' !== $dt_video['thumb'] ) {
-	$dt_embed = (string) preg_replace_callback(
-		'#( src=")([^"]+)#',
-		static function ( array $m ): string {
-			return $m[1] . esc_url( add_query_arg( 'autoplay', '1', html_entity_decode( $m[2] ) ) );
-		},
-		$dt_embed,
-		1
-	);
 }
 
 $dt_eyebrow = trim( (string) get_sub_field( 'eyebrow' ) );
@@ -86,30 +67,6 @@ $dt_classes = 'video-block' . dorotape_background_shape_class( $dt_shape );
 			</div>
 		<?php endif; ?>
 
-		<div class="video-block__frame">
-			<?php if ( '' !== $dt_video['thumb'] ) : ?>
-				<a class="video-block__play" href="<?php echo esc_url( $dt_url ); ?>" data-dt-video>
-					<img src="<?php echo esc_url( $dt_video['thumb'] ); ?>" alt="" loading="lazy" decoding="async">
-					<span class="video-block__play-icon"><?php echo dorotape_ui_icon( 'play' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?></span>
-					<span class="screen-reader-text">
-						<?php
-						/* translators: %s: video title. */
-						echo esc_html( '' !== $dt_video['title'] ? sprintf( __( 'Play video: %s', 'dorotape' ), $dt_video['title'] ) : __( 'Play video', 'dorotape' ) );
-						?>
-					</span>
-				</a>
-				<template data-dt-video-embed>
-					<?php
-					// oEmbed markup from a provider WordPress already trusts.
-					echo $dt_embed; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- oEmbed output.
-					?>
-				</template>
-			<?php else : ?>
-				<?php
-				// oEmbed markup from a provider WordPress already trusts.
-				echo $dt_embed; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- oEmbed output.
-				?>
-			<?php endif; ?>
-		</div>
+		<?php echo $dt_frame; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in dorotape_video_frame(), oEmbed markup inside. ?>
 	</div>
 </section>

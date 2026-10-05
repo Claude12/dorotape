@@ -244,6 +244,29 @@ function dorotape_product_assurances(): void {
 
 
 /**
+ * True when a variable product carries its codes on the variations only.
+ *
+ * Used to decide whether a parent with no SKU of its own should still print
+ * an SKU row for the variation script to fill, rather than leaving a product
+ * looking as though it has no code at all.
+ *
+ * @param WC_Product $product
+ * @return bool
+ */
+function dorotape_variations_have_skus( WC_Product $product ): bool {
+	if ( ! $product->is_type( 'variable' ) ) {
+		return false;
+	}
+	foreach ( $product->get_children() as $variation_id ) {
+		$variation = wc_get_product( $variation_id );
+		if ( $variation instanceof WC_Product && '' !== trim( (string) $variation->get_sku() ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * The SKU and category line under the buying controls.
  *
  * Replaces woocommerce_template_single_meta so the label and the value are
@@ -261,12 +284,29 @@ function dorotape_product_meta(): void {
 
 	$rows = array();
 
-	if ( $product->get_sku() ) {
-		// The sku class, inside product_meta below, is what WooCommerce's own
-		// variation script rewrites when an option is picked, which is how the
-		// code on screen follows the chosen variation (client, 25 Sept: "I
-		// notice that the SKU does not change though?").
-		$rows[] = array( __( 'SKU:', 'dorotape' ), esc_html( $product->get_sku() ), 'sku' );
+	$sku = (string) $product->get_sku();
+
+	// The sku class, inside product_meta below, is what WooCommerce's own
+	// variation script rewrites when an option is picked, which is how the
+	// code on screen follows the chosen variation (client, 25 Sept: "I
+	// notice that the SKU does not change though?").
+	if ( '' !== $sku ) {
+		$rows[] = array( __( 'SKU:', 'dorotape' ), esc_html( $sku ), 'sku' );
+	} elseif ( dorotape_variations_have_skus( $product ) ) {
+		// 51 variable products keep their codes on the variations with nothing
+		// on the parent. The row used to be skipped entirely for those, which
+		// left the script no .sku element to rewrite, so the code never showed
+		// however the options were set: the client's "the SKU is not showing"
+		// on EL300 (5 Oct). Printing the row with a placeholder gives the
+		// script its target, and WooCommerce puts the placeholder back when the
+		// selection is cleared.
+		$rows[] = array( __( 'SKU:', 'dorotape' ), esc_html__( 'Select an option', 'dorotape' ), 'sku' );
+	}
+
+	// Products with a quantity table carry the size in its header instead.
+	$roll_size = dorotape_roll_size_label( $product->get_id() );
+	if ( '' !== $roll_size && ! dorotape_has_tier_table( $product ) ) {
+		$rows[] = array( __( 'Roll size:', 'dorotape' ), esc_html( $roll_size ) );
 	}
 
 	$categories = wc_get_product_category_list( $product->get_id(), ', ' );

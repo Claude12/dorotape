@@ -33,6 +33,7 @@ yarn-error.log*
 .env.*
 # The template carries names and comments, never values.
 !.env.example
+!.env.push.example
 
 # Client data exports
 # dorotape-migration/ held 113 CSV exports of the old CMS, including 10,358

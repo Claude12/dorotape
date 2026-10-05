@@ -218,6 +218,75 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 	}
 } );
 
+
+/**
+ * Per-product quick add sizes, beside the switch that turns the box on.
+ *
+ * Blank keeps the site-wide list from Theme Settings, so nothing changes for
+ * the products already using the box. A list of numbers replaces it for this
+ * product, and the word "none" takes the buttons off altogether. That is the
+ * client's "could we leave off or amend the quick adds" (5 Oct), kept in the
+ * one place someone setting a new product up is already looking.
+ */
+add_action( 'woocommerce_product_options_advanced', function (): void {
+	global $post;
+
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_dt_cutsize_presets',
+			'label'       => __( 'Quick add sizes (mm)', 'dorotape' ),
+			'value'       => get_post_meta( $post->ID, '_dt_cutsize_presets', true ),
+			'placeholder' => implode( ', ', dorotape_cutsize_presets() ),
+			'description' => __( 'Comma separated, e.g. "150, 305, 610". Leave blank to use the site-wide list shown here, or enter "none" to hide the quick add buttons on this product.', 'dorotape' ),
+			'desc_tip'    => true,
+		)
+	);
+} );
+
+/**
+ * Persist the per-product list. Stored as typed so "none" survives; the
+ * numbers are sanitised when they are read, not here, so a typo shows up as
+ * a missing button rather than as a silently emptied field.
+ *
+ * @param WC_Product $product
+ */
+add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $product ): void {
+	if ( ! isset( $_POST['_dt_cutsize_presets'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+		return;
+	}
+	$raw = trim( (string) wc_clean( wp_unslash( $_POST['_dt_cutsize_presets'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+	if ( '' === $raw ) {
+		$product->delete_meta_data( '_dt_cutsize_presets' );
+	} else {
+		$product->update_meta_data( '_dt_cutsize_presets', $raw );
+	}
+} );
+
+/**
+ * Apply it. Runs through the filter the box already offers, so the override
+ * lives in one place and nothing in the rendering has to know about it.
+ *
+ * @param int[] $presets
+ * @param mixed $product
+ * @return int[]
+ */
+add_filter( 'dorotape_cutsize_presets', function ( array $presets, $product ): array {
+	if ( ! $product instanceof WC_Product ) {
+		return $presets;
+	}
+
+	$raw = trim( (string) get_post_meta( $product->get_id(), '_dt_cutsize_presets', true ) );
+	if ( '' === $raw ) {
+		return $presets; // site-wide list
+	}
+	if ( 'none' === strtolower( $raw ) ) {
+		return array();
+	}
+
+	$own = array_values( array_unique( array_filter( array_map( 'absint', explode( ',', $raw ) ) ) ) );
+	return $own ? $own : $presets;
+}, 10, 2 );
+
 // ─── Roll width detection ─────────────────────────────────────────────────────
 
 /**

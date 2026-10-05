@@ -1490,6 +1490,27 @@
                             "append": ""
                         },
                         {
+                            "key": "field_dttrst000106",
+                            "label": "Original colour logos",
+                            "name": "colour_logos",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Turn on for full colour logos (each sits on a white tile). Leave off for white-on-black logos, which are shown in greyscale as on the homepage.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
                             "key": "field_dttrst000102",
                             "label": "Logos",
                             "name": "logos",
@@ -3803,6 +3824,217 @@
                     "min": "",
                     "max": ""
                 },
+                "layout_dtacrd000001": {
+                    "key": "layout_dtacrd000001",
+                    "name": "accordion_block",
+                    "label": "Accordion / FAQ",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtacrd000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtacrd000102",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "type": "text",
+                            "instructions": "Optional. Use one when a page has several accordions (Application, Printing, Laminating). Leave empty when the page banner already says what the list is.",
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtacrd000103",
+                            "label": "First item open",
+                            "name": "open_first",
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "type": "true_false",
+                            "instructions": "Show the first item expanded when the page loads. Only one item on the page is open at a time, so this applies to the first accordion on the page only.",
+                            "message": "",
+                            "default_value": 1,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtacrd000104",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "type": "wysiwyg",
+                            "instructions": "Optional copy above the list, always visible.",
+                            "default_value": "",
+                            "allow_in_bindings": 0,
+                            "tabs": "all",
+                            "toolbar": "basic",
+                            "media_upload": 0,
+                            "delay": 1
+                        },
+                        {
+                            "key": "field_dtacrd000105",
+                            "label": "Items",
+                            "name": "items",
+                            "aria-label": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "type": "repeater",
+                            "instructions": "Each row is one question or term. Rows without a title are skipped. Each item gets its own link: the page address followed by # and the title in lower case with dashes, for example #surface-energy on the Glossary.",
+                            "layout": "block",
+                            "pagination": 0,
+                            "min": 1,
+                            "max": 0,
+                            "collapsed": "field_dtacrd000106",
+                            "button_label": "Add item",
+                            "rows_per_page": 20,
+                            "allow_in_bindings": 0,
+                            "sub_fields": [
+                                {
+                                    "key": "field_dtacrd000106",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "type": "text",
+                                    "instructions": "The question or term. This is the line people click.",
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_dtacrd000107",
+                                    "label": "Content",
+                                    "name": "content",
+                                    "aria-label": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "type": "wysiwyg",
+                                    "instructions": "The answer. Headings, lists, images and links are all styled by the theme.",
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "tabs": "all",
+                                    "toolbar": "full",
+                                    "media_upload": 1,
+                                    "delay": 1
+                                },
+                                {
+                                    "key": "field_dtacrd000108",
+                                    "label": "Video",
+                                    "name": "video_url",
+                                    "aria-label": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "type": "url",
+                                    "instructions": "Optional. A YouTube or Vimeo address, shown under the content. Paste the address bar.",
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_dtacrd000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
                 "layout_dtcont000001": {
                     "key": "layout_dtcont000001",
                     "name": "contact_block",
@@ -4414,6 +4646,13 @@
                 "operator": "==",
                 "value": "dorotape-shop-page"
             }
+        ],
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-blog-page"
+            }
         ]
     ],
     "menu_order": 0,
@@ -4425,5 +4664,5 @@
     "active": true,
     "description": "Flexible content blocks. Layout name maps to inc/blocks/{name}.php. Shown on Pages, on product and category terms, and on Theme Settings > Product Pages, Category Pages, Search Page and 404 Page, where the sections are shared by every page of that kind.",
     "show_in_rest": 0,
-    "modified": 1790243687
+    "modified": 1791202725
 }

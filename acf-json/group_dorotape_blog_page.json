@@ -1,0 +1,331 @@
+{
+    "key": "group_dorotape_blog_page",
+    "title": "Blog Page",
+    "fields": [
+        {
+            "key": "field_dtblog0100",
+            "label": "Listing",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtblog0001",
+            "label": "Banner eyebrow",
+            "name": "blog_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small capitals above the heading on the blog page and on each category page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Blog",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0002",
+            "label": "Banner background shape",
+            "name": "blog_banner_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the banner, on the blog, its categories and each article.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtblog0003",
+            "label": "Banner heading",
+            "name": "blog_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The heading on the blog page. A category page uses the category name instead.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Our blogs",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0004",
+            "label": "Banner standfirst",
+            "name": "blog_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The line under the heading on the blog page. A category page uses the category description (Posts > Categories) instead.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Our industry is forever changing and our customer base is varied and wide. Read on for a mixed bag of news, views, industry insights and standout projects.",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtblog0005",
+            "label": "All articles filter",
+            "name": "blog_all_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The first of the category buttons above the articles, the one that shows every article.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "All articles",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0006",
+            "label": "Articles background shape",
+            "name": "blog_results_shape",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Faint faceted line-work behind the article cards.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "": "None",
+                "cubes-left": "Cubes, left",
+                "cubes-right": "Cubes, right",
+                "triangles-left": "Triangles, left",
+                "triangles-right": "Triangles, right"
+            },
+            "default_value": "cubes-right",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        },
+        {
+            "key": "field_dtblog0007",
+            "label": "Card button",
+            "name": "blog_button",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button on each article card.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Read article",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0008",
+            "label": "Nothing to show",
+            "name": "blog_empty",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown in place of the cards when a category has no articles yet.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "There are no articles here yet. Have a look at the rest of the blog.",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtblog0101",
+            "label": "Article",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtblog0009",
+            "label": "Date line",
+            "name": "post_date_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Under the article heading. {date} is replaced with the date it was posted.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Posted {date}",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0010",
+            "label": "Back link",
+            "name": "post_back_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The link back to the blog at the end of each article.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Back to the blog",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0012",
+            "label": "Products heading",
+            "name": "post_products_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The heading over the products featured under an article (the Products featured field on each article).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Products featured in this blog",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0011",
+            "label": "Related heading",
+            "name": "post_related_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The heading over the three articles shown under each article, from the same category first.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "More from the blog",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "dorotape-blog-page"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The wording on the blog page, its category pages and each article. The articles themselves are ordinary posts (Posts in the admin menu).",
+    "show_in_rest": 0,
+    "modified": 1791208504
+}

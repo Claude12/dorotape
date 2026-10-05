@@ -1171,38 +1171,91 @@ add_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
 // Also render when a filter combination matches nothing, so it can be undone.
 add_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
 
-// ─── Variable product "From" price ────────────────────────────────────────────
+// ─── "From" prices on cards ───────────────────────────────────────────────────
+
+/**
+ * The unit suffix for a price, or '' when the product has not declared one.
+ *
+ * Deliberately reads the raw meta rather than dorotape_price_unit(), which
+ * treats an unset unit as metres: a card should say "From £X" plainly rather
+ * than assert a unit the product never declared.
+ *
+ * @param int $product_id
+ * @return string Leading-space suffix, e.g. " per metre".
+ */
+function dorotape_price_unit_suffix( int $product_id ): string {
+	switch ( get_post_meta( $product_id, '_dt_price_unit', true ) ) {
+		case 'metre':
+			return __( ' per metre', 'dorotape' );
+		case 'roll':
+			return __( ' per roll', 'dorotape' );
+		case 'item':
+			return __( ' each', 'dorotape' );
+	}
+	return '';
+}
 
 /**
  * Show variable products as "From £5.77 per metre" instead of the jarring
- * full range ("£5.77 – £635.00") the client flagged. The unit text is added
- * only when _dt_price_unit is explicitly set on the product — products that
- * haven't declared their unit get a plain "From £X" rather than a guess.
+ * full range ("£5.77 – £635.00") the client flagged.
+ *
+ * The floor comes from dorotape_lowest_price(), not from WooCommerce's own
+ * minimum, which knows only the single-unit price and so advertised £6.64 on
+ * a product buyable at £5.31, which is "it isn't picking up the lower of the pricing"
+ * (5 Oct).
  */
 add_filter( 'woocommerce_variable_price_html', function ( string $price, WC_Product_Variable $product ): string {
-	$min = $product->get_variation_price( 'min', true );
-	$max = $product->get_variation_price( 'max', true );
-	if ( '' === $min || $min >= $max ) {
+	$lowest = dorotape_lowest_price( $product );
+	$max    = (float) $product->get_variation_price( 'max', true );
+	if ( $lowest <= 0 || $lowest >= $max ) {
 		return $price; // single price — WooCommerce's default is fine
 	}
 
-	$unit_meta = get_post_meta( $product->get_id(), '_dt_price_unit', true );
-	$unit_text = '';
-	if ( 'metre' === $unit_meta ) {
-		$unit_text = __( ' per metre', 'dorotape' );
-	} elseif ( 'roll' === $unit_meta ) {
-		$unit_text = __( ' per roll', 'dorotape' );
-	} elseif ( 'item' === $unit_meta ) {
-		$unit_text = __( ' each', 'dorotape' );
+	return sprintf(
+		/* translators: 1: lowest obtainable price, 2: unit text e.g. " per metre" */
+		esc_html__( 'From %1$s%2$s', 'dorotape' ),
+		wc_price( wc_get_price_to_display( $product, array( 'price' => $lowest ) ) ),
+		esc_html( dorotape_price_unit_suffix( $product->get_id() ) )
+	);
+}, 10, 2 );
+
+/**
+ * The same floor for simple products that send the customer to their page.
+ *
+ * These carry quantity breaks but no variations, so WooCommerce prints the
+ * 1-unit rate flat ("£6.64") with no hint that the product is cheaper by the
+ * roll. Only products wearing "Select options" are touched: where the card
+ * has an add-to-cart button, one click really does buy one unit at the price
+ * shown, so that price has to stay the price being charged.
+ *
+ * The product's own page is left alone for the same reason: there the price
+ * belongs to the form underneath it, and the tier table already lists every
+ * break in full.
+ */
+add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $product ): string {
+	if ( ! $product->is_type( 'simple' ) || ! dorotape_needs_product_page( $product ) ) {
+		return $html;
+	}
+	if ( function_exists( 'dorotape_is_poa' ) && dorotape_is_poa( $product ) ) {
+		return $html; // POA products show a badge, not a price
+	}
+	if ( is_product() && get_queried_object_id() === $product->get_id() ) {
+		return $html;
+	}
+
+	$lowest = dorotape_lowest_price( $product );
+	$base   = (float) $product->get_price();
+	if ( $lowest <= 0 || $lowest >= $base ) {
+		return $html; // no break below the headline price
 	}
 
 	return sprintf(
-		/* translators: 1: minimum price, 2: unit text e.g. " per metre" */
+		/* translators: 1: lowest obtainable price, 2: unit text e.g. " per metre" */
 		esc_html__( 'From %1$s%2$s', 'dorotape' ),
-		wc_price( $min ),
-		esc_html( $unit_text )
+		wc_price( wc_get_price_to_display( $product, array( 'price' => $lowest ) ) ),
+		esc_html( dorotape_price_unit_suffix( $product->get_id() ) )
 	);
-}, 10, 2 );
+}, 20, 2 );
 
 // ─── Archive buttons for products that still need a choice ────────────────────
 

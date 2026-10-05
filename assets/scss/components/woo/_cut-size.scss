@@ -250,14 +250,23 @@
     }
   }
 
-  // 62px holds a four-digit width (the widest roll on the site is 1400mm) with
-  // room to spare, and keeps the whole table inside a 390px phone without a
-  // sideways swipe.
+  // Wide enough for the "Size in mm" placeholder, which is the point of the
+  // box: at 100px it had 74px of room inside for text needing 78px, so it
+  // read "Size in r" and the client asked for "this box bigger or the font
+  // size smaller" (5 Oct). Bigger, not smaller: these inputs stay at 16px
+  // because anything below that makes iOS zoom the page in on focus.
+  //
+  // The cell has hundreds of pixels spare on a desktop, so the box takes what
+  // it is given up to a sensible cap, and never drops below the width the
+  // placeholder needs. A four-digit width (the widest roll on the site is
+  // 1400mm) fits several times over.
   .dt-cutsize__size {
-    width: 62px;
+    width: 100%;
+    min-width: 96px;
+    max-width: 140px;
 
     @include min-breakpoint(mobile) {
-      width: 100px;
+      max-width: 160px;
     }
   }
 }

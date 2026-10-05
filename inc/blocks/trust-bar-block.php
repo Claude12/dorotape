@@ -10,7 +10,8 @@ declare( strict_types=1 );
  *
  * The logos are white on black. The stylesheet screens them onto the page, so
  * the black drops out and only the wordmark shows; they sit in greyscale until
- * hovered.
+ * hovered. With "Original colour logos" on, they keep their colours instead and
+ * each sits on a white tile, so dark wordmarks stay readable.
  *
  * @package dorotape
  */
@@ -19,6 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 $dt_label = get_sub_field( 'label' );
 $dt_rows  = get_sub_field( 'logos' );
+$dt_colour = (bool) get_sub_field( 'colour_logos' );
 
 $dt_logos = array();
 
@@ -44,7 +46,7 @@ $dt_loading = 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy';
 $dt_divider = (bool) get_sub_field( 'divider' );
 
 $dt_shape   = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
-$dt_classes = 'trust-bar-block' . dorotape_background_shape_class( $dt_shape );
+$dt_classes = 'trust-bar-block' . dorotape_background_shape_class( $dt_shape ) . ( $dt_colour ? ' trust-bar-block--colour' : '' );
 ?>
 
 <?php if ( $dt_divider ) : ?>
@@ -64,14 +66,14 @@ $dt_classes = 'trust-bar-block' . dorotape_background_shape_class( $dt_shape );
 				<?php
 				$dt_image = wp_get_attachment_image(
 					$dt_logo['image_id'],
-					'thumbnail',
+					$dt_colour ? 'medium' : 'thumbnail', // Colour logos are wide; the square thumbnail would crop them.
 					false,
 					array(
 						'class'    => 'trust-bar-block__image',
 						'alt'      => $dt_logo['name'],
 						'loading'  => $dt_loading,
 						'decoding' => 'async',
-						'sizes'    => '(min-width: 768px) 80px, 56px',
+						'sizes'    => $dt_colour ? '200px' : '(min-width: 768px) 80px, 56px',
 					)
 				);
 				?>

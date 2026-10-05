@@ -222,11 +222,11 @@ function dorotape_payment_method_copy(): array {
 		),
 		'igfw_invoice_gateway'   => array(
 			'title'       => __( 'Add this order to my account', 'dorotape' ),
-			'description' => __( 'Pay against your account. We will invoice you and payment is due within 30 days.', 'dorotape' ),
+			'description' => __( 'Pay against your account. We will invoice you and payment is due 30 days end of month, unless otherwise agreed in writing.', 'dorotape' ),
 		),
 		'cod'                    => array(
 			'title'       => __( 'Pay on collection', 'dorotape' ),
-			'description' => __( 'Pay when you collect your order from us. We accept card and cash.', 'dorotape' ),
+			'description' => __( 'Pay when you collect your order from us.', 'dorotape' ),
 		),
 	);
 }

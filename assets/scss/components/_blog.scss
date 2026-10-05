@@ -1,0 +1,218 @@
+// The blog: the listing, its category pages and an article (inc/blog.php).
+//
+// There is no blog design. The listing is the search page's band with the
+// category grid's cards, three across rather than four because each carries
+// an excerpt, and an article is the Rich Text block's 800px measure with the
+// photos over it.
+
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "../base/typography" as *;
+
+// ── Category buttons ─────────────────────────────────────────────────────
+
+.blog-filters {
+  margin-bottom: var(--spacer-32);
+
+  @include min-breakpoint(tablet) {
+    margin-bottom: var(--spacer-48);
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // The product card's pill, sized up to be a target.
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: var(--spacer-8) var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+    transition:
+      border-color var(--transition-fast),
+      color var(--transition-fast),
+      background-color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+    }
+
+    &.is-current {
+      border-color: var(--color-primary);
+      background-color: var(--color-primary);
+      color: var(--color-primary-foreground);
+    }
+  }
+}
+
+// ── Cards ────────────────────────────────────────────────────────────────
+
+// One across on a phone: an excerpt in half a phone's width is four words a
+// line.
+.post-grid {
+  grid-template-columns: minmax(0, 1fr);
+
+  @include min-breakpoint(tablet) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include min-breakpoint(desktop) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// A column, so the button sits on the bottom edge however long the title
+// above it runs, and a row of cards lines its buttons up.
+.post-card {
+  display: flex;
+  flex-direction: column;
+
+  &__image {
+    height: 200px;
+
+    @include min-breakpoint(tablet) {
+      height: 220px;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-4) var(--spacer-12);
+    margin: 0 0 var(--spacer-8);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    line-height: $line-height-xs;
+  }
+
+  &__category {
+    color: var(--color-cyan);
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-caps;
+    text-transform: uppercase;
+  }
+
+  // The card title's own size is for a two-word range name.
+  &__title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-base;
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-md;
+      line-height: $line-height-md;
+    }
+  }
+
+  &__excerpt {
+    @include truncate(3);
+
+    margin: var(--spacer-8) 0 0;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-sm;
+    line-height: $line-height-sm;
+  }
+
+  // The space above the button is the text's, because margin-top: auto on
+  // the button is what pins it to the bottom edge.
+  &__excerpt,
+  &__title:has(+ .post-card__button) {
+    margin-bottom: var(--spacer-16);
+  }
+
+  &__button {
+    margin-top: auto;
+  }
+}
+
+// The listing's pagination, in the band under the cards.
+.blog-band .woocommerce-pagination {
+  margin-top: var(--spacer-48);
+}
+
+// Under an article the band follows the article's own padding rather than a
+// banner, so it takes the band's full top padding back.
+.blog-band--related {
+  padding-top: calc(var(--spacer-80) + var(--spacer-4));
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+
+  @include min-breakpoint(tablet) {
+    padding-top: calc(var(--spacer-112) + var(--spacer-4));
+  }
+}
+
+// ── Article ──────────────────────────────────────────────────────────────
+
+.post-article {
+  position: relative;
+  padding-block: var(--spacer-32) var(--spacer-64);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(tablet) {
+    padding-block: var(--spacer-48) var(--spacer-112);
+  }
+
+  &__inner {
+    max-width: 800px;
+  }
+
+  // One photo full width; two side by side; three or more the first full
+  // width and the rest in pairs under it.
+  &__photos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacer-12);
+    margin-bottom: var(--spacer-32);
+
+    @include min-breakpoint(tablet) {
+      gap: var(--spacer-16);
+      margin-bottom: var(--spacer-48);
+    }
+  }
+
+  &__photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-2xl);
+    object-fit: cover;
+  }
+
+  &__photos--1 &__photo,
+  &__photos--3 &__photo:first-child {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  &__video {
+    margin-block: var(--spacer-32);
+  }
+
+  &__back {
+    margin: var(--spacer-48) 0 0;
+  }
+}

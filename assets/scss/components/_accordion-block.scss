@@ -1,0 +1,140 @@
+// Accordion / FAQ block: a heading and intro over items that open and close.
+//
+// Each item is a <details> card on the raised surface, the title and a
+// chevron on the clickable row and the answer as ordinary rich text
+// (components/_rte.scss) underneath. Kept to the Rich Text block's 800px
+// measure so the two line up when a page mixes them, as Application Advice
+// does.
+
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+@use "../base/typography" as *;
+
+.accordion-block {
+  position: relative;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  padding-block: var(--spacer-64);
+
+  @include min-breakpoint(tablet) {
+    padding-block: var(--spacer-112);
+  }
+
+  // Stacked accordions are one list split into groups (Problem Solving's
+  // Application, Printing, Laminating), so they sit closer than two
+  // unrelated sections would. A divider between them breaks this on purpose.
+  & + & {
+    padding-top: 0;
+  }
+
+  &__inner {
+    position: relative;
+    max-width: 800px;
+  }
+
+  &__heading {
+    margin: 0 0 var(--spacer-24);
+    font-size: $font-size-block-heading;
+    line-height: $line-height-block-heading;
+
+    @include min-breakpoint(tablet) {
+      margin-bottom: var(--spacer-32);
+    }
+  }
+
+  &__intro {
+    margin-bottom: var(--spacer-32);
+  }
+
+  &__list {
+    display: grid;
+    gap: var(--spacer-12);
+  }
+
+  &__item {
+    @include aurora-ring;
+
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+
+    &:hover,
+    &:has(> summary:focus-visible) {
+      @include aurora-ring-visible;
+    }
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-16);
+    padding: var(--spacer-20);
+    border-radius: inherit;
+    list-style: none;
+    cursor: pointer;
+
+    @include min-breakpoint(tablet) {
+      padding: var(--spacer-24) var(--spacer-28);
+    }
+
+    // The card's ring is the focus indicator.
+    &:focus-visible {
+      outline: none;
+    }
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  // Headings for the document outline, sized as a row label: an H2 at block
+  // heading size would shout on a list of thirty questions.
+  &__title {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: $font-size-md;
+    font-weight: $font-weight-bold;
+    letter-spacing: normal;
+    line-height: $line-height-md;
+    transition: color var(--transition-fast);
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-lg;
+      line-height: $line-height-lg;
+    }
+  }
+
+  &__summary:hover &__title,
+  &__item[open] &__title {
+    color: var(--color-cyan);
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-cyan);
+    transition: transform var(--transition);
+  }
+
+  &__item[open] &__icon {
+    transform: rotate(180deg);
+  }
+
+  &__panel {
+    padding: 0 var(--spacer-20) var(--spacer-20);
+
+    @include min-breakpoint(tablet) {
+      padding: 0 var(--spacer-28) var(--spacer-28);
+    }
+  }
+
+  &__video {
+    margin-top: var(--spacer-24);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}

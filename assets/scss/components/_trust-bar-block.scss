@@ -79,3 +79,60 @@
     filter: none;
   }
 }
+
+// Full colour logos (the Manufacturers page). Many have dark wordmarks, so
+// each one sits on a white tile instead of being screened onto the page.
+.trust-bar-block--colour {
+  .trust-bar-block__logos {
+    gap: var(--spacer-16);
+
+    @include min-breakpoint(tablet) {
+      column-gap: var(--spacer-24);
+    }
+  }
+
+  .trust-bar-block__item,
+  .trust-bar-block__link {
+    width: 100%;
+  }
+
+  .trust-bar-block__item {
+    flex: 0 0 calc(50% - var(--spacer-8));
+
+    @include min-breakpoint(tablet) {
+      flex-basis: 200px;
+    }
+  }
+
+  .trust-bar-block__link,
+  .trust-bar-block__item > .trust-bar-block__image {
+    transition: transform var(--transition);
+  }
+
+  .trust-bar-block__link,
+  .trust-bar-block__item:not(:has(.trust-bar-block__link)) {
+    align-items: center;
+    justify-content: center;
+    height: 104px;
+    padding: var(--spacer-16) var(--spacer-24);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-white);
+  }
+
+  .trust-bar-block__image {
+    max-width: 100%;
+    height: auto;
+    max-height: 64px;
+    opacity: 1;
+    filter: none;
+    mix-blend-mode: normal;
+
+    @include min-breakpoint(tablet) {
+      height: auto;
+    }
+  }
+
+  .trust-bar-block__link:hover {
+    transform: translateY(-2px);
+  }
+}

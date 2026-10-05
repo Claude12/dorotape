@@ -115,6 +115,32 @@ function dorotape_price_header( array $unit_strings, int $product_id ): string {
 	return sprintf( __( '%1$s (%2$s)', 'dorotape' ), $header, $size );
 }
 
+/**
+ * Whether the quantity pricing table will render for this product.
+ *
+ * The table header is the only place the roll size appears, so a product
+ * with no quantity breaks never showed its size anywhere: Floorappeal is
+ * 1370mm x 30m and said so nowhere on the page, which the client raised on
+ * 5 Oct. Products that do get a table keep the size in the header, where it
+ * sits beside the price it qualifies.
+ *
+ * @param WC_Product $product
+ * @return bool
+ */
+function dorotape_has_tier_table( WC_Product $product ): bool {
+	if ( ! empty( dorotape_parse_legacy_tiers( $product->get_id() ) ) ) {
+		return true;
+	}
+
+	foreach ( $product->get_children() as $variation_id ) {
+		if ( ! empty( dorotape_parse_legacy_tiers( (int) $variation_id ) ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // ─── Admin fields (Product data → Advanced) ───────────────────────────────────
 
 add_action( 'woocommerce_product_options_advanced', function (): void {

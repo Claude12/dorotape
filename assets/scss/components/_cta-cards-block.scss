@@ -28,6 +28,18 @@
     @include min-breakpoint(tablet) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+
+    // Four cards (the field's maximum) would leave one orphaned on a second
+    // row, so they go two by two on tablet and in a single row on desktop.
+    &:has(> :nth-child(4)) {
+      @include min-breakpoint(tablet) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      @include min-breakpoint(desktop) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
   }
 
   &__item {

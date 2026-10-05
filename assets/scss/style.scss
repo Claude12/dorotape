@@ -28,6 +28,7 @@
 @use "components/toast";
 @use "components/rte";
 @use "components/rte-block";
+@use "components/accordion-block";
 @use "components/hero-block";
 @use "components/image-text-block";
 @use "components/category-grid-block";
@@ -49,6 +50,7 @@
 @use "components/team-block";
 @use "components/contact-block";
 @use "components/embed-block";
+@use "components/blog";
 
 // WooCommerce functionality carried over from the Sprint 1 scaffold. These
 // are the custom features the client signed off on, retokenised for the dark

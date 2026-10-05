@@ -13,6 +13,7 @@ import { initQtyStep } from './lib/qty-step';
 import { initTestimonials } from './lib/testimonial';
 import { initToast } from './lib/toast';
 import { initVideo } from './lib/video';
+import { initAccordion } from './lib/accordion';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -35,6 +36,7 @@ const features = [
   initTestimonials,
   initToast,
   initVideo,
+  initAccordion,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

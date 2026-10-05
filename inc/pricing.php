@@ -669,6 +669,57 @@ function dorotape_find_applied_tier( int $qty, int $product_id ): ?array {
 	return null;
 }
 
+
+/**
+ * The lowest price a product can actually be bought at, quantity breaks included.
+ *
+ * WooCommerce only ever knows the base price, so a card for a product with
+ * tiers advertises the single-unit rate: "From £6.64 per metre" on a product
+ * whose 50m+ rate is £5.31. That is what the client meant by "it isn't
+ * picking up the lower of the pricing" (5 Oct).
+ *
+ * Every variation is checked against its own tiers, because a colour can
+ * carry breaks the others do not, and dorotape_parse_legacy_tiers() already
+ * falls back to the parent for variations that have none of their own.
+ *
+ * @param WC_Product $product
+ * @return float Lowest obtainable price, or 0.0 when nothing is purchasable.
+ */
+function dorotape_lowest_price( WC_Product $product ): float {
+	$ids    = $product->is_type( 'variable' ) ? $product->get_children() : array( $product->get_id() );
+	$lowest = 0.0;
+
+	foreach ( $ids as $id ) {
+		$id    = (int) $id;
+		$child = $id === $product->get_id() ? $product : wc_get_product( $id );
+		if ( ! $child instanceof WC_Product || ! $child->is_purchasable() ) {
+			continue;
+		}
+
+		$candidates = array();
+		$base       = (float) $child->get_price();
+		if ( $base > 0 ) {
+			$candidates[] = $base;
+		}
+		foreach ( dorotape_parse_legacy_tiers( $id ) as $tier ) {
+			$tier_price = (float) ( $tier['tier_price'] ?? 0 );
+			if ( $tier_price > 0 ) {
+				$candidates[] = $tier_price;
+			}
+		}
+		if ( empty( $candidates ) ) {
+			continue;
+		}
+
+		$child_lowest = min( $candidates );
+		if ( 0.0 === $lowest || $child_lowest < $lowest ) {
+			$lowest = $child_lowest;
+		}
+	}
+
+	return $lowest;
+}
+
 // ─── Cart Item Meta ───────────────────────────────────────────────────────────
 
 /**

@@ -290,23 +290,18 @@
   }
 }
 
+// Badges size to their own artwork (square seals and wide wordmarks sit side
+// by side), so the row wraps as a flex line rather than fixed grid cells,
+// which wide logos overflowed.
 .site-footer__badge-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-items: center;
-  gap: var(--spacer-32);
-
-  @include min-breakpoint(mobile) {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
+  justify-content: center;
+  gap: var(--spacer-24) var(--spacer-32);
 
   @include min-breakpoint(desktop) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  @include min-breakpoint(xl) {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    justify-content: flex-start;
   }
 }
 

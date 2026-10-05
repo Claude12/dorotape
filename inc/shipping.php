@@ -184,14 +184,14 @@ function dorotape_shipping_tariff(): array {
 					'max'   => 12.0,
 					'rates' => array(
 						'post'    => array( 'label' => __( 'Postage (2nd class)', 'dorotape' ), 'cost' => 1.00 ),
-						'courier' => array( 'label' => __( 'Upgrade to courier delivery (1-2 days, tracked, signature required)', 'dorotape' ), 'cost' => 8.00 ),
+						'courier' => array( 'label' => __( 'Upgrade to courier delivery', 'dorotape' ), 'cost' => 8.00 ),
 					),
 				),
 				array(
 					'max'   => null,
 					'rates' => array(
 						'post'    => array( 'label' => __( 'Free 2nd class postage', 'dorotape' ), 'cost' => 0.0 ),
-						'courier' => array( 'label' => __( 'Upgrade to courier delivery (1-2 days, tracked, signature required)', 'dorotape' ), 'cost' => 7.00 ),
+						'courier' => array( 'label' => __( 'Upgrade to courier delivery', 'dorotape' ), 'cost' => 7.00 ),
 					),
 				),
 			),

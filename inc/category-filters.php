@@ -545,7 +545,7 @@ function dorotape_category_filter_pills( WC_Product $product ): array {
 function dorotape_category_filter_header( int $count ): void {
 	$heading = dorotape_category_field( 'category_products_heading', __( 'Select your product', 'dorotape' ) );
 
-	$note  = dorotape_category_page_field( 'category_products_note', __( 'stocked in the UK and dispatched across the UK and Ireland.', 'dorotape' ) );
+	$note  = dorotape_category_page_field( 'category_products_note', __( 'all available from stock.', 'dorotape' ) );
 	$intro = dorotape_category_field(
 		'category_products_intro',
 		trim(

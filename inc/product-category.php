@@ -460,7 +460,7 @@ function dorotape_category_ranges(): void {
 		sprintf( __( 'Shop %s', 'dorotape' ), $term->name )
 	);
 
-	$note  = dorotape_category_page_field( 'category_ranges_note', __( 'stocked in the UK and dispatched across the UK and Ireland.', 'dorotape' ) );
+	$note  = dorotape_category_page_field( 'category_ranges_note', __( 'all available from stock.', 'dorotape' ) );
 	$count = count( $children );
 	$intro = dorotape_category_field(
 		'category_ranges_intro',

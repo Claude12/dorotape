@@ -32,8 +32,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Loading attribute for the next card image on the page.
  *
- * On a listing (the shop, a category, search results, the 404, and the empty
- * basket's suggestions) the grid is right under the heading, so its first
+ * On a listing (the shop, a category, search results, the 404, the blog, and
+ * the empty basket's suggestions) the grid is right under the heading, so its first
  * row is on screen at load and lazy loading only makes those images wait for
  * layout. The first four card
  * images there, a desktop row, load eagerly; every other card, and every card
@@ -44,7 +44,7 @@ defined( 'ABSPATH' ) || exit;
 function dorotape_card_loading(): string {
 	static $count = 0;
 
-	$listing = is_search() || is_404()
+	$listing = is_search() || is_404() || dorotape_is_blog_listing()
 		|| ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_cart() ) );
 
 	if ( ! $listing ) {

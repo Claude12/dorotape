@@ -1,0 +1,88 @@
+{
+    "key": "group_dorotape_blog_post",
+    "title": "Article Photos and Products",
+    "fields": [
+        {
+            "key": "field_dtpost0001",
+            "label": "Photos",
+            "name": "gallery",
+            "aria-label": "",
+            "type": "gallery",
+            "instructions": "Shown above the article text: the first large, the rest in a row under it. Leave empty to show the featured image instead.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "id",
+            "library": "all",
+            "min": "",
+            "max": 6,
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg, jpeg, png, webp",
+            "insert": "append",
+            "preview_size": "medium"
+        },
+        {
+            "key": "field_dtpost0002",
+            "label": "Products featured",
+            "name": "products",
+            "aria-label": "",
+            "type": "relationship",
+            "instructions": "Shown under the article as a row of product cards, in this order. The heading over them is on Theme Settings > Blog Page. Leave empty for none.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "product"
+            ],
+            "post_status": [
+                "publish"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search",
+                "taxonomy"
+            ],
+            "return_format": "id",
+            "min": "",
+            "max": 12,
+            "allow_in_bindings": 0,
+            "elements": [
+                "featured_image"
+            ],
+            "bidirectional": 0,
+            "bidirectional_target": []
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The photos at the top of a blog article, and the products featured under it.",
+    "show_in_rest": 0,
+    "modified": 1791208504
+}
