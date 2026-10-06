@@ -765,8 +765,48 @@ function dorotape_rewards_panel_loader(): void {
 					var t = document.createElement('template');
 					t.innerHTML = html;
 					slot.replaceWith(t.content);
+					// Only when the plugin is set to its default of icon and
+					// text. An editor who picked icon only or text only keeps it.
+					if (/launcherDisplayMode:\s*'icon_with_text'/.test(html)) collapse();
 				})
 				.catch(function () {});
+		}
+		/*
+		 * The launcher is fixed over the bottom right corner at every width,
+		 * and with its label it is 130px wide, which covered the end of
+		 * whatever the page had there: order buttons, address cards, form
+		 * fields. Once the visitor scrolls it drops to the round icon, 48px,
+		 * and the label comes back at the top of the page. The plugin's own
+		 * update-launcher-display event does the switch, and the button's
+		 * aria-label already reads "Open rewards" with the balance, so the
+		 * icon on its own still says what it is. That event also closes the
+		 * panel, so nothing is sent while the panel is open.
+		 */
+		function collapse() {
+			var mode = 'both';
+			var queued = false;
+			function button() {
+				var host = document.querySelector('rewards-panel');
+				var root = host && (host.shadowRoot || host);
+				return root ? root.querySelector('.rwp-launcher') : null;
+			}
+			function sync() {
+				queued = false;
+				var want = window.scrollY > 120 ? 'icon' : 'both';
+				var b = button();
+				if (want === mode || !b || 'true' === b.getAttribute('aria-expanded')) return;
+				mode = want;
+				window.dispatchEvent(new CustomEvent('update-launcher-display', { detail: want }));
+			}
+			window.addEventListener('scroll', function () {
+				if (!queued) {
+					queued = true;
+					requestAnimationFrame(sync);
+				}
+			}, { passive: true });
+			// A page opened part way down, from the back button or an anchor,
+			// starts compact once the panel has had a moment to start.
+			setTimeout(sync, 600);
 		}
 		function idle() {
 			if ('requestIdleCallback' in window) requestIdleCallback(fill, { timeout: 3000 });

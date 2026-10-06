@@ -340,12 +340,24 @@ you find rather than the ones you expect.
 The customer's WooCommerce billing and shipping addresses are untouched and stay
 the defaults. "Make default" copies a saved address onto them.
 
-**Known limitation at checkout.** Picking a saved address sets it on the order,
-but the address inputs on the page do not repopulate to match. Changing what the
-visible form shows means JavaScript driving the `wc/store/cart` data store, and
-the theme has no build step. The mitigation is that each option label carries the
-full address, so the customer can see what they picked. Worth revisiting if
-checkout ever gets a bundled script.
+**At checkout.** Picking a saved address writes it into the `wc/store/cart` data
+store (`assets/js/blocks/checkout-address-book.js`, unbundled like the payment
+methods script), so the address card changes and delivery is re-priced for the
+chosen address. The server also copies the choice onto the order when it is
+placed, as the last word for a browser where the script did not run. The
+picker's value is kept on the order for the admin but not repeated in emails or
+on the thank you page, where the address already appears under its own heading.
+Choosing collection hides the delivery picker and drops any delivery address
+picked from it; the old site's "Collect from Doro Tape" is the classic
+`local_pickup` method, which WooCommerce's own field rules do not count as
+collection, so the script does this rather than a rule on the field.
+
+**County at checkout.** WooCommerce 11.1.2's block checkout marks an empty
+county as an error before it knows the country, and does not clear it when
+Britain turns out not to need one, so editing the address and pressing Place
+order was refused. `assets/js/blocks/checkout-county.js`, loaded on every
+checkout from `inc/woocommerce.php`, clears that one error for countries whose
+county is optional. Ireland and the others that need one are still checked.
 
 ## Local development
 

@@ -16,14 +16,11 @@
  *     Store API has populated the order from the request and after additional
  *     fields have been persisted, so it is the first point where the choice and
  *     the order both exist. The saved address is copied onto the order there.
- *
- * KNOWN LIMITATION. The address inputs visible on the checkout page do not
- * repopulate when a saved address is picked; the order carries the chosen
- * address, but the customer does not watch the fields change. Doing that needs
- * JavaScript driving the wc/store/cart data store, and the theme has no build
- * step. It is mitigated by putting the full address in the option label, so the
- * customer can see what they selected, and it is worth revisiting if the
- * checkout ever gets a bundled script.
+ *  4. assets/js/blocks/checkout-address-book.js writes the picked address into
+ *     the checkout's cart store as it is chosen, so the address card changes
+ *     in front of the customer and delivery is priced for where the goods are
+ *     actually going. Step 3 stays as the last word on the server, for a
+ *     browser where the script did not run.
  *
  * @package dorotape
  */
@@ -60,8 +57,8 @@ add_action( 'woocommerce_init', function (): void {
 		foreach ( $saved as $address_id => $address ) {
 			$options[] = array(
 				'value' => $address_id,
-				// The whole address, because the field cannot repopulate the form
-				// and a bare label would leave the customer guessing.
+				// The whole address, so two sites with similar names can be told
+				// apart before one is picked.
 				'label' => $address['label'] . ': ' . dorotape_notice_to_plain( dorotape_format_address( $address ) ),
 			);
 		}
@@ -75,6 +72,11 @@ add_action( 'woocommerce_init', function (): void {
 				'location' => 'order',
 				'type'     => 'select',
 				'required' => false,
+				'placeholder' => __( 'Choose a saved address', 'dorotape' ),
+				// The address itself is already on the order, emails and
+				// thank you page under its own heading. Shown again here it
+				// read as a second, oddly labelled copy of the same thing.
+				'show_in_order_confirmation' => false,
 				'options'  => $options,
 				'validate_callback' => function ( $value ) use ( $type ) {
 					if ( '' === $value || DOROTAPE_ADDRESS_FORM_VALUE === $value ) {
@@ -97,6 +99,49 @@ add_action( 'woocommerce_init', function (): void {
 			)
 		);
 	}
+} );
+
+// ─── Filling the form as the choice is made ──────────────────────────────────
+
+/**
+ * Load the script that fills the form, with the customer's own book.
+ *
+ * Only on the checkout and only for someone with something saved, which is the
+ * same condition the picker is registered under.
+ */
+add_action( 'wp_enqueue_scripts', function (): void {
+	if ( ! is_user_logged_in() || ! function_exists( 'is_checkout' ) || ! is_checkout() || is_wc_endpoint_url() ) {
+		return;
+	}
+
+	$book = dorotape_get_address_book();
+
+	if ( ! $book ) {
+		return;
+	}
+
+	$relative = '/assets/js/blocks/checkout-address-book.js';
+
+	wp_enqueue_script(
+		'dorotape-checkout-address-book',
+		get_template_directory_uri() . $relative,
+		array( 'wp-data' ),
+		dorotape_asset_version( $relative ),
+		true
+	);
+
+	wp_localize_script(
+		'dorotape-checkout-address-book',
+		'dorotapeAddressBook',
+		array(
+			'book'      => $book,
+			'formValue' => DOROTAPE_ADDRESS_FORM_VALUE,
+			'fields'    => array(
+				'shipping' => dorotape_address_field_id( 'shipping' ),
+				'billing'  => dorotape_address_field_id( 'billing' ),
+			),
+		)
+	);
 } );
 
 // ─── Applying the choice ──────────────────────────────────────────────────────

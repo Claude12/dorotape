@@ -236,3 +236,20 @@ add_action( 'manage_woocommerce_page_wc-orders_custom_column', function ( string
 		esc_html__( 'Collection', 'dorotape' )
 	);
 }, 20, 2 );
+
+/**
+ * The order note WooCommerce's cash on delivery gateway leaves. Here that
+ * gateway is only ever "Pay on collection", so "upon delivery" was wrong.
+ *
+ * gettext_woocommerce runs for WooCommerce's own strings only, so this costs
+ * nothing anywhere else.
+ *
+ * @param string $translation
+ * @param string $text
+ * @return string
+ */
+add_filter( 'gettext_woocommerce', function ( $translation, $text ) {
+	return 'Payment to be made upon delivery.' === $text
+		? __( 'Payment to be made on collection.', 'dorotape' )
+		: $translation;
+}, 10, 2 );

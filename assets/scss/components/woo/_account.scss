@@ -235,6 +235,12 @@
 .woo-page--account .woocommerce-message .button,
 .woo-page--account .woocommerce-error .button {
   order: 1;
+
+  // Pushed to the far edge once the words and the button share a line. On a
+  // phone they wrap, and the button starts its own line under the words.
+  @include min-breakpoint(tablet) {
+    margin-left: auto;
+  }
 }
 
 // ── Dashboard ──────────────────────────────────────────────────────────────
@@ -345,10 +351,12 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   background-color: var(--color-surface);
+}
 
-  & + & {
-    margin-top: var(--spacer-12);
-  }
+// Written out rather than `& + &`, which under `.woo-page` compiles to
+// `.woo-page .row + .woo-page .row` and never matches, so the cards touched.
+.woo-page .woocommerce-orders-table__row + .woocommerce-orders-table__row {
+  margin-top: var(--spacer-12);
 }
 
 .woo-page .woocommerce-orders-table__cell {
@@ -468,16 +476,21 @@
     letter-spacing: $letter-spacing-label;
   }
 
+  // Over the buttons, which sit to the right of their column.
+  .woo-page .woocommerce-orders-table__header-order-actions {
+    text-align: right;
+  }
+
   .woo-page .woocommerce-orders-table__row {
     display: table-row;
     padding: 0;
     border: 0;
     border-radius: 0;
     background-color: transparent;
+  }
 
-    & + & {
-      margin-top: 0;
-    }
+  .woo-page .woocommerce-orders-table__row + .woocommerce-orders-table__row {
+    margin-top: 0;
   }
 
   .woo-page .woocommerce-orders-table__cell {
@@ -491,15 +504,22 @@
   // 1% is how a table is told a column should be as narrow as its contents.
   .woo-page .woocommerce-orders-table__cell-order-date,
   .woo-page .woocommerce-orders-table__cell-order-status,
-  .woo-page .woocommerce-orders-table__cell-order-total,
-  .woo-page .woocommerce-orders-table__cell-order-actions {
+  .woo-page .woocommerce-orders-table__cell-order-total {
     width: 1%;
     white-space: nowrap;
   }
 
+  // The actions take whatever width is left and wrap when it runs out. An
+  // unpaid order carries Pay, View and Cancel, and held to one line those
+  // pushed the table off the side of the screen at tablet and again beside
+  // the desktop menu.
   .woo-page .woocommerce-orders-table__cell-order-actions {
     display: table-cell;
     text-align: right;
+  }
+
+  .woo-page .woocommerce-orders-table__cell-order-actions .button {
+    margin-block: var(--spacer-4);
   }
 
   .woo-page .woocommerce-orders-table__cell-order-actions .button + .button {
@@ -510,6 +530,19 @@
     font-size: $font-size-sm;
     font-weight: $font-weight-bold;
   }
+}
+
+// Previous and Next under the list, at the 24px every block on these screens
+// keeps from the one above it.
+.woo-page--account .woocommerce-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin-top: var(--spacer-24);
+}
+
+.woo-page--account .woocommerce-pagination .woocommerce-button--next {
+  margin-left: auto;
 }
 
 // ── One order ──────────────────────────────────────────────────────────────
@@ -614,10 +647,11 @@
   text-align: left;
 }
 
-// The last row of the foot is the total, and it is the figure the page is
-// read for.
-.woo-page .order_details tfoot tr:last-child th,
-.woo-page .order_details tfoot tr:last-child td {
+// The total is the figure the page is read for. It is the last row with an
+// amount in it: WooCommerce puts the payment method and any customer note
+// after it, and refunds before it, and none of its rows carries a class.
+.woo-page .order_details tfoot tr:has(.woocommerce-Price-amount):not(:has(~ tr .woocommerce-Price-amount)) th,
+.woo-page .order_details tfoot tr:has(.woocommerce-Price-amount):not(:has(~ tr .woocommerce-Price-amount)) td {
   padding-bottom: 0;
   color: var(--color-foreground);
   font-size: $font-size-md;
@@ -646,6 +680,14 @@
   line-height: $line-height-relaxed;
 }
 
+// With both a billing and a shipping address the section holds two cards of
+// its own, and a panel round them was a card inside a card.
+.woo-page .woocommerce-customer-details:has(.col2-set) {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+}
+
 .woo-page .woocommerce-customer-details--phone,
 .woo-page .woocommerce-customer-details--email {
   margin: var(--spacer-8) 0 0;
@@ -661,7 +703,7 @@
 // and its button sitting on the last line of them.
 .woo-page--account-addresses .woocommerce-MyAccount-content > p,
 .woo-page--account-address-book .woocommerce-MyAccount-content > p {
-  margin: 0 0 var(--spacer-20);
+  margin: 0 0 var(--spacer-24);
   max-width: 68ch;
   color: var(--color-muted-foreground);
   font-size: $font-size-sm;
@@ -669,10 +711,9 @@
 }
 
 // "Add an address", which is a button in a paragraph of its own at the end of
-// the list. The same gap a form's last row takes below the fields above it,
-// further down this file: a button that closes a block sits 20px under it.
+// the list, at the 24px every block on these screens keeps from the one above.
 .woo-page--account-address-book .woocommerce-MyAccount-content > p:last-child {
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-24) 0 0;
 }
 
 .woo-page .woocommerce-Address-title {
@@ -748,6 +789,13 @@
   text-transform: uppercase;
 }
 
+// The one checkout starts with. Primary rather than muted, so it reads as the
+// state of the card and not as another classification.
+.dorotape-address-book__type--default {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
 .dorotape-address-book__item address {
   margin: 0;
   color: var(--color-muted-foreground);
@@ -783,6 +831,10 @@
 // so outweigh two classes. Three classes answers them.
 .woo-page--account .dorotape-address-book .button {
   @include button-size-md;
+
+  // Narrower sides, so Edit, Make default and Delete stay on one line in a
+  // card two to a row or on a phone, instead of Delete wrapping on its own.
+  padding-inline: var(--spacer-16);
 }
 
 .woo-page--account .dorotape-address-book__actions > .button {
@@ -793,9 +845,11 @@
   @include button-ghost;
 }
 
-// "Cancel", beside Save address.
+// "Cancel", beside Save address, with the gap the address book's buttons keep.
 .woo-page--account .dorotape-address-form a {
   @include action-link;
+
+  margin-left: var(--spacer-16);
 }
 
 // ── Forms ──────────────────────────────────────────────────────────────────
@@ -879,7 +933,7 @@
 
 .woo-page--account fieldset {
   margin-top: var(--spacer-24);
-  padding-top: var(--spacer-24);
+  padding-top: 0;
   border-top: 1px solid var(--color-border);
 }
 

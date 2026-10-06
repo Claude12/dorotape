@@ -239,3 +239,18 @@ function dorotape_account_dashboard_links(): void {
 	<?php
 }
 add_action( 'woocommerce_account_dashboard', 'dorotape_account_dashboard_links', 20 );
+
+/**
+ * Drop Downloads from the menu, and so from the cards above, for anyone with
+ * nothing to download. Nothing in the shop is downloadable, so for now that is
+ * everyone, but the tab comes back by itself if that ever changes.
+ *
+ * @param array $items
+ * @return array
+ */
+add_filter( 'woocommerce_account_menu_items', function ( array $items ): array {
+	if ( isset( $items['downloads'] ) && ! wc_get_customer_available_downloads( get_current_user_id() ) ) {
+		unset( $items['downloads'] );
+	}
+	return $items;
+} );

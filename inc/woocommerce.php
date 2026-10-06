@@ -1322,3 +1322,47 @@ add_filter( 'woocommerce_loop_add_to_cart_link', function ( string $link, WC_Pro
 		esc_html__( 'Select options', 'woocommerce' )
 	);
 }, 20, 3 );
+
+/**
+ * Stop the checkout refusing an order over a county it never asked for.
+ *
+ * WooCommerce's block checkout (11.1.2) draws the county box before it knows
+ * the country, using its own built-in field list where county is required. The
+ * empty box records an error straight away. When the country arrives, Britain
+ * says county is optional and the box relabels itself, but nothing checks it
+ * again and the hidden error stays. Open the delivery address to edit it,
+ * press Place order, and the customer is told to "enter a valid state/county"
+ * for a box marked optional. It happens with or without the address book.
+ *
+ * The built-in list has no filter, so assets/js/blocks/checkout-county.js
+ * clears that one error in the browser instead: for a country whose county is
+ * optional or hidden, while the box is empty. A county the country does need,
+ * Ireland's say, is still enforced as before.
+ */
+add_action( 'wp_enqueue_scripts', function (): void {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() || is_wc_endpoint_url() ) {
+		return;
+	}
+
+	$optional = array();
+
+	foreach ( WC()->countries->get_country_locale() as $country => $fields ) {
+		$state = $fields['state'] ?? array();
+
+		if ( 'default' !== $country && ( ( isset( $state['required'] ) && ! $state['required'] ) || ! empty( $state['hidden'] ) ) ) {
+			$optional[] = $country;
+		}
+	}
+
+	$relative = '/assets/js/blocks/checkout-county.js';
+
+	wp_enqueue_script(
+		'dorotape-checkout-county',
+		get_template_directory_uri() . $relative,
+		array( 'wp-data' ),
+		dorotape_asset_version( $relative ),
+		true
+	);
+
+	wp_localize_script( 'dorotape-checkout-county', 'dorotapeCheckoutCounty', array( 'optional' => $optional ) );
+}, 20 );

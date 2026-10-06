@@ -337,30 +337,16 @@ add_filter( 'woocommerce_quantity_input_classes', function ( $classes, $product 
 	return $classes;
 }, 10, 2 );
 
-/**
- * Lock the quantity box on the basket page too.
+/*
+ * The basket needs nothing here. It is the Cart *block*, which steps its +/-
+ * buttons by multiple_of from the Store API (set by the step filter above) and
+ * snaps a typed value to that step when the box loses focus.
  *
- * The basket is the WooCommerce Cart *block*, which is React drawing itself
- * from the Store API — none of the PHP above reaches it, so the theme's own
- * buttons and readonly flag never applied there and a customer could type 7 on
- * the basket page even though the product page refused it.
- *
- * The block already reads multiple_of from the Store API (it comes from the
- * step filter above, so it is already correct) and steps its +/- buttons by it.
- * Its input renders readOnly={! editable} while leaving those buttons live, so
- * turning editable off gives the basket exactly the product page's behaviour:
- * a locked box moved only by the arrows.
- *
- * @param bool       $editable
- * @param WC_Product $product
- * @return bool
+ * It used to be locked with woocommerce_store_api_product_quantity_editable,
+ * on the belief that the block kept its buttons when the box was read-only. It
+ * does not: with editable off it draws no buttons at all, which left stepped
+ * lines in the basket with no way to change the quantity but to remove them.
  */
-add_filter( 'woocommerce_store_api_product_quantity_editable', function ( $editable, $product ) {
-	if ( $product instanceof WC_Product && dorotape_qty_step( $product ) > 1 ) {
-		return false;
-	}
-	return $editable;
-}, 10, 2 );
 
 /**
  * Server-side backstop for the quantity step.
@@ -819,6 +805,32 @@ function dorotape_tier_qty_for_line( array $cart_item ): int {
 }
 
 /**
+ * The "10m+ rate · save 10%" label for a line, or an empty string.
+ *
+ * Empty when the tier saves nothing, which is the first tier on most products:
+ * "Qty Discount: 1m+ rate" on a line at full price read as a discount that
+ * was not there.
+ *
+ * @param array      $tier       The applied tier.
+ * @param WC_Product $product    The product priced, the variation where there is one.
+ * @param int        $product_id The parent product, which owns the sell unit.
+ */
+function dorotape_tier_label( array $tier, WC_Product $product, int $product_id ): string {
+	$base_price = (float) $product->get_regular_price();
+	$saving_pct = $base_price > 0
+		? (int) round( ( ( $base_price - (float) $tier['tier_price'] ) / $base_price ) * 100 )
+		: 0;
+
+	if ( $saving_pct <= 0 ) {
+		return '';
+	}
+
+	$unit = dorotape_unit_strings( dorotape_price_unit( $product_id ) );
+
+	return (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate · save ' . $saving_pct . '%';
+}
+
+/**
  * Display the active quantity-tier discount label in cart, checkout, and emails.
  *
  * @param array $item_data Existing display meta.
@@ -834,18 +846,10 @@ function dorotape_cart_item_display_meta( array $item_data, array $cart_item ): 
 	$qty  = dorotape_tier_qty_for_line( $cart_item );
 	$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
-	if ( $tier ) {
-		$product    = $cart_item['data'] ?? wc_get_product( $product_id );
-		$base_price = $product ? (float) $product->get_regular_price() : 0.0;
-		$tier_price = (float) $tier['tier_price'];
-		$saving_pct = ( $base_price > 0 )
-			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
-			: 0;
-		$unit  = dorotape_unit_strings( dorotape_price_unit( (int) $product_id ) );
-		$label = (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate';
-		if ( $saving_pct > 0 ) {
-			$label .= ' · save ' . $saving_pct . '%';
-		}
+	$product = $cart_item['data'] ?? wc_get_product( $lookup_id );
+	$label   = $tier && $product ? dorotape_tier_label( $tier, $product, (int) $product_id ) : '';
+
+	if ( '' !== $label ) {
 		$item_data[] = array(
 			'name'  => esc_html__( 'Qty Discount', 'dorotape' ),
 			'value' => esc_html( $label ),
@@ -883,18 +887,12 @@ function dorotape_save_order_item_meta(
 	$qty  = dorotape_tier_qty_for_line( $values );
 	$tier = dorotape_find_applied_tier( $qty, $lookup_id );
 
-	if ( $tier ) {
-		$product    = wc_get_product( $product_id );
-		$base_price = $product ? (float) $product->get_regular_price() : 0.0;
-		$tier_price = (float) $tier['tier_price'];
-		$saving_pct = ( $base_price > 0 )
-			? (int) round( ( ( $base_price - $tier_price ) / $base_price ) * 100 )
-			: 0;
-		$unit  = dorotape_unit_strings( dorotape_price_unit( (int) $product_id ) );
-		$label = (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate';
-		if ( $saving_pct > 0 ) {
-			$label .= ' · save ' . $saving_pct . '%';
-		}
+	// The variation, not the parent: a variable parent has no regular price of
+	// its own, so reading it here lost the saving from the saved label.
+	$product = wc_get_product( $lookup_id );
+	$label   = $tier && $product ? dorotape_tier_label( $tier, $product, (int) $product_id ) : '';
+
+	if ( '' !== $label ) {
 		$item->add_meta_data(
 			esc_html__( 'Qty Discount', 'dorotape' ),
 			$label,

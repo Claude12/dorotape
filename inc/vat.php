@@ -505,46 +505,8 @@ add_action( 'woocommerce_admin_order_data_after_order_details', function ( $orde
 
 // ─── Customer facing ──────────────────────────────────────────────────────────
 
-/**
- * Emails and the My Account order view.
- *
- * WooCommerce renders registered checkout fields on the order confirmation page
- * only, so both of these are done here. The customer's own VAT number belongs on
- * the paperwork they file, which is the whole reason we asked for it.
- *
- * @param WC_Order $order
- * @param bool     $sent_to_admin
- * @param bool     $plain_text
+/*
+ * Nothing here on purpose. WooCommerce now prints registered checkout fields in
+ * every order email and on the My Account order view ("Additional information"),
+ * so rendering the VAT number here as well showed it twice.
  */
-add_action( 'woocommerce_email_order_meta', function ( $order, $sent_to_admin = false, $plain_text = false ): void {
-	$number = dorotape_get_vat_number( $order );
-	if ( '' === $number ) {
-		return;
-	}
-
-	if ( $plain_text ) {
-		printf( "%s: %s\n\n", esc_html__( 'VAT number', 'dorotape' ), esc_html( $number ) );
-		return;
-	}
-
-	printf(
-		'<p><strong>%s:</strong> %s</p>',
-		esc_html__( 'VAT number', 'dorotape' ),
-		esc_html( $number )
-	);
-}, 10, 3 );
-
-/**
- * @param WC_Order $order
- */
-add_action( 'woocommerce_order_details_after_order_table', function ( $order ): void {
-	$number = dorotape_get_vat_number( $order );
-	if ( '' === $number ) {
-		return;
-	}
-	printf(
-		'<p class="dorotape-order__vat"><strong>%s:</strong> %s</p>',
-		esc_html__( 'VAT number', 'dorotape' ),
-		esc_html( $number )
-	);
-} );

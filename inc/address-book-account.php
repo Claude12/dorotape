@@ -180,6 +180,26 @@ add_action( 'template_redirect', function (): void {
 	exit;
 } );
 
+// ─── Scripts ──────────────────────────────────────────────────────────────────
+
+/**
+ * The country and county behaviour of WooCommerce's own address form, and the
+ * confirm on Delete, on this endpoint only.
+ */
+add_action( 'wp_enqueue_scripts', function (): void {
+	if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( DOROTAPE_ADDRESS_BOOK_ENDPOINT ) ) {
+		return;
+	}
+
+	wp_enqueue_script( 'wc-country-select' );
+	wp_enqueue_script( 'wc-address-i18n' );
+
+	wp_add_inline_script(
+		'wc-country-select',
+		"document.addEventListener('submit',function(e){var b=e.submitter;if(b&&b.dataset.dorotapeConfirm&&!window.confirm(b.dataset.dorotapeConfirm)){e.preventDefault();}});"
+	);
+}, 20 );
+
 // ─── Rendering ────────────────────────────────────────────────────────────────
 
 /**
@@ -211,18 +231,23 @@ function dorotape_render_address_list(): void {
 	if ( ! $book ) {
 		printf( '<p>%s</p>', esc_html__( 'You have not saved any addresses yet.', 'dorotape' ) );
 	} else {
+		$customer = new WC_Customer( get_current_user_id() );
+
 		echo '<ul class="dorotape-address-book">';
 
 		foreach ( $book as $address_id => $address ) {
 			$edit_url = add_query_arg( 'edit', rawurlencode( $address_id ), wc_get_account_endpoint_url( DOROTAPE_ADDRESS_BOOK_ENDPOINT ) );
 
+			$is_default = dorotape_address_is_default( $address, $customer );
+
 			echo '<li class="dorotape-address-book__item">';
 			printf(
-				'<h3 class="dorotape-address-book__label">%s <span class="dorotape-address-book__type">%s</span></h3>',
+				'<h3 class="dorotape-address-book__label">%s <span class="dorotape-address-book__type">%s</span>%s</h3>',
 				esc_html( $address['label'] ),
 				'billing' === $address['type']
 					? esc_html__( 'Invoice', 'dorotape' )
-					: esc_html__( 'Delivery', 'dorotape' )
+					: esc_html__( 'Delivery', 'dorotape' ),
+				$is_default ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default', 'dorotape' ) . '</span>' : ''
 			);
 			printf( '<address>%s</address>', wp_kses( dorotape_format_address( $address ), array( 'br' => array() ) ) );
 
@@ -230,7 +255,9 @@ function dorotape_render_address_list(): void {
 			// there is nothing else for the row they sit in to be drawn on.
 			echo '<div class="dorotape-address-book__actions">';
 			printf( '<a class="button" href="%s">%s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dorotape' ) );
-			dorotape_address_action_button( 'set_default', $address_id, __( 'Make default', 'dorotape' ) );
+			if ( ! $is_default ) {
+				dorotape_address_action_button( 'set_default', $address_id, __( 'Make default', 'dorotape' ) );
+			}
 			dorotape_address_action_button( 'delete', $address_id, __( 'Delete', 'dorotape' ), true );
 			echo '</div>';
 
@@ -245,6 +272,31 @@ function dorotape_render_address_list(): void {
 		esc_url( add_query_arg( 'add', '1', wc_get_account_endpoint_url( DOROTAPE_ADDRESS_BOOK_ENDPOINT ) ) ),
 		esc_html__( 'Add an address', 'dorotape' )
 	);
+}
+
+/**
+ * Whether a saved address is what the customer's WooCommerce default of the
+ * same type currently holds, which is what "Make default" writes.
+ *
+ * Compared field by field rather than remembered, because the default can also
+ * be changed under Addresses or by checkout, and a stored flag would go stale.
+ *
+ * @param array       $address
+ * @param WC_Customer $customer
+ */
+function dorotape_address_is_default( array $address, WC_Customer $customer ): bool {
+	$type = $address['type'] ?? '';
+
+	foreach ( array( 'first_name', 'last_name', 'address_1', 'address_2', 'city', 'postcode', 'country' ) as $key ) {
+		$getter = "get_{$type}_{$key}";
+
+		if ( ! method_exists( $customer, $getter )
+			|| strcasecmp( trim( (string) $customer->$getter() ), trim( (string) ( $address[ $key ] ?? '' ) ) ) !== 0 ) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
@@ -264,7 +316,9 @@ function dorotape_address_action_button( string $action, string $address_id, str
 			<input type="hidden" name="address_id" value="%s">
 			<button type="submit" class="button"%s>%s</button>
 		</form>',
-		wp_nonce_field( 'dorotape_address_' . $action, 'dorotape_address_nonce', true, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// Not wp_nonce_field(): it gives every copy the same id, and this
+		// form is printed twice per saved address.
+		'<input type="hidden" name="dorotape_address_nonce" value="' . esc_attr( wp_create_nonce( 'dorotape_address_' . $action ) ) . '">', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		esc_attr( $action ),
 		esc_attr( $address_id ),
 		$confirm ? ' data-dorotape-confirm="' . esc_attr__( 'Delete this address?', 'dorotape' ) . '"' : '',
@@ -324,9 +378,26 @@ function dorotape_render_address_form( string $address_id ): void {
 		$type
 	);
 
-	foreach ( dorotape_address_book_fields( $type ) as $key => $field ) {
-		woocommerce_form_field( $key, $field, $value( $key ) );
+	// A new address starts in the shop's own country, as WooCommerce's own
+	// address forms do, rather than on "Select a country".
+	$country = $value( 'country' );
+	if ( '' === $country ) {
+		$country = WC()->countries->get_base_country();
 	}
+
+	// WooCommerce's country script finds the county box, and relabels the
+	// fields for the chosen country, by their shipping_ ids inside this
+	// wrapper. The names stay bare, which is what the book stores. Billing
+	// and delivery have the same fields here, so one set of ids serves both.
+	echo '<div class="woocommerce-address-fields"><div class="woocommerce-address-fields__field-wrapper">';
+	foreach ( dorotape_address_book_fields( $type ) as $key => $field ) {
+		$field['id'] = 'shipping_' . $key;
+		if ( 'state' === $key ) {
+			$field['country'] = $country;
+		}
+		woocommerce_form_field( $key, $field, 'country' === $key ? $country : $value( $key ) );
+	}
+	echo '</div></div>';
 
 	printf(
 		'<p><button type="submit" class="button">%s</button> <a href="%s">%s</a></p>',

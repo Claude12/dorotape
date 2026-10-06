@@ -202,48 +202,8 @@ add_action( 'manage_shop_order_posts_custom_column', 'dorotape_purchase_order_co
 
 // ─── Customer facing ──────────────────────────────────────────────────────────
 
-/**
- * Emails.
- *
- * WooCommerce renders registered checkout fields on the order confirmation page
- * only. Emails and the My Account order view are not covered, so both are done
- * here rather than left to look like they work until someone checks an invoice.
- *
- * @param WC_Order $order
- * @param bool     $sent_to_admin
- * @param bool     $plain_text
+/*
+ * Nothing here on purpose. WooCommerce now prints registered checkout fields in
+ * every order email and on the My Account order view ("Additional information"),
+ * so rendering the PO number here as well showed it twice.
  */
-add_action( 'woocommerce_email_order_meta', function ( $order, $sent_to_admin = false, $plain_text = false ): void {
-	$po = dorotape_get_purchase_order( $order );
-	if ( '' === $po ) {
-		return;
-	}
-
-	if ( $plain_text ) {
-		printf( "%s: %s\n\n", esc_html__( 'Purchase order number', 'dorotape' ), esc_html( $po ) );
-		return;
-	}
-
-	printf(
-		'<p><strong>%s:</strong> %s</p>',
-		esc_html__( 'Purchase order number', 'dorotape' ),
-		esc_html( $po )
-	);
-}, 10, 3 );
-
-/**
- * My Account, order detail view.
- *
- * @param WC_Order $order
- */
-add_action( 'woocommerce_order_details_after_order_table', function ( $order ): void {
-	$po = dorotape_get_purchase_order( $order );
-	if ( '' === $po ) {
-		return;
-	}
-	printf(
-		'<p class="dorotape-order__po"><strong>%s:</strong> %s</p>',
-		esc_html__( 'Purchase order number', 'dorotape' ),
-		esc_html( $po )
-	);
-} );
