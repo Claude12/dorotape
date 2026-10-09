@@ -38,6 +38,8 @@ defined( 'ABSPATH' ) || exit;
  *                              can hand over a raw field value.
  *     @type bool   $breadcrumb Whether a breadcrumb belongs under the text.
  *                              False on the 404, which is not anywhere.
+ *     @type bool   $centred    Centre the text over a centred column below,
+ *                              as a blog article has.
  * }
  */
 function dorotape_page_banner( array $args = array() ): void {
@@ -49,11 +51,15 @@ function dorotape_page_banner( array $args = array() ): void {
 			'intro'      => '',
 			'shape'      => 'cubes-right',
 			'breadcrumb' => true,
+			'centred'    => false,
 		)
 	);
 
 	$shape   = dorotape_background_shape_value( (string) $args['shape'] );
 	$classes = 'internal-banner-block internal-banner-block--overlap' . dorotape_background_shape_class( $shape );
+	if ( $args['centred'] ) {
+		$classes .= ' internal-banner-block--centred';
+	}
 	?>
 	<section class="<?php echo esc_attr( $classes ); ?>">
 		<?php dorotape_background_shape( $shape ); ?>

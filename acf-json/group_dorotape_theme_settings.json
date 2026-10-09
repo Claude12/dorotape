@@ -201,6 +201,26 @@
             "append": ""
         },
         {
+            "key": "field_dorotape_header_menu_view_all",
+            "label": "Menu \"View all\" label",
+            "name": "header_menu_view_all",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Starts the link to a menu section's own page, followed by the section name: \"View all\" reads \"View all Sign & Display Vinyl\". Leave empty to show the section name alone.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "View all",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dorotape_tab_footer",
             "label": "Footer",
             "name": "",
@@ -626,5 +646,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1790245329
+    "modified": 1791543131
 }

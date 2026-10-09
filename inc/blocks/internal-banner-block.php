@@ -23,6 +23,7 @@ $dt_eyebrow    = trim( (string) get_sub_field( 'eyebrow' ) );
 $dt_heading    = trim( (string) get_sub_field( 'heading' ) );
 $dt_intro      = trim( (string) get_sub_field( 'intro' ) );
 $dt_breadcrumb = (bool) get_sub_field( 'breadcrumb' );
+$dt_centred    = 'center' === get_sub_field( 'align' );
 
 // The heading is what the banner is for. Without one the rest has nothing to
 // hang off, so the block hides rather than rendering a tall empty wash.
@@ -39,6 +40,10 @@ $dt_heading_tag = $dt_is_first ? 'h1' : 'h2';
 $dt_classes = 'internal-banner-block';
 if ( $dt_is_first ) {
 	$dt_classes .= ' internal-banner-block--overlap';
+}
+
+if ( $dt_centred ) {
+	$dt_classes .= ' internal-banner-block--centred';
 }
 
 $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );

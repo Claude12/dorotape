@@ -133,6 +133,21 @@
     margin-top: var(--spacer-32);
   }
 
+  // Articles and case studies, whose content sits in the middle of the page.
+  &--centred &__inner {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  &--centred &__heading,
+  &--centred &__intro {
+    margin-inline: auto;
+  }
+
+  &--centred .breadcrumb__trail {
+    justify-content: center;
+  }
+
   // Category pages put a photograph beside the text. The grid only splits at
   // desktop, because below it the photo would either squash the text into a
   // column too narrow for the heading or push the ranges grid off the first

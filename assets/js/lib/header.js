@@ -10,14 +10,25 @@
  * Three behaviours:
  *   1. Solid-on-scroll, matching the design's `scrollY > 40` threshold.
  *   2. The drawer, shared by the menu button and the phone search button.
- *   3. Dropdowns on the category row, for pointer and keyboard.
+ *   3. The menu row's panels (dropdowns and mega panels), for pointer,
+ *      touch and keyboard.
+ *   4. The drawer's accordion.
  */
 
 const SCROLL_THRESHOLD = 40;
 
-// Matches the `xl` tier in abstracts/_mixins.scss, where the category row
+// Matches the `desktop` tier in abstracts/_mixins.scss, where the menu row
 // appears and the drawer is hidden by CSS.
-const XL_BREAKPOINT = 1280;
+const DESKTOP_BREAKPOINT = 1024;
+
+// Hover delays. Opening waits a moment so a pointer crossing the row on its
+// way to the search box does not flash every panel; closing waits longer so
+// a diagonal move from the label into the panel survives a brief exit.
+const HOVER_OPEN_DELAY = 80;
+const HOVER_CLOSE_DELAY = 220;
+// A mega group is chosen when the pointer rests on it, not as it passes over
+// it heading for the links on the right.
+const GROUP_INTENT_DELAY = 120;
 
 // Hooks are js- classes, never styled; state is is- classes, which the SCSS
 // reads (layout/_header.scss). Keeping the two apart means a restyle can
@@ -25,7 +36,7 @@ const XL_BREAKPOINT = 1280;
 const STATE_SOLID = 'is-solid';
 const STATE_DRAWER_OPEN = 'is-drawer-open';
 const STATE_OPEN = 'is-open';
-const STATE_FOCUSED = 'is-focused';
+const STATE_ACTIVE = 'is-active';
 
 export function initHeader() {
   const header = document.querySelector('.js-site-header');
@@ -36,7 +47,9 @@ export function initHeader() {
 
   initScrollState(header);
   initDrawer(header);
-  initDropdowns(header);
+  initPanels(header);
+  initShortcuts(header);
+  initDrawerAccordion(header);
 }
 
 /**
@@ -166,10 +179,10 @@ function initDrawer(header) {
     setOpen(false);
   });
 
-  // Rotating a tablet past the xl breakpoint hides the drawer in CSS while
+  // Rotating a tablet past the desktop breakpoint hides the drawer in CSS while
   // the open class stays behind, so the next tap on the menu button would
   // close something already invisible and appear to do nothing.
-  const wide = window.matchMedia('(min-width: ' + XL_BREAKPOINT + 'px)');
+  const wide = window.matchMedia('(min-width: ' + DESKTOP_BREAKPOINT + 'px)');
   const onChange = function (e) {
     if (e.matches) {
       setOpen(false);
@@ -185,108 +198,285 @@ function initDrawer(header) {
 }
 
 /**
- * Dropdowns on the category row.
+ * Panels on the menu row.
  *
- * The design has no submenus, but these are WordPress menus and the client's
- * Primary menu already runs three levels deep, so anything they nest has to
- * open rather than silently disappear.
+ * Every label with children is a <button> (inc/header-menu.php), so a click,
+ * a tap, Enter and Space all arrive here as one click event. Hover opens too,
+ * for a mouse, but never on its own for touch: a tap fires mouseenter first,
+ * and opening on that would make the click that follows close the panel
+ * again. Only one panel is open at a time.
  */
-function initDropdowns(header) {
+function initPanels(header) {
   const nav = header.querySelector('.js-header-nav');
 
   if (!nav) {
     return;
   }
 
-  const parents = nav.querySelectorAll('.menu-item-has-children');
+  const triggers = Array.prototype.slice.call(nav.querySelectorAll('.js-nav-trigger'));
 
-  if (!parents.length) {
+  if (!triggers.length) {
     return;
   }
 
-  /*
-   * Tell assistive tech whether each panel is open. Hover is left out: it is
-   * a pointer affordance and a screen reader never produces it, so the state
-   * follows the keyboard classes alone.
-   */
-  function sync(item) {
-    const link = item.querySelector(':scope > .site-header__nav-link');
-    if (link) {
-      const open = item.classList.contains(STATE_OPEN) || item.classList.contains(STATE_FOCUSED);
-      link.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-  }
+  let openItem = null;
+  let hoverTimer = 0;
+  // The last pointer type seen, so hover handlers can stand aside for touch.
+  let pointerType = 'mouse';
 
-  parents.forEach(function (item) {
-    // Pointer open/close is CSS (:hover). This only adds the keyboard path,
-    // plus the .is-focused class that keeps a panel open while tabbing
-    // through it.
-    const link = item.querySelector(':scope > .site-header__nav-link');
-
-    if (!link) {
-      return;
-    }
-
-    link.setAttribute('aria-expanded', 'false');
-
-    link.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        item.classList.remove(STATE_OPEN, STATE_FOCUSED);
-        sync(item);
-        link.focus();
-        return;
-      }
-
-      if (e.key !== 'Enter' && e.key !== ' ') {
-        return;
-      }
-
-      // Enter on a parent that points somewhere real should follow the link:
-      // a category item links to its own archive, and swallowing that would
-      // make the archive unreachable by keyboard.
-      const href = link.getAttribute('href');
-      if (
-        e.key === 'Enter' &&
-        !item.classList.contains(STATE_OPEN) &&
-        href &&
-        href !== '#'
-      ) {
-        return;
-      }
-
-      e.preventDefault();
-      item.classList.toggle(STATE_OPEN);
-      sync(item);
-    });
-  });
-
-  // Keep the panel open while focus is anywhere inside it.
   nav.addEventListener(
-    'focusin',
+    'pointerdown',
     function (e) {
-      parents.forEach(function (item) {
-        item.classList.toggle(STATE_FOCUSED, item.contains(e.target));
-        sync(item);
-      });
+      pointerType = e.pointerType || 'mouse';
+    },
+    true
+  );
+  nav.addEventListener(
+    'pointerover',
+    function (e) {
+      pointerType = e.pointerType || 'mouse';
     },
     true
   );
 
-  nav.addEventListener('focusout', function (e) {
-    if (!nav.contains(e.relatedTarget)) {
-      parents.forEach(function (item) {
-        item.classList.remove(STATE_FOCUSED, STATE_OPEN);
-        sync(item);
+  function itemOf(trigger) {
+    return trigger.parentElement;
+  }
+
+  function triggerOf(item) {
+    return item.querySelector(':scope > .js-nav-trigger');
+  }
+
+  function setOpen(item, open) {
+    const trigger = triggerOf(item);
+    item.classList.toggle(STATE_OPEN, open);
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  function open(item) {
+    if (openItem && openItem !== item) {
+      setOpen(openItem, false);
+    }
+    setOpen(item, true);
+    openItem = item;
+  }
+
+  function close() {
+    if (openItem) {
+      setOpen(openItem, false);
+      openItem = null;
+    }
+  }
+
+  function isMouse() {
+    return pointerType === 'mouse' || pointerType === 'pen';
+  }
+
+  triggers.forEach(function (trigger) {
+    const item = itemOf(trigger);
+
+    trigger.addEventListener('click', function (e) {
+      window.clearTimeout(hoverTimer);
+      // A mouse has usually opened the panel by hover before the click lands,
+      // so for a mouse the click only ever opens. Keyboard clicks (detail 0)
+      // and taps toggle.
+      if (isMouse() && e.detail > 0) {
+        open(item);
+        return;
+      }
+      if (openItem === item) {
+        close();
+      } else {
+        open(item);
+      }
+    });
+
+    item.addEventListener('mouseenter', function () {
+      if (!isMouse()) {
+        return;
+      }
+      window.clearTimeout(hoverTimer);
+      // Already showing a panel: move straight to the next one, as a menu
+      // bar does, rather than closing and reopening with a delay.
+      hoverTimer = window.setTimeout(
+        function () {
+          open(item);
+        },
+        openItem ? 0 : HOVER_OPEN_DELAY
+      );
+    });
+
+    item.addEventListener('mouseleave', function () {
+      if (!isMouse()) {
+        return;
+      }
+      window.clearTimeout(hoverTimer);
+      hoverTimer = window.setTimeout(function () {
+        if (openItem === item) {
+          close();
+        }
+      }, HOVER_CLOSE_DELAY);
+    });
+
+    item.querySelectorAll('.js-mega-group').forEach(function (group) {
+      initMegaGroup(item, group);
+    });
+  });
+
+  /*
+   * A mega panel shows one group's links at a time. Resting the pointer on a
+   * group, or tabbing to it, shows that group. A group with its own archive
+   * is a link: with a mouse that is simply a link to follow, but on touch
+   * there is no hover, so the first tap shows the group and only a second
+   * tap on the already-shown group follows it.
+   */
+  function initMegaGroup(item, group) {
+    const tab = group.querySelector(':scope > .js-mega-tab');
+
+    if (!tab) {
+      return;
+    }
+
+    let intent = 0;
+
+    function activate() {
+      item.querySelectorAll('.js-mega-group').forEach(function (other) {
+        const active = other === group;
+        const otherTab = other.querySelector(':scope > .js-mega-tab');
+        other.classList.toggle(STATE_ACTIVE, active);
+        if (otherTab && otherTab.tagName === 'BUTTON') {
+          otherTab.setAttribute('aria-expanded', active ? 'true' : 'false');
+        }
       });
+    }
+
+    tab.addEventListener('mouseenter', function () {
+      if (!isMouse()) {
+        return;
+      }
+      window.clearTimeout(intent);
+      intent = window.setTimeout(activate, GROUP_INTENT_DELAY);
+    });
+
+    tab.addEventListener('mouseleave', function () {
+      window.clearTimeout(intent);
+    });
+
+    tab.addEventListener('focus', activate);
+
+    // Whether the group was already shown when the finger went down. A tap
+    // focuses the link before its click fires, and focus shows the group, so
+    // by click time every tap would look like a second tap.
+    let wasActive = false;
+    tab.addEventListener('pointerdown', function () {
+      wasActive = group.classList.contains(STATE_ACTIVE);
+    });
+
+    tab.addEventListener('click', function (e) {
+      if (tab.tagName === 'A' && !isMouse() && !wasActive) {
+        e.preventDefault();
+      }
+      wasActive = true;
+      activate();
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !openItem) {
+      return;
+    }
+    const trigger = triggerOf(openItem);
+    close();
+    trigger.focus();
+  });
+
+  // Tabbing out of the row closes whatever it left open.
+  nav.addEventListener('focusout', function (e) {
+    if (openItem && e.relatedTarget && !openItem.contains(e.relatedTarget)) {
+      close();
     }
   });
 
   document.addEventListener('click', function (e) {
-    if (!nav.contains(e.target)) {
-      parents.forEach(function (item) {
-        item.classList.remove(STATE_OPEN);
-        sync(item);
+    if (openItem && !openItem.contains(e.target)) {
+      close();
+    }
+  });
+}
+
+/**
+ * Category shortcuts that do not fit.
+ *
+ * CSS hides them by letting them wrap onto a clipped second line, but a
+ * clipped link can still take focus. Any link not on the first line is made
+ * invisible to the keyboard and to screen readers, and the check reruns
+ * whenever the row changes width.
+ */
+function initShortcuts(header) {
+  const list = header.querySelector('.js-nav-shortcuts');
+
+  if (!list || !window.ResizeObserver) {
+    return;
+  }
+
+  const items = Array.prototype.slice.call(list.children);
+
+  function apply() {
+    const top = list.getBoundingClientRect().top;
+    items.forEach(function (item) {
+      const hidden = item.getBoundingClientRect().top - top > 1;
+      item.style.visibility = hidden ? 'hidden' : '';
+    });
+  }
+
+  new window.ResizeObserver(apply).observe(list);
+}
+
+/**
+ * The drawer's accordion.
+ *
+ * Each section is a button followed by its list; CSS reads the button's
+ * aria-expanded to show the list, so this only has to flip that attribute.
+ * Opening a section closes its siblings, at either level, which keeps the
+ * drawer short enough to scan on a phone. Closing a section also closes the
+ * groups inside it, so it reopens folded rather than as it was left.
+ */
+function initDrawerAccordion(header) {
+  const drawer = header.querySelector('.js-header-drawer');
+
+  if (!drawer) {
+    return;
+  }
+
+  drawer.addEventListener('click', function (e) {
+    const toggle = e.target.closest('.js-drawer-toggle');
+
+    if (!toggle || !drawer.contains(toggle)) {
+      return;
+    }
+
+    const expand = toggle.getAttribute('aria-expanded') !== 'true';
+    const list = toggle.closest('ul');
+
+    function collapse(button) {
+      button.setAttribute('aria-expanded', 'false');
+      button.parentElement.querySelectorAll('.js-drawer-toggle').forEach(function (inner) {
+        inner.setAttribute('aria-expanded', 'false');
       });
+    }
+
+    if (expand && list) {
+      list.querySelectorAll(':scope > li > .js-drawer-toggle').forEach(function (sibling) {
+        if (sibling !== toggle) {
+          collapse(sibling);
+        }
+      });
+    }
+
+    if (expand) {
+      toggle.setAttribute('aria-expanded', 'true');
+    } else {
+      collapse(toggle);
     }
   });
 }

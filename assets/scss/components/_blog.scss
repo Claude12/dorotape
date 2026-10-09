@@ -175,8 +175,11 @@
     padding-block: var(--spacer-48) var(--spacer-112);
   }
 
+  // Centred under the centred banner. The text inside stays left aligned,
+  // since a ragged left edge is hard to read over more than a few lines.
   &__inner {
     max-width: 800px;
+    margin-inline: auto;
   }
 
   // One photo full width; two side by side; three or more the first full
@@ -214,5 +217,6 @@
 
   &__back {
     margin: var(--spacer-48) 0 0;
+    text-align: center;
   }
 }

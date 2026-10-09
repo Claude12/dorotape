@@ -4,7 +4,7 @@ declare( strict_types=1 );
  * A blog article.
  *
  * The internal banner with the article's category and date, the photos, the
- * text at the Rich Text block's measure, a link back to the blog and three
+ * text at the Rich Text block's measure, all centred on the page, a link back to the blog and three
  * more articles. The wording around the article is on Theme Settings > Blog
  * Page (inc/blog.php).
  *
@@ -55,6 +55,7 @@ while ( have_posts() ) :
 				'heading' => get_the_title(),
 				'intro'   => $dt_date,
 				'shape'   => dorotape_blog_field( 'blog_banner_shape', 'cubes-right' ),
+				'centred' => true,
 			)
 		);
 		?>

@@ -7,10 +7,10 @@
  *
  * Three stacked rows:
  *   utility  - delivery notice + phone/account/basket, from tablet up
- *   main     - logo, search, quick links, quote button, always
- *   nav      - the product categories, from 1280px up
- * Below 1280px the categories move into a drawer under the main row, which
- * also carries the search field and the utility links.
+ *   main     - logo, search, quote button, always
+ *   nav      - the main menu with its mega panels, from 1024px up
+ * Below 1024px the menu moves into a drawer under the main row, as an
+ * accordion, with the search field and the utility links.
  *
  * Styling is assets/scss/layout/_header.scss, behaviour assets/js/lib/header.js.
  * Helpers are inc/header.php.
@@ -101,31 +101,6 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 
 				<div class="site-header__centre">
 					<?php dorotape_header_search_field( 'dt-search-desktop', $dorotape_search ); ?>
-
-					<?php
-					// The design's Applications / Sustainability / Support links.
-					// Those pages do not exist yet, so this renders whatever is
-					// in the Secondary menu and nothing at all when that slot is
-					// empty: a hard-coded trio would be three 404s.
-					if ( has_nav_menu( 'secondary' ) ) :
-						?>
-						<nav class="site-header__quick-links" aria-label="<?php esc_attr_e( 'Secondary menu', 'dorotape' ); ?>">
-							<?php
-							wp_nav_menu(
-								array(
-									'theme_location' => 'secondary',
-									'menu_id'        => 'secondary-menu',
-									'menu_class'     => 'site-header__quick-links-list',
-									'item_class'     => 'site-header__quick-links-item',
-									'link_class'     => 'site-header__quick-link',
-									'container'      => false,
-									'depth'          => 1,
-									'fallback_cb'    => false,
-								)
-							);
-							?>
-						</nav>
-					<?php endif; ?>
 				</div>
 
 				<div class="site-header__actions">
@@ -162,30 +137,15 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 		</div><!-- .site-header__main -->
 
 		<?php
-		// An unassigned menu location must render nothing. wp_nav_menu()'s
-		// default fallback_cb is wp_page_menu(), which lists every published
-		// page alphabetically, so an empty slot was putting Cart, Checkout, My
-		// account, Wishlist and the policy pages into the site navigation.
-		// Hence fallback_cb => false, and has_nav_menu() around the wrapper so
-		// an empty slot does not leave an empty <nav> landmark behind either.
+		// The main menu: Products and Applications as mega panels, the rest as
+		// links or short dropdowns. Built in inc/header-menu.php from the
+		// Primary Navigation menu. An empty slot leaves no empty <nav> behind.
 		if ( has_nav_menu( 'primary' ) ) :
 			?>
-			<nav class="site-header__nav js-header-nav" aria-label="<?php esc_attr_e( 'Product categories', 'dorotape' ); ?>">
+			<nav class="site-header__nav js-header-nav" aria-label="<?php esc_attr_e( 'Main menu', 'dorotape' ); ?>">
 				<div class="container site-header__nav-inner">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'menu_id'        => 'primary-menu',
-							'menu_class'     => 'site-header__nav-list',
-							'item_class'     => 'site-header__nav-item',
-							'link_class'     => 'site-header__nav-link',
-							'submenu_class'  => 'site-header__nav-submenu',
-							'container'      => false,
-							'fallback_cb'    => false,
-						)
-					);
-					?>
+					<?php dorotape_header_nav(); ?>
+					<?php dorotape_header_shortcuts(); ?>
 				</div>
 			</nav>
 		<?php endif; ?>
@@ -200,22 +160,7 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 			<div class="container">
 				<?php dorotape_header_search_field( 'dt-search-drawer', '' !== $dorotape_search_sm ? $dorotape_search_sm : $dorotape_search ); ?>
 
-				<?php
-				if ( has_nav_menu( 'primary' ) ) {
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'menu_id'        => 'primary-menu-drawer',
-							'menu_class'     => 'site-header__drawer-list',
-							'item_class'     => 'site-header__drawer-item',
-							'link_class'     => 'site-header__drawer-link',
-							'submenu_class'  => 'site-header__drawer-submenu',
-							'container'      => false,
-							'fallback_cb'    => false,
-						)
-					);
-				}
-				?>
+				<?php dorotape_header_drawer_menu(); ?>
 
 				<div class="site-header__drawer-utility">
 					<?php if ( '' !== $dorotape_phone['display'] ) : ?>

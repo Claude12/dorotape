@@ -51,24 +51,22 @@ function dorotape_setup() {
 	add_theme_support( 'wc-product-gallery-slider' );
 
 	/*
-	 * The footer has three link columns and a legal row rather than one menu.
-	 * footer-products is optional: with nothing assigned to it the Products
-	 * column renders the primary menu, which is what the design shows (the
-	 * same eight categories as the header).
+	 * One location per place a menu appears, named for that place so an
+	 * editor in Appearance > Menus can tell where each one shows.
 	 *
-	 * 'footer' stays registered for the single-menu footer that shipped
-	 * before this rebuild. Nothing is assigned to it, and it can be dropped
-	 * once that is confirmed on the live site too.
+	 * primary is the header's main menu (inc/header-menu.php): sections on
+	 * the menu bar from 1024px, the burger menu below. shortcuts is the short
+	 * list of category links at the right of that bar. The footer has three
+	 * link columns and a legal row, one location each.
 	 */
 	register_nav_menus(
 		array(
-			'primary'         => esc_html__( 'Primary Navigation', 'dorotape' ),
-			'secondary'       => esc_html__( 'Secondary Navigation', 'dorotape' ),
-			'footer-products' => esc_html__( 'Footer: Products', 'dorotape' ),
-			'footer-support'  => esc_html__( 'Footer: Support', 'dorotape' ),
-			'footer-about'    => esc_html__( 'Footer: About', 'dorotape' ),
-			'footer-legal'    => esc_html__( 'Footer: Legal', 'dorotape' ),
-			'footer'          => esc_html__( 'Footer Navigation (legacy)', 'dorotape' ),
+			'primary'         => esc_html__( 'Header: Main menu (menu bar on desktop, burger menu on mobile)', 'dorotape' ),
+			'shortcuts'       => esc_html__( 'Header: Category shortcuts (right of the menu bar; about 4 fit, extras hide on smaller screens)', 'dorotape' ),
+			'footer-products' => esc_html__( 'Footer: Products column', 'dorotape' ),
+			'footer-support'  => esc_html__( 'Footer: Support column', 'dorotape' ),
+			'footer-about'    => esc_html__( 'Footer: About column', 'dorotape' ),
+			'footer-legal'    => esc_html__( 'Footer: Legal links (bottom row)', 'dorotape' ),
 		)
 	);
 
@@ -253,6 +251,7 @@ require get_template_directory() . '/inc/webp.php';
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/setup.php';
 require get_template_directory() . '/inc/header.php';
+require get_template_directory() . '/inc/header-menu.php';
 require get_template_directory() . '/inc/toast.php';
 require get_template_directory() . '/inc/footer.php';
 require get_template_directory() . '/inc/background-shape.php';

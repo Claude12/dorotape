@@ -8,8 +8,8 @@
 // Three stacked rows, each appearing at its own breakpoint:
 //   utility  - delivery message + phone/account/basket, from tablet up
 //   main     - logo, aurora-bordered search, quick links, quote button, always
-//   nav      - the eight product categories, from xl (1280px) up
-// Below xl the categories move into a drawer under the main row.
+//   nav      - the main menu and its panels, from desktop (1024px) up
+// Below desktop the menu moves into a drawer under the main row.
 //
 // The design fixes the header to the viewport so the hero can run underneath
 // it. This uses sticky instead: it pins identically, but it keeps its space in
@@ -27,8 +27,8 @@
 // The header's rendered height at each tier, for the hero overlap. CSS rather
 // than a JS measurement, so the hero is in place on first paint instead of
 // jumping up once a script runs. Keep these in step with the row heights
-// below: main 80px, utility 36px + 1px border from tablet, category row
-// 48px + 1px border from xl. The header's own bottom edge is a shadow and
+// below: main 80px, utility 36px + 1px border from tablet, menu row
+// 48px + 1px border from desktop. The header's own bottom edge is a shadow and
 // takes no space.
 :root {
   --site-header-height: 80px;
@@ -37,7 +37,7 @@
     --site-header-height: 117px;
   }
 
-  @include min-breakpoint(xl) {
+  @include min-breakpoint(desktop) {
     --site-header-height: 166px;
   }
 }
@@ -410,51 +410,6 @@
   z-index: z(overlay);
 }
 
-// ── Quick links ──────────────────────────────────────────────────────────
-
-// Held back to desktop. At 768 the tablet layout has 720px of container to
-// fit the logo, the search and the actions group, and these three links were
-// the 115px that pushed it over. They are secondary navigation, so they are
-// what gives way rather than the search field shrinking further.
-.site-header__quick-links {
-  display: none;
-
-  @include min-breakpoint(desktop) {
-    display: flex;
-    flex-shrink: 0;
-  }
-}
-
-.site-header__quick-links-list {
-  display: flex;
-  align-items: center;
-  gap: var(--spacer-20);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.site-header__quick-links-item {
-  margin: 0;
-}
-
-.site-header__quick-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--spacer-24);
-  padding-block: var(--spacer-4);
-  color: var(--color-muted-foreground);
-  font-size: $font-size-sm;
-  line-height: $line-height-sm;
-  text-decoration: none;
-  transition: color var(--transition-fast);
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-cyan);
-  }
-}
-
 // ── Actions ──────────────────────────────────────────────────────────────
 
 .site-header__actions {
@@ -505,7 +460,7 @@
 }
 
 .site-header__menu-toggle {
-  @include min-breakpoint(xl) {
+  @include min-breakpoint(desktop) {
     display: none;
   }
 }
@@ -552,127 +507,459 @@
   }
 }
 
-// ── Category nav row ─────────────────────────────────────────────────────
+// ── Main menu row ────────────────────────────────────────────────────────
+//
+// From desktop up. The row used to hold eight category links and needed
+// 1280px; it now holds seven short section labels (Products, Applications,
+// Inspiration ...) with the categories inside panels, so it fits at 1024 and
+// the hamburger is only needed below that. Markup is inc/header-menu.php.
 
 .site-header__nav {
   display: none;
   border-top: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
   background-color: var(--color-background);
 
-  @include min-breakpoint(xl) {
+  @include min-breakpoint(desktop) {
     display: block;
   }
 }
 
+// The positioning context for the mega panels, which span the container
+// rather than hanging off their own item.
 .site-header__nav-inner {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   min-height: var(--spacer-48);
 }
 
-// `flex-wrap` is the safety net. The eight labels are menu items an editor
-// controls, so their combined width is not fixed: today they need 1308px and
-// the container at 1280 offers 1232. Rather than let a long label push the
-// whole page sideways, the row wraps. The tighter type below 1440 is what
-// makes sure it does not have to.
-//
-// Horizontal scrolling would be the other option, but it needs
-// `overflow-x: auto`, and that clips the dropdown panels, which matters
-// because the client's menus nest three levels deep.
+// The sections, at their natural spacing from the left. The negative margin
+// pulls the first label's padding outside the container, so its text lines up
+// with the logo above.
 .site-header__nav-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-shrink: 0;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin: 0;
+  gap: var(--spacer-4);
+  margin: 0 0 0 calc(-1 * var(--spacer-12));
   padding: 0;
   list-style: none;
 }
 
-.site-header__nav-item {
-  position: relative;
+// Category shortcuts (inc/header-menu.php), filling the rest of the row from
+// the right, as the design's category links did. One line tall with the
+// overflow hidden: links that do not fit wrap onto a second line nobody sees,
+// so the row loses shortcuts as it narrows instead of crowding or wrapping.
+.site-header__shortcuts {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
+  height: var(--spacer-48);
+  margin: 0 calc(-1 * var(--spacer-10)) 0 var(--spacer-16);
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
 }
 
-// Between 1280 and 1440 the labels are set one step tighter than the design,
-// which specifies 14px type on 12px of padding. At 1440 there is room for the
-// design's values; at 1280 there is not, and the choice is between tightening
-// the labels by a pixel or holding the whole category row back to a width the
-// design does not use.
-.site-header__nav-link {
-  display: block;
-  padding: var(--spacer-8);
-  border-radius: var(--radius-2xl);
-  color: var(--color-foreground);
+.site-header__shortcut {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  // A short rule ahead of the first shortcut separates them from the
+  // sections, which open panels; these go straight to a category.
+  &:first-child::before {
+    content: "";
+    width: 1px;
+    height: var(--spacer-20);
+    margin-right: var(--spacer-8);
+    background-color: var(--color-border);
+  }
+}
+
+.site-header__shortcut-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--spacer-48);
+  // A step tighter than the sections, which is the difference between three
+  // shortcuts and four at 1440.
+  padding: 0 var(--spacer-10);
+  color: var(--color-muted-foreground);
   font-size: $font-size-13;
-  font-weight: $font-weight-bold;
+  font-weight: $font-weight-semibold;
   line-height: $line-height-sm;
   white-space: nowrap;
   text-decoration: none;
   transition: color var(--transition-fast);
 
-  @include min-breakpoint(wide) {
-    padding: var(--spacer-8) var(--spacer-12);
-    font-size: $font-size-sm;
+  &:hover,
+  &:focus-visible,
+  &[aria-current="page"] {
+    color: var(--color-cyan);
+  }
+}
+
+.site-header__nav-item {
+  position: relative;
+
+  // Mega panels are positioned against .site-header__nav-inner instead.
+  &--mega {
+    position: static;
+  }
+}
+
+// Links and panel triggers share one look, so a reader cannot tell which
+// labels open a panel until the chevron says so.
+.site-header__nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-6);
+  min-height: var(--spacer-48);
+  padding: 0 var(--spacer-12);
+  border: 0;
+  background: none;
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+
+  // The underline marks the open panel and the section the page is in. Drawn
+  // on the row's bottom edge so it reads as a tab attached to the panel.
+  &::after {
+    content: "";
+    position: absolute;
+    right: var(--spacer-12);
+    bottom: -1px;
+    left: var(--spacer-12);
+    height: 2px;
+    border-radius: 2px;
+    background-image: var(--gradient-aurora);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition:
+      opacity var(--transition-fast),
+      transform var(--transition-fast);
   }
 
   &:hover,
-  &:focus-visible {
+  &:focus-visible,
+  &[aria-expanded="true"] {
     color: var(--color-cyan);
   }
 
-  // Dropdown links. Not in the design, which shows no submenus.
-  &--sub {
-    font-size: $font-size-13;
-    font-weight: $font-weight-semibold;
-    white-space: normal;
+  &[aria-expanded="true"]::after,
+  .is-current > &::after {
+    opacity: 1;
+    transform: scaleX(1);
   }
 }
 
-// Dropdowns. The design shows none, but these are WordPress menus and the
-// client's Primary menu already has three levels in it, so the markup has to
-// cope. Anything nested renders as a panel instead of being dropped, which
-// would silently hide menu items an editor had added.
-.site-header__nav-item.menu-item-has-children > .site-header__nav-link::after {
-  content: "";
-  display: inline-block;
-  width: 0;
-  height: 0;
-  margin-left: var(--spacer-8);
-  vertical-align: middle;
-  border-top: 4px solid currentcolor;
-  border-right: 4px solid transparent;
-  border-left: 4px solid transparent;
+.site-header__nav-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+
+  [aria-expanded="true"] > & {
+    transform: rotate(180deg);
+  }
 }
 
-.site-header__nav-submenu {
-  display: none;
+// ── Panels (shared) ──────────────────────────────────────────────────────
+
+.site-header__dropdown,
+.site-header__mega {
   position: absolute;
   top: 100%;
-  left: 0;
   z-index: z(dropdown);
-  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  background: var(--color-popover);
+  box-shadow: 0 24px 48px -12px color-mix(in oklab, var(--color-navy) 80%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    visibility 0s linear 150ms;
+
+  .is-open > & {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity var(--transition-fast),
+      transform var(--transition-fast),
+      visibility 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+    transition: none;
+
+    .is-open > & {
+      transition: none;
+    }
+  }
+}
+
+// The link to a section's own page. Used at the foot of a dropdown, the foot
+// of a mega panel's group list and the head of each group's links.
+.site-header__overview {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  color: var(--color-cyan);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.site-header__overview-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+
+  .site-header__overview:hover & {
+    transform: translateX(2px);
+  }
+}
+
+// ── Dropdown ─────────────────────────────────────────────────────────────
+
+.site-header__dropdown {
+  left: 0;
   width: max-content;
   min-width: 240px;
-  margin: 0;
+  max-width: 320px;
   padding: var(--spacer-8);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-popover);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--color-navy) 60%, transparent);
+
+  // The last two items sit near the row's right edge, so their panels open
+  // leftwards and stay inside the container.
+  .site-header__nav-item:nth-last-child(-n + 2) > & {
+    right: 0;
+    left: auto;
+  }
+
+  .site-header__overview {
+    margin: var(--spacer-8) var(--spacer-12) var(--spacer-8);
+  }
+}
+
+.site-header__dropdown-list {
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
-.site-header__nav-submenu .site-header__nav-submenu {
-  top: calc(-1 * var(--spacer-8));
-  left: 100%;
+.site-header__dropdown-link {
+  display: block;
+  padding: var(--spacer-8) var(--spacer-12);
+  border-radius: var(--radius-md);
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--color-secondary);
+    color: var(--color-cyan);
+  }
+
+  &[aria-current="page"] {
+    color: var(--color-cyan);
+  }
 }
 
-.site-header__nav-item:hover > .site-header__nav-submenu,
-.site-header__nav-item.is-focused > .site-header__nav-submenu,
-.site-header__nav-item.is-open > .site-header__nav-submenu {
+// ── Mega panel ───────────────────────────────────────────────────────────
+//
+// Groups down the left, the active group's links filling the rest. Each
+// group's links sit in the same <li> as the group, so screen readers hear
+// them together; visually every pane is lifted out of the rail and pinned to
+// the panel's right-hand area. The panel has a fixed height that fits the
+// longest group at two columns, so it does not jump as the pointer moves down
+// the rail, and a pane that is still too long scrolls inside itself.
+
+.site-header__mega {
+  --mega-rail: 264px;
+
+  right: 0;
+  left: 0;
+  height: min(480px, calc(100vh - var(--site-header-height) - var(--spacer-24)));
+  height: min(480px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
+  overflow: hidden;
+
+  @include min-breakpoint(xl) {
+    --mega-rail: 296px;
+
+    height: min(440px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
+  }
+}
+
+.site-header__mega-rail {
   display: flex;
+  flex-direction: column;
+  width: var(--mega-rail);
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--spacer-16);
+  border-right: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+
+  .site-header__overview--rail {
+    margin: auto var(--spacer-12) var(--spacer-4);
+    padding-top: var(--spacer-16);
+  }
+}
+
+.site-header__mega-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header__mega-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-12);
+  width: 100%;
+  padding: var(--spacer-10) var(--spacer-12);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-sm;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible,
+  .is-active > & {
+    background-color: var(--color-secondary);
+    color: var(--color-cyan);
+  }
+}
+
+.site-header__mega-tab-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-muted-foreground);
+  // The shared chevron, turned to point at the pane it opens.
+  transform: rotate(-90deg);
+  transition: transform var(--transition-fast);
+
+  .is-active > .site-header__mega-tab & {
+    color: currentcolor;
+    transform: rotate(-90deg) translateY(2px);
+  }
+}
+
+.site-header__mega-pane {
+  display: none;
+  position: absolute;
+  inset: 0 0 0 var(--mega-rail);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--spacer-24) var(--spacer-32) var(--spacer-32);
+
+  .is-active > & {
+    display: block;
+  }
+}
+
+.site-header__mega-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-16);
+  margin-bottom: var(--spacer-20);
+  padding-bottom: var(--spacer-16);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+}
+
+.site-header__mega-thumb {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.site-header__mega-title {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: $font-size-md;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+}
+
+.site-header__overview--head {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.site-header__mega-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: var(--spacer-32);
+
+  @include min-breakpoint(xl) {
+    columns: 3;
+  }
+
+  li {
+    break-inside: avoid;
+  }
+}
+
+.site-header__mega-link {
+  display: block;
+  padding: var(--spacer-6) 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible,
+  &[aria-current="page"] {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-decoration-color: var(--color-cyan);
+    text-underline-offset: 3px;
+  }
 }
 
 // ── Mobile drawer ────────────────────────────────────────────────────────
@@ -683,27 +970,37 @@
 
 .site-header__drawer {
   display: none;
-  max-height: 70vh;
-  max-height: 70dvh; // the visible height, not the height behind the iOS toolbar
+  // The visible height under the 80px main row, not the height behind the
+  // iOS toolbar. The drawer scrolls inside itself, so a long open section
+  // never leaves the page behind it scrolling instead.
+  max-height: calc(100vh - var(--site-header-height));
+  max-height: calc(100dvh - var(--site-header-height));
   overflow-y: auto;
-  padding: var(--spacer-16) 0;
+  overscroll-behavior: contain;
+  padding: var(--spacer-16) 0 var(--spacer-24);
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background);
 }
 
-// Hidden again from xl, where the category row takes over. Same weight as the
-// open rule and after it, so it wins without !important.
+// Hidden again from desktop, where the menu row takes over. Same weight as
+// the open rule and after it, so it wins without !important.
 .site-header.is-drawer-open .site-header__drawer {
   display: block;
 
-  @include min-breakpoint(xl) {
+  @include min-breakpoint(desktop) {
     display: none;
   }
 }
 
 .site-header__drawer .site-header__search {
   max-width: none;
-  margin-bottom: var(--spacer-16);
+  margin-bottom: var(--spacer-8);
+
+  // From tablet the main row has its own search, so a second one at the top
+  // of the drawer would only push the menu down.
+  @include min-breakpoint(tablet) {
+    display: none;
+  }
 }
 
 .site-header__drawer .site-header__search-field,
@@ -718,37 +1015,108 @@
   list-style: none;
 }
 
-// space-y-1 and a 50% rule under each top-level item, as in the design.
 .site-header__drawer-item {
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
-
-  & + & {
-    margin-top: var(--spacer-4);
-  }
-
-  &--sub {
-    border-bottom: 0;
-  }
 }
 
+// Top-level rows: links and toggles alike, 48px tall for a thumb.
 .site-header__drawer-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-12);
+  width: 100%;
+  min-height: var(--spacer-48);
   padding: var(--spacer-12) 0;
+  border: 0;
+  background: none;
   color: var(--color-foreground);
+  font-family: inherit;
   font-size: $font-size-base;
   font-weight: $font-weight-bold;
   line-height: $line-height-base;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 
-  // Nested items stay visible rather than needing a second tap: a drawer that
-  // hides the client's third-level categories behind an accordion is a worse
-  // trade than a slightly longer scroll. Not in the design, which has none.
-  &--sub {
-    padding-left: var(--spacer-16);
+  .is-current > & {
+    color: var(--color-cyan);
+  }
+}
+
+.site-header__drawer-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-muted-foreground);
+  transition: transform var(--transition-fast);
+
+  [aria-expanded="true"] > & {
+    color: var(--color-cyan);
+    transform: rotate(180deg);
+  }
+}
+
+// Closed until its toggle opens it. The toggle and list are siblings, so the
+// state is read from the toggle's aria-expanded and no second class has to be
+// kept in step with it.
+.site-header__drawer-submenu {
+  display: none;
+
+  [aria-expanded="true"] + & {
+    display: block;
+  }
+
+  &--0 {
+    padding-bottom: var(--spacer-12);
+  }
+
+  // The third level is indented under its group, with a rule down the left
+  // so a long list still reads as belonging to the group above it.
+  &--1 {
+    margin: var(--spacer-4) 0 var(--spacer-8) var(--spacer-8);
+    padding-left: var(--spacer-12);
+    border-left: 2px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  }
+}
+
+.site-header__drawer-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacer-12);
+  width: 100%;
+  min-height: var(--spacer-44);
+  padding: var(--spacer-10) 0 var(--spacer-10) var(--spacer-12);
+  border: 0;
+  background: none;
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  .site-header__drawer-submenu--1 & {
+    min-height: 40px;
+    padding-block: var(--spacer-8);
     color: var(--color-muted-foreground);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
-    line-height: $line-height-sm;
+    font-weight: $font-weight-regular;
+  }
+
+  &:hover,
+  &:focus-visible,
+  &[aria-current="page"] {
+    color: var(--color-cyan);
+  }
+
+  // "View all ...": the section's own page, first in its list.
+  &--overview,
+  .site-header__drawer-submenu--1 &--overview {
+    color: var(--color-cyan);
+    font-weight: $font-weight-bold;
   }
 }
 

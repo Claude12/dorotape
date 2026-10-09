@@ -75,10 +75,11 @@ $dt_pay_heading    = (string) dorotape_setting( 'footer_payments_heading' );
 				</div>
 
 				<?php
-				// The Products column shares the header's category menu by
-				// design: same eight labels, same destinations. Assigning a
-				// menu to footer-products overrides that.
-				dorotape_footer_column( has_nav_menu( 'footer-products' ) ? 'footer-products' : 'primary', (string) ( $dt_headings['products'] ?? '' ), 'magenta' );
+				// Each column is its own menu. The Products column used to fall
+				// back to the header menu, but that is now sections with panels
+				// (Products, Applications ...), not the category list the
+				// column wants.
+				dorotape_footer_column( 'footer-products', (string) ( $dt_headings['products'] ?? '' ), 'magenta' );
 				dorotape_footer_column( 'footer-support', (string) ( $dt_headings['support'] ?? '' ), 'cyan' );
 				dorotape_footer_column( 'footer-about', (string) ( $dt_headings['about'] ?? '' ), 'cyan' );
 				?>

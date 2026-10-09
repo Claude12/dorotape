@@ -188,7 +188,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dthero000107"
                                 },
                                 {
                                     "key": "field_dthero000109",
@@ -209,7 +210,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dthero000107"
                                 }
                             ]
                         },
@@ -366,6 +368,35 @@
                             "ui_off_text": ""
                         },
                         {
+                            "key": "field_dtbanr000106",
+                            "label": "Text alignment",
+                            "name": "align",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Left suits pages that open into a section of text. Centred suits case studies, whose content sits in the middle of the page under it.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "left": "Left",
+                                "center": "Centred"
+                            },
+                            "default_value": "left",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
                             "key": "field_dtbanr000120",
                             "label": "Background shape",
                             "name": "background_shape",
@@ -504,7 +535,8 @@
                                     "ajax": 0,
                                     "placeholder": "",
                                     "create_options": 0,
-                                    "save_options": 0
+                                    "save_options": 0,
+                                    "parent_repeater": "field_dtusps000103"
                                 },
                                 {
                                     "key": "field_dtusps000105",
@@ -525,7 +557,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtusps000103"
                                 }
                             ]
                         },
@@ -712,7 +745,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dt5050000115"
                                 },
                                 {
                                     "key": "field_dt5050000117",
@@ -733,7 +767,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dt5050000115"
                                 },
                                 {
                                     "key": "field_dt5050000118",
@@ -754,7 +789,8 @@
                                     "tabs": "all",
                                     "toolbar": "basic",
                                     "media_upload": 0,
-                                    "delay": 0
+                                    "delay": 0,
+                                    "parent_repeater": "field_dt5050000115"
                                 },
                                 {
                                     "key": "field_dt5050000119",
@@ -771,7 +807,8 @@
                                         "id": ""
                                     },
                                     "return_format": "array",
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "parent_repeater": "field_dt5050000115"
                                 }
                             ]
                         },
@@ -1160,7 +1197,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtcint000107"
                                 },
                                 {
                                     "key": "field_dtcint000109",
@@ -1177,7 +1215,8 @@
                                         "id": ""
                                     },
                                     "return_format": "array",
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "parent_repeater": "field_dtcint000107"
                                 }
                             ]
                         },
@@ -1354,7 +1393,8 @@
                                     "bidirectional": 0,
                                     "multiple": 0,
                                     "allow_null": 1,
-                                    "bidirectional_target": []
+                                    "bidirectional_target": [],
+                                    "parent_repeater": "field_dtcatg000105"
                                 },
                                 {
                                     "key": "field_dtcatg000107",
@@ -1375,7 +1415,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtcatg000105"
                                 },
                                 {
                                     "key": "field_dtcatg000108",
@@ -1401,7 +1442,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dtcatg000105"
                                 }
                             ]
                         },
@@ -1527,7 +1569,7 @@
                             "layout": "table",
                             "pagination": 0,
                             "min": 0,
-                            "max": "",
+                            "max": 0,
                             "collapsed": "",
                             "button_label": "Add logo",
                             "rows_per_page": 20,
@@ -1557,7 +1599,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dttrst000102"
                                 },
                                 {
                                     "key": "field_dttrst000104",
@@ -1578,7 +1621,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dttrst000102"
                                 },
                                 {
                                     "key": "field_dttrst000105",
@@ -1596,7 +1640,8 @@
                                     },
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dttrst000102"
                                 }
                             ]
                         },
@@ -1680,7 +1725,7 @@
                             "layout": "block",
                             "pagination": 0,
                             "min": 0,
-                            "max": "",
+                            "max": 0,
                             "collapsed": "field_dttest000103",
                             "button_label": "Add quote",
                             "rows_per_page": 20,
@@ -1705,7 +1750,8 @@
                                     "allow_in_bindings": 0,
                                     "rows": 4,
                                     "placeholder": "",
-                                    "new_lines": ""
+                                    "new_lines": "",
+                                    "parent_repeater": "field_dttest000101"
                                 },
                                 {
                                     "key": "field_dttest000103",
@@ -1726,7 +1772,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dttest000101"
                                 },
                                 {
                                     "key": "field_dttest000104",
@@ -1747,7 +1794,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dttest000101"
                                 },
                                 {
                                     "key": "field_dttest000105",
@@ -1768,7 +1816,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dttest000101"
                                 }
                             ]
                         },
@@ -2164,7 +2213,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dtctac000102"
                                 },
                                 {
                                     "key": "field_dtctac000104",
@@ -2185,7 +2235,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtctac000102"
                                 },
                                 {
                                     "key": "field_dtctac000105",
@@ -2202,7 +2253,8 @@
                                         "id": ""
                                     },
                                     "return_format": "array",
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "parent_repeater": "field_dtctac000102"
                                 },
                                 {
                                     "key": "field_dtctac000106",
@@ -2223,7 +2275,8 @@
                                     "allow_in_bindings": 0,
                                     "rows": 3,
                                     "placeholder": "",
-                                    "new_lines": ""
+                                    "new_lines": "",
+                                    "parent_repeater": "field_dtctac000102"
                                 }
                             ]
                         },
@@ -2349,7 +2402,7 @@
                             "layout": "block",
                             "pagination": 0,
                             "min": 0,
-                            "max": "",
+                            "max": 0,
                             "collapsed": "field_dtcase000107",
                             "button_label": "Add project",
                             "rows_per_page": 20,
@@ -2379,7 +2432,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dtcase000104"
                                 },
                                 {
                                     "key": "field_dtcase000106",
@@ -2400,7 +2454,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtcase000104"
                                 },
                                 {
                                     "key": "field_dtcase000107",
@@ -2421,7 +2476,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtcase000104"
                                 },
                                 {
                                     "key": "field_dtcase000108",
@@ -2442,7 +2498,8 @@
                                     "allow_in_bindings": 0,
                                     "ui": 1,
                                     "ui_on_text": "",
-                                    "ui_off_text": ""
+                                    "ui_off_text": "",
+                                    "parent_repeater": "field_dtcase000104"
                                 },
                                 {
                                     "key": "field_dtcase000109",
@@ -2460,7 +2517,8 @@
                                     },
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dtcase000104"
                                 }
                             ]
                         },
@@ -2890,7 +2948,7 @@
                             "layout": "block",
                             "pagination": 0,
                             "min": 0,
-                            "max": "",
+                            "max": 0,
                             "collapsed": "field_dttagl000105",
                             "button_label": "Add tag",
                             "rows_per_page": 20,
@@ -2915,7 +2973,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dttagl000104"
                                 },
                                 {
                                     "key": "field_dttagl000106",
@@ -2932,7 +2991,8 @@
                                         "id": ""
                                     },
                                     "return_format": "array",
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "parent_repeater": "field_dttagl000104"
                                 }
                             ]
                         },
@@ -3244,7 +3304,7 @@
                             "layout": "block",
                             "pagination": 0,
                             "min": 0,
-                            "max": "",
+                            "max": 0,
                             "collapsed": "field_dtteam000108",
                             "button_label": "Add person",
                             "rows_per_page": 20,
@@ -3274,7 +3334,8 @@
                                     "max_size": "",
                                     "mime_types": "",
                                     "allow_in_bindings": 0,
-                                    "preview_size": "medium"
+                                    "preview_size": "medium",
+                                    "parent_repeater": "field_dtteam000106"
                                 },
                                 {
                                     "key": "field_dtteam000108",
@@ -3295,7 +3356,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtteam000106"
                                 },
                                 {
                                     "key": "field_dtteam000109",
@@ -3316,7 +3378,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtteam000106"
                                 },
                                 {
                                     "key": "field_dtteam000110",
@@ -3336,7 +3399,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtteam000106"
                                 },
                                 {
                                     "key": "field_dtteam000111",
@@ -3357,7 +3421,8 @@
                                     "allow_in_bindings": 0,
                                     "rows": 4,
                                     "placeholder": "",
-                                    "new_lines": ""
+                                    "new_lines": "",
+                                    "parent_repeater": "field_dtteam000106"
                                 },
                                 {
                                     "key": "field_dtteam000112",
@@ -3375,7 +3440,8 @@
                                     },
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dtteam000106"
                                 }
                             ]
                         },
@@ -3526,7 +3592,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtrnow000104"
                                 },
                                 {
                                     "key": "field_dtrnow000106",
@@ -3547,7 +3614,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtrnow000104"
                                 },
                                 {
                                     "key": "field_dtrnow000107",
@@ -3566,7 +3634,9 @@
                                     "display_format": "d M Y",
                                     "return_format": "d M Y",
                                     "first_day": 1,
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "default_to_current_date": 0,
+                                    "parent_repeater": "field_dtrnow000104"
                                 },
                                 {
                                     "key": "field_dtrnow000108",
@@ -3584,7 +3654,8 @@
                                     },
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dtrnow000104"
                                 }
                             ]
                         },
@@ -3630,7 +3701,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtrnow000109"
                                 },
                                 {
                                     "key": "field_dtrnow000111",
@@ -3651,7 +3723,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtrnow000109"
                                 },
                                 {
                                     "key": "field_dtrnow000112",
@@ -3669,7 +3742,8 @@
                                     },
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dtrnow000109"
                                 }
                             ]
                         },
@@ -3835,6 +3909,8 @@
                             "label": "Aurora line above",
                             "name": "divider",
                             "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3842,8 +3918,6 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "type": "true_false",
-                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
                             "message": "",
                             "default_value": 0,
                             "allow_in_bindings": 0,
@@ -3856,6 +3930,8 @@
                             "label": "Heading",
                             "name": "heading",
                             "aria-label": "",
+                            "type": "text",
+                            "instructions": "Optional. Use one when a page has several accordions (Application, Printing, Laminating). Leave empty when the page banner already says what the list is.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3863,8 +3939,6 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "type": "text",
-                            "instructions": "Optional. Use one when a page has several accordions (Application, Printing, Laminating). Leave empty when the page banner already says what the list is.",
                             "default_value": "",
                             "maxlength": "",
                             "allow_in_bindings": 0,
@@ -3877,6 +3951,8 @@
                             "label": "First item open",
                             "name": "open_first",
                             "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Show the first item expanded when the page loads. Only one item on the page is open at a time, so this applies to the first accordion on the page only.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3884,8 +3960,6 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "type": "true_false",
-                            "instructions": "Show the first item expanded when the page loads. Only one item on the page is open at a time, so this applies to the first accordion on the page only.",
                             "message": "",
                             "default_value": 1,
                             "allow_in_bindings": 0,
@@ -3898,6 +3972,8 @@
                             "label": "Intro",
                             "name": "intro",
                             "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "Optional copy above the list, always visible.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3905,8 +3981,6 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "type": "wysiwyg",
-                            "instructions": "Optional copy above the list, always visible.",
                             "default_value": "",
                             "allow_in_bindings": 0,
                             "tabs": "all",
@@ -3919,6 +3993,8 @@
                             "label": "Items",
                             "name": "items",
                             "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "Each row is one question or term. Rows without a title are skipped. Each item gets its own link: the page address followed by # and the title in lower case with dashes, for example #surface-energy on the Glossary.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3926,8 +4002,6 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "type": "repeater",
-                            "instructions": "Each row is one question or term. Rows without a title are skipped. Each item gets its own link: the page address followed by # and the title in lower case with dashes, for example #surface-energy on the Glossary.",
                             "layout": "block",
                             "pagination": 0,
                             "min": 1,
@@ -3942,6 +4016,8 @@
                                     "label": "Title",
                                     "name": "title",
                                     "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "The question or term. This is the line people click.",
                                     "required": 0,
                                     "conditional_logic": 0,
                                     "wrapper": {
@@ -3949,20 +4025,21 @@
                                         "class": "",
                                         "id": ""
                                     },
-                                    "type": "text",
-                                    "instructions": "The question or term. This is the line people click.",
                                     "default_value": "",
                                     "maxlength": "",
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtacrd000105"
                                 },
                                 {
                                     "key": "field_dtacrd000107",
                                     "label": "Content",
                                     "name": "content",
                                     "aria-label": "",
+                                    "type": "wysiwyg",
+                                    "instructions": "The answer. Headings, lists, images and links are all styled by the theme.",
                                     "required": 0,
                                     "conditional_logic": 0,
                                     "wrapper": {
@@ -3970,20 +4047,21 @@
                                         "class": "",
                                         "id": ""
                                     },
-                                    "type": "wysiwyg",
-                                    "instructions": "The answer. Headings, lists, images and links are all styled by the theme.",
                                     "default_value": "",
                                     "allow_in_bindings": 0,
                                     "tabs": "all",
                                     "toolbar": "full",
                                     "media_upload": 1,
-                                    "delay": 1
+                                    "delay": 1,
+                                    "parent_repeater": "field_dtacrd000105"
                                 },
                                 {
                                     "key": "field_dtacrd000108",
                                     "label": "Video",
                                     "name": "video_url",
                                     "aria-label": "",
+                                    "type": "url",
+                                    "instructions": "Optional. A YouTube or Vimeo address, shown under the content. Paste the address bar.",
                                     "required": 0,
                                     "conditional_logic": 0,
                                     "wrapper": {
@@ -3991,11 +4069,10 @@
                                         "class": "",
                                         "id": ""
                                     },
-                                    "type": "url",
-                                    "instructions": "Optional. A YouTube or Vimeo address, shown under the content. Paste the address bar.",
                                     "default_value": "",
                                     "allow_in_bindings": 0,
-                                    "placeholder": ""
+                                    "placeholder": "",
+                                    "parent_repeater": "field_dtacrd000105"
                                 }
                             ]
                         },
@@ -4180,7 +4257,8 @@
                                     "ajax": 0,
                                     "placeholder": "",
                                     "create_options": 0,
-                                    "save_options": 0
+                                    "save_options": 0,
+                                    "parent_repeater": "field_dtcont000105"
                                 },
                                 {
                                     "key": "field_dtcont000107",
@@ -4201,7 +4279,8 @@
                                     "allow_in_bindings": 0,
                                     "placeholder": "",
                                     "prepend": "",
-                                    "append": ""
+                                    "append": "",
+                                    "parent_repeater": "field_dtcont000105"
                                 },
                                 {
                                     "key": "field_dtcont000108",
@@ -4222,7 +4301,8 @@
                                     "allow_in_bindings": 0,
                                     "rows": 3,
                                     "placeholder": "",
-                                    "new_lines": ""
+                                    "new_lines": "",
+                                    "parent_repeater": "field_dtcont000105"
                                 },
                                 {
                                     "key": "field_dtcont000109",
@@ -4239,7 +4319,8 @@
                                         "id": ""
                                     },
                                     "return_format": "array",
-                                    "allow_in_bindings": 0
+                                    "allow_in_bindings": 0,
+                                    "parent_repeater": "field_dtcont000105"
                                 }
                             ]
                         },
@@ -4664,5 +4745,9 @@
     "active": true,
     "description": "Flexible content blocks. Layout name maps to inc/blocks/{name}.php. Shown on Pages, on product and category terms, and on Theme Settings > Product Pages, Category Pages, Search Page and 404 Page, where the sections are shared by every page of that kind.",
     "show_in_rest": 0,
-    "modified": 1791202725
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1791549490,
+    "local_file": "/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape/acf-json/group_dorotape_content_sections.json"
 }
