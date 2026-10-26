@@ -229,6 +229,32 @@
             "new_lines": ""
         },
         {
+            "key": "field_dtcat0014",
+            "label": "Linked ranges",
+            "name": "category_linked_ranges",
+            "aria-label": "",
+            "type": "taxonomy",
+            "instructions": "Categories to show as this page's ranges, in this order, in place of its own subcategories. For a category that gathers ranges from elsewhere, such as an Application. The products stay in their own categories. Leave empty to show the subcategories.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "product_cat",
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "id",
+            "field_type": "multi_select",
+            "allow_null": 1,
+            "allow_in_bindings": 0,
+            "bidirectional": 0,
+            "multiple": 0,
+            "bidirectional_target": []
+        },
+        {
             "key": "field_dtcat0012",
             "label": "Products heading",
             "name": "category_products_heading",
@@ -271,5 +297,5 @@
             "new_lines": ""
         }
     ],
-    "modified": 1792797080
+    "modified": 1793030400
 }

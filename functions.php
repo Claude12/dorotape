@@ -56,13 +56,13 @@ function dorotape_setup() {
 	 *
 	 * primary is the header's main menu (inc/header-menu.php): sections on
 	 * the menu bar from 1024px, the burger menu below. shortcuts is the short
-	 * list of category links at the right of that bar. The footer has three
+	 * Quick links list at the right of that bar. The footer has three
 	 * link columns and a legal row, one location each.
 	 */
 	register_nav_menus(
 		array(
 			'primary'         => esc_html__( 'Header: Main menu (menu bar on desktop, burger menu on mobile)', 'dorotape' ),
-			'shortcuts'       => esc_html__( 'Header: Category shortcuts (right of the menu bar; about 4 fit, extras hide on smaller screens)', 'dorotape' ),
+			'shortcuts'       => esc_html__( 'Header: Quick links (right of the menu bar; about 4 fit, extras hide on smaller screens)', 'dorotape' ),
 			'footer-products' => esc_html__( 'Footer: Products column', 'dorotape' ),
 			'footer-support'  => esc_html__( 'Footer: Support column', 'dorotape' ),
 			'footer-about'    => esc_html__( 'Footer: About column', 'dorotape' ),

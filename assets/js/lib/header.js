@@ -405,7 +405,7 @@ function initPanels(header) {
 }
 
 /**
- * Category shortcuts that do not fit.
+ * Quick links that do not fit.
  *
  * CSS hides them by letting them wrap onto a clipped second line, but a
  * clipped link can still take focus. Any link not on the first line is made

@@ -118,6 +118,55 @@ function dorotape_menu_is_current( WP_Post $item ): bool {
 }
 
 /**
+ * Whether the item, or anything under it, is the current page or one of its
+ * ancestors. Counts category ancestors too: on a range that is not in the
+ * menu itself (ASLAN CT113 under Transparent Vinyl), WordPress marks the
+ * Transparent Vinyl item current-product_cat-parent and nothing more.
+ */
+function dorotape_menu_holds_current( array $node ): bool {
+	$item    = $node['item'];
+	$markers = array(
+		'current-menu-item',
+		'current-menu-parent',
+		'current-menu-ancestor',
+		'current-' . $item->object . '-parent',
+		'current-' . $item->object . '-ancestor',
+	);
+
+	if ( array_intersect( (array) $item->classes, $markers ) ) {
+		return true;
+	}
+
+	foreach ( $node['children'] as $child ) {
+		if ( dorotape_menu_holds_current( $child ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * The one top-level item to mark as where you are.
+ *
+ * A category can sit in Products and in an Application as well, so two tabs
+ * would both light up. The first in menu order wins, which puts a category
+ * page under Products, where its own family is.
+ *
+ * @param array<int, array{item: WP_Post, children: array}> $tree Top-level nodes.
+ * @return int Menu item ID, or 0 when none is current.
+ */
+function dorotape_menu_current_top( array $tree ): int {
+	foreach ( $tree as $node ) {
+		if ( dorotape_menu_holds_current( $node ) ) {
+			return (int) $node['item']->ID;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * The "View all ..." link for a parent, or null when it has no page of its
  * own or a child already links there (Inspiration's Case Studies).
  *
@@ -202,6 +251,7 @@ function dorotape_header_nav(): void {
 	}
 
 	$chevron = dorotape_ui_icon( 'chevron-down', 'site-header__nav-chevron' );
+	$current = dorotape_menu_current_top( $tree );
 	?>
 	<ul class="site-header__nav-list" id="primary-menu">
 		<?php
@@ -214,7 +264,7 @@ function dorotape_header_nav(): void {
 			if ( $mega ) {
 				$classes[] = 'site-header__nav-item--mega';
 			}
-			if ( dorotape_menu_is_current( $item ) ) {
+			if ( (int) $item->ID === $current ) {
 				$classes[] = 'is-current';
 			}
 			?>
@@ -241,12 +291,12 @@ function dorotape_header_nav(): void {
 }
 
 /**
- * Category shortcuts, at the right-hand end of the menu row.
+ * Quick links, at the right-hand end of the menu row.
  *
  * The design's row was the product categories themselves. They now sit inside
- * Products, but the row has room to spare, so the Category shortcuts menu puts
- * the most used ones back as direct links. Flat by design: anything nested in
- * that menu is ignored.
+ * Products, so the row holds whatever the Quick links menu gives it (Sign Me
+ * Up, from Site Edits, October 2026). Flat by design: anything nested in that
+ * menu is ignored.
  *
  * The list is one line tall with overflow hidden and wraps, so whatever does
  * not fit at the current width drops onto a hidden second line; the menu
@@ -261,7 +311,7 @@ function dorotape_header_shortcuts(): void {
 	}
 
 	?>
-	<ul class="site-header__shortcuts js-nav-shortcuts" aria-label="<?php esc_attr_e( 'Popular categories', 'dorotape' ); ?>">
+	<ul class="site-header__shortcuts js-nav-shortcuts" aria-label="<?php esc_attr_e( 'Quick links', 'dorotape' ); ?>">
 		<?php foreach ( $tree as $node ) : ?>
 			<li class="site-header__shortcut<?php echo dorotape_menu_is_current( $node['item'] ) ? ' is-current' : ''; ?>">
 				<a class="site-header__shortcut-link"<?php echo dorotape_menu_link_attrs( $node['item'], true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?>><?php echo esc_html( $node['item']->title ); ?></a>
@@ -385,6 +435,7 @@ function dorotape_header_drawer_menu(): void {
 	<nav aria-label="<?php esc_attr_e( 'Main menu', 'dorotape' ); ?>">
 		<ul class="site-header__drawer-list" id="primary-menu-drawer">
 			<?php
+			$current = dorotape_menu_current_top( $tree );
 			foreach ( $tree as $node ) :
 				$classes = array( 'site-header__drawer-item' );
 
@@ -393,7 +444,7 @@ function dorotape_header_drawer_menu(): void {
 				if ( $node['children'] && dorotape_menu_is_mega( $node ) ) {
 					$classes[] = 'site-header__drawer-item--mega';
 				}
-				if ( dorotape_menu_is_current( $node['item'] ) ) {
+				if ( (int) $node['item']->ID === $current ) {
 					$classes[] = 'is-current';
 				}
 				?>

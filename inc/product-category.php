@@ -48,11 +48,41 @@ function dorotape_category_term(): ?WP_Term {
  * menu_order, which is the admin's drag and drop order. The design's own order
  * is curated rather than alphabetical, so that is the one to follow.
  *
+ * A category given Linked ranges shows those instead, in the order picked.
+ * That is how an Application (Vehicle Wrapping, Glass Decoration) lists the
+ * ranges it draws on without moving any product out of its own category,
+ * which the old site did the same way.
+ *
  * @return array<int, object> Category objects as get_categories() returns them.
  */
 function dorotape_category_children( WP_Term $term ): array {
 	if ( ! function_exists( 'woocommerce_get_product_subcategories' ) ) {
 		return array();
+	}
+
+	$linked = function_exists( 'get_field' ) ? get_field( 'category_linked_ranges', 'term_' . $term->term_id ) : null;
+
+	if ( is_array( $linked ) && array() !== $linked ) {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'include'    => array_map( 'intval', $linked ),
+				'orderby'    => 'include',
+				'hide_empty' => false,
+			)
+		);
+
+		// Woo's padded count, so a range whose products all sit in its own
+		// subcategories still shows, and an empty one is dropped as Woo does.
+		// An Application holds no products itself, so its own linked ranges
+		// count instead (the Applications page lists them).
+		return is_array( $terms ) ? array_values(
+			array_filter(
+				$terms,
+				fn( WP_Term $t ) => (int) get_term_meta( $t->term_id, 'product_count_product_cat', true ) > 0
+					|| get_field( 'category_linked_ranges', 'term_' . $t->term_id )
+			)
+		) : array();
 	}
 
 	$children = woocommerce_get_product_subcategories( $term->term_id );
