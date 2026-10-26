@@ -44,10 +44,13 @@
 // and the gap is one section's worth, as it is next to anything else.
 //
 // Only blocks that sit on the page's own plain navy are listed, and only
-// without a background modifier or a background shape: a surface or aurora
-// block next to navy is a change of colour, and it needs its padding on both
-// sides to read as a band. The category grid's glow and the shard art behind
-// Right Now fill their whole box for the same reason, so neither is listed.
+// without a background modifier: a surface or aurora block next to navy is a
+// change of colour, and it needs its padding on both sides to read as a band.
+// A background shape is thin line art on that same navy, so a shaped block
+// still counts as plain; the art covers the whole box and simply starts
+// nearer the section above. The testimonial's shards, the category grid's
+// glow and the shard art behind Right Now are colour fields that fill their
+// box, so none of them is listed.
 // A divider prints between the two sections, so a pair with one in between
 // is not adjacent here and keeps the space either side of the rule.
 //
@@ -55,8 +58,8 @@
 // desktop in each block, because at 768 to 1023 the desktop gaps were the
 // other thing that "feels quite large" (Site Edits, October 2026).
 
-$flat-sections: ".accordion-block, .case-studies-block, .contact-block, .cta-cards-block, .embed-block, .image-text-block, .intro-columns-block, .product-row-block, .rte-block, .tag-list-block, .team-block, .text-image-block, .video-block";
+$flat-sections: ".accordion-block, .case-studies-block, .contact-block, .cta-cards-block, .embed-block, .image-text-block, .intro-columns-block, .media-band-block, .product-row-block, .rte-block, .tag-list-block, .team-block, .text-image-block, .video-block";
 
-.site-main--blocks > :is(#{$flat-sections}):not([class*="--bg-"], .has-background-shape) + :is(#{$flat-sections}):not([class*="--bg-"], .has-background-shape) {
+.site-main--blocks > :is(#{$flat-sections}):not([class*="--bg-"]) + :is(#{$flat-sections}):not([class*="--bg-"]) {
   padding-top: 0;
 }

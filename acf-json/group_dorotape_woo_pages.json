@@ -116,6 +116,195 @@
             "append": ""
         },
         {
+            "key": "field_dtwoo0032",
+            "label": "Share basket: heading",
+            "name": "woo_share_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the share buttons under the basket. Lets someone on site send the basket, with its widths, quantities and cut sizes, to whoever places the order.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Share this basket",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0033",
+            "label": "Share basket: WhatsApp button",
+            "name": "woo_share_whatsapp",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "WhatsApp",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0034",
+            "label": "Share basket: email button",
+            "name": "woo_share_email",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Email",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0035",
+            "label": "Share basket: copy button",
+            "name": "woo_share_copy",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Copy link",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0036",
+            "label": "Share basket: copied",
+            "name": "woo_share_copied",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Replaces the copy button's wording for a moment after the link is copied.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Link copied",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0037",
+            "label": "Share basket: email subject",
+            "name": "woo_share_subject",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Dorotape basket",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0038",
+            "label": "Share basket: message",
+            "name": "woo_share_message",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The WhatsApp message and the email body. {link} is the basket link; if it is left out the link goes on the end.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Here is a Dorotape basket ready to order: {link}",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0039",
+            "label": "Share basket: added",
+            "name": "woo_share_added",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown when someone opens a shared basket link. {count} is the number of lines added.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "{count} items from a shared basket have been added to your basket.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0040",
+            "label": "Share basket: unavailable",
+            "name": "woo_share_missing",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown alongside the message above when products in the link have since been removed or are out of stock.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "{count} items in the shared basket are no longer available, so they were left out.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtwoo0007",
             "label": "Checkout",
             "name": "",
@@ -347,5 +536,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1792797786
+    "modified": 1792998702
 }

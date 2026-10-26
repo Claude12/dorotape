@@ -100,6 +100,27 @@ function dorotape_header_cart_count(): int {
 }
 
 /**
+ * Count basket lines, not units.
+ *
+ * WooCommerce's count sums quantities, and a roll sold by the metre carries
+ * its metres as the quantity, so three lines read as "Basket (120)" (Site
+ * Edits, Checkout A5). Filtering the count itself, rather than the header,
+ * keeps the header, its AJAX fragment and the Cart block's item total, which
+ * reads the same number through the Store API, in agreement.
+ *
+ * @param int $count Sum of line quantities.
+ * @return int
+ */
+function dorotape_cart_line_count( $count ): int {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return (int) $count;
+	}
+
+	return count( WC()->cart->get_cart() );
+}
+add_filter( 'woocommerce_cart_contents_count', 'dorotape_cart_line_count' );
+
+/**
  * Number of products on the visitor's wishlist.
  *
  * Guarded the same way the basket count is, because YITH is a plugin and the

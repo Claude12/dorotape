@@ -125,6 +125,40 @@ add_action( 'woocommerce_set_additional_field_value', function ( $key, $value, $
 	$wc_object->update_meta_data( DOROTAPE_PO_META_KEY, (string) $value );
 }, 10, 4 );
 
+/**
+ * Start the next checkout with an empty PO number and order note.
+ *
+ * WooCommerce 11's checkout saves the page as it is filled in before an order
+ * exists: the note goes into the session, and order fields like this one onto
+ * the customer, which for a logged-in customer is their user meta. Neither is
+ * cleared when the order is placed, so the next checkout opened with the last
+ * order's PO and note already filled in (Site Edits, Checkout A6). Both
+ * belong to one order, so they are cleared once that order is through.
+ *
+ * Every order-location field is cleared, not just ours, so Woosage's field is
+ * covered too if it is ever switched on. Contact-location fields are meant to
+ * be remembered and are left alone.
+ */
+add_action( 'woocommerce_store_api_checkout_order_processed', function (): void {
+	if ( WC()->session ) {
+		WC()->session->__unset( 'store_api_customer_note' );
+	}
+
+	$customer = WC()->customer;
+	if ( ! $customer ) {
+		return;
+	}
+
+	$fields = Automattic\WooCommerce\Blocks\Package::container()
+		->get( Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::class )
+		->get_fields_for_location( 'order' );
+
+	foreach ( array_keys( $fields ) as $key ) {
+		$customer->delete_meta_data( Automattic\WooCommerce\Blocks\Domain\Services\CheckoutFields::OTHER_FIELDS_PREFIX . $key );
+	}
+	$customer->save();
+} );
+
 // ─── Reading ──────────────────────────────────────────────────────────────────
 
 /**

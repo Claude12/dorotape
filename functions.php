@@ -292,6 +292,7 @@ require get_template_directory() . '/inc/credit-limit.php';
 require get_template_directory() . '/inc/account-pending.php';
 require get_template_directory() . '/inc/shipping.php';
 require get_template_directory() . '/inc/free-delivery.php';
+require get_template_directory() . '/inc/share-basket.php';
 require get_template_directory() . '/inc/checkout-wording.php';
 require get_template_directory() . '/inc/collection.php';
 require get_template_directory() . '/inc/dispatch.php';

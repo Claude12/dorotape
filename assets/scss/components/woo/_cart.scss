@@ -223,3 +223,79 @@
     text-align: left;
   }
 }
+
+// ── Share this basket ──────────────────────────────────────────────────────
+//
+// Under the basket (inc/share-basket.php, Site Edits, October 2026, Wishlist
+// A3). Laid out like the wishlist's share row, with the label in the same
+// uppercase style, but the buttons are worded rather than icon only: this is
+// a thing to do with the order, and "Copy link" needs saying.
+
+.woo-page .share-basket {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-12) var(--spacer-16);
+  margin-top: var(--spacer-32);
+  padding-top: var(--spacer-24);
+  border-top: 1px solid var(--color-border);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.woo-page .share-basket__title {
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-label;
+}
+
+.woo-page .share-basket__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// The outline pill the wishlist's share links and the footer's social links
+// use, widened to take a word.
+.woo-page .share-basket__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  min-height: var(--spacer-36);
+  padding: 0 var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-muted-foreground);
+  font: inherit;
+  font-size: $font-size-sm;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-cyan);
+    background-color: color-mix(in oklab, var(--color-cyan) 12%, transparent);
+    color: var(--color-cyan);
+  }
+}
+
+.woo-page .share-basket__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}

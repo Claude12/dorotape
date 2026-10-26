@@ -18,6 +18,7 @@ import { initScrollers } from './lib/scroller';
 import { initCaseFilter } from './lib/case-filter';
 import { initDescriptionTabs } from './lib/description-tabs';
 import { initFreeDelivery } from './lib/free-delivery';
+import { initShareBasket } from './lib/share-basket';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -45,6 +46,7 @@ const features = [
   initCaseFilter,
   initDescriptionTabs,
   initFreeDelivery,
+  initShareBasket,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
