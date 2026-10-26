@@ -5,7 +5,7 @@ declare( strict_types=1 );
  *
  * Small data and markup helpers for header.php, kept out of the template so
  * the template stays readable markup. The header's content (logo, notice,
- * phone, trade account link, quote button, search placeholders) is edited on
+ * phone, quote button, search placeholders) is edited on
  * the Theme Settings options page and read through dorotape_setting() in
  * inc/acf.php. The category and quick links are WordPress menus.
  *

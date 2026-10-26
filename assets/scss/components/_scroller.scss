@@ -1,0 +1,51 @@
+
+// Scroller arrows.
+//
+// The previous and next pair beside a sideways strip, from
+// dorotape_scroller_nav() in inc/icons.php and wired by lib/scroller.js. Round
+// outline buttons that fill magenta, like the outline button, so they read as
+// the same family as the "View all" and card buttons around them.
+
+.scroller-nav {
+  display: flex;
+  gap: var(--spacer-8);
+
+  &.is-hidden {
+    display: none;
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-background) 60%, transparent);
+    color: var(--color-foreground);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      opacity var(--transition-fast);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      border-color: var(--color-primary);
+      background-color: var(--color-primary);
+      color: var(--color-primary-foreground);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+  }
+}

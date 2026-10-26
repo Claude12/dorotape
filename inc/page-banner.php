@@ -24,6 +24,23 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * The eyebrow dot's colour, as a value the dot's modifier class can use.
+ *
+ * The client's rule (Site Edits, October 2026): magenta where the banner
+ * leads to products, cyan where it is information. Blocks offer it as the
+ * `eyebrow_colour` select; rows saved before that field existed have no value
+ * and take the block's own default, which is the colour most of its pages
+ * want (the hero sells, the internal banner mostly informs).
+ *
+ * @param mixed  $value   The select's stored value, or anything else.
+ * @param string $default magenta | cyan, used when $value is neither.
+ * @return string magenta | cyan.
+ */
+function dorotape_eyebrow_colour( $value, string $default ): string {
+	return in_array( $value, array( 'magenta', 'cyan' ), true ) ? $value : $default;
+}
+
+/**
  * Print the banner.
  *
  * @param array $args {
@@ -40,6 +57,8 @@ defined( 'ABSPATH' ) || exit;
  *                              False on the 404, which is not anywhere.
  *     @type bool   $centred    Centre the text over a centred column below,
  *                              as a blog article has.
+ *     @type string $dot        Eyebrow dot colour: magenta for the product
+ *                              pages (shop, search), cyan for the rest.
  * }
  */
 function dorotape_page_banner( array $args = array() ): void {
@@ -52,6 +71,7 @@ function dorotape_page_banner( array $args = array() ): void {
 			'shape'      => 'cubes-right',
 			'breadcrumb' => true,
 			'centred'    => false,
+			'dot'        => 'cyan',
 		)
 	);
 
@@ -69,7 +89,7 @@ function dorotape_page_banner( array $args = array() ): void {
 
 				<?php if ( '' !== $args['eyebrow'] ) : ?>
 					<p class="internal-banner-block__eyebrow">
-						<span class="internal-banner-block__eyebrow-dot" aria-hidden="true"></span>
+						<span class="internal-banner-block__eyebrow-dot internal-banner-block__eyebrow-dot--<?php echo esc_attr( dorotape_eyebrow_colour( $args['dot'], 'cyan' ) ); ?>" aria-hidden="true"></span>
 						<?php echo esc_html( (string) $args['eyebrow'] ); ?>
 					</p>
 				<?php endif; ?>

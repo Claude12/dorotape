@@ -1,0 +1,318 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+@use "abstracts/button-mixins" as *;
+
+// The product description, split (inc/product-description.php).
+//
+// The intro, video and price note on the left, and Structure, Suitability,
+// Advantages and Downloads as tabs on the right, so a wide screen uses both
+// halves of the band rather than one long column (Site Edits, October 2026,
+// Product A5). Stacked until desktop, where the tabs column is the wider one
+// because the lists are what people come to read. A description with fewer
+// than two sections is not split and none of this applies.
+
+// The panel's reading measure is for one column of prose. Split, it is two.
+.woocommerce-tabs .woocommerce-Tabs-panel:has(> .product-description--split) {
+  max-width: none;
+}
+
+.product-description {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacer-32);
+
+  // From desktop the intro and the notes under it share the left column and
+  // the tabs take the right, whatever the left one's height. The areas are
+  // named from desktop only: a name with no template to match makes the grid
+  // add columns of its own, sized to the content, which pushed a phone 160px
+  // wide.
+  @include min-breakpoint(desktop) {
+    grid-template-areas:
+      "intro tabs"
+      "extras tabs";
+    grid-template-rows: auto 1fr;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--spacer-32) var(--spacer-64);
+  }
+
+  &--tabs-only {
+    @include min-breakpoint(desktop) {
+      grid-template-areas: "tabs";
+      grid-template-rows: auto;
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  // Its own formatting context, so the PVC free badge that floats right of
+  // the intro stays inside it rather than hanging over the tabs.
+  &__intro {
+    display: flow-root;
+
+    @include min-breakpoint(desktop) {
+      grid-area: intro;
+    }
+  }
+
+  &__tabs {
+    @include min-breakpoint(desktop) {
+      grid-area: tabs;
+    }
+  }
+
+  &__extras {
+    align-self: start;
+
+    @include min-breakpoint(desktop) {
+      grid-area: extras;
+    }
+  }
+
+  &__intro > :first-child,
+  &__extras > :first-child {
+    margin-top: 0;
+  }
+
+  &__intro > :last-child,
+  &__extras > :last-child {
+    margin-bottom: 0;
+  }
+
+  // ── Tab bar ────────────────────────────────────────────────────────────
+
+  // The blog's category pills, filled cyan when chosen, because this is
+  // information rather than something to buy. One row that swipes on a phone,
+  // out through the gutter like the case study filter: four pills wrapped to
+  // two rows looked like two sets of controls.
+  &__tablist {
+    display: flex;
+    gap: var(--spacer-8);
+    margin: 0 calc(-1 * #{$gutter}) var(--spacer-24);
+    padding: 0 $gutter;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    @include min-breakpoint(tablet) {
+      flex-wrap: wrap;
+      margin: 0 0 var(--spacer-24);
+      padding: 0;
+      overflow: visible;
+    }
+  }
+
+  &__tab {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: 40px;
+    padding: var(--spacer-8) var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    font-family: inherit;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color var(--transition-fast),
+      color var(--transition-fast),
+      background-color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+    }
+
+    &[aria-selected="true"] {
+      border-color: var(--color-cyan);
+      background-color: var(--color-cyan);
+      color: var(--color-background);
+    }
+  }
+
+  // ── Panels ─────────────────────────────────────────────────────────────
+
+  // Without the script every section shows, so each keeps its heading and
+  // stands off the one above.
+  &__panel + &__panel {
+    margin-top: var(--spacer-32);
+  }
+
+  &__panel[hidden] {
+    display: none;
+  }
+
+  &__panel:focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: var(--spacer-8);
+  }
+
+  &__panel > ul:first-of-type {
+    margin-top: 0;
+  }
+
+  &__panel-title {
+    margin: 0 0 var(--spacer-12);
+    color: var(--color-magenta);
+    font-size: $font-size-base;
+    font-weight: $font-weight-extrabold;
+    line-height: $line-height-base;
+  }
+
+  // The tab says it now.
+  &__tabs.is-enhanced &__panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  // A second heading inside one tab: the inks under Suitability.
+  &__subheading {
+    margin: var(--spacer-24) 0 var(--spacer-8);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-widest;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__panel > &__subheading:first-child {
+    margin-top: 0;
+  }
+
+  // ── Downloads ──────────────────────────────────────────────────────────
+
+  // Cyan lozenges with the document's name, where the old site had a picture
+  // of each label on light grey (Product A9).
+  &__downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-12);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__download {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    min-height: 44px;
+    padding: var(--spacer-8) var(--spacer-20);
+    border: 1px solid var(--color-cyan);
+    border-radius: var(--radius-pill);
+    color: var(--color-cyan);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+    transition:
+      color var(--transition-fast),
+      background-color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-cyan);
+      color: var(--color-background);
+    }
+  }
+
+  &__download-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Brand ──────────────────────────────────────────────────────────────────
+
+// The manufacturer's logo over the title, white on the dark hero like the
+// homepage brands strip, where it used to open the description in its own
+// colours on a white box (Product A8). Wide wordmarks are capped by width,
+// square marks by height.
+.product-brand {
+  margin: var(--spacer-20) 0 0;
+  line-height: 0;
+}
+
+.product-brand__image {
+  display: block;
+  width: auto;
+  max-width: 180px;
+  height: auto;
+  max-height: 40px;
+  object-fit: contain;
+  filter: url("#dorotape-logo-white");
+
+  @include min-breakpoint(tablet) {
+    max-height: 48px;
+  }
+}
+
+// The Theme Settings logos are all drawn on the same 2:1 canvas with room
+// around the mark, so they take a fixed box rather than the caps above, which
+// left a wordmark like Ritrama | Fedrigoni the size of a footnote.
+.product-brand__image--brand {
+  width: 112px;
+  max-width: none;
+  height: 56px;
+  max-height: none;
+  margin: calc(-1 * var(--spacer-8)) 0;
+
+  @include min-breakpoint(tablet) {
+    width: 144px;
+    height: 72px;
+  }
+}
+
+// A brand's own white artwork is white already.
+.product-brand__image--white {
+  filter: none;
+}
+
+.product-brand__filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+// ── Reward points ──────────────────────────────────────────────────────────
+
+// Under the price, where the buying decision is, instead of an orange picture
+// half way down the description (Product A10).
+.product-reward {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+  margin: var(--spacer-12) 0 0;
+  color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-sm;
+}
+
+.product-reward__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-yellow);
+}
+
+.product-reward__link {
+  @include action-link;
+}

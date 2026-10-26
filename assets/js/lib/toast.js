@@ -88,7 +88,9 @@ function getHost() {
  * @param {string} options.text    The sentence. Required.
  * @param {string} [options.title] A short bold line above it.
  * @param {string} [options.type]  success | wishlist | error | info.
+ * @param {string} [options.note]  A second, quieter line under the sentence.
  * @param {Object} [options.action] { label, url } for the trailing link.
+ * @param {Object[]} [options.actions] Several { label, url } links, in order.
  * @returns {HTMLElement|null}
  */
 export function toast(options) {
@@ -112,10 +114,13 @@ export function toast(options) {
     '<div class="toast__body">' +
     (opts.title ? '<p class="toast__title"></p>' : '') +
     '<p class="toast__text"></p>' +
+    (opts.note ? '<p class="toast__note"></p>' : '') +
     '</div>';
 
-  if (opts.action && opts.action.url && opts.action.label) {
-    markup += '<a class="toast__action" href="#"></a>';
+  const actions = (opts.actions || [opts.action]).filter((a) => a && a.url && a.label);
+
+  if (actions.length) {
+    markup += '<div class="toast__actions">' + '<a class="toast__action" href="#"></a>'.repeat(actions.length) + '</div>';
   }
 
   markup +=
@@ -130,12 +135,12 @@ export function toast(options) {
   // Everything that came from outside this file goes in as text.
   if (opts.title) el.querySelector('.toast__title').textContent = opts.title;
   el.querySelector('.toast__text').textContent = decode(text);
+  if (opts.note) el.querySelector('.toast__note').textContent = decode(opts.note);
 
-  const action = el.querySelector('.toast__action');
-  if (action) {
-    action.href = opts.action.url;
-    action.textContent = opts.action.label;
-  }
+  el.querySelectorAll('.toast__action').forEach((link, i) => {
+    link.href = actions[i].url;
+    link.textContent = actions[i].label;
+  });
 
   const close = el.querySelector('.toast__close');
   close.querySelector('.screen-reader-text').textContent = 'Dismiss notification';
@@ -222,7 +227,8 @@ function drainServerQueue() {
     return;
   }
 
-  const cartUrl = window.dorotapeToastData && window.dorotapeToastData.cartUrl;
+  const data = window.dorotapeToastData || {};
+  const cartUrl = data.cartUrl;
 
   queued.forEach((item) => {
     const text = item.text || '';
@@ -232,11 +238,20 @@ function drainServerQueue() {
     // and the rest are statements, and a link on them is noise.
     const isCart = /basket|cart/i.test(text) && cartUrl;
 
-    toast({
-      text,
-      type: 'success',
-      action: isCart ? { label: 'View basket', url: cartUrl } : null,
-    });
+    // On a product page the form posts back to the product, so without a
+    // way back the person is left on it (Site Edits, October 2026). The
+    // category is the shelf they most likely took it from.
+    const actions = isCart
+      ? [
+        { label: 'View basket', url: cartUrl },
+        { label: 'Continue shopping', url: data.continueUrl },
+      ]
+      : [];
+
+    // And how far the basket is from free delivery, which is the other
+    // thing worth knowing at that moment (Site Edits, October 2026,
+    // Checkout A4).
+    toast({ text, type: 'success', actions, note: isCart ? data.freeDelivery : '' });
   });
 }
 
@@ -270,6 +285,7 @@ function bindWooEvents() {
       text: name ? '\u201c' + name + '\u201d has been added to your basket.' : 'Added to your basket.',
       type: 'success',
       action: data.cartUrl ? { label: 'View basket', url: data.cartUrl } : null,
+      note: fragments && fragments.dorotape_free_delivery,
     });
   });
 

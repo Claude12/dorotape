@@ -169,14 +169,16 @@
     }
   }
 
+  // A step under the design's text-xl / text-3xl, which the client found too
+  // large for quotes of this length (Site Edits, October 2026).
   &__quote {
     margin: 0;
-    font-size: $font-size-lg;
+    font-size: $font-size-md;
     font-weight: $font-weight-bold;
     line-height: $line-height-relaxed;
 
     @include min-breakpoint(tablet) {
-      font-size: $font-size-30;
+      font-size: $font-size-xl;
       line-height: $line-height-leading-snug;
     }
 

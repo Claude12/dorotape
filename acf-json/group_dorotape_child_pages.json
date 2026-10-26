@@ -1,0 +1,166 @@
+{
+    "key": "group_dorotape_child_pages",
+    "title": "Child Pages",
+    "fields": [
+        {
+            "key": "field_dtchild0001",
+            "label": "Previous and next on child pages",
+            "name": "child_nav",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "Adds a band at the end of each page under this one with the previous and next page, a link back here and an optional second button. The order is the Order number under Page Attributes on each child page, then the date it was published.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "allow_in_bindings": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
+            "key": "field_dtchild0002",
+            "label": "Previous label",
+            "name": "child_prev_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the previous page's title.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_dtchild0001",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Previous",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtchild0003",
+            "label": "Next label",
+            "name": "child_next_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the next page's title.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_dtchild0001",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Next",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtchild0004",
+            "label": "Back link",
+            "name": "child_back_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button back to this page. Leave empty to use this page's title.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_dtchild0001",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Back to case studies",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtchild0005",
+            "label": "Second button",
+            "name": "child_extra_link",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "Optional, beside the back link. For example Contact us.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_dtchild0001",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "page"
+            },
+            {
+                "param": "page_type",
+                "operator": "==",
+                "value": "parent"
+            }
+        ]
+    ],
+    "menu_order": 10,
+    "position": "side",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Previous and next links on the pages under this one (inc/post-nav.php).",
+    "show_in_rest": 0,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1792794838
+}

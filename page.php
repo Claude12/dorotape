@@ -46,6 +46,10 @@ get_header();
 			 */
 			if ( $dt_is_blocks ) {
 				dorotape_render_flexible_content();
+
+				// Previous, next and back on a case study, when its parent
+				// turns the band on (inc/post-nav.php).
+				dorotape_child_page_nav( get_the_ID() );
 			} elseif ( $dt_is_woo ) {
 				get_template_part( 'template-parts/content', 'woo' );
 			} else {

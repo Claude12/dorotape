@@ -53,30 +53,33 @@ $dt_classes = 'product-row-block' . dorotape_background_shape_class( $dt_shape )
 <section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 
-	<div class="container product-row-block__container">
+	<div class="container product-row-block__container js-scroller">
 
-		<?php if ( $dt_eyebrow || $dt_heading || ! empty( $dt_link['url'] ) ) : ?>
-			<div class="product-row-block__header">
-				<div>
-					<?php if ( $dt_eyebrow ) : ?>
-						<p class="product-row-block__eyebrow"><?php echo esc_html( $dt_eyebrow ); ?></p>
-					<?php endif; ?>
+		<?php // Printed even with no heading or link: the scroller arrows live in it. ?>
+		<div class="product-row-block__header">
+			<div>
+				<?php if ( $dt_eyebrow ) : ?>
+					<p class="product-row-block__eyebrow"><?php echo esc_html( $dt_eyebrow ); ?></p>
+				<?php endif; ?>
 
-					<?php if ( $dt_heading ) : ?>
-						<h2 class="product-row-block__heading"><?php echo esc_html( $dt_heading ); ?></h2>
-					<?php endif; ?>
-				</div>
+				<?php if ( $dt_heading ) : ?>
+					<h2 class="product-row-block__heading"><?php echo esc_html( $dt_heading ); ?></h2>
+				<?php endif; ?>
+			</div>
 
+			<div class="product-row-block__actions">
 				<?php if ( ! empty( $dt_link['url'] ) && ! empty( $dt_link['title'] ) ) : ?>
 					<a class="product-row-block__view-all" href="<?php echo esc_url( $dt_link['url'] ); ?>"<?php echo ! empty( $dt_link['target'] ) ? ' target="' . esc_attr( $dt_link['target'] ) . '" rel="noopener"' : ''; ?>>
 						<?php echo esc_html( $dt_link['title'] ); ?>
 						<svg class="product-row-block__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 					</a>
 				<?php endif; ?>
-			</div>
-		<?php endif; ?>
 
-		<ul class="product-row-block__track">
+				<?php dorotape_scroller_nav(); ?>
+			</div>
+		</div>
+
+		<ul class="product-row-block__track js-scroller-track">
 			<?php foreach ( $dt_products as $dt_product ) : ?>
 				<li class="product-row-block__item">
 					<?php

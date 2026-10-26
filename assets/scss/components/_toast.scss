@@ -150,12 +150,28 @@
   overflow: hidden;
 }
 
-// "View basket". On its own row under the message rather than beside it, so a
-// long product name is not squeezed into a column to make room for it.
-.toast__action {
+// What is left to spend for free delivery, under the basket confirmation
+// (inc/free-delivery.php). Quieter than the sentence above it, which is the
+// news.
+.toast__note {
+  margin: var(--spacer-4) 0 0;
+  color: color-mix(in oklab, var(--color-foreground) 75%, transparent);
+  font-size: $font-size-xs;
+  line-height: $line-height-xs;
+}
+
+// "View basket", and "Continue shopping" after it on a product page. On their
+// own row under the message rather than beside it, so a long product name is
+// not squeezed into a column to make room for them.
+.toast__actions {
   grid-column: 2;
-  justify-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-4) var(--spacer-20);
   margin-top: var(--spacer-4);
+}
+
+.toast__action {
   color: var(--color-cyan);
   font-size: $font-size-sm;
   font-weight: $font-weight-bold;

@@ -43,6 +43,14 @@
 }
 
 .site-header {
+  // The hover and current-state accent. The client's rule (Site Edits,
+  // October 2026): anything that leads to products turns magenta, anything
+  // informational turns cyan. Cyan is the default here; the product parts of
+  // the menu (the mega panels, the category shortcuts and their drawer
+  // equivalents) set it to magenta, so every rule below reads one property
+  // and none of them has to know which kind of link it is styling.
+  --nav-accent: var(--color-cyan);
+
   position: sticky;
   top: 0;
   z-index: z(header);
@@ -96,22 +104,28 @@
 }
 
 .site-header__notice {
+  // Bold and full contrast, to match the links on the right (Site Edits,
+  // October 2026).
+  min-width: 0;
   margin: 0;
+  color: var(--color-foreground);
+  font-weight: $font-weight-bold;
 }
 
-// Held back to desktop. At tablet the row has 720px to hold the delivery
-// notice and these four links, and the two longest ("Trade account" and
-// "Basket (0)") were breaking mid-label and pushing the row to two lines.
-// Every one of them is repeated in the drawer, which is what the hamburger
-// opens at that width, so hiding them here costs nothing.
+// From tablet up, with the row. These were held back to desktop while there
+// were five of them: at 720px the longest labels broke mid-word. With Trade
+// account gone (it went to the same place as Login) the links fit, and it is
+// the notice that gives way instead: it wraps to two 16px lines, which still
+// sit inside the 36px bar, so --site-header-height does not move.
 .site-header__utility-links {
   display: none;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--spacer-20);
   // Stays on the right when the delivery notice is left empty.
   margin-left: auto;
 
-  @include min-breakpoint(desktop) {
+  @include min-breakpoint(tablet) {
     display: flex;
   }
 }
@@ -232,8 +246,12 @@
     padding-inline: var(--spacer-16);
   }
 
+  // Right-aligned on desktop, against the quote button, so the field reads
+  // as part of the actions rather than floating mid-row (Site Edits, October
+  // 2026).
   @include min-breakpoint(desktop) {
-    padding-inline: var(--spacer-32);
+    justify-content: flex-end;
+    padding-inline: var(--spacer-32) 0;
   }
 }
 
@@ -254,7 +272,7 @@
   background-image: var(--gradient-aurora);
 
   @include min-breakpoint(desktop) {
-    max-width: 32rem;
+    max-width: 40rem;
   }
 
   &:focus-within {
@@ -551,6 +569,8 @@
 // overflow hidden: links that do not fit wrap onto a second line nobody sees,
 // so the row loses shortcuts as it narrows instead of crowding or wrapping.
 .site-header__shortcuts {
+  --nav-accent: var(--color-magenta);
+
   display: flex;
   flex: 1;
   flex-wrap: wrap;
@@ -597,7 +617,7 @@
   &:hover,
   &:focus-visible,
   &[aria-current="page"] {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 }
 
@@ -605,7 +625,11 @@
   position: relative;
 
   // Mega panels are positioned against .site-header__nav-inner instead.
+  // They are the product sections (Products, Applications), so they and
+  // everything inside their panels take the product accent.
   &--mega {
+    --nav-accent: var(--color-magenta);
+
     position: static;
   }
 }
@@ -652,7 +676,7 @@
   &:hover,
   &:focus-visible,
   &[aria-expanded="true"] {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 
   &[aria-expanded="true"]::after,
@@ -718,7 +742,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacer-8);
-  color: var(--color-cyan);
+  color: var(--nav-accent);
   font-size: $font-size-sm;
   font-weight: $font-weight-bold;
   line-height: $line-height-sm;
@@ -785,11 +809,11 @@
   &:hover,
   &:focus-visible {
     background-color: var(--color-secondary);
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 
   &[aria-current="page"] {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 }
 
@@ -800,21 +824,23 @@
 // them together; visually every pane is lifted out of the rail and pinned to
 // the panel's right-hand area. The panel has a fixed height that fits the
 // longest group at two columns, so it does not jump as the pointer moves down
-// the rail, and a pane that is still too long scrolls inside itself.
+// the rail, and a pane that is still too long scrolls inside itself. The
+// heights fit Sign & Display Vinyl, the longest group, with its links drawn
+// as buttons: re-measure if a group grows or the link's padding changes.
 
 .site-header__mega {
   --mega-rail: 264px;
 
   right: 0;
   left: 0;
-  height: min(480px, calc(100vh - var(--site-header-height) - var(--spacer-24)));
-  height: min(480px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
+  height: min(640px, calc(100vh - var(--site-header-height) - var(--spacer-24)));
+  height: min(640px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
   overflow: hidden;
 
   @include min-breakpoint(xl) {
     --mega-rail: 296px;
 
-    height: min(440px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
+    height: min(480px, calc(100dvh - var(--site-header-height) - var(--spacer-24)));
   }
 }
 
@@ -865,7 +891,7 @@
   &:focus-visible,
   .is-active > & {
     background-color: var(--color-secondary);
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 }
 
@@ -932,33 +958,43 @@
   padding: 0;
   list-style: none;
   columns: 2;
-  column-gap: var(--spacer-32);
+  column-gap: var(--spacer-12);
 
   @include min-breakpoint(xl) {
     columns: 3;
   }
 
   li {
+    padding-bottom: var(--spacer-6);
     break-inside: avoid;
   }
 }
 
+// Each sub-category is drawn as a button rather than a line of text, so the
+// pane reads as a set of choices (Site Edits, October 2026). The ghost
+// button's border and fill, at the dropdown link's size.
 .site-header__mega-link {
   display: block;
-  padding: var(--spacer-6) 0;
-  color: var(--color-muted-foreground);
+  padding: var(--spacer-8) var(--spacer-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: color-mix(in oklab, var(--color-background) 40%, transparent);
+  color: var(--color-foreground);
   font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
   line-height: $line-height-sm;
   text-decoration: none;
-  transition: color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 
   &:hover,
   &:focus-visible,
   &[aria-current="page"] {
-    color: var(--color-foreground);
-    text-decoration: underline;
-    text-decoration-color: var(--color-cyan);
-    text-underline-offset: 3px;
+    border-color: var(--nav-accent);
+    background-color: var(--color-secondary);
+    color: var(--nav-accent);
   }
 }
 
@@ -1017,6 +1053,11 @@
 
 .site-header__drawer-item {
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+
+  // The drawer's copy of a mega panel section, as in the bar.
+  &--mega {
+    --nav-accent: var(--color-magenta);
+  }
 }
 
 // Top-level rows: links and toggles alike, 48px tall for a thumb.
@@ -1040,7 +1081,7 @@
   cursor: pointer;
 
   .is-current > & {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 }
 
@@ -1052,7 +1093,7 @@
   transition: transform var(--transition-fast);
 
   [aria-expanded="true"] > & {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
     transform: rotate(180deg);
   }
 }
@@ -1109,7 +1150,7 @@
   &:hover,
   &:focus-visible,
   &[aria-current="page"] {
-    color: var(--color-cyan);
+    color: var(--nav-accent);
   }
 
   // "View all ...": the section's own page, first in its list.
@@ -1130,4 +1171,9 @@
   margin-top: var(--spacer-20);
   font-size: $font-size-xs;
   line-height: $line-height-xs;
+
+  // From tablet the utility row above carries them.
+  @include min-breakpoint(tablet) {
+    display: none;
+  }
 }

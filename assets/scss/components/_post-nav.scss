@@ -1,0 +1,125 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// Previous, next and back.
+//
+// The band at the end of an article or a case study, from dorotape_post_nav()
+// in inc/post-nav.php (Site Edits, October 2026). Two cards, the previous one
+// on the left and the next on the right, over a centred row of buttons.
+// Cyan on hover, because both are information, not products.
+
+.post-nav {
+  padding: var(--spacer-48) 0 var(--spacer-64);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+
+  @include min-breakpoint(desktop) {
+    padding: var(--spacer-64) 0 var(--spacer-96);
+  }
+
+  &__links {
+    display: grid;
+    gap: var(--spacer-12);
+
+    @include min-breakpoint(tablet) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-20);
+    }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacer-16);
+    padding: var(--spacer-20);
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    text-decoration: none;
+    transition: border-color var(--transition-fast);
+
+    @include min-breakpoint(tablet) {
+      padding: var(--spacer-24);
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-cyan);
+    }
+  }
+
+  // The next card reads right to left: title against the right edge, arrow
+  // after it.
+  &__link--next {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+
+  // Holds the right-hand place when there is no previous one. On a phone the
+  // cards stack, so the gap would only be a hole.
+  &__link--empty {
+    display: none;
+    border: 0;
+    background: none;
+
+    @include min-breakpoint(tablet) {
+      display: block;
+    }
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-cyan);
+    transition: transform var(--transition-fast);
+  }
+
+  &__link--prev:hover &__icon {
+    transform: translateX(calc(-1 * var(--spacer-4)));
+  }
+
+  &__link--next:hover &__icon {
+    transform: translateX(var(--spacer-4));
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacer-4);
+    min-width: 0;
+  }
+
+  &__label {
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $letter-spacing-widest;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-snug;
+
+    @include min-breakpoint(tablet) {
+      font-size: $font-size-base;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacer-12);
+    margin-top: var(--spacer-32);
+  }
+
+  &__actions:first-child {
+    margin-top: 0;
+  }
+}

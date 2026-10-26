@@ -189,6 +189,344 @@
                     "append": ""
                 }
             ]
+        },
+        {
+            "key": "field_dtprod0020",
+            "label": "Structure tab",
+            "name": "product_tab_structure",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The four tabs beside a product's description. A description is split on its own bold headings: Structure and Material Characteristics go under this one.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Structure",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Structure",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0021",
+            "label": "Suitability tab",
+            "name": "product_tab_suitability",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Suitability, with Ink Compatibility under it.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Suitability",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Suitability",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0022",
+            "label": "Advantages tab",
+            "name": "product_tab_advantages",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Advantages.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Advantages",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Advantages",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0023",
+            "label": "Downloads tab",
+            "name": "product_tab_downloads",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Technical Information, as buttons.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Downloads",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Downloads",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0024",
+            "label": "Ink compatibility heading",
+            "name": "product_tab_inks",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The small heading over the inks inside the Suitability tab.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Ink compatibility",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Ink compatibility",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0028",
+            "label": "Download button fallback",
+            "name": "product_download_fallback",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "For a download whose picture is not in the list below and has no description of its own.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Download",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Download",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0025",
+            "label": "Download labels",
+            "name": "product_download_labels",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "On the old site each download was a picture of its label. The picture's file name says which document it is, so this turns it into words. Leave it empty and the standard fourteen are used: Datasheet, Colour, Fire, Profile, Blog, App, Hand, MSDS, Coshh, Template, Slip, War, Measure and Brox. A row here changes or adds one.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "table",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "field_dtprod0027",
+            "button_label": "Add label",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_dtprod0026",
+                    "label": "Picture",
+                    "name": "image",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "The file name, such as Datasheet.png or Datasheet.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "40",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_dtprod0025"
+                },
+                {
+                    "key": "field_dtprod0027",
+                    "label": "Label",
+                    "name": "label",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "What the button says, such as Technical datasheet.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "60",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_dtprod0025"
+                }
+            ]
+        },
+        {
+            "key": "field_dtprod0031",
+            "label": "Ink drops",
+            "name": "product_inks",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "The coloured drops shown for each ink under a digital print category's banner and on its product cards. Add a row only to rename an ink or change its picture.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "table",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "",
+            "button_label": "Add ink",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_dtprod0032",
+                    "label": "Ink",
+                    "name": "ink",
+                    "aria-label": "",
+                    "type": "select",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "choices": {
+                        "ecosol": "Eco-solvent",
+                        "sol": "Solvent",
+                        "latex": "Latex",
+                        "uv": "UV",
+                        "dye": "Dye",
+                        "pigment": "Pigment"
+                    },
+                    "default_value": false,
+                    "return_format": "value",
+                    "multiple": 0,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "ui": 0,
+                    "ajax": 0,
+                    "placeholder": "",
+                    "create_options": 0,
+                    "save_options": 0,
+                    "parent_repeater": "field_dtprod0031"
+                },
+                {
+                    "key": "field_dtprod0033",
+                    "label": "Name",
+                    "name": "label",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Leave empty to keep the name shown in the Ink column.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_dtprod0031"
+                },
+                {
+                    "key": "field_dtprod0034",
+                    "label": "Drop",
+                    "name": "image",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "Leave empty to keep the old site's drop.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "id",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "png, jpg, jpeg, webp, svg",
+                    "preview_size": "thumbnail",
+                    "parent_repeater": "field_dtprod0031"
+                }
+            ]
+        },
+        {
+            "key": "field_dtprod0029",
+            "label": "Reward points line",
+            "name": "product_reward_text",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Under the price on every product with Reward points turned on (Product data > Advanced).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "60",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Earn reward points every time you buy this product",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Earn reward points every time you buy this product",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtprod0030",
+            "label": "Reward points link",
+            "name": "product_reward_link",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "Optional. A link after the line, such as to a page about the scheme.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "40",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
         }
     ],
     "location": [
@@ -209,5 +547,5 @@
     "active": true,
     "description": "Settings the single product page reads on every product: the two background shapes, the Related products headings, and the assurance lines under add to cart.",
     "show_in_rest": 0,
-    "modified": 1790172769
+    "modified": 1792797080
 }

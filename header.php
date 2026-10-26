@@ -25,7 +25,6 @@ $dorotape_cart       = dorotape_header_wc_url( 'cart' );
 $dorotape_wishlist   = dorotape_header_wishlist_url();
 $dorotape_wish_count = dorotape_header_wishlist_count();
 $dorotape_notice     = dorotape_header_notice();
-$dorotape_trade      = dorotape_setting_link( 'header_trade_account' );
 $dorotape_quote      = dorotape_setting_link( 'header_quote' );
 $dorotape_logo       = dorotape_site_logo();
 $dorotape_search     = (string) dorotape_setting( 'header_search_placeholder' );
@@ -54,16 +53,9 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 
 				<div class="site-header__utility-links">
 					<?php if ( '' !== $dorotape_phone['display'] ) : ?>
-						<a class="site-header__utility-link" href="<?php echo esc_url( $dorotape_phone['href'] ); ?>">
+						<a class="site-header__utility-link site-header__utility-link--strong" href="<?php echo esc_url( $dorotape_phone['href'] ); ?>">
 							<?php echo dorotape_header_icon( 'phone', 'site-header__utility-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<?php echo esc_html( $dorotape_phone['display'] ); ?>
-						</a>
-					<?php endif; ?>
-
-					<?php if ( $dorotape_trade ) : ?>
-						<a class="site-header__utility-link" href="<?php echo esc_url( $dorotape_trade['url'] ); ?>"<?php echo $dorotape_trade['target'] ? ' target="' . esc_attr( $dorotape_trade['target'] ) . '" rel="noopener"' : ''; ?>>
-							<?php echo dorotape_header_icon( 'user', 'site-header__utility-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							<?php echo esc_html( $dorotape_trade['title'] ); ?>
 						</a>
 					<?php endif; ?>
 

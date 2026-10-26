@@ -21,6 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $dt_background = get_sub_field( 'background_image' );
 $dt_eyebrow    = get_sub_field( 'eyebrow' );
+$dt_dot        = dorotape_eyebrow_colour( get_sub_field( 'eyebrow_colour' ), 'magenta' );
 $dt_heading    = get_sub_field( 'heading' );
 $dt_intro      = get_sub_field( 'intro' );
 $dt_primary    = get_sub_field( 'primary_link' );
@@ -79,7 +80,7 @@ $dt_stats = is_array( $dt_stats ) ? $dt_stats : array();
 		<div class="hero-block__lead">
 			<?php if ( $dt_eyebrow ) : ?>
 				<p class="hero-block__eyebrow">
-					<span class="hero-block__eyebrow-dot" aria-hidden="true"></span>
+					<span class="hero-block__eyebrow-dot hero-block__eyebrow-dot--<?php echo esc_attr( $dt_dot ); ?>" aria-hidden="true"></span>
 					<?php echo esc_html( $dt_eyebrow ); ?>
 				</p>
 			<?php endif; ?>

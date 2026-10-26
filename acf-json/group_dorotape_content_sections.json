@@ -71,6 +71,35 @@
                             "append": ""
                         },
                         {
+                            "key": "field_dthero000110",
+                            "label": "Eyebrow dot",
+                            "name": "eyebrow_colour",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Magenta when the page or banner leads to products, cyan when it is information (about, support, case studies, news).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "magenta": "Magenta: products",
+                                "cyan": "Cyan: information"
+                            },
+                            "default_value": "magenta",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
                             "key": "field_dthero000103",
                             "label": "Heading",
                             "name": "heading",
@@ -289,7 +318,7 @@
                             "name": "eyebrow",
                             "aria-label": "",
                             "type": "text",
-                            "instructions": "Small capitals above the heading, with a magenta dot.",
+                            "instructions": "Small capitals above the heading.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -303,6 +332,35 @@
                             "placeholder": "",
                             "prepend": "",
                             "append": ""
+                        },
+                        {
+                            "key": "field_dtbanr000107",
+                            "label": "Eyebrow dot",
+                            "name": "eyebrow_colour",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Magenta when the page or banner leads to products, cyan when it is information (about, support, case studies, news).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "magenta": "Magenta: products",
+                                "cyan": "Cyan: information"
+                            },
+                            "default_value": "cyan",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
                         },
                         {
                             "key": "field_dtbanr000103",
@@ -1537,7 +1595,7 @@
                             "name": "colour_logos",
                             "aria-label": "",
                             "type": "true_false",
-                            "instructions": "Turn on for full colour logos (each sits on a white tile). Leave off for white-on-black logos, which are shown in greyscale as on the homepage.",
+                            "instructions": "Turn on for full colour logos, each on a white tile. Leave off to show every logo in white on the page background, as on the homepage.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1553,14 +1611,49 @@
                             "ui_off_text": ""
                         },
                         {
+                            "key": "field_dttrst000107",
+                            "label": "Logos from",
+                            "name": "logo_source",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Brands from Theme Settings keeps this block in step with every other one that uses them. Choose this block's own logos for a one-off list.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "site": "Brands from Theme Settings",
+                                "custom": "This block's own logos"
+                            },
+                            "default_value": "site",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": ""
+                        },
+                        {
                             "key": "field_dttrst000102",
                             "label": "Logos",
                             "name": "logos",
                             "aria-label": "",
                             "type": "repeater",
-                            "instructions": "Each row is one logo. Rows without an image are skipped. The strip scrolls on its own and pauses on hover.",
+                            "instructions": "Each row is one logo. Rows without an image are skipped.",
                             "required": 0,
-                            "conditional_logic": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_dttrst000107",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ],
                             "wrapper": {
                                 "width": "",
                                 "class": "",
@@ -2379,6 +2472,56 @@
                                 "id": ""
                             },
                             "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtcase000110",
+                            "label": "Filter by category",
+                            "name": "filter",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Buttons above the projects, one for each category the projects use, that show only that category's projects. Wide projects take one place while a filter is on.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtcase000111",
+                            "label": "All button",
+                            "name": "filter_all_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "The first button, which shows every project again.",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_dtcase000110",
+                                        "operator": "==",
+                                        "value": "1"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "All projects",
                             "maxlength": "",
                             "allow_in_bindings": 0,
                             "placeholder": "",
@@ -3807,7 +3950,8 @@
                                 "": "Default (navy)",
                                 "surface": "Raised panel",
                                 "surface-2": "Raised panel (lighter)",
-                                "aurora": "Aurora wash"
+                                "aurora": "Aurora wash",
+                                "magenta": "Magenta glow"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4748,6 +4892,6 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1791549490,
+    "modified": 1792795520,
     "local_file": "/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape/acf-json/group_dorotape_content_sections.json"
 }

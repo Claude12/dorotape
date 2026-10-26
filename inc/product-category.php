@@ -286,7 +286,10 @@ function dorotape_category_banner(): void {
 
 	$eyebrow = dorotape_category_field( 'category_banner_eyebrow', $default );
 	$title   = dorotape_category_field( 'category_banner_title', $term->name );
-	$intro   = dorotape_category_field( 'category_banner_intro', trim( wp_strip_all_tags( $term->description ) ) );
+	// The ink lines come out of the text and go back in as drops, below it.
+	$split   = dorotape_ink_split_description( (string) $term->description );
+	$intro   = dorotape_category_field( 'category_banner_intro', dorotape_category_description_text( $split['text'] ) );
+	$ticks   = dorotape_category_banner_ticks( $term );
 
 	// The category thumbnail set in Products, Categories is the fallback, so a
 	// category that was never given a banner image still shows the picture the
@@ -309,7 +312,7 @@ function dorotape_category_banner(): void {
 				<div class="internal-banner-block__inner">
 					<?php if ( '' !== $eyebrow ) : ?>
 						<p class="internal-banner-block__eyebrow">
-							<span class="internal-banner-block__eyebrow-dot" aria-hidden="true"></span>
+							<span class="internal-banner-block__eyebrow-dot internal-banner-block__eyebrow-dot--magenta" aria-hidden="true"></span>
 							<?php echo esc_html( $eyebrow ); ?>
 						</p>
 					<?php endif; ?>
@@ -319,6 +322,8 @@ function dorotape_category_banner(): void {
 					<?php if ( '' !== $intro ) : ?>
 						<p class="internal-banner-block__intro"><?php echo esc_html( $intro ); ?></p>
 					<?php endif; ?>
+
+					<?php dorotape_ink_list( $split['inks'], 'ink-list' ); ?>
 
 					<?php dorotape_breadcrumb_nav( 'internal-banner-block__breadcrumb' ); ?>
 				</div>
@@ -347,10 +352,73 @@ function dorotape_category_banner(): void {
 
 			</div>
 
+			<?php if ( array() !== $ticks ) : ?>
+				<ul class="internal-banner-block__ticks">
+					<?php foreach ( $ticks as $tick ) : ?>
+						<li class="internal-banner-block__tick">
+							<?php echo dorotape_icon( 'check', 'internal-banner-block__tick-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup built from a fixed icon map. ?>
+							<span><?php echo esc_html( $tick ); ?></span>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+
 			<div class="aurora-rule internal-banner-block__rule" aria-hidden="true"></div>
 		</div>
 	</section>
 	<?php
+}
+
+/**
+ * A category description as one paragraph for the banner.
+ *
+ * The old descriptions are lists set as lines, "the following properties:"
+ * then "Intermediate grade" then "Monomeric", and run together they read as
+ * one sentence with no full stops in it. Each line that does not end in
+ * punctuation of its own gets a full stop.
+ *
+ * @param string $description Term description, as stored.
+ * @return string Plain text.
+ */
+function dorotape_category_description_text( string $description ): string {
+	$lines = array();
+
+	foreach ( preg_split( '/\r\n|\r|\n/', $description ) ?: array() as $line ) {
+		$line = html_entity_decode( wp_strip_all_tags( $line ), ENT_QUOTES, 'UTF-8' );
+		$line = trim( (string) preg_replace( '/[\s\x{00A0}]+/u', ' ', $line ) );
+
+		if ( '' === $line ) {
+			continue;
+		}
+
+		$lines[] = preg_match( '/[.:;!?]$/u', $line ) ? $line : $line . '.';
+	}
+
+	return implode( ' ', $lines );
+}
+
+/**
+ * The ticked points under a category's banner.
+ *
+ * For a range whose selling points would otherwise need a band of their own
+ * between the banner and the colours: Optima had both, saying much the same
+ * twice, and the colours were a long scroll away (Site Edits, October 2026,
+ * Category Main A7). Four to a row from desktop, so eight make two rows.
+ *
+ * @param WP_Term $term Category.
+ * @return string[] Labels, empty rows dropped.
+ */
+function dorotape_category_banner_ticks( WP_Term $term ): array {
+	$rows = function_exists( 'get_field' ) ? get_field( 'category_banner_ticks', 'term_' . $term->term_id ) : null;
+
+	return array_values(
+		array_filter(
+			array_map(
+				static fn ( $row ) => is_array( $row ) ? trim( (string) ( $row['label'] ?? '' ) ) : '',
+				is_array( $rows ) ? $rows : array()
+			)
+		)
+	);
 }
 
 /**
@@ -522,7 +590,7 @@ function dorotape_category_ranges(): void {
 										'alt'      => '',
 										'loading'  => $has_sections ? 'lazy' : dorotape_card_loading(),
 										'decoding' => 'async',
-										'sizes'    => '(min-width: 1024px) 25vw, 50vw',
+										'sizes'    => '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw',
 									)
 								);
 								?>

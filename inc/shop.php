@@ -148,6 +148,7 @@ function dorotape_shop_banner(): void {
 			'intro'      => $intro,
 			'shape'      => dorotape_shop_field( 'shop_banner_shape', 'cubes-right' ),
 			'breadcrumb' => true,
+			'dot'        => 'magenta',
 		)
 	);
 }

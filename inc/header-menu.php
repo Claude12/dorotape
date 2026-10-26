@@ -384,8 +384,20 @@ function dorotape_header_drawer_menu(): void {
 	?>
 	<nav aria-label="<?php esc_attr_e( 'Main menu', 'dorotape' ); ?>">
 		<ul class="site-header__drawer-list" id="primary-menu-drawer">
-			<?php foreach ( $tree as $node ) : ?>
-				<li class="site-header__drawer-item<?php echo dorotape_menu_is_current( $node['item'] ) ? ' is-current' : ''; ?>">
+			<?php
+			foreach ( $tree as $node ) :
+				$classes = array( 'site-header__drawer-item' );
+
+				// Same test as the bar: a mega section is a product section,
+				// and takes the product accent here too.
+				if ( $node['children'] && dorotape_menu_is_mega( $node ) ) {
+					$classes[] = 'site-header__drawer-item--mega';
+				}
+				if ( dorotape_menu_is_current( $node['item'] ) ) {
+					$classes[] = 'is-current';
+				}
+				?>
+				<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 					<?php dorotape_header_drawer_node( $node, 0 ); ?>
 				</li>
 			<?php endforeach; ?>

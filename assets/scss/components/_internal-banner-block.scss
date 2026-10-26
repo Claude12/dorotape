@@ -48,12 +48,17 @@
     pointer-events: none;
   }
 
+  // Brighter than the design's wash, which read as a smudge on most screens
+  // (Site Edits, October 2026): a stronger core, a middle stop so it holds
+  // its colour further out, and a centre lifted clear of the fade below,
+  // which had been painting over the brightest part.
   &::before {
     inset: 0;
     background-image: radial-gradient(
-      120% 90% at 90% 95%,
-      color-mix(in oklab, var(--color-magenta) 45%, transparent) 0%,
-      color-mix(in oklab, var(--color-background) 92%, transparent) 60%,
+      120% 90% at 88% 85%,
+      color-mix(in oklab, var(--color-magenta) 70%, transparent) 0%,
+      color-mix(in oklab, var(--color-magenta) 28%, transparent) 35%,
+      color-mix(in oklab, var(--color-background) 92%, transparent) 65%,
       var(--color-background) 100%
     );
   }
@@ -100,12 +105,17 @@
     text-transform: uppercase;
   }
 
+  // Magenta for products, cyan for information; see dorotape_eyebrow_colour().
   &__eyebrow-dot {
     width: 6px;
     height: 6px;
     flex-shrink: 0;
     border-radius: var(--radius-pill);
     background-color: var(--color-magenta);
+
+    &--cyan {
+      background-color: var(--color-cyan);
+    }
   }
 
   &__heading {
@@ -183,6 +193,51 @@
     height: 20rem;
     border-radius: var(--radius-2xl);
     object-fit: cover;
+  }
+
+  // A range's selling points, under the text and the photo rather than in a
+  // band of their own below the banner (Site Edits, October 2026, Category
+  // Main A7). The Category Intro's rows, four to a row from desktop.
+  &__ticks {
+    display: grid;
+    gap: var(--spacer-8);
+    margin: var(--spacer-40) 0 0;
+    padding: 0;
+    list-style: none;
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-12);
+    }
+
+    @include min-breakpoint(desktop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: var(--spacer-48);
+    }
+  }
+
+  &__tick {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacer-12);
+    padding: var(--spacer-12) var(--spacer-16);
+    border: 1px solid color-mix(in oklab, var(--color-border) 15%, transparent);
+    border-radius: var(--radius-2xl);
+    background-color: color-mix(in oklab, var(--color-surface) 15%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+
+    @include min-breakpoint(mobile) {
+      padding: var(--spacer-16);
+    }
+  }
+
+  &__tick-icon {
+    flex: 0 0 auto;
+    width: var(--spacer-16);
+    height: var(--spacer-16);
+    margin-top: 2px;
+    color: var(--color-cyan);
   }
 
   // Closes the banner rather than opening the band below it, so the line sits

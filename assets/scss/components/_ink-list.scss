@@ -1,0 +1,63 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/variables" as *;
+@use "base/typography" as *;
+
+// The inks a material takes, as the old site's coloured drops (inc/inks.php).
+//
+// Under a digital print category's banner each drop has its name beside it,
+// where the words used to run on from the paragraph above with nothing between
+// them (Site Edits, October 2026, Category Main A6). On a card the drops stand
+// alone, and the names are read out and shown on hover.
+
+.ink-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: var(--spacer-16) 0 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-6);
+    padding: var(--spacer-4) var(--spacer-12) var(--spacer-4) var(--spacer-8);
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-surface) 40%, transparent);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+  }
+
+  &__drop {
+    width: 12px;
+    height: auto;
+    flex-shrink: 0;
+  }
+}
+
+.product-card__inks {
+  display: flex;
+  gap: var(--spacer-4);
+  margin: var(--spacer-8) 0 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: inline-flex;
+  }
+
+  &__drop {
+    width: 10px;
+    height: auto;
+  }
+
+  // An ink with no picture keeps its name, small, rather than vanishing.
+  &__label:not(.screen-reader-text) {
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-xs;
+  }
+}

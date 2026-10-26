@@ -53,6 +53,10 @@ function dorotape_category_filter_excluded(): array {
 		'select-size-of-roll',
 		'size-format',
 		'option',
+		// One value per ink cartridge, so every box matched one product and
+		// filtered nothing (Site Edits, October 2026, Product A13). Each ink
+		// comes in every colour, so a colour filter would not narrow it either.
+		'select-colour-size-below',
 	);
 }
 
@@ -729,6 +733,7 @@ function dorotape_category_filter_grid( array $product_ids, bool $panel ): void 
 							'link'        => 'title',
 							'add_to_cart' => true,
 							'pills'       => dorotape_category_filter_pills( $dt_product ),
+							'inks'        => dorotape_product_inks( $dt_product ),
 							// The same modifier Related products uses: equal
 							// height cards with the button pinned to the foot,
 							// which is what a grid of them needs in both places.

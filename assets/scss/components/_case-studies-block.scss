@@ -13,7 +13,8 @@
   background-color: var(--color-background);
   color: var(--color-foreground);
 
-  @include min-breakpoint(tablet) {
+  // The full section padding waits for desktop; see layout/_site-main.scss.
+  @include min-breakpoint(desktop) {
     padding: var(--spacer-112) 0;
   }
 
@@ -41,6 +42,42 @@
     line-height: $line-height-block-heading;
   }
 
+  // ── Filter ─────────────────────────────────────────────────────────────
+
+  // The News page's pills (components/_blog.scss), as buttons here because
+  // they filter in the page rather than go to one.
+  &__filters {
+    margin-top: calc(-1 * var(--spacer-16));
+
+    .blog-filters__link {
+      font-family: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    // One row that swipes on a phone, out through the gutter like the
+    // product rows. Wrapped, a dozen categories stacked seven rows deep
+    // before the first project.
+    .blog-filters__list {
+      flex-wrap: nowrap;
+      margin: 0 calc(-1 * #{$gutter});
+      padding: 0 $gutter;
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      @include min-breakpoint(tablet) {
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        overflow: visible;
+      }
+    }
+  }
+
   // ── Grid ───────────────────────────────────────────────────────────────
 
   &__grid {
@@ -63,6 +100,16 @@
         grid-column: span 2;
       }
     }
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  // Filtered, a wide project takes one place like the rest, or a category of
+  // two or three projects leaves holes (assets/js/lib/case-filter.js).
+  &__grid.is-filtered &__item--wide {
+    grid-column: auto;
   }
 
   &__card {

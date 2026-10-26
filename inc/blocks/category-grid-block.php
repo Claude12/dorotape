@@ -62,7 +62,10 @@ if ( ! $dt_cards ) {
 
 $dt_loading = 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy';
 
-$dt_classes = 'category-grid-block';
+// The block's grid scrolls sideways on a phone; the category pages print
+// their own grid without this, because a shopper there wants every range in
+// view (Site Edits, October 2026).
+$dt_classes = 'category-grid-block category-grid-block--carousel';
 if ( $dt_divider ) {
 	$dt_classes .= ' category-grid-block--divider';
 }
@@ -77,7 +80,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 		<div class="aurora-rule category-grid-block__rule" aria-hidden="true"></div>
 	<?php endif; ?>
 
-	<div class="container">
+	<div class="container js-scroller">
 
 		<?php if ( $dt_heading || $dt_intro ) : ?>
 			<div class="category-grid-block__header">
@@ -91,7 +94,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 			</div>
 		<?php endif; ?>
 
-		<ul class="category-grid-block__grid">
+		<ul class="category-grid-block__grid js-scroller-track">
 			<?php foreach ( $dt_cards as $dt_card ) : ?>
 				<li class="category-grid-block__item">
 					<a class="category-grid-block__card" href="<?php echo esc_url( $dt_card['url'] ); ?>">
@@ -109,7 +112,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 									'alt'      => '',
 									'loading'  => $dt_loading,
 									'decoding' => 'async',
-									'sizes'    => '(min-width: 1024px) 25vw, 50vw',
+									'sizes'    => '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 80vw',
 								)
 							);
 							?>
@@ -128,6 +131,8 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 				</li>
 			<?php endforeach; ?>
 		</ul>
+
+		<?php dorotape_scroller_nav( 'category-grid-block__nav' ); ?>
 
 	</div>
 </section>

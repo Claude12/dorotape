@@ -98,12 +98,17 @@
     text-transform: uppercase;
   }
 
+  // Magenta for products, cyan for information; see dorotape_eyebrow_colour().
   &__eyebrow-dot {
     width: 6px;
     height: 6px;
     flex-shrink: 0;
     border-radius: var(--radius-pill);
     background-color: var(--color-magenta);
+
+    &--cyan {
+      background-color: var(--color-cyan);
+    }
   }
 
   // A hero heading, so it takes the hero tier rather than the shared block

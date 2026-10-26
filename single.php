@@ -4,8 +4,9 @@ declare( strict_types=1 );
  * A blog article.
  *
  * The internal banner with the article's category and date, the photos, the
- * text at the Rich Text block's measure, all centred on the page, a link back to the blog and three
- * more articles. The wording around the article is on Theme Settings > Blog
+ * text at the Rich Text block's measure, all centred on the page, the
+ * previous and next articles with a link back to the blog (inc/post-nav.php),
+ * and three more articles. The wording around the article is on Theme Settings > Blog
  * Page (inc/blog.php).
  *
  * Any other post type without a template of its own still gets the plain
@@ -88,15 +89,28 @@ while ( have_posts() ) :
 						<?php the_content(); ?>
 					</div>
 
-					<p class="post-article__back">
-						<a class="btn btn--outline" href="<?php echo esc_url( dorotape_blog_url() ); ?>">
-							<?php echo esc_html( dorotape_blog_field( 'post_back_label', __( 'Back to the blog', 'dorotape' ) ) ); ?>
-						</a>
-					</p>
-
 				</div>
 			</div>
 		</article>
+
+		<?php
+		// Previous is the older article, next the newer one, as WordPress has it.
+		$dt_prev = get_previous_post();
+		$dt_next = get_next_post();
+
+		dorotape_post_nav(
+			array(
+				'prev'       => $dt_prev instanceof WP_Post ? $dt_prev->ID : 0,
+				'next'       => $dt_next instanceof WP_Post ? $dt_next->ID : 0,
+				'prev_label' => dorotape_blog_field( 'post_prev_label', __( 'Previous article', 'dorotape' ) ),
+				'next_label' => dorotape_blog_field( 'post_next_label', __( 'Next article', 'dorotape' ) ),
+				'back'       => array(
+					'url'   => dorotape_blog_url(),
+					'title' => dorotape_blog_field( 'post_back_label', __( 'Back to the blog', 'dorotape' ) ),
+				),
+			)
+		);
+		?>
 
 		<?php if ( $dt_products ) : ?>
 			<section class="product-row-block post-products">

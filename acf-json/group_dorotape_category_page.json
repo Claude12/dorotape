@@ -109,6 +109,52 @@
             "preview_size": "medium"
         },
         {
+            "key": "field_dtcat0110",
+            "label": "Banner ticks",
+            "name": "category_banner_ticks",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Optional. Short selling points shown with a tick under the banner, four to a row on a wide screen, so eight make two rows. Use these instead of a Category Intro section when the points are all the range needs, so the colours start sooner.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "table",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "",
+            "button_label": "Add point",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_dtcat0111",
+                    "label": "Point",
+                    "name": "label",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_dtcat0110"
+                }
+            ]
+        },
+        {
             "key": "field_dtcat0005",
             "label": "Banner background shape",
             "name": "category_banner_shape",
@@ -224,5 +270,6 @@
             "placeholder": "",
             "new_lines": ""
         }
-    ]
+    ],
+    "modified": 1792797080
 }

@@ -20,6 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 $dt_background = get_sub_field( 'background_image' );
 $dt_eyebrow    = trim( (string) get_sub_field( 'eyebrow' ) );
+$dt_dot        = dorotape_eyebrow_colour( get_sub_field( 'eyebrow_colour' ), 'cyan' );
 $dt_heading    = trim( (string) get_sub_field( 'heading' ) );
 $dt_intro      = trim( (string) get_sub_field( 'intro' ) );
 $dt_breadcrumb = (bool) get_sub_field( 'breadcrumb' );
@@ -83,7 +84,7 @@ $dt_classes .= dorotape_background_shape_class( $dt_shape );
 
 			<?php if ( '' !== $dt_eyebrow ) : ?>
 				<p class="internal-banner-block__eyebrow">
-					<span class="internal-banner-block__eyebrow-dot" aria-hidden="true"></span>
+					<span class="internal-banner-block__eyebrow-dot internal-banner-block__eyebrow-dot--<?php echo esc_attr( $dt_dot ); ?>" aria-hidden="true"></span>
 					<?php echo esc_html( $dt_eyebrow ); ?>
 				</p>
 			<?php endif; ?>

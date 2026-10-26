@@ -32,12 +32,15 @@
   isolation: isolate;
   overflow: hidden;
   margin-top: calc(-1 * var(--site-header-height));
-  padding: calc(var(--site-header-height) + var(--spacer-40)) 0 var(--spacer-64);
+  // The bottom is short of the top because the tabs band below brings its
+  // own 32 or 40px; together they were a 136px gap under the SKU line that
+  // read as the end of the page (Site Edits, October 2026).
+  padding: calc(var(--site-header-height) + var(--spacer-40)) 0 var(--spacer-24);
   background-color: var(--color-background);
   color: var(--color-foreground);
 
   @include min-breakpoint(tablet) {
-    padding: calc(var(--site-header-height) + var(--spacer-56)) 0 var(--spacer-96);
+    padding: calc(var(--site-header-height) + var(--spacer-56)) 0 var(--spacer-40);
   }
 
   // The wash fades in from the top, out at the bottom and out to the right,
@@ -401,9 +404,16 @@
 // of them: it has its own three-state line in components/woo/_stock.scss,
 // which a tick would flatten.
 
+// A row rather than a list down the column (Site Edits, October 2026): short
+// lines read at a glance side by side, and the column is shorter for it. On a
+// phone they wrap as whole lines. From desktop the summary column is too
+// narrow for all of them at full length, and wrapping left the last one alone
+// on a second line, so each gets an equal column, however many there are,
+// and its text wraps inside it instead.
 .product-assurances {
-  display: grid;
-  gap: var(--spacer-8);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8) var(--spacer-24);
   margin: var(--spacer-24) 0 0;
   padding: 0;
   list-style: none;
@@ -412,17 +422,32 @@
   font-weight: $font-weight-semibold;
   line-height: $line-height-sm;
 
+  @include min-breakpoint(desktop) {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
   &__item {
     display: flex;
     align-items: center;
     gap: var(--spacer-8);
+
+    @include min-breakpoint(desktop) {
+      align-items: flex-start;
+    }
   }
 
+  // Nudged down to the first line's centre for when the text wraps beside it.
   &__icon {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
     color: var(--color-cyan);
+
+    @include min-breakpoint(desktop) {
+      margin-top: 2px;
+    }
   }
 }
 

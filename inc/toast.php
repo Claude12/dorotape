@@ -195,23 +195,48 @@ function dorotape_toast_add_to_cart_message( string $message, array $products ):
 add_filter( 'wc_add_to_cart_message_html', 'dorotape_toast_add_to_cart_message', 10, 2 );
 
 /**
- * The two URLs a toast can offer to send someone to.
+ * The URLs a toast can offer to send someone to.
  *
  * Localised rather than written into the bundle because both are editable
  * pages: a site that renames /cart/ would otherwise get a toast pointing at
  * nothing, and the bundle is shared across installs.
+ *
+ * continueUrl is for the basket toast on a product page: the product's most
+ * specific category, the same one its breadcrumb runs through, or the shop
+ * for a product in none.
  */
 function dorotape_toast_js_data(): void {
 	wp_localize_script(
 		'dorotape-design-system',
 		'dorotapeToastData',
 		array(
-			'cartUrl'     => dorotape_header_wc_url( 'cart' ),
-			'wishlistUrl' => dorotape_header_wishlist_url(),
+			'cartUrl'      => dorotape_header_wc_url( 'cart' ),
+			'wishlistUrl'  => dorotape_header_wishlist_url(),
+			'continueUrl'  => dorotape_toast_continue_url(),
+			// The basket as it stands after the add that reloaded this page
+			// (inc/free-delivery.php).
+			'freeDelivery' => function_exists( 'dorotape_free_delivery_message' ) ? dorotape_free_delivery_message() : '',
 		)
 	);
 }
 add_action( 'wp_enqueue_scripts', 'dorotape_toast_js_data', 20 );
+
+/**
+ * Where "Continue shopping" goes from the product being viewed.
+ *
+ * @return string Empty anywhere but a product page.
+ */
+function dorotape_toast_continue_url(): string {
+	if ( ! is_product() ) {
+		return '';
+	}
+
+	$terms = get_the_terms( get_queried_object_id(), 'product_cat' );
+	$term  = is_array( $terms ) ? dorotape_deepest_term( $terms ) : null;
+	$url   = $term ? get_term_link( $term ) : '';
+
+	return is_string( $url ) && '' !== $url ? $url : (string) wc_get_page_permalink( 'shop' );
+}
 
 /**
  * Keep the header's basket count honest when a card adds over AJAX.

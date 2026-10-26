@@ -36,6 +36,8 @@ function dorotape_icon_paths(): array {
 		'map-pin'   => '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
 		'phone'     => '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
 		'scissors'  => '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+		'download'  => '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
+		'hand-coins' => '<path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/>',
 	);
 }
 
@@ -93,12 +95,14 @@ function dorotape_icon( string $name, string $class = '', string $stroke = '1.5'
  */
 function dorotape_ui_icon_paths(): array {
 	return array(
-		'arrow-right'  => '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
-		'search'       => '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
-		'x'            => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
-		'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
-		'info'         => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-		'play'         => '<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>',
+		'arrow-right'   => '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+		'search'        => '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+		'x'             => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+		'chevron-down'  => '<path d="m6 9 6 6 6-6"/>',
+		'chevron-left'  => '<path d="m15 18-6-6 6-6"/>',
+		'chevron-right' => '<path d="m9 18 6-6-6-6"/>',
+		'info'          => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+		'play'          => '<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>',
 	);
 }
 
@@ -139,4 +143,25 @@ function dorotape_ui_icon( string $name, string $class = '' ): string {
  */
 function dorotape_arrow_icon( string $class = 'btn__icon' ): string {
 	return dorotape_ui_icon( 'arrow-right', $class );
+}
+
+/**
+ * The previous and next arrows for a sideways-scrolling strip.
+ *
+ * assets/js/lib/scroller.js wires them to the `.js-scroller-track` inside the
+ * same `.js-scroller`, and hides the pair while everything fits. They print
+ * hidden, so a strip that never needs them does not flash them before the
+ * script has measured it.
+ *
+ * @param string $class Extra class for the wrapper, for placement only.
+ */
+function dorotape_scroller_nav( string $class = '' ): void {
+	printf(
+		'<div class="scroller-nav is-hidden%1$s"><button type="button" class="scroller-nav__button js-scroller-prev" aria-label="%2$s">%3$s</button><button type="button" class="scroller-nav__button js-scroller-next" aria-label="%4$s">%5$s</button></div>',
+		'' !== $class ? ' ' . esc_attr( $class ) : '',
+		esc_attr__( 'Scroll back', 'dorotape' ),
+		dorotape_ui_icon( 'chevron-left', 'scroller-nav__icon' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup.
+		esc_attr__( 'Scroll on', 'dorotape' ),
+		dorotape_ui_icon( 'chevron-right', 'scroller-nav__icon' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed icon markup.
+	);
 }

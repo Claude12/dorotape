@@ -74,6 +74,48 @@
             "save_options": 0
         },
         {
+            "key": "field_dtwoo0030",
+            "label": "Free delivery: still to spend",
+            "name": "woo_free_delivery_remaining",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown above the basket and checkout, and under the Add to cart message. {amount} is what is left to spend, {region} is where it is going. The threshold comes from the delivery tariff for that region.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Spend {amount} more (ex VAT) for free delivery to {region}.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0031",
+            "label": "Free delivery: reached",
+            "name": "woo_free_delivery_reached",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown once the basket is over the threshold. {region} is where it is going.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Your order qualifies for free delivery to {region}.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtwoo0007",
             "label": "Checkout",
             "name": "",
@@ -305,5 +347,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1790947528
+    "modified": 1792797786
 }

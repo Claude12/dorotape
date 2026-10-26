@@ -11,6 +11,13 @@ declare( strict_types=1 );
  *
  * A project with no link is still shown, as a plain card without the arrow.
  *
+ * With "Filter by category" on, a row of buttons over the grid shows one
+ * category's projects at a time, like the News page's (Site Edits, October
+ * 2026). The buttons come from the projects' own category text, so there is
+ * no list to keep up. It filters in the page (assets/js/lib/case-filter.js):
+ * the projects are all here already, and the buttons stay hidden without
+ * JavaScript, which leaves the full grid.
+ *
  * @package dorotape
  */
 
@@ -43,6 +50,27 @@ if ( ! $dt_projects ) {
 $dt_eyebrow = get_sub_field( 'eyebrow' );
 $dt_heading = get_sub_field( 'heading' );
 
+// One button per category, in the order the projects first use them. Two
+// spellings of the same word count once.
+$dt_filters = array();
+
+if ( get_sub_field( 'filter' ) ) {
+	foreach ( $dt_projects as $dt_project ) {
+		$dt_slug = sanitize_title( $dt_project['category'] );
+
+		if ( '' !== $dt_slug && ! isset( $dt_filters[ $dt_slug ] ) ) {
+			$dt_filters[ $dt_slug ] = $dt_project['category'];
+		}
+	}
+
+	// One category is nothing to choose between.
+	if ( count( $dt_filters ) < 2 ) {
+		$dt_filters = array();
+	}
+}
+
+$dt_all_label = trim( (string) get_sub_field( 'filter_all_label' ) );
+
 $dt_shape   = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 $dt_classes = 'case-studies-block' . dorotape_background_shape_class( $dt_shape );
 ?>
@@ -67,10 +95,25 @@ $dt_classes = 'case-studies-block' . dorotape_background_shape_class( $dt_shape 
 			</div>
 		<?php endif; ?>
 
-		<ul class="case-studies-block__grid">
+		<?php if ( $dt_filters ) : ?>
+			<div class="blog-filters case-studies-block__filters js-case-filter" hidden>
+				<ul class="blog-filters__list" role="list">
+					<li>
+						<button type="button" class="blog-filters__link is-current" data-filter="" aria-pressed="true"><?php echo esc_html( '' !== $dt_all_label ? $dt_all_label : __( 'All projects', 'dorotape' ) ); ?></button>
+					</li>
+					<?php foreach ( $dt_filters as $dt_slug => $dt_name ) : ?>
+						<li>
+							<button type="button" class="blog-filters__link" data-filter="<?php echo esc_attr( $dt_slug ); ?>" aria-pressed="false"><?php echo esc_html( $dt_name ); ?></button>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
+
+		<ul class="case-studies-block__grid"<?php echo $dt_filters ? ' aria-live="polite"' : ''; ?>>
 			<?php foreach ( $dt_projects as $dt_project ) : ?>
 				<?php $dt_tag = $dt_project['url'] ? 'a' : 'div'; ?>
-				<li class="case-studies-block__item<?php echo $dt_project['wide'] ? ' case-studies-block__item--wide' : ''; ?>">
+				<li class="case-studies-block__item<?php echo $dt_project['wide'] ? ' case-studies-block__item--wide' : ''; ?>"<?php echo $dt_filters ? ' data-category="' . esc_attr( sanitize_title( $dt_project['category'] ) ) . '"' : ''; ?>>
 					<<?php echo esc_html( $dt_tag ); ?> class="case-studies-block__card"<?php if ( $dt_project['url'] ) : ?> href="<?php echo esc_url( $dt_project['url'] ); ?>"<?php endif; ?>>
 						<div class="case-studies-block__media">
 							<?php if ( $dt_project['image'] ) : ?>

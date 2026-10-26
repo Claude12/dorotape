@@ -49,6 +49,27 @@ function dorotape_breadcrumb_trail(): array {
 }
 
 /**
+ * The category a product's trail runs through, when it is in several.
+ *
+ * With no primary category set, Rank Math takes the first category by name,
+ * which put every Dichroic film under "Christmassy Films for Festive
+ * Displays" (Site Edits, October 2026). The most specific category is the
+ * one the chip above the title already names, so the two now agree.
+ *
+ * @param WP_Term   $term  Rank Math's choice.
+ * @param WP_Term[] $terms Every term on the post in that taxonomy.
+ * @return WP_Term
+ */
+function dorotape_breadcrumb_main_term( $term, $terms ) {
+	if ( ! $term instanceof WP_Term || 'product_cat' !== $term->taxonomy || ! is_array( $terms ) || count( $terms ) < 2 ) {
+		return $term;
+	}
+
+	return dorotape_deepest_term( $terms ) ?? $term;
+}
+add_filter( 'rank_math/frontend/breadcrumb/main_term', 'dorotape_breadcrumb_main_term', 10, 2 );
+
+/**
  * The trail as Rank Math sees it.
  *
  * Rank Math hands back a list of [ label, url, ... ] arrays. Breadcrumbs::get()

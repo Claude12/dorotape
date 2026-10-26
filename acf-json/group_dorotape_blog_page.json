@@ -267,6 +267,48 @@
             "append": ""
         },
         {
+            "key": "field_dtblog0013",
+            "label": "Previous label",
+            "name": "post_prev_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the title of the older article, at the end of each article.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Previous article",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtblog0014",
+            "label": "Next label",
+            "name": "post_next_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Above the title of the newer article, at the end of each article.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Next article",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtblog0012",
             "label": "Products heading",
             "name": "post_products_heading",
@@ -327,5 +369,5 @@
     "active": true,
     "description": "The wording on the blog page, its category pages and each article. The articles themselves are ordinary posts (Posts in the admin menu).",
     "show_in_rest": 0,
-    "modified": 1791208504
+    "modified": 1792794838
 }

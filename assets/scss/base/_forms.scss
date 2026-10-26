@@ -200,11 +200,26 @@ input[type="radio"] {
 // stylesheet is enqueued before the plugin's, so matching its weight would
 // lose on source order. Naming the two elements it leaves implicit is enough,
 // and is worth doing rather than reaching for !important.
+//
+// The max-height stops a visitor dragging the box down past the form, while
+// still letting it grow enough to see a long message (Site Edits, October
+// 2026).
 div.wpforms-container-full form.wpforms-form textarea {
   min-height: 120px;
+  max-height: 320px;
   padding-top: var(--spacer-12);
   padding-bottom: var(--spacer-12);
   line-height: $line-height-snug;
+}
+
+// The plugin's "Medium" field size stops a single-line field at 60% of the
+// form, which left the short fields ending part way across next to the full
+// width message box (Site Edits, October 2026). Every field spans the form;
+// the name field's first and last halves are a row of their own and keep it.
+.wpforms-container-full .wpforms-form input.wpforms-field-medium,
+.wpforms-container-full .wpforms-form select.wpforms-field-medium,
+.wpforms-container-full .wpforms-form .wpforms-field-row.wpforms-field-medium {
+  max-width: 100%;
 }
 
 // The design's focus is the border turning magenta. The plugin draws a 1px

@@ -24,8 +24,10 @@
 // products both draw.
 @use "components/breadcrumb";
 @use "components/product-card";
+@use "components/ink-list";
 @use "components/product-list";
 @use "components/toast";
+@use "components/scroller";
 @use "components/rte";
 @use "components/rte-block";
 @use "components/accordion-block";
@@ -51,6 +53,7 @@
 @use "components/contact-block";
 @use "components/embed-block";
 @use "components/blog";
+@use "components/post-nav";
 
 // WooCommerce functionality carried over from the Sprint 1 scaffold. These
 // are the custom features the client signed off on, retokenised for the dark
@@ -72,6 +75,8 @@
 // builds, and the WooCommerce markup sitting inside them. Last in this
 // list because it places the components above rather than restyling them.
 @use "components/woo/product-page";
+@use "components/woo/product-description";
+@use "components/woo/free-delivery";
 
 @use "layout/header";
 @use "layout/site-main";

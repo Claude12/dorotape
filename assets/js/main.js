@@ -14,6 +14,10 @@ import { initTestimonials } from './lib/testimonial';
 import { initToast } from './lib/toast';
 import { initVideo } from './lib/video';
 import { initAccordion } from './lib/accordion';
+import { initScrollers } from './lib/scroller';
+import { initCaseFilter } from './lib/case-filter';
+import { initDescriptionTabs } from './lib/description-tabs';
+import { initFreeDelivery } from './lib/free-delivery';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -37,6 +41,10 @@ const features = [
   initToast,
   initVideo,
   initAccordion,
+  initScrollers,
+  initCaseFilter,
+  initDescriptionTabs,
+  initFreeDelivery,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

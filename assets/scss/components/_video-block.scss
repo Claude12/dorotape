@@ -14,7 +14,8 @@
   background-color: var(--color-background);
   color: var(--color-foreground);
 
-  @include min-breakpoint(tablet) {
+  // The full section padding waits for desktop; see layout/_site-main.scss.
+  @include min-breakpoint(desktop) {
     padding: var(--spacer-112) 0;
   }
 

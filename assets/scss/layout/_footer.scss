@@ -67,11 +67,6 @@
 
 .site-footer__signup-form {
   width: 100%;
-  max-width: 28rem;
-
-  @include min-breakpoint(desktop) {
-    max-width: none;
-  }
 }
 
 // ── Newsletter form (WPForms) ──────────────────────────────────
@@ -88,8 +83,17 @@
 
 .site-footer__signup-form .wpforms-container-full .wpforms-form {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--spacer-8);
+
+  // On a phone the field and the button each take the full width, one above
+  // the other (Site Edits, October 2026). Side by side from tablet, where
+  // the field stretches across the panel and the button keeps its width.
+  @include min-breakpoint(tablet) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
 }
 
 .site-footer__signup-form .wpforms-container-full .wpforms-field-container {
@@ -114,6 +118,14 @@
   display: flex;
   flex-shrink: 0;
   margin: 0;
+
+  .wpforms-submit {
+    width: 100%;
+
+    @include min-breakpoint(tablet) {
+      width: auto;
+    }
+  }
 }
 
 // The confirmation replaces the row in place, so it is a line of text on the
@@ -139,11 +151,27 @@
   gap: var(--spacer-48);
   margin-top: var(--spacer-64);
 
-  // Single column until desktop, as in the design (lg:grid-cols-...). The
-  // brand column is wider than the three link columns beside it, which is
-  // what stops the blurb setting at an awkward measure.
+  // The design stacks everything until desktop, which left one narrow list
+  // down the left of a tablet with the rest of the row empty. From tablet the
+  // three link columns sit side by side under a full-width brand row (Site
+  // Edits, October 2026); from desktop the brand joins them, wider than the
+  // link columns so the blurb does not set at an awkward measure.
+  @include min-breakpoint(tablet) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   @include min-breakpoint(desktop) {
     grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
+  }
+}
+
+.site-footer__brand {
+  @include min-breakpoint(tablet) {
+    grid-column: 1 / -1;
+  }
+
+  @include min-breakpoint(desktop) {
+    grid-column: auto;
   }
 }
 
@@ -169,7 +197,9 @@
 .site-footer__logo .custom-logo {
   display: block;
   width: auto;
-  height: 32px;
+  // The header's 50px would crowd the blurb; 44px gives the logo the weight
+  // the client asked for (Site Edits, October 2026) without doing that.
+  height: 44px;
 }
 
 .site-footer__blurb {
@@ -196,7 +226,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacer-10);
+  padding: var(--spacer-12);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   color: var(--color-foreground);
@@ -213,8 +243,8 @@
 
 .site-footer__social-icon {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 
 .site-footer__column-heading {
@@ -298,7 +328,11 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--spacer-24) var(--spacer-32);
+  gap: var(--spacer-16) var(--spacer-20);
+
+  @include min-breakpoint(tablet) {
+    gap: var(--spacer-24) var(--spacer-32);
+  }
 
   @include min-breakpoint(desktop) {
     justify-content: flex-start;
@@ -317,11 +351,19 @@
   background-color: var(--color-white);
 }
 
+// Smaller on a phone, where the eight seals at full size took three rows and
+// most of a screen (Site Edits, October 2026). At this size they fit in two,
+// and every seal's wording still reads.
 .site-footer__badge {
   width: auto;
-  max-width: 150px;
-  height: 64px;
+  max-width: 104px;
+  height: 44px;
   object-fit: contain;
+
+  @include min-breakpoint(mobile) {
+    max-width: 150px;
+    height: 64px;
+  }
 
   @include min-breakpoint(tablet) {
     height: 80px;

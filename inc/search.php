@@ -156,6 +156,7 @@ function dorotape_search_banner(): void {
 			'intro'      => $intro,
 			'shape'      => dorotape_search_field( 'search_banner_shape', 'cubes-right' ),
 			'breadcrumb' => true,
+			'dot'        => 'magenta',
 		)
 	);
 }

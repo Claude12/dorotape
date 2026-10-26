@@ -71,9 +71,12 @@
   background-color: var(--color-cyan);
   color: var(--color-background);
 
+  // Lightened on hover rather than thinned towards the navy. Thinning took
+  // the navy label from 5.4:1 down to 4.6:1, which reads as the button going
+  // dim; a fifth white lifts it to 7:1 instead (Site Edits, October 2026).
   &:hover:not(:disabled),
   &:focus-visible {
-    background-color: color-mix(in oklab, var(--color-cyan) 90%, transparent);
+    background-color: color-mix(in oklab, var(--color-cyan) 80%, white);
     color: var(--color-background);
   }
 }

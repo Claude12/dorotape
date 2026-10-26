@@ -63,16 +63,23 @@ function dorotape_card_loading(): string {
  */
 function dorotape_product_card_meta( WC_Product $product ): string {
 	$terms = get_the_terms( $product->get_id(), 'product_cat' );
+	$best  = is_array( $terms ) ? dorotape_deepest_term( $terms ) : null;
 
-	if ( ! is_array( $terms ) || ! $terms ) {
-		return '';
-	}
+	return $best ? $best->name : '';
+}
 
+/**
+ * The most deeply nested of a set of terms, the first one found on a tie.
+ *
+ * @param WP_Term[] $terms Terms from one hierarchical taxonomy.
+ * @return WP_Term|null Null when the list is empty.
+ */
+function dorotape_deepest_term( array $terms ): ?WP_Term {
 	$best       = null;
 	$best_depth = -1;
 
 	foreach ( $terms as $term ) {
-		$depth = count( get_ancestors( $term->term_id, 'product_cat', 'taxonomy' ) );
+		$depth = count( get_ancestors( $term->term_id, $term->taxonomy, 'taxonomy' ) );
 
 		if ( $depth > $best_depth ) {
 			$best       = $term;
@@ -80,7 +87,7 @@ function dorotape_product_card_meta( WC_Product $product ): string {
 		}
 	}
 
-	return $best ? $best->name : '';
+	return $best;
 }
 
 /**
@@ -150,6 +157,7 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 	$dt_add_to_cart = 'title' === $dt_link && ! empty( $args['add_to_cart'] );
 	$dt_sizes       = (string) ( $args['sizes'] ?? '(min-width: 1024px) 330px, (min-width: 576px) 46vw, 74vw' );
 	$dt_pills       = is_array( $args['pills'] ?? null ) ? $args['pills'] : array();
+	$dt_inks        = is_array( $args['inks'] ?? null ) ? $args['inks'] : array();
 	$dt_classes     = 'product-card' . ( ! empty( $args['modifier'] ) ? ' ' . $args['modifier'] : '' );
 	$dt_url         = $product->get_permalink();
 	// Thirty-nine of the catalogue's products carry no photo. A grid of flat
@@ -230,6 +238,12 @@ function dorotape_product_card( WC_Product $product, array $args = array() ): vo
 					<?php elseif ( '' !== $dt_meta ) : ?>
 						<p class="product-card__meta"><?php echo esc_html( $dt_meta ); ?></p>
 					<?php endif; ?>
+
+					<?php
+					// The drops a digital print category's banner says each
+					// material shows (inc/inks.php).
+					dorotape_ink_list( $dt_inks, 'product-card__inks', false );
+					?>
 
 					<?php if ( '' !== $dt_price ) : ?>
 						<p class="product-card__price"><?php echo wp_kses_post( $dt_price ); ?></p>

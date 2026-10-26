@@ -97,16 +97,16 @@ function dorotape_shipping_tariff(): array {
 				array(
 					'max'   => 150.0,
 					'rates' => array(
-						'nextday'  => array( 'label' => __( 'Next day delivery', 'dorotape' ), 'cost' => 11.75 ),
-						'prenoon'  => array( 'label' => __( 'Next day delivery, before noon', 'dorotape' ), 'cost' => 19.25 ),
+						'nextday'  => array( 'label' => __( 'Next working day delivery', 'dorotape' ), 'cost' => 11.75 ),
+						'prenoon'  => array( 'label' => __( 'Next working day delivery, before noon', 'dorotape' ), 'cost' => 19.25 ),
 						'economy'  => array( 'label' => __( 'Economy delivery (up to 3 days)', 'dorotape' ), 'cost' => 8.99 ),
 					),
 				),
 				array(
 					'max'   => null,
 					'rates' => array(
-						'nextday' => array( 'label' => __( 'Free next day delivery', 'dorotape' ), 'cost' => 0.0 ),
-						'prenoon' => array( 'label' => __( 'Upgrade to before noon next day delivery', 'dorotape' ), 'cost' => 7.50 ),
+						'nextday' => array( 'label' => __( 'Free next working day delivery', 'dorotape' ), 'cost' => 0.0 ),
+						'prenoon' => array( 'label' => __( 'Upgrade to before noon next working day delivery', 'dorotape' ), 'cost' => 7.50 ),
 					),
 				),
 			),

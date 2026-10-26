@@ -16,7 +16,8 @@
   color: var(--color-foreground);
   padding-block: var(--spacer-64);
 
-  @include min-breakpoint(tablet) {
+  // The full section padding waits for desktop; see layout/_site-main.scss.
+  @include min-breakpoint(desktop) {
     padding-block: var(--spacer-112);
   }
 
@@ -27,9 +28,11 @@
     padding-top: 0;
   }
 
+  // The full container width, like the rich text block: at 800px the
+  // Glossary and Application Advice pages left the right half of a desktop
+  // empty (Site Edits, October 2026).
   &__inner {
     position: relative;
-    max-width: 800px;
   }
 
   &__heading {

@@ -16,7 +16,8 @@
   padding-block: var(--spacer-64);
   position: relative;
 
-  @include min-breakpoint(tablet) {
+  // The full section padding waits for desktop; see layout/_site-main.scss.
+  @include min-breakpoint(desktop) {
     padding-block: var(--spacer-112);
   }
 
@@ -41,14 +42,40 @@
     }
   }
 
-  // Keeps prose to a comfortable measure instead of running the full 1400px
-  // container width, which is unreadable on a desktop monitor.
-  &__inner {
-    position: relative;
-    max-width: 800px;
+  // A magenta bloom on the right edge, for the "How can we help you?" panel
+  // that ends the case studies, with the triangles over it (Site Edits,
+  // October 2026). The category pages' soft glow
+  // (components/_category-grid-block.scss), as a layer under the content and
+  // under any background shape, which comes after it in the markup.
+  &--bg-magenta {
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image: radial-gradient(
+        90% 120% at 85% 50%,
+        color-mix(in oklab, var(--color-magenta) 55%, transparent) 0%,
+        color-mix(in oklab, var(--color-magenta) 18%, transparent) 45%,
+        transparent 75%
+      );
+      pointer-events: none;
+    }
   }
 
+  // The full container width. At 800px the one column pages (Delivery,
+  // Terms, Privacy, Support) read as a narrow strip with an empty right half
+  // on a desktop (Site Edits, October 2026).
+  &__inner {
+    position: relative;
+  }
+
+  // Centred text still needs a measure, or short lines float in the middle
+  // of a very wide box.
   &--centered &__inner {
+    max-width: 800px;
     margin-inline: auto;
     text-align: center;
   }
