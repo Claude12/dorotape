@@ -73,6 +73,12 @@ $dt_all_label = trim( (string) get_sub_field( 'filter_all_label' ) );
 
 $dt_shape   = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 $dt_classes = 'case-studies-block' . dorotape_background_shape_class( $dt_shape );
+
+// The magenta glow the "How can we help you?" panel had, moved onto the grid
+// (Site Edits, October 2026).
+if ( 'magenta' === get_sub_field( 'background_color' ) ) {
+	$dt_classes .= ' case-studies-block--bg-magenta';
+}
 ?>
 
 <?php if ( get_sub_field( 'divider' ) ) : ?>

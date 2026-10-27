@@ -42,27 +42,13 @@
     }
   }
 
-  // A magenta bloom on the right edge, for the "How can we help you?" panel
+  // A magenta bloom on the right edge, first made for the "How can we help you?" panel
   // that ends the case studies, with the triangles over it (Site Edits,
   // October 2026). The category pages' soft glow
   // (components/_category-grid-block.scss), as a layer under the content and
   // under any background shape, which comes after it in the markup.
   &--bg-magenta {
-    isolation: isolate;
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background-image: radial-gradient(
-        90% 120% at 85% 50%,
-        color-mix(in oklab, var(--color-magenta) 55%, transparent) 0%,
-        color-mix(in oklab, var(--color-magenta) 18%, transparent) 45%,
-        transparent 75%
-      );
-      pointer-events: none;
-    }
+    @include magenta-glow;
   }
 
   // The full container width. At 800px the one column pages (Delivery,

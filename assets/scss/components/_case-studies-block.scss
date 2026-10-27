@@ -18,6 +18,12 @@
     padding: var(--spacer-112) 0;
   }
 
+  // The background_color select's one option: the glow the "How can we help
+  // you?" panel had, moved onto the grid (Site Edits, October 2026).
+  &--bg-magenta {
+    @include magenta-glow;
+  }
+
   // ── Header ─────────────────────────────────────────────────────────────
 
   &__header {

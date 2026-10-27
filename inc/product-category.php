@@ -38,15 +38,17 @@ function dorotape_category_term(): ?WP_Term {
 }
 
 /**
- * The category's children, in the order set by dragging them in Products,
+ * The category's children, in the order the main menu lists them, then any
+ * the menu leaves out in the order set by dragging them in Products,
  * Categories.
  *
  * WooCommerce's own function rather than a get_terms() call: it is cached per
  * parent, it pads the counts so a parent whose products all sit in
  * grandchildren still counts as stocked, and it drops the empty ones. Its
  * order comes free, because WooCommerce defaults product_cat term queries to
- * menu_order, which is the admin's drag and drop order. The design's own order
- * is curated rather than alphabetical, so that is the one to follow.
+ * menu_order, which is the admin's drag and drop order. Michael asked for the
+ * tiles to match the menu (Site Edits, October 2026), so the menu's order
+ * is laid over it; see dorotape_menu_category_positions().
  *
  * A category given Linked ranges shows those instead, in the order picked.
  * That is how an Application (Vehicle Wrapping, Glass Decoration) lists the
@@ -87,7 +89,50 @@ function dorotape_category_children( WP_Term $term ): array {
 
 	$children = woocommerce_get_product_subcategories( $term->term_id );
 
-	return is_array( $children ) ? $children : array();
+	if ( ! is_array( $children ) ) {
+		return array();
+	}
+
+	// The tiles follow the main menu, so one reorder in Appearance, Menus
+	// moves both (Michael, Site Edits, October 2026). A range that is not in
+	// the menu keeps its drag and drop place, after the ones that are.
+	$positions = dorotape_menu_category_positions();
+	$fallback  = count( $positions );
+	$order     = array_flip( array_map( fn( $c ) => (int) $c->term_id, $children ) );
+
+	usort(
+		$children,
+		fn( $a, $b ) => array( $positions[ (int) $a->term_id ] ?? $fallback, $order[ (int) $a->term_id ] )
+			<=> array( $positions[ (int) $b->term_id ] ?? $fallback, $order[ (int) $b->term_id ] )
+	);
+
+	return $children;
+}
+
+/**
+ * Each product category's place in the main menu, top to bottom.
+ *
+ * @return array<int, int> Term ID => position. A category in the menu twice
+ *                         takes its first place.
+ */
+function dorotape_menu_category_positions(): array {
+	static $positions = null;
+
+	if ( null !== $positions ) {
+		return $positions;
+	}
+
+	$positions = array();
+	$locations = get_nav_menu_locations();
+	$items     = empty( $locations['primary'] ) ? array() : wp_get_nav_menu_items( $locations['primary'], array( 'update_post_term_cache' => false ) );
+
+	foreach ( is_array( $items ) ? $items : array() as $i => $item ) {
+		if ( 'taxonomy' === $item->type && 'product_cat' === $item->object && ! isset( $positions[ (int) $item->object_id ] ) ) {
+			$positions[ (int) $item->object_id ] = $i;
+		}
+	}
+
+	return $positions;
 }
 
 /**

@@ -76,6 +76,28 @@ $breakpoints: (
 //     @include aurora-ring-visible;
 //   }
 // }
+// A magenta bloom on the right edge of a section: the category pages' soft
+// glow, as a layer under the content and under any background shape, which
+// comes after it in the markup. Used by the RTE and Case Studies blocks.
+@mixin magenta-glow {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(
+      90% 120% at 85% 50%,
+      color-mix(in oklab, var(--color-magenta) 55%, transparent) 0%,
+      color-mix(in oklab, var(--color-magenta) 18%, transparent) 45%,
+      transparent 75%
+    );
+    pointer-events: none;
+  }
+}
+
 @mixin aurora-ring {
   position: relative;
   isolation: isolate;
