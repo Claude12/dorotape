@@ -22,6 +22,23 @@ add_filter(
 	}
 );
 
+/**
+ * Close the gap a disabled flexible-content row leaves.
+ *
+ * ACF drops a row switched off with "Disable layout" from the frontend value
+ * but keeps the other rows on their original keys, so the list runs 0..5, 7.
+ * have_rows() walks it by position and lands on the row after the gap twice:
+ * disabling the About testimonials showed "Our commitment to you" two times.
+ * Sub-field values are already loaded into each row, so renumbering is safe.
+ */
+add_filter(
+	'acf/load_value/type=flexible_content',
+	function ( $value ) {
+		return is_array( $value ) ? array_values( $value ) : $value;
+	},
+	20
+);
+
 if ( ! function_exists( 'dorotape_render_flexible_content' ) ) :
 	/**
 	 * Renders the "content_sections" ACF flexible content field for a post.
