@@ -13,7 +13,11 @@ declare( strict_types=1 );
  * Four different things sit behind those four lines, so this file is mostly
  * about making them look like one list:
  *
- *   1 is a real card gateway. WooPayments, chosen in DR-56.
+ *   1 is a real card gateway: Opayo Form, through the SagePay Form Gateway for
+ *     WooCommerce plugin. The old site took cards through Opayo Form too, and
+ *     the client is staying with Opayo (Site Edits, October 2026, General A3),
+ *     which replaces the WooPayments choice made in DR-56. Card details are
+ *     typed on Opayo's own page, never on this site.
  *   2 is Invoice Gateway, already here, already gated to approved accounts by
  *     inc/pay-on-account.php.
  *   3 and 4 are ours, in inc/class-dorotape-gateway-phone.php and
@@ -41,8 +45,8 @@ defined( 'ABSPATH' ) || exit;
 /** The two gateways this theme owns. */
 const DOROTAPE_THEME_GATEWAYS = array( 'dorotape_phone', 'dorotape_paylink' );
 
-/** WooPayments' card gateway id. */
-const DOROTAPE_CARD_GATEWAY_ID = 'woocommerce_payments';
+/** The Opayo Form gateway's id. */
+const DOROTAPE_CARD_GATEWAY_ID = 'sagepayform';
 
 /**
  * The order the methods are listed in, top to bottom.
