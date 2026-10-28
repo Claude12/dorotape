@@ -1,0 +1,70 @@
+@use "abstracts/mixins" as *;
+@use "base/typography" as *;
+
+// The reward points the basket earns, under the free delivery line above the
+// basket and the checkout (inc/rewards.php, Michael, 27 Oct). The same line
+// and bar, in the yellow of the reward icon under a product's price, with the
+// bar showing the way to the next point.
+
+.reward-points-notice {
+  --reward-points-accent: var(--color-yellow);
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-12);
+  margin: 0 0 var(--spacer-24);
+  padding: var(--spacer-12) var(--spacer-16);
+  border: 1px solid color-mix(in oklab, var(--reward-points-accent) 45%, var(--color-border));
+  border-radius: var(--radius-2xl);
+  background-color: color-mix(in oklab, var(--reward-points-accent) 8%, var(--color-surface));
+
+  @include min-breakpoint(tablet) {
+    gap: var(--spacer-16);
+    padding: var(--spacer-16) var(--spacer-24);
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--reward-points-accent);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+  }
+
+  &__bar {
+    display: block;
+    height: 4px;
+    margin-top: var(--spacer-8);
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-foreground) 12%, transparent);
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--reward-points-accent);
+    transition: width var(--transition-md);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}

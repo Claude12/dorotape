@@ -116,6 +116,48 @@
             "append": ""
         },
         {
+            "key": "field_dtwoo0041",
+            "label": "Reward points: earned",
+            "name": "woo_reward_points_earned",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown above the basket and checkout when the basket earns points. {points} becomes \"1 reward point\" or \"3 reward points\", {amount} is what is left to spend (ex VAT) on reward products for the next one. The rate comes from the RewardsWP settings.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "This order earns {points}. Spend {amount} more (ex VAT) on reward products for the next one.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0042",
+            "label": "Reward points: none yet",
+            "name": "woo_reward_points_none",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown when the basket holds reward products but not yet enough for a point. {amount} is what is left to spend (ex VAT) on reward products.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Spend {amount} more (ex VAT) on reward products to earn a reward point.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtwoo0032",
             "label": "Share basket: heading",
             "name": "woo_share_heading",
@@ -536,5 +578,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1792998702
+    "modified": 1793200000
 }

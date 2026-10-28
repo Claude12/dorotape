@@ -3,7 +3,7 @@
 @use "base/typography" as *;
 
 // USP strip, from UspStrip.tsx in the signed-off internal pages design.
-// One row of promises on desktop, two columns on tablet, stacked on phones.
+// One row of promises on desktop, two columns below it, phones included.
 //
 // The design has two treatments: banded, where the strip sits on the surface
 // tone between two hairlines, and plain, where it sits straight on the page
@@ -25,15 +25,19 @@
     background-color: var(--color-background);
   }
 
+  // Two to a row on phones too: one per line made five promises a band
+  // taller than the screen's first view (Site Edits, October 2026, Category
+  // Main A5). An odd last promise takes the whole row rather than leave a gap.
   &__list {
     display: grid;
-    gap: var(--spacer-24);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacer-16) var(--spacer-12);
     margin: 0;
     padding: 0;
     list-style: none;
 
     @include min-breakpoint(mobile) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacer-24);
     }
 
     // One column per promise. Five fixed columns left Contact's four
@@ -49,7 +53,21 @@
   &__item {
     display: flex;
     align-items: center;
-    gap: var(--spacer-12);
+    gap: var(--spacer-8);
+
+    &:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+
+    @include min-breakpoint(mobile) {
+      gap: var(--spacer-12);
+    }
+
+    @include min-breakpoint(desktop) {
+      &:last-child:nth-child(odd) {
+        grid-column: auto;
+      }
+    }
   }
 
   &__icon {

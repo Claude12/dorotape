@@ -298,17 +298,18 @@
 .product-reward {
   display: flex;
   align-items: center;
-  gap: var(--spacer-8);
+  gap: var(--spacer-12);
   margin: var(--spacer-12) 0 0;
   color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
-  font-size: $font-size-sm;
+  font-size: $font-size-md;
   font-weight: $font-weight-semibold;
-  line-height: $line-height-sm;
+  line-height: $line-height-md;
 }
 
+// Larger than the 20px it started at: "maybe larger" (Michael, 27 Oct).
 .product-reward__icon {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   color: var(--color-yellow);
 }

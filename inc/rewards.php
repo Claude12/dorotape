@@ -338,6 +338,152 @@ add_action( 'wp', function (): void {
 }, 20 );
 
 
+// ─── Points the basket earns ─────────────────────────────────────────────────
+
+/*
+ * "Can we show how many points a purchase banks?" (Michael, 27 Oct). A line
+ * above the basket and the checkout, under the free delivery one and built
+ * the same way (inc/free-delivery.php): printed with the page, and put on the
+ * Store API's cart so assets/js/lib/reward-points.js can keep it current as
+ * quantities and coupons change.
+ *
+ * Not on the product page as a number: at one point per £150 nearly every
+ * product on its own earns none, so the basket is where the figure means
+ * something.
+ *
+ * The count is the one the order will be awarded: the plugin's own rate and
+ * rounding (calculate_purchase_points), on the same qualifying lines, after
+ * discounts and before VAT, that rewardswp_order_total_for_points counts above.
+ */
+
+/**
+ * The basket's points and what is left to spend for the next one.
+ *
+ * @return array{message:string, points:int, progress:int}|null Null when the
+ *         basket holds no reward products or the points programme is off.
+ */
+function dorotape_reward_points_status(): ?array {
+	$cart = function_exists( 'WC' ) ? WC()->cart : null;
+
+	if ( ! $cart || $cart->is_empty()
+		|| ! function_exists( '\Awesomemotive\Rewardswp\Helpers\get_option_value' )
+		|| ! function_exists( '\Awesomemotive\Rewardswp\Helpers\calculate_purchase_points' ) ) {
+		return null;
+	}
+
+	$earn     = \Awesomemotive\Rewardswp\Helpers\get_option_value( \Awesomemotive\Rewardswp\Settings\Options\Points\EarnActionsOption::class );
+	$purchase = is_array( $earn ) ? ( $earn['purchase'] ?? array() ) : array();
+	$rate     = (float) ( $purchase['points_per_dollar'] ?? 0 );
+	$base     = (float) ( $purchase['base_amount'] ?? 1 );
+
+	if ( empty( $purchase['enabled'] ) || $rate <= 0 || $base <= 0 ) {
+		return null;
+	}
+
+	$qualifying = 0.0;
+	$any        = false;
+
+	foreach ( $cart->get_cart() as $item ) {
+		$product = $item['data'] ?? null;
+
+		if ( dorotape_product_earns_points( $product ) ) {
+			$any         = true;
+			$qualifying += (float) ( $item['line_total'] ?? 0 ) * dorotape_reward_multiplier( $product );
+		}
+	}
+
+	if ( ! $any ) {
+		return null;
+	}
+
+	$points    = \Awesomemotive\Rewardswp\Helpers\calculate_purchase_points( $qualifying, $base, $rate );
+	$step      = $base / $rate;
+	$remaining = max( 0.0, ( $points + 1 ) * $step - $qualifying );
+	$amount    = html_entity_decode( wp_strip_all_tags( wc_price( $remaining ) ), ENT_QUOTES, 'UTF-8' );
+
+	$message = $points > 0
+		? dorotape_woo_pages_field( 'woo_reward_points_earned', __( 'This order earns {points}. Spend {amount} more (ex VAT) on reward products for the next one.', 'dorotape' ) )
+		: dorotape_woo_pages_field( 'woo_reward_points_none', __( 'Spend {amount} more (ex VAT) on reward products to earn a reward point.', 'dorotape' ) );
+
+	return array(
+		'message'  => strtr(
+			$message,
+			array(
+				/* translators: %s: number of points. */
+				'{points}' => sprintf( _n( '%s reward point', '%s reward points', $points, 'dorotape' ), number_format_i18n( $points ) ),
+				'{amount}' => $amount,
+			)
+		),
+		'points'   => $points,
+		// Towards the next point, not the whole order.
+		'progress' => (int) min( 100, max( 0, round( ( $qualifying - $points * $step ) / $step * 100 ) ) ),
+	);
+}
+
+/**
+ * The line above the basket and the checkout.
+ *
+ * Rendered empty and hidden when there is nothing to say, so the script has
+ * somewhere to write once a reward product goes in.
+ */
+function dorotape_reward_points_notice(): string {
+	$status = dorotape_reward_points_status();
+
+	ob_start();
+	?>
+	<div class="reward-points-notice" data-reward-points role="status" aria-live="polite"<?php echo $status ? '' : ' hidden'; ?>>
+		<?php echo dorotape_icon( 'hand-coins', 'reward-points-notice__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?>
+		<div class="reward-points-notice__body">
+			<p class="reward-points-notice__text"><?php echo esc_html( $status['message'] ?? '' ); ?></p>
+			<span class="reward-points-notice__bar" aria-hidden="true"><span class="reward-points-notice__fill" style="width: <?php echo (int) ( $status['progress'] ?? 0 ); ?>%"></span></span>
+		</div>
+	</div>
+	<?php
+	return (string) ob_get_clean();
+}
+
+// Priority 19, so the free delivery line (20) is put in above it.
+add_filter(
+	'render_block',
+	function ( $content, $block ) {
+		if ( ! in_array( $block['blockName'] ?? '', array( 'woocommerce/cart', 'woocommerce/checkout' ), true ) ) {
+			return $content;
+		}
+
+		return dorotape_reward_points_notice() . $content;
+	},
+	19,
+	2
+);
+
+// The same answer on the Store API's cart, under extensions.dorotape_rewards.
+add_action(
+	'init',
+	function (): void {
+		if ( ! function_exists( 'woocommerce_store_api_register_endpoint_data' ) ) {
+			return;
+		}
+
+		woocommerce_store_api_register_endpoint_data(
+			array(
+				'endpoint'        => \Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema::IDENTIFIER,
+				'namespace'       => 'dorotape_rewards',
+				'data_callback'   => static fn (): array => array( 'points' => dorotape_reward_points_status() ),
+				'schema_callback' => static fn (): array => array(
+					'points' => array(
+						'description' => __( 'The reward points the basket earns, or null.', 'dorotape' ),
+						'type'        => array( 'object', 'null' ),
+						'context'     => array( 'view', 'edit' ),
+						'readonly'    => true,
+					),
+				),
+				'schema_type'     => ARRAY_A,
+			)
+		);
+	}
+);
+
+
 /*
  * ─── Refunds ─────────────────────────────────────────────────────────────────
  *
