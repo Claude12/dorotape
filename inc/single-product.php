@@ -190,11 +190,24 @@ function dorotape_product_category_pill(): void {
 
 	$category = dorotape_product_card_meta( $product );
 
-	if ( '' === $category ) {
+	// The brand logo shares the pill's row, at its far end, rather than taking
+	// a row of its own above the title (meeting, 28 October 2026).
+	ob_start();
+	dorotape_product_brand_logo();
+	$logo = (string) ob_get_clean();
+
+	if ( '' === $category && '' === $logo ) {
 		return;
 	}
 
-	printf( '<p class="product-hero__category">%s</p>', esc_html( $category ) );
+	echo '<div class="product-hero__topline">';
+
+	if ( '' !== $category ) {
+		printf( '<p class="product-hero__category">%s</p>', esc_html( $category ) );
+	}
+
+	echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped by dorotape_product_brand_logo().
+	echo '</div>';
 }
 
 /**

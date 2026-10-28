@@ -149,13 +149,14 @@ add_action( 'woocommerce_product_options_advanced', function (): void {
 			'label'       => __( 'Quantity step', 'dorotape' ),
 			'value'       => get_post_meta( $post->ID, '_dt_qty_step', true ) ?: '1',
 			'options'     => array(
-				'1'  => __( 'None (order any quantity)', 'dorotape' ),
-				'3'  => __( 'Jumps of 3', 'dorotape' ),
-				'5'  => __( 'Jumps of 5', 'dorotape' ),
-				'10' => __( 'Jumps of 10', 'dorotape' ),
-				'15' => __( 'Jumps of 15', 'dorotape' ),
-				'25' => __( 'Jumps of 25', 'dorotape' ),
-				'50' => __( 'Jumps of 50', 'dorotape' ),
+				'1'    => __( 'None (order any quantity)', 'dorotape' ),
+				'3'    => __( 'Jumps of 3', 'dorotape' ),
+				'5'    => __( 'Jumps of 5', 'dorotape' ),
+				'10'   => __( 'Jumps of 10', 'dorotape' ),
+				'12.5' => __( 'Jumps of 12.5', 'dorotape' ),
+				'15'   => __( 'Jumps of 15', 'dorotape' ),
+				'25'   => __( 'Jumps of 25', 'dorotape' ),
+				'50'   => __( 'Jumps of 50', 'dorotape' ),
 			),
 			'description' => __( 'Forces the quantity box on the product page to increment in steps (e.g. 5, 10, 15...) instead of one at a time.', 'dorotape' ),
 		)
@@ -173,7 +174,7 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 	 * scripts set to 25 would quietly drop back to ordering one at a time
 	 * the first time somebody opened it in the editor and pressed Update.
 	 */
-	if ( in_array( $step, array( '3', '5', '10', '15', '25', '50' ), true ) ) {
+	if ( in_array( $step, array( '3', '5', '10', '12.5', '15', '25', '50' ), true ) ) {
 		$product->update_meta_data( '_dt_qty_step', $step );
 	} else {
 		$product->delete_meta_data( '_dt_qty_step' ); // '1' = default, nothing to store
@@ -183,13 +184,60 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 /**
  * Resolve a product/variation's quantity step, parent meta wins.
  *
+ * A whole step comes back as an int, so callers comparing it with 1 === keep
+ * working; only a fractional one (S62HT's 12.5) is a float.
+ *
  * @param WC_Product $product
- * @return int
+ * @return int|float
  */
-function dorotape_qty_step( WC_Product $product ): int {
+function dorotape_qty_step( WC_Product $product ) {
 	$id   = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
-	$step = (int) get_post_meta( $id, '_dt_qty_step', true );
+	$step = dorotape_stock_amount( get_post_meta( $id, '_dt_qty_step', true ) );
 	return $step > 1 ? $step : 1;
+}
+
+/**
+ * Quantities to two decimal places, replacing WooCommerce's own intval.
+ *
+ * S62HT is sold in 12.5m lengths (meeting, 28 October 2026; Sage takes a
+ * decimal quantity). WooCommerce runs every quantity it reads (the add to
+ * cart form, the Store API, the cart session, saved order lines) through
+ * this filter, so intval turned 12.5 into 12 before anything else saw it.
+ * Whole numbers still come back as ints, so every other product, and
+ * Woosage's own quantity check, behave exactly as before. Nobody can buy 2.5
+ * of a product sold in ones: the add to cart check below and the Store
+ * API's multiple_of both refuse a quantity that is off the step.
+ *
+ * @param mixed $amount
+ * @return int|float
+ */
+function dorotape_stock_amount( $amount ) {
+	$amount = round( (float) $amount, 2 );
+	return floor( $amount ) === $amount ? (int) $amount : $amount;
+}
+remove_filter( 'woocommerce_stock_amount', 'intval' );
+add_filter( 'woocommerce_stock_amount', 'dorotape_stock_amount' );
+
+/**
+ * True when $qty is a whole number of steps, allowing for float error.
+ *
+ * @param int|float $qty
+ * @param int|float $step
+ * @return bool
+ */
+function dorotape_is_qty_multiple( $qty, $step ): bool {
+	$steps = $qty / $step;
+	return abs( $steps - round( $steps ) ) < 0.0001;
+}
+
+/**
+ * A quantity for display: 12.5 rather than 12.50, 25 rather than 25.00.
+ *
+ * @param int|float $qty
+ * @return string
+ */
+function dorotape_format_qty( $qty ): string {
+	return (string) dorotape_stock_amount( $qty );
 }
 
 add_filter( 'woocommerce_quantity_input_step', function ( $step, $product ) {
@@ -216,6 +264,11 @@ add_filter( 'woocommerce_quantity_input_args', function ( array $args, $product 
 	// a three-key array with no input_value. Reading it blindly emitted a PHP
 	// warning straight into the JSON body, breaking the cart response on any
 	// stepped product. So touch each key only if the caller provided it.
+	// A phone's number pad has no decimal point; 12.5 needs one.
+	if ( ! is_int( $step ) ) {
+		$args['inputmode'] = 'decimal';
+	}
+
 	if ( isset( $args['min_value'] ) ) {
 		$args['min_value'] = max( (int) $args['min_value'], $step );
 	} else {
@@ -224,7 +277,7 @@ add_filter( 'woocommerce_quantity_input_args', function ( array $args, $product 
 
 	if ( isset( $args['input_value'] )
 		&& empty( $_POST['quantity'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- display default only.
-		&& (int) $args['input_value'] < $step ) {
+		&& (float) $args['input_value'] < $step ) {
 		$args['input_value'] = $step;
 	}
 
@@ -315,9 +368,9 @@ add_action( 'woocommerce_after_quantity_input_field', function (): void {
 		'<span class="dt-qty-step__note">%s</span>',
 		esc_html(
 			sprintf(
-				/* translators: %d: quantity step */
-				__( 'Sold in multiples of %d', 'dorotape' ),
-				$step
+				/* translators: %s: quantity step */
+				__( 'Sold in multiples of %s', 'dorotape' ),
+				dorotape_format_qty( $step )
 			)
 		)
 	);
@@ -374,17 +427,23 @@ add_filter( 'woocommerce_add_to_cart_validation', function ( $passed, $product_i
 		return $passed;
 	}
 	$step = dorotape_qty_step( $product );
-	$qty  = (int) $quantity;
-	if ( $step > 1 && $qty > 0 && 0 !== $qty % $step ) {
-		$lower = max( $step, (int) floor( $qty / $step ) * $step );
+	$qty  = dorotape_stock_amount( $quantity );
+	// A step of 1 is checked too: now that quantities are no longer forced to
+	// whole numbers, this is what stops 2.5 of a product sold in ones.
+	if ( $qty > 0 && ! dorotape_is_qty_multiple( $qty, $step ) && 1 === $step ) {
+		wc_add_notice( esc_html__( 'Please enter a whole number for the quantity.', 'dorotape' ), 'error' );
+		return false;
+	}
+	if ( $qty > 0 && ! dorotape_is_qty_multiple( $qty, $step ) ) {
+		$lower = max( $step, floor( $qty / $step ) * $step );
 		$upper = $lower + $step;
 		wc_add_notice(
 			sprintf(
 				/* translators: 1: step, 2: nearest lower valid quantity, 3: nearest higher valid quantity */
-				esc_html__( 'This product is ordered in multiples of %1$d. Please choose %2$d or %3$d.', 'dorotape' ),
-				$step,
-				$lower,
-				$upper
+				esc_html__( 'This product is ordered in multiples of %1$s. Please choose %2$s or %3$s.', 'dorotape' ),
+				dorotape_format_qty( $step ),
+				dorotape_format_qty( $lower ),
+				dorotape_format_qty( $upper )
 			),
 			'error'
 		);
@@ -472,7 +531,7 @@ function dorotape_dynamic_pricing( WC_Cart $cart ): void {
 		// tiers on the rolls ordered rather than on each line.
 		$qty = $combined_qty[ $product_id ]
 			?? $combined_item[ dorotape_cart_item_tier_key( $cart_item ) ]
-			?? (int) $cart_item['quantity'];
+			?? (float) $cart_item['quantity'];
 
 		$price = dorotape_get_tier_price( $qty, $lookup_id, $base_price );
 
@@ -597,12 +656,12 @@ function dorotape_parse_legacy_tiers_own( int $product_id ): array {
  * Return the tiered price for the given quantity.
  * Falls back to base_price when no tiers are configured or none match.
  *
- * @param int   $qty        Cart line quantity (metres ordered).
+ * @param float $qty        Cart line quantity (metres ordered).
  * @param int   $product_id Variation ID or product ID.
  * @param float $base_price WooCommerce regular price for this product/variation.
  * @return float
  */
-function dorotape_get_tier_price( int $qty, int $product_id, float $base_price ): float {
+function dorotape_get_tier_price( float $qty, int $product_id, float $base_price ): float {
 	$tiers = dorotape_parse_legacy_tiers( $product_id );
 	if ( empty( $tiers ) ) {
 		return $base_price;
@@ -632,11 +691,11 @@ function dorotape_get_tier_price( int $qty, int $product_id, float $base_price )
  * Return the tier that was applied for a given quantity, or null if none matched.
  * Used by cart/order meta display so customers can see which discount was applied.
  *
- * @param int $qty        Cart line quantity (metres).
- * @param int $product_id
+ * @param float $qty        Cart line quantity (metres).
+ * @param int   $product_id
  * @return array|null Tier row (min_qty, tier_price) or null.
  */
-function dorotape_find_applied_tier( int $qty, int $product_id ): ?array {
+function dorotape_find_applied_tier( float $qty, int $product_id ): ?array {
 	$tiers = dorotape_parse_legacy_tiers( $product_id );
 	if ( empty( $tiers ) ) {
 		return null;
@@ -716,7 +775,7 @@ function dorotape_lowest_price( WC_Product $product ): float {
  * keeps its own SKU, price, and cart line.
  *
  * @param WC_Cart|null $cart
- * @return array<int,int> parent product_id => combined quantity
+ * @return array<int,int|float> parent product_id => combined quantity
  */
 function dorotape_combined_quick_add_qty( $cart = null ): array {
 	$cart = $cart instanceof WC_Cart ? $cart : ( function_exists( 'WC' ) ? WC()->cart : null );
@@ -731,7 +790,7 @@ function dorotape_combined_quick_add_qty( $cart = null ): array {
 		$parent = wc_get_product( $item['product_id'] );
 		if ( $parent && function_exists( 'dorotape_is_quick_add' ) && dorotape_is_quick_add( $parent ) ) {
 			$pid              = (int) $item['product_id'];
-			$combined[ $pid ] = ( $combined[ $pid ] ?? 0 ) + (int) $item['quantity'];
+			$combined[ $pid ] = ( $combined[ $pid ] ?? 0 ) + (float) $item['quantity'];
 		}
 	}
 	return $combined;
@@ -765,7 +824,7 @@ function dorotape_cart_item_tier_key( array $cart_item ): string {
  * line of its own.
  *
  * @param WC_Cart|null $cart
- * @return array<string,int> dorotape_cart_item_tier_key() => combined quantity
+ * @return array<string,int|float> dorotape_cart_item_tier_key() => combined quantity
  */
 function dorotape_combined_item_qty( $cart = null ): array {
 	$cart = $cart instanceof WC_Cart ? $cart : ( function_exists( 'WC' ) ? WC()->cart : null );
@@ -776,7 +835,7 @@ function dorotape_combined_item_qty( $cart = null ): array {
 	$combined = array();
 	foreach ( $cart->get_cart() as $item ) {
 		$key              = dorotape_cart_item_tier_key( $item );
-		$combined[ $key ] = ( $combined[ $key ] ?? 0 ) + (int) $item['quantity'];
+		$combined[ $key ] = ( $combined[ $key ] ?? 0 ) + (float) $item['quantity'];
 	}
 	return $combined;
 }
@@ -791,10 +850,10 @@ function dorotape_combined_item_qty( $cart = null ): array {
  * syncs to Sage.
  *
  * @param array $cart_item
- * @return int
+ * @return float
  */
-function dorotape_tier_qty_for_line( array $cart_item ): int {
-	$qty        = (int) ( $cart_item['quantity'] ?? 1 );
+function dorotape_tier_qty_for_line( array $cart_item ): float {
+	$qty        = (float) ( $cart_item['quantity'] ?? 1 );
 	$product_id = (int) ( $cart_item['product_id'] ?? 0 );
 	$combined   = dorotape_combined_quick_add_qty();
 	$pooled     = dorotape_combined_item_qty();

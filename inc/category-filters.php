@@ -64,7 +64,8 @@ function dorotape_category_filter_excluded(): array {
  * The products in a category, in the order the archive would list them.
  *
  * Ordered by menu_order then title, which is what WooCommerce's own default
- * catalogue ordering resolves to, so the grid reads the same as the shop.
+ * catalogue ordering resolves to, with the featured products first, so the
+ * grid reads the same as the shop.
  *
  * @param WP_Term $term Category being viewed.
  * @return array<int, int> Product IDs.
@@ -98,7 +99,7 @@ function dorotape_category_filter_products( WP_Term $term ): array {
 		)
 	);
 
-	$ids = array_map( 'intval', $ids );
+	$ids = dorotape_featured_first( array_map( 'intval', $ids ) );
 
 	/*
 	 * One query for every product's terms, instead of one per product per

@@ -74,6 +74,45 @@
             "save_options": 0
         },
         {
+            "key": "field_dtwoo0043",
+            "label": "Continue shopping: button",
+            "name": "woo_cart_continue_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button under the basket that takes people back to the products.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Continue shopping",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0044",
+            "label": "Continue shopping: link",
+            "name": "woo_cart_continue_url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "Where the button goes. Empty means the shop.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "placeholder": ""
+        },
+        {
             "key": "field_dtwoo0030",
             "label": "Free delivery: still to spend",
             "name": "woo_free_delivery_remaining",
@@ -578,5 +617,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1793200000
+    "modified": 1793203278
 }

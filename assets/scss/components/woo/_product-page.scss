@@ -93,6 +93,25 @@
     }
   }
 
+  // The category pill and the brand logo share one row, the logo at the far
+  // end, so the logo no longer takes a row of its own above the title
+  // (meeting, 28 October 2026). A long category name wraps inside its pill
+  // rather than pushing the logo onto a row of its own.
+  &__topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacer-16);
+  }
+
+  &__topline > * {
+    min-width: 0;
+  }
+
+  &__topline .product-brand {
+    flex-shrink: 0;
+  }
+
   // The category chip over the title. The same "most specific category" the
   // product card shows, so a product is labelled the same way in a row on the
   // homepage and on its own page.
@@ -182,13 +201,15 @@
 
   // object-fit: contain, not cover. Much of this catalogue is a roll or a
   // flat swatch photographed to the edge of the frame, and cover was cutting
-  // the ends off them.
+  // the ends off them. A landscape image sits at the top of the square, not
+  // in the middle with a gap above it (meeting, 28 October 2026).
   &__image img {
     display: block;
     width: 100%;
     aspect-ratio: 1;
     border-radius: var(--radius-2xl);
     object-fit: contain;
+    object-position: top;
   }
 
   // A product with no image of its own. WooCommerce prints a white
@@ -238,6 +259,44 @@
   .flex-control-thumbs li:has(.flex-active) {
     background-color: var(--color-cyan);
     background-image: none;
+  }
+
+  // A video slide: square like the pictures, so the slider keeps its
+  // height, with the 16:9 still in the middle of a quiet panel.
+  &__image--video {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-2xl);
+    background-color: var(--color-surface-2);
+    overflow: hidden;
+  }
+
+  // The zoom and the lightbox are for pictures; on a video they would open
+  // the lightbox at a slide it does not have.
+  &:has(.woocommerce-product-gallery__image--video.flex-active-slide) .woocommerce-product-gallery__trigger {
+    display: none;
+  }
+
+  // A play mark on the video's thumb, which flexslider builds from the
+  // slide's data-thumb with no class of its own to hang it on.
+  .flex-control-thumbs li:has(img[src*="ytimg.com"]) {
+    position: relative;
+  }
+
+  .flex-control-thumbs li:has(img[src*="ytimg.com"])::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7v10l8-5z' fill='%23131d2e'/%3E%3C/svg%3E") center / 18px no-repeat;
+    pointer-events: none;
+  }
+
+  .flex-control-thumbs li:has(img[src*="ytimg.com"]) img {
+    object-fit: cover;
   }
 
   .flex-control-thumbs img {

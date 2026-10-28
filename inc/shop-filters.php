@@ -804,3 +804,85 @@ function dorotape_shop_orderby_options(): array {
 
 	return array_map( 'strval', $options );
 }
+
+// ─── Featured first ──────────────────────────────────────────────────────────
+
+/**
+ * Put the featured products at the front of a list, keeping the order within
+ * each half.
+ *
+ * Featured is the star in Products > All Products, so the client's own pick
+ * leads the default order on the shop and every category (meeting, 28 October
+ * 2026). The other sorts are left alone: someone who asks for the cheapest
+ * first wants the cheapest first.
+ *
+ * @param array<int, int> $ids Product ids, in order.
+ * @return array<int, int>
+ */
+function dorotape_featured_first( array $ids ): array {
+	$featured = array_flip( array_map( 'intval', wc_get_featured_product_ids() ) );
+
+	if ( ! $featured ) {
+		return $ids;
+	}
+
+	$first = array();
+	$rest  = array();
+
+	foreach ( $ids as $id ) {
+		if ( isset( $featured[ $id ] ) ) {
+			$first[] = $id;
+		} else {
+			$rest[] = $id;
+		}
+	}
+
+	return array_merge( $first, $rest );
+}
+
+/**
+ * The same on the paged shop, in the query itself.
+ *
+ * Only on the default order, and only on the main product query, which is the
+ * shop and the category pages that keep WooCommerce's loop.
+ *
+ * @param WP_Query $query The product query WooCommerce built.
+ */
+function dorotape_shop_featured_first( WP_Query $query ): void {
+	if ( ! $query->is_main_query() || '' !== dorotape_shop_orderby() && 'menu_order' !== dorotape_shop_orderby() ) {
+		return;
+	}
+
+	$term = (int) ( wc_get_product_visibility_term_ids()['featured'] ?? 0 );
+
+	if ( $term > 0 ) {
+		$query->set( 'dorotape_featured_first', $term );
+	}
+}
+
+add_action( 'woocommerce_product_query', 'dorotape_shop_featured_first' );
+
+/**
+ * Order by featured ahead of whatever order the query already has.
+ *
+ * @param array<string, string> $clauses Query clauses.
+ * @param WP_Query              $query   The query.
+ * @return array<string, string>
+ */
+function dorotape_shop_featured_first_clauses( array $clauses, WP_Query $query ): array {
+	$term = (int) $query->get( 'dorotape_featured_first' );
+
+	if ( $term <= 0 ) {
+		return $clauses;
+	}
+
+	global $wpdb;
+
+	$featured = $wpdb->prepare( "EXISTS (SELECT 1 FROM {$wpdb->term_relationships} dt_featured WHERE dt_featured.object_id = {$wpdb->posts}.ID AND dt_featured.term_taxonomy_id = %d) DESC", $term );
+
+	$clauses['orderby'] = '' !== trim( $clauses['orderby'] ) ? $featured . ', ' . $clauses['orderby'] : $featured;
+
+	return $clauses;
+}
+
+add_filter( 'posts_clauses', 'dorotape_shop_featured_first_clauses', 10, 2 );

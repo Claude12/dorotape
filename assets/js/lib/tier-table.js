@@ -14,7 +14,7 @@ export function initTierTable() {
   if ( ! table && ! livePriceEl ) return;
 
   const qtyInput = document.querySelector( 'form.cart .quantity input[type="number"], form.cart input.qty' );
-  function getQty() { return qtyInput ? ( parseInt( qtyInput.value, 10 ) || 1 ) : 1; }
+  function getQty() { return qtyInput ? ( parseFloat( qtyInput.value ) || 1 ) : 1; }
 
   // Collect tiers from DOM rows (min_qty + unit price via data attributes).
   var currentTiers = table ? tiersFromTable( table ) : [];
@@ -80,7 +80,7 @@ export function initTierTable() {
  * Mirrors dorotape_qty_step() in inc/pricing.php; 1 means no step. */
 function qtyStep( table ) {
   var holder = table.closest( '.dt-tier-pricing' );
-  var step   = holder ? parseInt( holder.dataset.qtyStep, 10 ) : 1;
+  var step   = holder ? parseFloat( holder.dataset.qtyStep ) : 1;
   return step > 1 ? step : 1;
 }
 

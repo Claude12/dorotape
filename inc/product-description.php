@@ -53,14 +53,46 @@ function dorotape_product_description_tab_headings(): array {
 }
 
 /**
+ * The certification badge pictures the descriptions use, by file name
+ * without the extension.
+ *
+ * The old site's own badges, all in onpagegraphics/. The Fire.png, Datasheet
+ * and Colour buttons are not badges; they are the download lozenges (A9).
+ *
+ * @return string[]
+ */
+function dorotape_product_badge_files(): array {
+	return (array) apply_filters(
+		'dorotape_product_badge_files',
+		array(
+			'PVC_free_logo',
+			'rPET_Logo',
+			'vegan',
+			'Oeko-Tex',
+			'HP-Latex-Certified',
+			'EN71-3',
+			'Natural_Choice',
+			'FSC-Conform-Logo',
+			'FSC-Logo',
+			'Recyclable-Paper-Green-Logo',
+			'Recycled-Paper-Green-Logo',
+			'REACH',
+			'ROHS',
+			'Fire-Rated',
+		)
+	);
+}
+
+/**
  * Split a product's description into its parts.
  *
  * @param int $product_id Product.
- * @return array{logo:array{src:string,alt:string}|null,intro:string,tabs:array<string,array<int,array{heading:string,html:string}>>,extras:string}
+ * @return array{logo:array{src:string,alt:string}|null,intro:string,tabs:array<string,array<int,array{heading:string,html:string}>>,extras:string,badges:array<int,array{src:string,alt:string}>,videos:string[]}
  *         The logo, the copy above the first section, each tab's chunks with
- *         the heading that opened them, and what followed the last list (the
- *         price note, a video, a blog link). Tabs is empty when the
- *         description has fewer than two sections.
+ *         the heading that opened them, what followed the last list (the
+ *         price note, a blog link), the certification badges and the video
+ *         embeds. Tabs is empty when the description has fewer than two
+ *         sections.
  */
 function dorotape_product_description_parts( int $product_id ): array {
 	static $cache = array();
@@ -76,19 +108,50 @@ function dorotape_product_description_parts( int $product_id ): array {
 	// that really earn points.
 	$html = (string) preg_replace( '#(?:<br\s*/?>\s*)?<img\b[^>]*Reward_Logo\.[a-z]+[^>]*>\s*(?:<span\b[^>]*>[^<]*</span>)?#i', '', $html );
 
+	// The certification badges, from wherever they sit, usually floated right
+	// beside the intro, mostly inside an empty <a>. They go to a row of their
+	// own beside Add to basket (meeting, 28 October 2026).
+	$badges = array();
+	$html   = (string) preg_replace_callback(
+		'#(?:<a>\s*)?(<img\b[^>]*\bsrc=["\']?([^"\'\s>]*/(?:' . implode( '|', array_map( static fn ( $file ) => preg_quote( $file, '#' ), dorotape_product_badge_files() ) ) . ')\.[a-z]+)[^>]*>)(?:\s*</a>)?#i',
+		static function ( array $m ) use ( &$badges ): string {
+			if ( ! isset( $badges[ $m[2] ] ) ) {
+				preg_match( '#\balt=["\']([^"\']*)["\']#i', $m[1], $alt );
+
+				$badges[ $m[2] ] = array(
+					'src' => $m[2],
+					'alt' => isset( $alt[1] ) ? (string) $alt[1] : '',
+				);
+			}
+
+			return '';
+		},
+		$html
+	);
+
+	// The videos, wherever they sit, for the gallery (dorotape_product_gallery_videos()).
+	$videos = array();
+
+	if ( preg_match_all( '#<div class="dt-product-video".*?</iframe></div>#is', $html, $found ) ) {
+		$videos = $found[0];
+		$html   = str_replace( $videos, '', $html );
+	}
+
 	$parts = array(
 		'logo'   => null,
 		'intro'  => $html,
 		'tabs'   => array(),
 		'extras' => '',
+		'badges' => array_values( $badges ),
+		'videos' => $videos,
 	);
 
 	$headings = dorotape_product_description_find_headings( $html );
 	$top      = $headings ? substr( $html, 0, $headings[0]['start'] ) : $html;
 
 	// The manufacturer logo: the first picture above the sections with "logo"
-	// in its file name. The PVC free and reward badges are named that way too
-	// but are not a brand.
+	// in its file name. The badges named that way are already out, and the
+	// reward picture too.
 	if ( preg_match_all( '#<img\b[^>]*\bsrc=["\']?([^"\'\s>]+)[^>]*>#i', $top, $images, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
 		foreach ( $images as $image ) {
 			$file = strtolower( wp_basename( (string) wp_parse_url( $image[1][0], PHP_URL_PATH ) ) );
@@ -156,19 +219,6 @@ function dorotape_product_description_parts( int $product_id ): array {
 			'heading' => $heading['text'],
 			'html'    => $body,
 		);
-	}
-
-	// The videos are as wide as their column, so they go beside the tabs
-	// rather than inside one.
-	$video = '#<div class="dt-product-video".*?</iframe></div>#is';
-
-	foreach ( $tabs as $tab => $chunks ) {
-		foreach ( $chunks as $n => $chunk ) {
-			if ( preg_match_all( $video, $chunk['html'], $found ) ) {
-				$extras                    .= implode( '', $found[0] );
-				$tabs[ $tab ][ $n ]['html'] = (string) preg_replace( $video, '', $chunk['html'] );
-			}
-		}
 	}
 
 	$tabs = array_filter( $tabs );
@@ -366,8 +416,12 @@ function dorotape_product_description_tab(): void {
 		echo '<h2>' . esc_html( $heading ) . '</h2>';
 	}
 
+	// A product with no picture has no gallery to put its video in, so the
+	// video stays in the description, where it always was.
+	$videos = dorotape_product_gallery_has_room( $product ) ? '' : implode( '', $parts['videos'] );
+
 	if ( ! $parts['tabs'] ) {
-		echo dorotape_product_description_format( $parts['intro'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
+		echo dorotape_product_description_format( $parts['intro'] . $videos ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
 		return;
 	}
 
@@ -378,7 +432,7 @@ function dorotape_product_description_tab(): void {
 		'downloads'   => dorotape_product_page_field( 'product_tab_downloads', __( 'Downloads', 'dorotape' ) ),
 	);
 	$inks   = dorotape_product_page_field( 'product_tab_inks', __( 'Ink compatibility', 'dorotape' ) );
-	$extras = $parts['extras'];
+	$extras = $parts['extras'] . $videos;
 	$panels = array();
 
 	foreach ( $parts['tabs'] as $tab => $chunks ) {
@@ -500,7 +554,7 @@ function dorotape_logo_white_filter( string $class ): void {
 }
 
 /**
- * The manufacturer logo at the top of the summary (A8).
+ * The manufacturer logo, beside the category pill (A8).
  *
  * The brand's own logo from Theme Settings > Brands when the description's
  * logo file names one of them, since those are the cleaner files the
@@ -594,6 +648,111 @@ function dorotape_product_reward_line(): void {
 	echo '</span></p>';
 }
 
+/**
+ * Whether the gallery is a real one that a video slide can join.
+ *
+ * Without a picture WooCommerce prints a placeholder that is not a slide, so
+ * a video added beside it would sit hidden behind it.
+ *
+ * @param WC_Product $product Product.
+ */
+function dorotape_product_gallery_has_room( WC_Product $product ): bool {
+	return (bool) $product->get_image_id();
+}
+
+/**
+ * The description's videos as the last slides of the gallery.
+ *
+ * Each one is the YouTube still with a play button, its thumbnail in the
+ * strip under the main image, and the player itself waits in a <template>
+ * until it is played, as the Video block does (assets/js/lib/video.js), so
+ * nothing loads from YouTube on a page view. A button rather than a link, so
+ * WooCommerce's lightbox, which opens on any link in a slide, leaves it be;
+ * and no data-large_image, so the lightbox leaves it out of its own list.
+ */
+function dorotape_product_gallery_videos(): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product || ! dorotape_product_gallery_has_room( $product ) ) {
+		return;
+	}
+
+	foreach ( dorotape_product_description_parts( $product->get_id() )['videos'] as $video ) {
+		if ( ! preg_match( '#<iframe\b[^>]*\bsrc=["\']([^"\']+)["\'][^>]*>#i', $video, $iframe ) || ! preg_match( '#youtube(?:-nocookie)?\.com/embed/([\w-]{6,})#', $iframe[1], $id ) ) {
+			continue;
+		}
+
+		$thumb = 'https://i.ytimg.com/vi/' . $id[1] . '/hqdefault.jpg';
+		$src   = add_query_arg( 'autoplay', '1', set_url_scheme( html_entity_decode( $iframe[1] ), 'https' ) );
+		$title = preg_match( '#\btitle=["\']([^"\']*)["\']#i', $iframe[0], $m ) ? html_entity_decode( $m[1] ) : '';
+
+		printf(
+			'<div class="woocommerce-product-gallery__image woocommerce-product-gallery__image--video" data-thumb="%1$s" data-thumb-alt="%2$s"><div class="product-video"><button class="product-video__play" type="button" data-dt-video><img src="%1$s" alt="" loading="lazy" decoding="async"><span class="product-video__icon">%3$s</span><span class="screen-reader-text">%4$s</span></button><template data-dt-video-embed><iframe src="%5$s" title="%6$s" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></template></div></div>',
+			esc_url( $thumb ),
+			esc_attr__( 'Video', 'dorotape' ),
+			dorotape_ui_icon( 'play' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hard-coded SVG paths.
+			esc_html__( 'Play video', 'dorotape' ),
+			esc_url( $src ),
+			esc_attr( '' !== $title ? $title : __( 'Video', 'dorotape' ) )
+		);
+	}
+}
+
+/**
+ * The inks the product takes, as chips over Add to basket.
+ *
+ * The same drops the Suitability tab lists, read from the description by
+ * dorotape_product_inks(), so the two can never disagree.
+ */
+function dorotape_product_ink_chips(): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product || ! function_exists( 'dorotape_product_inks' ) ) {
+		return;
+	}
+
+	$inks = dorotape_product_inks( $product );
+
+	if ( ! $inks ) {
+		return;
+	}
+
+	echo '<div class="product-inks"><p class="product-inks__title">' . esc_html( dorotape_product_page_field( 'product_tab_inks', __( 'Ink compatibility', 'dorotape' ) ) ) . '</p>';
+	dorotape_ink_list( $inks, 'ink-list' );
+	echo '</div>';
+}
+
+/**
+ * The certification badges, in a row under Add to basket.
+ */
+function dorotape_product_badges(): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	$badges = dorotape_product_description_parts( $product->get_id() )['badges'];
+
+	if ( ! $badges ) {
+		return;
+	}
+
+	echo '<ul class="product-badges" aria-label="' . esc_attr( dorotape_product_page_field( 'product_badges_label', __( 'Certifications', 'dorotape' ) ) ) . '">';
+
+	foreach ( $badges as $badge ) {
+		$alt = '' !== $badge['alt'] ? $badge['alt'] : str_replace( array( '_', '-' ), ' ', (string) preg_replace( '#\.[a-z]+$#i', '', wp_basename( $badge['src'] ) ) );
+
+		printf(
+			'<li class="product-badges__item"><img class="product-badges__image" src="%1$s" alt="%2$s" title="%2$s" loading="lazy" decoding="async"></li>',
+			esc_url( $badge['src'] ),
+			esc_attr( ucfirst( $alt ) )
+		);
+	}
+
+	echo '</ul>';
+}
+
 add_action(
 	'wp',
 	static function (): void {
@@ -601,9 +760,14 @@ add_action(
 			return;
 		}
 
-		// Between the breadcrumb (2) and the title (5).
-		add_action( 'woocommerce_single_product_summary', 'dorotape_product_brand_logo', 3 );
+		// The brand logo is printed beside the category pill, by
+		// dorotape_product_category_pill().
 		// Straight under the price (10).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_reward_line', 11 );
+		// Over the form (30), and under the assurance lines (32).
+		add_action( 'woocommerce_single_product_summary', 'dorotape_product_ink_chips', 29 );
+		add_action( 'woocommerce_single_product_summary', 'dorotape_product_badges', 33 );
+		// After the gallery's own thumbnails (20).
+		add_action( 'woocommerce_product_thumbnails', 'dorotape_product_gallery_videos', 30 );
 	}
 );

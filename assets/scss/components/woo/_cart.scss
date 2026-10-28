@@ -224,6 +224,25 @@
   }
 }
 
+// ── Continue shopping ──────────────────────────────────────────────────────
+//
+// Under the basket (inc/woo-pages.php, meeting, 28 October 2026). Hidden
+// while the basket is empty, where the block offers new products instead.
+
+.woo-page .continue-shopping {
+  margin: var(--spacer-24) 0 0;
+
+  // The chevron leads and points back, so it steps left on hover, not right.
+  .btn:hover .btn__icon:last-child,
+  .btn:focus-visible .btn__icon:last-child {
+    transform: translateX(calc(-1 * var(--spacer-4)));
+  }
+}
+
+.woo-page .wp-block-woocommerce-cart:not(:has(.wc-block-cart-items)) + .continue-shopping {
+  display: none;
+}
+
 // ── Share this basket ──────────────────────────────────────────────────────
 //
 // Under the basket (inc/share-basket.php, Site Edits, October 2026, Wishlist

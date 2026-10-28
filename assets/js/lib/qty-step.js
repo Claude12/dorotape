@@ -4,17 +4,20 @@
 
 export function initQtyStep() {
   function stepOf( input ) {
-    return parseInt( input.getAttribute( 'step' ), 10 ) || 1;
+    return parseFloat( input.getAttribute( 'step' ) ) || 1;
   }
   function minOf( input, step ) {
-    return parseInt( input.getAttribute( 'min' ), 10 ) || step;
+    return parseFloat( input.getAttribute( 'min' ) ) || step;
   }
   function maxOf( input ) {
-    var max = parseInt( input.getAttribute( 'max' ), 10 );
+    var max = parseFloat( input.getAttribute( 'max' ) );
     return ( ! isNaN( max ) && max > 0 ) ? max : 0;
   }
 
+  // Steps can be fractional (S62HT is sold in 12.5m), so read with
+  // parseFloat and round to 2 places, or 3 × 12.5 can come out 37.499...
   function commit( input, value ) {
+    value = Math.round( value * 100 ) / 100;
     if ( String( value ) === input.value ) return;
     input.value = value;
     input.dispatchEvent( new Event( 'input',  { bubbles: true } ) );
@@ -28,7 +31,7 @@ export function initQtyStep() {
     var step = stepOf( input );
     if ( step <= 1 ) return;
     var min = minOf( input, step );
-    var val = parseInt( input.value, 10 );
+    var val = parseFloat( input.value );
     if ( isNaN( val ) || val < min ) { val = min; }
 
     // Ties round up: on a step of 5, 7.5 → 10 is the friendlier default.
@@ -46,7 +49,7 @@ export function initQtyStep() {
     if ( step <= 1 ) return;
     var min  = minOf( input, step );
     var max  = maxOf( input );
-    var val  = parseInt( input.value, 10 );
+    var val  = parseFloat( input.value );
     if ( isNaN( val ) ) val = min;
 
     var next = val + ( direction * step );

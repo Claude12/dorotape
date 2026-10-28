@@ -322,6 +322,31 @@ function dorotape_header_shortcuts(): void {
 }
 
 /**
+ * Quick links in the phone menu's bottom row, ahead of the phone number.
+ *
+ * The bar's shortcuts row is desktop only, so on a phone a Quick link would
+ * otherwise have nowhere to go. Only links given an icon (ACF, on the menu
+ * item) come down here: the icon is what makes them fit a row of icons, and
+ * leaving it empty is how a link stays desktop only. Menu order, as on the bar.
+ */
+function dorotape_header_drawer_shortcuts(): void {
+	foreach ( dorotape_menu_tree( 'shortcuts' ) as $node ) {
+		$icon = function_exists( 'get_field' ) ? (string) get_field( 'menu_icon', $node['item']->ID ) : '';
+		$svg  = $icon ? dorotape_header_icon( $icon, 'site-header__utility-icon' ) : '';
+
+		if ( '' === $svg ) {
+			continue;
+		}
+		?>
+		<a class="site-header__utility-link"<?php echo dorotape_menu_link_attrs( $node['item'], true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?>>
+			<?php echo $svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo esc_html( $node['item']->title ); ?>
+		</a>
+		<?php
+	}
+}
+
+/**
  * A plain dropdown list under the bar.
  */
 function dorotape_header_dropdown( array $node, string $id ): void {

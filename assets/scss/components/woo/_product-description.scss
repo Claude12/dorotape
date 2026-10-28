@@ -91,9 +91,19 @@
     padding: 0 $gutter;
     overflow-x: auto;
     scrollbar-width: none;
+    // On a phone the row scrolls sideways, and the tab cut off at the right
+    // edge fades out so it reads as more to come (meeting, 28 October 2026).
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
 
     &::-webkit-scrollbar {
       display: none;
+    }
+
+    // Room past the last tab, so it can scroll clear of the fade.
+    &::after {
+      content: "";
+      flex: 0 0 var(--spacer-24);
     }
 
     @include min-breakpoint(tablet) {
@@ -101,6 +111,12 @@
       margin: 0 0 var(--spacer-24);
       padding: 0;
       overflow: visible;
+      -webkit-mask-image: none;
+      mask-image: none;
+
+      &::after {
+        content: none;
+      }
     }
   }
 
@@ -316,4 +332,151 @@
 
 .product-reward__link {
   @include action-link;
+}
+
+// Beside the category pill, so it is the height of that row rather than a
+// row of its own (meeting, 28 October 2026).
+.product-hero__topline .product-brand {
+  margin: 0 0 0 auto;
+}
+
+.product-hero__topline .product-brand__image {
+  max-height: 32px;
+
+  @include min-breakpoint(tablet) {
+    max-height: 40px;
+  }
+}
+
+.product-hero__topline .product-brand__image--brand {
+  width: 96px;
+  height: 48px;
+
+  @include min-breakpoint(tablet) {
+    width: 112px;
+    height: 56px;
+  }
+}
+
+// ── Video slides ───────────────────────────────────────────────────────────
+
+// The description's videos, as the gallery's last slides. The still and play
+// button match the Video block's; the player replaces the button when played
+// (assets/js/lib/video.js).
+.product-video {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  transform: translateY(-50%);
+  background-color: var(--color-navy);
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  &__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+
+    // Over the gallery's own rule for its pictures (contain, from the top),
+    // so the still fills the frame and YouTube's letterbox bars crop away.
+    .woocommerce-product-gallery & img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+      border-radius: 0;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    &:hover .product-video__icon,
+    &:focus-visible .product-video__icon {
+      transform: scale(1.08);
+    }
+  }
+
+  &__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-image: var(--gradient-aurora);
+    color: var(--color-white);
+    transition: transform var(--transition-fast);
+
+    svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 4px; // the triangle's visual centre sits right of its box
+      fill: currentColor;
+    }
+  }
+}
+
+// ── Inks and badges ────────────────────────────────────────────────────────
+
+// The inks over Add to basket, as the chips the category banners use
+// (components/_ink-list.scss).
+.product-inks {
+  margin: var(--spacer-20) 0 0;
+
+  &__title {
+    margin: 0;
+    color: color-mix(in oklab, var(--color-foreground) 75%, transparent);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $letter-spacing-wide;
+    line-height: $line-height-xs;
+    text-transform: uppercase;
+  }
+
+  .ink-list {
+    margin-top: var(--spacer-8);
+  }
+}
+
+// The certification badges (PVC free, rPET, vegan and the rest), lifted out
+// of the description into one row under the assurance lines. On white tiles,
+// because they are the makers' own coloured marks drawn for a white page.
+.product-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: var(--spacer-20) 0 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    padding: var(--spacer-6);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-white);
+  }
+
+  &__image {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
 }

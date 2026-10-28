@@ -60,8 +60,15 @@ $dt_classes = 'testimonial-block js-testimonial' . dorotape_background_shape_cla
 // The shards are tinted from one hue token, so the choice is a single class
 // on the block rather than six per-shard colours.
 $dt_shards = (string) get_sub_field( 'shard_colour' );
-if ( in_array( $dt_shards, array( 'indigo', 'cyan', 'aurora' ), true ) ) {
+if ( in_array( $dt_shards, array( 'indigo', 'cyan', 'aurora', 'none' ), true ) ) {
 	$dt_classes .= ' testimonial-block--shards-' . $dt_shards;
+}
+
+// The same panel colours as the RTE block, so a quote can sit on any of the
+// backgrounds the rest of the page uses (meeting, 28 October 2026).
+$dt_background = (string) get_sub_field( 'background_color' );
+if ( in_array( $dt_background, array( 'surface', 'surface-2', 'aurora', 'magenta' ), true ) ) {
+	$dt_classes .= ' testimonial-block--bg-' . $dt_background;
 }
 ?>
 
@@ -71,11 +78,13 @@ if ( in_array( $dt_shards, array( 'indigo', 'cyan', 'aurora' ), true ) ) {
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
-	<div class="testimonial-block__art" aria-hidden="true">
-		<?php for ( $dt_i = 1; $dt_i <= 6; $dt_i++ ) : ?>
-			<span class="testimonial-block__shard testimonial-block__shard--<?php echo esc_attr( (string) $dt_i ); ?>"></span>
-		<?php endfor; ?>
-	</div>
+	<?php if ( 'none' !== $dt_shards ) : ?>
+		<div class="testimonial-block__art" aria-hidden="true">
+			<?php for ( $dt_i = 1; $dt_i <= 6; $dt_i++ ) : ?>
+				<span class="testimonial-block__shard testimonial-block__shard--<?php echo esc_attr( (string) $dt_i ); ?>"></span>
+			<?php endfor; ?>
+		</div>
+	<?php endif; ?>
 
 	<div class="container">
 		<div class="testimonial-block__inner">

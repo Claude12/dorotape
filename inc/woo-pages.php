@@ -241,3 +241,35 @@ function dorotape_empty_cart_products( string $html, array $block ): string {
 	return (string) ob_get_clean();
 }
 add_filter( 'render_block_woocommerce/product-new', 'dorotape_empty_cart_products', 10, 2 );
+
+/**
+ * A Continue shopping button under the basket (meeting, 28 October 2026).
+ *
+ * The Cart block has no way back to the products of its own once something
+ * is in it. Printed after the block rather than inside it, because the block
+ * redraws its own contents in the browser; _cart.scss hides it while the
+ * basket is empty, where the block shows new products instead. The wording
+ * and the link are on the Woo Pages settings; the link falls back to the shop.
+ *
+ * Priority 15, so it sits above the share row (inc/share-basket.php, 20).
+ */
+add_filter(
+	'render_block',
+	function ( $content, $block ) {
+		if ( 'woocommerce/cart' !== ( $block['blockName'] ?? '' ) ) {
+			return $content;
+		}
+
+		$label = dorotape_woo_pages_field( 'woo_cart_continue_label', __( 'Continue shopping', 'dorotape' ) );
+		$url   = dorotape_woo_pages_field( 'woo_cart_continue_url', wc_get_page_permalink( 'shop' ) );
+
+		return $content . sprintf(
+			'<p class="continue-shopping"><a class="btn btn--outline" href="%1$s">%2$s%3$s</a></p>',
+			esc_url( $url ),
+			dorotape_ui_icon( 'chevron-left', 'btn__icon' ),
+			esc_html( $label )
+		);
+	},
+	15,
+	2
+);

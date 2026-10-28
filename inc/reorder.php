@@ -97,22 +97,22 @@ add_filter( 'woocommerce_add_order_again_cart_item', function ( $cart_item, $car
 	}
 
 	$step = dorotape_qty_step( $product );
-	$qty  = (int) $cart_item['quantity'];
-	if ( $step <= 1 || $qty <= 0 || 0 === $qty % $step ) {
+	$qty  = dorotape_stock_amount( $cart_item['quantity'] );
+	if ( $step <= 1 || $qty <= 0 || dorotape_is_qty_multiple( $qty, $step ) ) {
 		return $cart_item;
 	}
 
-	$rounded               = (int) ceil( $qty / $step ) * $step;
+	$rounded               = dorotape_stock_amount( ceil( $qty / $step ) * $step );
 	$cart_item['quantity'] = $rounded;
 
 	wc_add_notice(
 		sprintf(
 			/* translators: 1: product name, 2: quantity on the previous order, 3: adjusted quantity, 4: step */
-			esc_html__( '%1$s was ordered as %2$d last time, which is no longer a quantity we can supply. It has gone into your basket as %3$d, the next multiple of %4$d.', 'dorotape' ),
+			esc_html__( '%1$s was ordered as %2$s last time, which is no longer a quantity we can supply. It has gone into your basket as %3$s, the next multiple of %4$s.', 'dorotape' ),
 			$product->get_name(),
-			$qty,
-			$rounded,
-			$step
+			dorotape_format_qty( $qty ),
+			dorotape_format_qty( $rounded ),
+			dorotape_format_qty( $step )
 		),
 		'notice'
 	);

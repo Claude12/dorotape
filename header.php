@@ -155,6 +155,8 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 				<?php dorotape_header_drawer_menu(); ?>
 
 				<div class="site-header__drawer-utility">
+					<?php dorotape_header_drawer_shortcuts(); ?>
+
 					<?php if ( '' !== $dorotape_phone['display'] ) : ?>
 						<a class="site-header__utility-link" href="<?php echo esc_url( $dorotape_phone['href'] ); ?>">
 							<?php echo dorotape_header_icon( 'phone', 'site-header__utility-icon' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

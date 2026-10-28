@@ -1932,7 +1932,40 @@
                                 "": "Magenta (default)",
                                 "indigo": "Indigo",
                                 "cyan": "Cyan",
-                                "aurora": "Aurora mix"
+                                "aurora": "Aurora mix",
+                                "none": "No shards (plain background)"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_dttest000115",
+                            "label": "Background Color",
+                            "name": "background_color",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "The panel colour behind the quote. Pick \"No shards\" above to see it plain, with a background shape over it.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "Default (navy)",
+                                "surface": "Raised panel",
+                                "surface-2": "Raised panel (lighter)",
+                                "aurora": "Aurora wash",
+                                "magenta": "Magenta glow"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4921,6 +4954,6 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1793100000,
+    "modified": 1793208634,
     "local_file": "/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape/acf-json/group_dorotape_content_sections.json"
 }

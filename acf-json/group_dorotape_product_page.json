@@ -296,6 +296,27 @@
             "append": ""
         },
         {
+            "key": "field_dtprod0035",
+            "label": "Certifications label",
+            "name": "product_badges_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Read out by screen readers for the row of certification badges (PVC free, rPET, vegan and so on) beside Add to basket. The badges themselves come from the product description.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Certifications",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Certifications",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtprod0028",
             "label": "Download button fallback",
             "name": "product_download_fallback",
@@ -547,5 +568,5 @@
     "active": true,
     "description": "Settings the single product page reads on every product: the two background shapes, the Related products headings, and the assurance lines under add to cart.",
     "show_in_rest": 0,
-    "modified": 1792797080
+    "modified": 1793203926
 }

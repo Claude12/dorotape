@@ -1,0 +1,57 @@
+{
+    "key": "group_dorotape_menu_item",
+    "title": "Quick link",
+    "fields": [
+        {
+            "key": "field_dtmenu0001",
+            "label": "Phone menu icon",
+            "name": "menu_icon",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "Pick an icon to show this link in the bottom row of the phone menu, ahead of the phone number and login. Leave it on None to keep it on the desktop bar only.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "allow_in_bindings": 0,
+            "choices": {
+                "": "None",
+                "mail": "Envelope",
+                "sparkles": "Sparkles",
+                "tag": "Tag",
+                "star": "Star"
+            },
+            "default_value": "",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "create_options": 0,
+            "save_options": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "nav_menu_item",
+                "operator": "==",
+                "value": "location/shortcuts"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Settings for a link in the Quick links menu.",
+    "show_in_rest": 0,
+    "modified": 1793193600
+}

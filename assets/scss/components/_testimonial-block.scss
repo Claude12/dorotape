@@ -18,12 +18,24 @@
 // var()s where it is declared: taking them from :root would bake in the
 // default magenta before the modifier could move the hue.
 
+// From tablet, a rounded panel inside the page's gutters rather than a full
+// width band, and a step shorter, so it reads as a quote and not a section
+// (meeting, 28 October 2026). The shards and vignette clip to the panel. A
+// phone keeps the full width, since a narrower column there only adds lines.
 .testimonial-block {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: var(--spacer-96) 0;
+  padding: var(--spacer-48) 0;
   background-color: var(--color-background);
+
+  @include min-breakpoint(tablet) {
+    width: calc(100% - 2 * #{$gutter});
+    max-width: 64rem;
+    margin: var(--spacer-48) auto;
+    padding: var(--spacer-64) 0;
+    border-radius: var(--radius-2xl);
+  }
   color: var(--color-primary-foreground);
 
   // The vignette, over the shards and under the quote.
@@ -136,6 +148,39 @@
   &--shards-aurora &__shard--6 {
     --shard-hue: #{$shard-hue-cyan};
     --shard-chroma: #{$shard-chroma-cyan};
+  }
+
+  // No shards: the vignette only exists to calm them, so it goes too and the
+  // background colour and shape read as chosen.
+  &--shards-none::after {
+    content: none;
+  }
+
+  // ── Background colour ──────────────────────────────────────────────────
+  //
+  // The RTE block's options (components/_rte-block.scss). ::after is the
+  // vignette here, so the washes take ::before.
+
+  &--bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  &--bg-surface-2 {
+    background-color: var(--color-surface-2);
+  }
+
+  &--bg-aurora::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--gradient-aurora-soft);
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  &--bg-magenta {
+    @include magenta-glow;
   }
 
   // ── Quote ──────────────────────────────────────────────────────────────

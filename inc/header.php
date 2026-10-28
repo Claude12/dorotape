@@ -22,7 +22,8 @@ defined( 'ABSPATH' ) || exit;
  * for seven icons in the critical path costs more than the ~1KB of markup.
  * `currentcolor` lets each one inherit the hover colour of its link.
  *
- * @param string $name One of phone, user, heart, cart, search, menu, close.
+ * @param string $name One of phone, user, heart, cart, search, menu, close,
+ *                     or a Quick link's icon: mail, sparkles, tag, star.
  * @param string $class CSS class for the <svg> element.
  * @return string Escaped-safe SVG markup, or an empty string for an unknown name.
  */
@@ -35,6 +36,10 @@ function dorotape_header_icon( string $name, string $class = '' ): string {
 		'search' => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
 		'menu'   => '<path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/>',
 		'close'  => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+		'mail'   => '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+		'sparkles' => '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0Z"/><path d="M20 3v4"/><path d="M22 5h-4"/>',
+		'tag'    => '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42Z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+		'star'   => '<path d="M11.53 2.3a.53.53 0 0 1 .94 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .3-.9l5.16-.76a2.12 2.12 0 0 0 1.6-1.16Z"/>',
 	);
 
 	if ( ! isset( $paths[ $name ] ) ) {
