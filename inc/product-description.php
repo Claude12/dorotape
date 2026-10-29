@@ -129,7 +129,7 @@ function dorotape_product_description_parts( int $product_id ): array {
 		$html
 	);
 
-	// The videos, wherever they sit, for the gallery (dorotape_product_gallery_videos()).
+	// The videos, wherever they sit, for under the gallery (dorotape_product_video()).
 	$videos = array();
 
 	if ( preg_match_all( '#<div class="dt-product-video".*?</iframe></div>#is', $html, $found ) ) {
@@ -416,12 +416,8 @@ function dorotape_product_description_tab(): void {
 		echo '<h2>' . esc_html( $heading ) . '</h2>';
 	}
 
-	// A product with no picture has no gallery to put its video in, so the
-	// video stays in the description, where it always was.
-	$videos = dorotape_product_gallery_has_room( $product ) ? '' : implode( '', $parts['videos'] );
-
 	if ( ! $parts['tabs'] ) {
-		echo dorotape_product_description_format( $parts['intro'] . $videos ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
+		echo dorotape_product_description_format( $parts['intro'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
 		return;
 	}
 
@@ -432,7 +428,7 @@ function dorotape_product_description_tab(): void {
 		'downloads'   => dorotape_product_page_field( 'product_tab_downloads', __( 'Downloads', 'dorotape' ) ),
 	);
 	$inks   = dorotape_product_page_field( 'product_tab_inks', __( 'Ink compatibility', 'dorotape' ) );
-	$extras = $parts['extras'] . $videos;
+	$extras = $parts['extras'];
 	$panels = array();
 
 	foreach ( $parts['tabs'] as $tab => $chunks ) {
@@ -649,52 +645,60 @@ function dorotape_product_reward_line(): void {
 }
 
 /**
- * Whether the gallery is a real one that a video slide can join.
+ * The product's video, as a YouTube page URL, or '' for none.
  *
- * Without a picture WooCommerce prints a placeholder that is not a slide, so
- * a video added beside it would sit hidden behind it.
+ * The Video field when it is filled in, otherwise the video that came in the
+ * description, so the 85 products that had one keep it with nothing to fill
+ * in. "Hide the video" turns both off.
  *
  * @param WC_Product $product Product.
  */
-function dorotape_product_gallery_has_room( WC_Product $product ): bool {
-	return (bool) $product->get_image_id();
+function dorotape_product_video_url( WC_Product $product ): string {
+	$id = $product->get_id();
+
+	if ( function_exists( 'get_field' ) ) {
+		if ( get_field( 'product_video_hide', $id ) ) {
+			return '';
+		}
+
+		$url = trim( (string) get_field( 'product_video_url', $id ) );
+
+		if ( '' !== $url ) {
+			return $url;
+		}
+	}
+
+	foreach ( dorotape_product_description_parts( $id )['videos'] as $video ) {
+		if ( preg_match( '#youtube(?:-nocookie)?\.com/embed/([\w-]{6,})#', $video, $m ) ) {
+			return 'https://www.youtube.com/watch?v=' . $m[1];
+		}
+	}
+
+	return '';
 }
 
 /**
- * The description's videos as the last slides of the gallery.
+ * The video under the gallery, where it fills the space the taller summary
+ * column leaves beside it (Paul, 29 October 2026, in place of the gallery
+ * slide from the 28 October meeting). Printed after the summary, as the hero
+ * grid's third cell, so on a phone it comes after Add to basket rather than
+ * pushing it down a screen; from desktop the grid lifts it under the gallery.
  *
- * Each one is the YouTube still with a play button, its thumbnail in the
- * strip under the main image, and the player itself waits in a <template>
- * until it is played, as the Video block does (assets/js/lib/video.js), so
- * nothing loads from YouTube on a page view. A button rather than a link, so
- * WooCommerce's lightbox, which opens on any link in a slide, leaves it be;
- * and no data-large_image, so the lightbox leaves it out of its own list.
+ * The Video block's frame: a still with a play button, the player loading
+ * only once it is played (assets/js/lib/video.js).
  */
-function dorotape_product_gallery_videos(): void {
+function dorotape_product_video(): void {
 	global $product;
 
-	if ( ! $product instanceof WC_Product || ! dorotape_product_gallery_has_room( $product ) ) {
+	if ( ! $product instanceof WC_Product ) {
 		return;
 	}
 
-	foreach ( dorotape_product_description_parts( $product->get_id() )['videos'] as $video ) {
-		if ( ! preg_match( '#<iframe\b[^>]*\bsrc=["\']([^"\']+)["\'][^>]*>#i', $video, $iframe ) || ! preg_match( '#youtube(?:-nocookie)?\.com/embed/([\w-]{6,})#', $iframe[1], $id ) ) {
-			continue;
-		}
+	$url   = dorotape_product_video_url( $product );
+	$frame = '' !== $url ? dorotape_video_frame( $url ) : '';
 
-		$thumb = 'https://i.ytimg.com/vi/' . $id[1] . '/hqdefault.jpg';
-		$src   = add_query_arg( 'autoplay', '1', set_url_scheme( html_entity_decode( $iframe[1] ), 'https' ) );
-		$title = preg_match( '#\btitle=["\']([^"\']*)["\']#i', $iframe[0], $m ) ? html_entity_decode( $m[1] ) : '';
-
-		printf(
-			'<div class="woocommerce-product-gallery__image woocommerce-product-gallery__image--video" data-thumb="%1$s" data-thumb-alt="%2$s"><div class="product-video"><button class="product-video__play" type="button" data-dt-video><img src="%1$s" alt="" loading="lazy" decoding="async"><span class="product-video__icon">%3$s</span><span class="screen-reader-text">%4$s</span></button><template data-dt-video-embed><iframe src="%5$s" title="%6$s" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></template></div></div>',
-			esc_url( $thumb ),
-			esc_attr__( 'Video', 'dorotape' ),
-			dorotape_ui_icon( 'play' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hard-coded SVG paths.
-			esc_html__( 'Play video', 'dorotape' ),
-			esc_url( $src ),
-			esc_attr( '' !== $title ? $title : __( 'Video', 'dorotape' ) )
-		);
+	if ( '' !== $frame ) {
+		echo '<div class="product-video">' . $frame . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- dorotape_video_frame() escapes its parts; the embed is oEmbed output.
 	}
 }
 
@@ -767,7 +771,7 @@ add_action(
 		// Over the form (30), and under the assurance lines (32).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_ink_chips', 29 );
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_badges', 33 );
-		// After the gallery's own thumbnails (20).
-		add_action( 'woocommerce_product_thumbnails', 'dorotape_product_gallery_videos', 30 );
+		// After the summary, before the hero closes (1).
+		add_action( 'woocommerce_after_single_product_summary', 'dorotape_product_video', 0 );
 	}
 );

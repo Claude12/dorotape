@@ -1,0 +1,62 @@
+{
+    "key": "group_dorotape_product_video",
+    "title": "Product Video",
+    "fields": [
+        {
+            "key": "field_dtpvid0001",
+            "label": "Video",
+            "name": "product_video_url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "A YouTube link, shown under the product's pictures. Leave empty to use the video in the description, if it has one.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "https://www.youtube.com/watch?v=..."
+        },
+        {
+            "key": "field_dtpvid0002",
+            "label": "Hide the video",
+            "name": "product_video_hide",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "Shows no video on this product, not even the one in the description.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "product"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "The video under a product's pictures.",
+    "show_in_rest": 0,
+    "modified": 1793270909
+}

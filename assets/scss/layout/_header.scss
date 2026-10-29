@@ -972,12 +972,10 @@
 
 // Each sub-category is drawn as a button rather than a line of text, so the
 // pane reads as a set of choices (Site Edits, October 2026). The ghost
-// button's border and fill, at the dropdown link's size. Hover draws the
-// aurora ring the category tiles use, here and nowhere else in the menus
-// (meeting, 28 October 2026).
+// button's border and fill, at the dropdown link's size. Hover fills it
+// solid pink with white text (Paul, 29 October 2026, replacing the aurora
+// ring from the 28 October meeting).
 .site-header__mega-link {
-  @include aurora-ring;
-
   display: block;
   padding: var(--spacer-8) var(--spacer-12);
   border: 1px solid var(--color-border);
@@ -996,11 +994,9 @@
   &:hover,
   &:focus-visible,
   &[aria-current="page"] {
-    @include aurora-ring-visible;
-
-    border-color: transparent;
-    background-color: var(--color-secondary);
-    color: var(--nav-accent);
+    border-color: var(--color-magenta);
+    background-color: var(--color-magenta);
+    color: var(--color-primary-foreground);
   }
 }
 

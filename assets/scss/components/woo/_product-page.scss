@@ -91,6 +91,29 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--spacer-64);
     }
+
+    // The video comes after the summary, so on a phone it follows Add to
+    // basket. From desktop the summary runs down both rows and the video
+    // takes the second row of the first column, under the pictures; the
+    // second row is the flexible one, so the gallery's row stays its own
+    // height and the video sits straight under it.
+    @include min-breakpoint(desktop) {
+      &:has(> .product-video) {
+        grid-template-rows: auto 1fr;
+        row-gap: var(--spacer-32);
+      }
+
+      &:has(> .product-video) > .summary {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+      }
+
+      > .product-video {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+      }
+    }
   }
 
   // The category pill and the brand logo share one row, the logo at the far
@@ -259,44 +282,6 @@
   .flex-control-thumbs li:has(.flex-active) {
     background-color: var(--color-cyan);
     background-image: none;
-  }
-
-  // A video slide: square like the pictures, so the slider keeps its
-  // height, with the 16:9 still in the middle of a quiet panel.
-  &__image--video {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: var(--radius-2xl);
-    background-color: var(--color-surface-2);
-    overflow: hidden;
-  }
-
-  // The zoom and the lightbox are for pictures; on a video they would open
-  // the lightbox at a slide it does not have.
-  &:has(.woocommerce-product-gallery__image--video.flex-active-slide) .woocommerce-product-gallery__trigger {
-    display: none;
-  }
-
-  // A play mark on the video's thumb, which flexslider builds from the
-  // slide's data-thumb with no class of its own to hang it on.
-  .flex-control-thumbs li:has(img[src*="ytimg.com"]) {
-    position: relative;
-  }
-
-  .flex-control-thumbs li:has(img[src*="ytimg.com"])::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7v10l8-5z' fill='%23131d2e'/%3E%3C/svg%3E") center / 18px no-repeat;
-    pointer-events: none;
-  }
-
-  .flex-control-thumbs li:has(img[src*="ytimg.com"]) img {
-    object-fit: cover;
   }
 
   .flex-control-thumbs img {

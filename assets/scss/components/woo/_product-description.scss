@@ -80,13 +80,18 @@
 
   // ── Tab bar ────────────────────────────────────────────────────────────
 
-  // The blog's category pills, filled cyan when chosen, because this is
-  // information rather than something to buy. One row that swipes on a phone,
-  // out through the gutter like the case study filter: four pills wrapped to
-  // two rows looked like two sets of controls.
+  // Text tabs over a line, as the Description tab above them, rather than
+  // the blog's category pills (Paul, 29 October 2026). One row that swipes on
+  // a phone, out through the gutter like the case study filter: four tabs
+  // wrapped to two rows looked like two sets of controls.
+  //
+  // The line is a background rather than a border, because the row scrolls on
+  // a phone and a scrolling box clips the -1px the tabs would need to sit on a
+  // border. The selected tab's 2px underline covers it.
   &__tablist {
     display: flex;
     gap: var(--spacer-8);
+    background: linear-gradient(color-mix(in oklab, var(--color-border) 60%, transparent), color-mix(in oklab, var(--color-border) 60%, transparent)) bottom / 100% 1px no-repeat;
     margin: 0 calc(-1 * #{$gutter}) var(--spacer-24);
     padding: 0 $gutter;
     overflow-x: auto;
@@ -124,33 +129,36 @@
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
-    min-height: 40px;
-    padding: var(--spacer-8) var(--spacer-16);
-    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
-    border-radius: var(--radius-pill);
-    background-color: var(--color-surface);
-    color: var(--color-foreground);
+    min-height: 44px;
+    padding: var(--spacer-12) var(--spacer-20);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
     font-family: inherit;
     font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-extrabold;
     line-height: $line-height-sm;
     white-space: nowrap;
     cursor: pointer;
     transition:
       border-color var(--transition-fast),
-      color var(--transition-fast),
-      background-color var(--transition-fast);
+      color var(--transition-fast);
 
-    &:hover,
+    &:hover {
+      color: var(--color-foreground);
+    }
+
     &:focus-visible {
-      border-color: var(--color-cyan);
-      color: var(--color-cyan);
+      outline: 2px solid var(--color-cyan);
+      outline-offset: -2px;
+      color: var(--color-foreground);
     }
 
     &[aria-selected="true"] {
-      border-color: var(--color-cyan);
-      background-color: var(--color-cyan);
-      color: var(--color-background);
+      border-bottom-color: var(--color-magenta);
+      color: var(--color-foreground);
     }
   }
 
@@ -358,76 +366,12 @@
   }
 }
 
-// ── Video slides ───────────────────────────────────────────────────────────
+// ── Video ──────────────────────────────────────────────────────────────────
 
-// The description's videos, as the gallery's last slides. The still and play
-// button match the Video block's; the player replaces the button when played
-// (assets/js/lib/video.js).
+// The product's video, in the Video block's frame (components/_video-block.scss),
+// placed by the hero grid in components/woo/_product-page.scss.
 .product-video {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  aspect-ratio: 16 / 9;
-  width: 100%;
-  transform: translateY(-50%);
-  background-color: var(--color-navy);
-
-  iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-  }
-
-  &__play {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-
-    // Over the gallery's own rule for its pictures (contain, from the top),
-    // so the still fills the frame and YouTube's letterbox bars crop away.
-    .woocommerce-product-gallery & img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: auto;
-      border-radius: 0;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    &:hover .product-video__icon,
-    &:focus-visible .product-video__icon {
-      transform: scale(1.08);
-    }
-  }
-
-  &__icon {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background-image: var(--gradient-aurora);
-    color: var(--color-white);
-    transition: transform var(--transition-fast);
-
-    svg {
-      width: 28px;
-      height: 28px;
-      margin-left: 4px; // the triangle's visual centre sits right of its box
-      fill: currentColor;
-    }
-  }
+  min-width: 0;
 }
 
 // ── Inks and badges ────────────────────────────────────────────────────────
