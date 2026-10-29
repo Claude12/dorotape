@@ -82,7 +82,7 @@ while ( have_posts() ) :
 										'class'    => 'post-gallery__photo',
 										'loading'  => 0 === $dt_index ? 'eager' : 'lazy',
 										'decoding' => 'async',
-										'sizes'    => $dt_has_thumbs ? '(min-width: 880px) 620px, 75vw' : '(min-width: 880px) 800px, 92vw',
+										'sizes'    => $dt_has_thumbs ? '(min-width: 880px) 620px, (min-width: 576px) 75vw, 92vw' : '(min-width: 880px) 800px, 92vw',
 									);
 									if ( 0 !== $dt_index ) {
 										$dt_attrs['hidden'] = 'hidden';
@@ -112,7 +112,7 @@ while ( have_posts() ) :
 														'alt'      => '',
 														'loading'  => 'lazy',
 														'decoding' => 'async',
-														'sizes'    => '(min-width: 880px) 180px, 22vw',
+														'sizes'    => '(min-width: 880px) 180px, (min-width: 576px) 22vw, 31vw',
 													)
 												);
 												?>

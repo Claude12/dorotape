@@ -272,6 +272,10 @@ function dorotape_category_filter_siblings( WP_Term $term ): array {
 				'exclude'    => array( $term->term_id ),
 			)
 		);
+
+		if ( is_array( $siblings ) ) {
+			$siblings = array_values( array_filter( $siblings, fn( WP_Term $t ) => ! dorotape_category_hidden_from_parent( $t->term_id ) ) );
+		}
 	}
 
 	if ( is_wp_error( $siblings ) || ! $siblings ) {

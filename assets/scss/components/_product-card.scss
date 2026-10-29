@@ -216,6 +216,12 @@
     ins {
       text-decoration: none;
     }
+
+    // "ex VAT". The browser's own <small> came out at 11.7px, under the
+    // 12px the rest of the site keeps as its smallest text.
+    .woocommerce-price-suffix {
+      font-size: $font-size-xs;
+    }
   }
 
   // ── Grid mode ────────────────────────────────────────────────────────────

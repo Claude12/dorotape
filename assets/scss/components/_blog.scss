@@ -193,9 +193,13 @@
 // the old site's articles had them (Michael, 28 October 2026). A lone photo
 // takes the full width. lib/post-gallery.js swaps the large one.
 //
-// The large photo sets the height and the thumbnails share it: size
-// containment keeps their own height out of the row, so however many there
-// are, the column ends level with the photo's bottom edge.
+// On a phone a column beside the photo leaves thumbnails too small to pick,
+// so below 576px they sit in a row under it instead (Claudius, 29 October
+// 2026).
+//
+// From there up the large photo sets the height and the thumbnails share it:
+// size containment keeps their own height out of the row, so however many
+// there are, the column ends level with the photo's bottom edge.
 
 .post-gallery {
   margin-bottom: var(--spacer-32);
@@ -206,8 +210,12 @@
 
   &--thumbs {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 22%;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--spacer-8);
+
+    @include min-breakpoint(mobile) {
+      grid-template-columns: minmax(0, 1fr) 22%;
+    }
 
     @include min-breakpoint(tablet) {
       gap: var(--spacer-16);
@@ -232,12 +240,15 @@
 
   &__thumbs {
     display: flex;
-    flex-direction: column;
     gap: var(--spacer-8);
     margin: 0;
     padding: 0;
     list-style: none;
-    contain: size;
+
+    @include min-breakpoint(mobile) {
+      flex-direction: column;
+      contain: size;
+    }
 
     @include min-breakpoint(tablet) {
       gap: var(--spacer-16);
@@ -245,13 +256,19 @@
 
     li {
       flex: 1 1 0;
+      min-width: 0;
       min-height: 0;
     }
   }
 
   &__thumb {
     display: block;
-    height: 100%;
+    aspect-ratio: 4 / 3;
+
+    @include min-breakpoint(mobile) {
+      height: 100%;
+      aspect-ratio: auto;
+    }
     overflow: hidden;
     border: 2px solid transparent;
     border-radius: var(--radius-xl);

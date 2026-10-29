@@ -255,6 +255,27 @@
             "bidirectional_target": []
         },
         {
+            "key": "field_dtcat0015",
+            "label": "Hide from the parent's ranges",
+            "name": "category_hide_from_parent",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "Leaves this range out of the tiles on the category above it and out of the \"More in\" links on its sister ranges. Its own page, products and breadcrumb stay as they are, so it is still reached by search or a direct link.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "allow_in_bindings": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
             "key": "field_dtcat0012",
             "label": "Products heading",
             "name": "category_products_heading",
@@ -297,5 +318,5 @@
             "new_lines": ""
         }
     ],
-    "modified": 1793030400
+    "modified": 1793258409
 }

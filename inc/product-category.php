@@ -93,6 +93,8 @@ function dorotape_category_children( WP_Term $term ): array {
 		return array();
 	}
 
+	$children = array_values( array_filter( $children, fn( $c ) => ! dorotape_category_hidden_from_parent( (int) $c->term_id ) ) );
+
 	// The tiles follow the main menu, so one reorder in Appearance, Menus
 	// moves both (Michael, Site Edits, October 2026). A range that is not in
 	// the menu keeps its drag and drop place, after the ones that are.
@@ -107,6 +109,17 @@ function dorotape_category_children( WP_Term $term ): array {
 	);
 
 	return $children;
+}
+
+/**
+ * True when a range is ticked "Hide from the parent's ranges".
+ *
+ * Its own page, products and breadcrumb stay, so it is still reached by
+ * search or a link, as the old site kept Doro-Mount 865 out of Double Sided
+ * Tapes' list while still selling it (Claudius, 29 October 2026).
+ */
+function dorotape_category_hidden_from_parent( int $term_id ): bool {
+	return function_exists( 'get_field' ) && (bool) get_field( 'category_hide_from_parent', 'term_' . $term_id );
 }
 
 /**
