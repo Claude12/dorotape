@@ -116,25 +116,6 @@
     }
   }
 
-  // The category pill and the brand logo share one row, the logo at the far
-  // end, so the logo no longer takes a row of its own above the title
-  // (meeting, 28 October 2026). A long category name wraps inside its pill
-  // rather than pushing the logo onto a row of its own.
-  &__topline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacer-16);
-  }
-
-  &__topline > * {
-    min-width: 0;
-  }
-
-  &__topline .product-brand {
-    flex-shrink: 0;
-  }
-
   // The category chip over the title. The same "most specific category" the
   // product card shows, so a product is labelled the same way in a row on the
   // homepage and on its own page.
@@ -300,13 +281,19 @@
 // Spacing is set on each piece rather than with a flex gap, because the
 // pieces are hooked in by half a dozen different files and a gap would give
 // the same distance to a tier table and a one-line note.
+//
+// Three distances, so the column reads as one rhythm (Claudius, 29 October
+// 2026): 16 between the heading lines (pill, breadcrumb, title, price), 12
+// for the reward line that belongs to the price, and 24 between every block
+// from the description down, with 32 only above the rule that sets the meta
+// apart. A piece hooked in later takes 24 unless it belongs to the one above.
 
 .single-product .entry-summary {
   margin: 0;
 }
 
 .single-product .product_title {
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-16) 0 0;
   font-size: $font-size-page-title;
   font-weight: $font-weight-extrabold;
   letter-spacing: $letter-spacing-tight;
@@ -318,7 +305,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--spacer-12);
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-16) 0 0;
   color: var(--color-cyan);
   font-size: $font-size-30;
   font-weight: $font-weight-extrabold;
@@ -359,7 +346,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacer-16);
-  margin: var(--spacer-32) 0 0;
+  margin: var(--spacer-24) 0 0;
 }
 
 // A variable product stacks its attribute rows above the same quantity and
@@ -404,6 +391,12 @@
     vertical-align: middle;
   }
 
+  // The form's own gap is the distance to the quantity box below.
+  tr:last-child th,
+  tr:last-child td {
+    padding-bottom: 0;
+  }
+
   // Lined up with the middle of the select beside it rather than with the
   // middle of the cell. WooCommerce keeps the reset link in flow below the
   // last select and only hides it with visibility, so that row is a line
@@ -439,6 +432,13 @@
 .single-product .reset_variations {
   color: var(--color-cyan);
   font-size: $font-size-sm;
+
+  // WooCommerce hides the link with an inline visibility: hidden, which keeps
+  // its line, so the gap between the last select and the quantity box was
+  // half as tall again as any other in the form until an option was picked.
+  &[style*="hidden"] {
+    display: none;
+  }
 }
 
 // ── Assurances ─────────────────────────────────────────────────────────────

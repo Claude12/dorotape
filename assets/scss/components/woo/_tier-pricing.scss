@@ -14,7 +14,7 @@
   // with a magenta header bar, the breaks as bordered rows, and the unit note
   // as a footer bar. overflow hidden is what lets the rows meet the rounded
   // corners cleanly.
-  margin: var(--spacer-32) 0 0;
+  margin: var(--spacer-24) 0 0;
   overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
   border-radius: var(--radius-2xl);
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacer-12);
-  margin: var(--spacer-32) 0 0;
+  margin: var(--spacer-24) 0 0;
   padding: var(--spacer-16) var(--spacer-20);
   border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
   border-left: 4px solid var(--color-magenta);

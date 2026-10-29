@@ -15,8 +15,11 @@
   // width and pushes out of the page instead. With it the box takes the width
   // it is given and .dt-cutsize__table-wrap scrolls the table inside itself,
   // so on a narrow phone the far column is a swipe away rather than gone.
+  // No margin of its own: the row's 16px gap spaces it, and a margin on top
+  // of that left it twice as far from its neighbours as anything else in the
+  // form once it wrapped onto a line of its own (Claudius, 29 October 2026).
   min-width: 0;
-  margin: var(--spacer-16) 0;
+  margin: 0;
   padding: var(--spacer-16);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);

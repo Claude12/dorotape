@@ -314,3 +314,10 @@ li.product:not(:has(> .product-card)) {
     }
   }
 }
+
+// Under Add to cart on a product it belongs to the button, so it takes the
+// 16 the buying controls keep between themselves rather than YITH's own 7px
+// above and below.
+.summary .yith-add-to-wishlist-button-block {
+  margin: var(--spacer-16) 0 0;
+}

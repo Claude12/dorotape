@@ -265,42 +265,45 @@
 
 // ── Brand ──────────────────────────────────────────────────────────────────
 
-// The manufacturer's logo over the title, white on the dark hero like the
-// homepage brands strip, where it used to open the description in its own
+// The manufacturer's logo under the ink chips, white on the dark hero like
+// the homepage brands strip, where it used to open the description in its own
 // colours on a white box (Product A8). Wide wordmarks are capped by width,
 // square marks by height.
 .product-brand {
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-24) 0 0;
   line-height: 0;
 }
 
 .product-brand__image {
   display: block;
   width: auto;
-  max-width: 180px;
+  max-width: 240px;
   height: auto;
-  max-height: 40px;
+  max-height: 56px;
   object-fit: contain;
   filter: url("#dorotape-logo-white");
 
   @include min-breakpoint(tablet) {
-    max-height: 48px;
+    max-height: 64px;
   }
 }
 
 // The Theme Settings logos are all drawn on the same 2:1 canvas with room
 // around the mark, so they take a fixed box rather than the caps above, which
-// left a wordmark like Ritrama | Fedrigoni the size of a footnote.
+// left a wordmark like Ritrama | Fedrigoni the size of a footnote. Sized
+// up again once it moved under the ink chips, where it has the room
+// (Claudius, 29 October 2026). The negative margin takes back the canvas's
+// empty band, so the gaps either side still read as the column's 24.
 .product-brand__image--brand {
-  width: 112px;
+  width: 160px;
   max-width: none;
-  height: 56px;
+  height: 80px;
   max-height: none;
-  margin: calc(-1 * var(--spacer-8)) 0;
+  margin: calc(-1 * var(--spacer-12)) 0;
 
   @include min-breakpoint(tablet) {
-    width: 144px;
-    height: 72px;
+    width: 200px;
+    height: 100px;
   }
 }
 
@@ -342,30 +345,6 @@
   @include action-link;
 }
 
-// Beside the category pill, so it is the height of that row rather than a
-// row of its own (meeting, 28 October 2026).
-.product-hero__topline .product-brand {
-  margin: 0 0 0 auto;
-}
-
-.product-hero__topline .product-brand__image {
-  max-height: 32px;
-
-  @include min-breakpoint(tablet) {
-    max-height: 40px;
-  }
-}
-
-.product-hero__topline .product-brand__image--brand {
-  width: 96px;
-  height: 48px;
-
-  @include min-breakpoint(tablet) {
-    width: 112px;
-    height: 56px;
-  }
-}
-
 // ── Video ──────────────────────────────────────────────────────────────────
 
 // The product's video, in the Video block's frame (components/_video-block.scss),
@@ -379,7 +358,7 @@
 // The inks over Add to basket, as the chips the category banners use
 // (components/_ink-list.scss).
 .product-inks {
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-24) 0 0;
 
   &__title {
     margin: 0;
@@ -403,7 +382,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacer-8);
-  margin: var(--spacer-20) 0 0;
+  margin: var(--spacer-24) 0 0;
   padding: 0;
   list-style: none;
 

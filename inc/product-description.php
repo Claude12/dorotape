@@ -550,7 +550,7 @@ function dorotape_logo_white_filter( string $class ): void {
 }
 
 /**
- * The manufacturer logo, beside the category pill (A8).
+ * The manufacturer logo, under the ink chips (A8).
  *
  * The brand's own logo from Theme Settings > Brands when the description's
  * logo file names one of them, since those are the cleaner files the
@@ -764,12 +764,14 @@ add_action(
 			return;
 		}
 
-		// The brand logo is printed beside the category pill, by
-		// dorotape_product_category_pill().
 		// Straight under the price (10).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_reward_line', 11 );
 		// Over the form (30), and under the assurance lines (32).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_ink_chips', 29 );
+		// Under the ink chips, at the same priority so it follows them, where
+		// it has the room to be read rather than squeezed beside the category
+		// pill (Claudius, 29 October 2026).
+		add_action( 'woocommerce_single_product_summary', 'dorotape_product_brand_logo', 29 );
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_badges', 33 );
 		// After the summary, before the hero closes (1).
 		add_action( 'woocommerce_after_single_product_summary', 'dorotape_product_video', 0 );
