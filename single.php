@@ -66,22 +66,61 @@ while ( have_posts() ) :
 				<div class="post-article__inner">
 
 					<?php if ( $dt_photos ) : ?>
-						<div class="post-article__photos post-article__photos--<?php echo esc_attr( (string) min( count( $dt_photos ), 3 ) ); ?>">
-							<?php foreach ( $dt_photos as $dt_index => $dt_photo ) : ?>
-								<?php
-								echo wp_get_attachment_image(
-									$dt_photo,
-									0 === $dt_index ? 'large' : 'medium_large',
-									false,
-									array(
-										'class'    => 'post-article__photo',
+						<?php
+						// One photo large with every photo as a thumbnail beside it, as the old
+						// site's articles had them (Michael, 28 October 2026). A thumbnail
+						// swaps the large one (lib/post-gallery.js); without scripts it opens
+						// the full-size file instead.
+						$dt_photo_label = dorotape_blog_field( 'post_photo_label', __( 'Show photo {number}', 'dorotape' ) );
+						$dt_has_thumbs  = count( $dt_photos ) > 1;
+						?>
+						<div class="post-gallery<?php echo $dt_has_thumbs ? ' post-gallery--thumbs' : ''; ?>" data-post-gallery>
+							<div class="post-gallery__main">
+								<?php foreach ( $dt_photos as $dt_index => $dt_photo ) : ?>
+									<?php
+									$dt_attrs = array(
+										'class'    => 'post-gallery__photo',
 										'loading'  => 0 === $dt_index ? 'eager' : 'lazy',
 										'decoding' => 'async',
-										'sizes'    => 0 === $dt_index ? '(min-width: 880px) 800px, 92vw' : '(min-width: 880px) 400px, 46vw',
-									)
-								);
-								?>
-							<?php endforeach; ?>
+										'sizes'    => $dt_has_thumbs ? '(min-width: 880px) 620px, 75vw' : '(min-width: 880px) 800px, 92vw',
+									);
+									if ( 0 !== $dt_index ) {
+										$dt_attrs['hidden'] = 'hidden';
+									}
+									echo wp_get_attachment_image( $dt_photo, 'large', false, $dt_attrs );
+									?>
+								<?php endforeach; ?>
+							</div>
+
+							<?php if ( $dt_has_thumbs ) : ?>
+								<ul class="post-gallery__thumbs">
+									<?php foreach ( $dt_photos as $dt_index => $dt_photo ) : ?>
+										<li>
+											<a
+												class="post-gallery__thumb<?php echo 0 === $dt_index ? ' is-active' : ''; ?>"
+												href="<?php echo esc_url( (string) wp_get_attachment_image_url( $dt_photo, 'full' ) ); ?>"
+												aria-label="<?php echo esc_attr( str_replace( '{number}', (string) ( $dt_index + 1 ), $dt_photo_label ) ); ?>"
+												<?php echo 0 === $dt_index ? 'aria-current="true"' : ''; ?>
+											>
+												<?php
+												echo wp_get_attachment_image(
+													$dt_photo,
+													'medium',
+													false,
+													array(
+														'class'    => 'post-gallery__thumb-image',
+														'alt'      => '',
+														'loading'  => 'lazy',
+														'decoding' => 'async',
+														'sizes'    => '(min-width: 880px) 180px, 22vw',
+													)
+												);
+												?>
+											</a>
+										</li>
+									<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 

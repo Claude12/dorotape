@@ -309,6 +309,27 @@
             "append": ""
         },
         {
+            "key": "field_dtblog0015",
+            "label": "Photo button label",
+            "name": "post_photo_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Read out by screen readers on the small photos beside an article's main photo. {number} is replaced with the photo's number.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Show photo {number}",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtblog0012",
             "label": "Products heading",
             "name": "post_products_heading",
@@ -369,5 +390,5 @@
     "active": true,
     "description": "The wording on the blog page, its category pages and each article. The articles themselves are ordinary posts (Posts in the admin menu).",
     "show_in_rest": 0,
-    "modified": 1792794838
+    "modified": 1793253202
 }

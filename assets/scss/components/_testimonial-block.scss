@@ -18,24 +18,12 @@
 // var()s where it is declared: taking them from :root would bake in the
 // default magenta before the modifier could move the hue.
 
-// From tablet, a rounded panel inside the page's gutters rather than a full
-// width band, and a step shorter, so it reads as a quote and not a section
-// (meeting, 28 October 2026). The shards and vignette clip to the panel. A
-// phone keeps the full width, since a narrower column there only adds lines.
 .testimonial-block {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: var(--spacer-48) 0;
+  padding: var(--spacer-96) 0;
   background-color: var(--color-background);
-
-  @include min-breakpoint(tablet) {
-    width: calc(100% - 2 * #{$gutter});
-    max-width: 64rem;
-    margin: var(--spacer-48) auto;
-    padding: var(--spacer-64) 0;
-    border-radius: var(--radius-2xl);
-  }
   color: var(--color-primary-foreground);
 
   // The vignette, over the shards and under the quote.
@@ -185,10 +173,11 @@
 
   // ── Quote ──────────────────────────────────────────────────────────────
 
-  // max-w-3xl in the design, measured to the outside of its 24px padding;
-  // .container supplies the padding here, so the column is 48rem less it.
+  // Wider than the design's max-w-3xl, so a long quote runs to fewer lines
+  // and the band is shorter (meeting, 28 October 2026). The band itself stays
+  // full width.
   &__inner {
-    max-width: calc(48rem - 2 * #{$gutter});
+    max-width: 64rem;
     margin: 0 auto;
     text-align: center;
   }
