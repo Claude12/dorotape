@@ -471,6 +471,25 @@
   margin: var(--spacer-8) 0 0;
   color: var(--color-muted-foreground);
   font-size: $font-size-xs;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// In the bar's place until a size is chosen: a dashed outline the size of
+// the bar, so it reads as where the picture will go.
+.dt-cutsize__diagram-choose {
+  margin: 0;
+  padding: var(--spacer-12) var(--spacer-16);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 .dt-cutsize__bar-row {

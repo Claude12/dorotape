@@ -364,6 +364,23 @@ function dorotape_blog_pagination(): void {
 }
 
 /**
+ * The aurora line above the footer's newsletter sign-up, on the blog, its
+ * category pages and each article.
+ *
+ * It follows the "Aurora line after the last section" switch on the page set
+ * as Posts page in Settings > Reading. That page's editor shows the switch,
+ * but WordPress draws the blog with home.php, which never read it (Paul,
+ * News A4, 9 November 2026).
+ */
+function dorotape_blog_end_rule(): void {
+	$page = (int) get_option( 'page_for_posts' );
+
+	if ( $page && function_exists( 'get_field' ) && get_field( 'content_sections_end_rule', $page ) ) {
+		echo '<div class="aurora-rule" aria-hidden="true"></div>';
+	}
+}
+
+/**
  * The listing: the blog page and each category page.
  */
 function dorotape_blog_listing(): void {
@@ -399,6 +416,8 @@ function dorotape_blog_listing(): void {
 		if ( dorotape_has_flexible_content( DOROTAPE_BLOG_SECTIONS_ID ) ) {
 			dorotape_render_flexible_content( DOROTAPE_BLOG_SECTIONS_ID, 1 );
 		}
+
+		dorotape_blog_end_rule();
 		?>
 
 	</main>

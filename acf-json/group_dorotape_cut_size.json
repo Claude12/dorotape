@@ -410,6 +410,27 @@
             "new_lines": ""
         },
         {
+            "key": "field_dtcut0033",
+            "label": "Diagram prompt, before a size is chosen",
+            "name": "cutsize_diagram_choose",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown where the diagram goes on a product with several roll sizes, until the customer picks one. Without a size there is no roll width to draw the cuts against.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Choose a roll size above to see how your cuts will fit across the roll.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtcut0021",
             "label": "Messages",
             "name": "",
@@ -674,5 +695,5 @@
     "active": true,
     "description": "Every word in the cut size box on product pages, including the messages it shows as a customer types.",
     "show_in_rest": 0,
-    "modified": 1790690994
+    "modified": 1794240038
 }

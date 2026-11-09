@@ -187,6 +187,8 @@ while ( have_posts() ) :
 			</section>
 		<?php endif; ?>
 
+		<?php dorotape_blog_end_rule(); ?>
+
 	</main>
 
 	<?php

@@ -14,6 +14,8 @@ export function initCutRows() {
   const addRollBtn  = box.querySelector( '.dt-cutsize__addgroup' );
   const diagram     = box.querySelector( '.dt-cutsize__diagram' );
   const diagramRows = box.querySelector( '.dt-cutsize__diagram-rolls' );
+  const diagramNote = box.querySelector( '.dt-cutsize__diagram-note' );
+  const choosePrompt = box.querySelector( '.dt-cutsize__diagram-choose' );
   const form        = box.closest( 'form.cart' );
   if ( ! body || ! form ) return;
 
@@ -230,15 +232,24 @@ export function initCutRows() {
     if ( ! diagram || ! diagramRows ) return;
 
     // Without a stated roll width there is nothing to draw the cuts against.
+    // On a product with several sizes that only means none is chosen yet, so
+    // the diagram's place asks for one instead of staying empty.
     if ( ! ( currentMax > 0 ) ) {
-      diagram.hidden = true;
       rolls.forEach( function ( roll ) {
         var left = roll.cell.querySelector( '.dt-cutsize__roll-left' );
         if ( left ) left.textContent = '';
       } );
+      diagramRows.textContent = '';
+      diagram.hidden = ! choosePrompt;
+      if ( choosePrompt ) {
+        choosePrompt.hidden = false;
+        if ( diagramNote ) diagramNote.hidden = true;
+      }
       return;
     }
 
+    if ( choosePrompt ) choosePrompt.hidden = true;
+    if ( diagramNote ) diagramNote.hidden = false;
     diagram.hidden = false;
     diagramRows.textContent = '';
 

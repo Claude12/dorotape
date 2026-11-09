@@ -564,6 +564,15 @@ add_action( 'woocommerce_after_add_to_cart_quantity', function (): void {
 				);
 				?>
 			</p>
+			<?php
+			// Until a size is chosen on a product with several, there is no
+			// width to draw against. This says so where the bar will appear,
+			// rather than leaving cuts typed in with no picture (Paul, Meeting
+			// 28 Oct A38, 9 November 2026).
+			if ( $width_json ) :
+				?>
+				<p class="dt-cutsize__diagram-choose" hidden><?php echo esc_html( dorotape_cutsize_text( 'cutsize_diagram_choose', 'Choose a roll size above to see how your cuts will fit across the roll.' ) ); ?></p>
+			<?php endif; ?>
 			<div class="dt-cutsize__diagram-rolls"></div>
 			<p class="dt-cutsize__diagram-note">
 				<?php
