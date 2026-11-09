@@ -1,16 +1,16 @@
 <?php
 declare( strict_types=1 );
 /**
- * The product description: two columns and four tabs, the brand logo and the
+ * The product description: its sections as tabs, the brand logo and the
  * reward line.
  *
  * The imported descriptions are one long column: a manufacturer logo, an
  * intro, then Structure, Suitability, Advantages, Ink Compatibility and
  * Technical Information, each a magenta bold span over a list. On a wide
  * screen that left the right half of the band empty and the page very long,
- * so the client asked for two columns, with the sections as four tabs:
- * Structure, Suitability (with the inks), Advantages and Downloads (Site
- * Edits, October 2026, Product A5).
+ * so the sections became tabs: Structure, Suitability (with the inks),
+ * Advantages and Downloads (Site Edits, October 2026, Product A5). Since
+ * 9 November 2026 they are main tabs beside Description (Paul).
  *
  * Nothing is rewritten in the database. The description is split at render
  * time on the headings it already has, so an editor can keep writing it the
@@ -397,28 +397,33 @@ function dorotape_product_download_labels(): array {
 }
 
 /**
- * Print the description tab.
+ * The description's sections, ready to print, once per product.
  *
- * Replaces WooCommerce's woocommerce_product_description_tab, keeping its
- * heading, which the tab bar already says and _product-page.scss hides.
+ * @param WC_Product $product Product.
+ * @return array{intro:string,extras:string,panels:array<string,array{label:string,html:string}>}
+ *         The intro and the notes after the last list, formatted, and each
+ *         section's label and body. Panels is empty when the description has
+ *         fewer than two sections, and the intro then holds all of it.
  */
-function dorotape_product_description_tab(): void {
-	global $product;
+function dorotape_product_description_sections( WC_Product $product ): array {
+	static $cache = array();
 
-	if ( ! $product instanceof WC_Product ) {
-		return;
+	$product_id = $product->get_id();
+
+	if ( isset( $cache[ $product_id ] ) ) {
+		return $cache[ $product_id ];
 	}
 
-	$parts   = dorotape_product_description_parts( $product->get_id() );
-	$heading = apply_filters( 'woocommerce_product_description_heading', __( 'Description', 'woocommerce' ) );
-
-	if ( $heading ) {
-		echo '<h2>' . esc_html( $heading ) . '</h2>';
-	}
+	$parts = dorotape_product_description_parts( $product_id );
 
 	if ( ! $parts['tabs'] ) {
-		echo dorotape_product_description_format( $parts['intro'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
-		return;
+		$cache[ $product_id ] = array(
+			'intro'  => dorotape_product_description_format( $parts['intro'] ),
+			'extras' => '',
+			'panels' => array(),
+		);
+
+		return $cache[ $product_id ];
 	}
 
 	$labels = array(
@@ -469,55 +474,105 @@ function dorotape_product_description_tab(): void {
 		}
 
 		if ( '' !== trim( $body ) ) {
-			$panels[ $tab ] = $body;
+			$panels[ $tab ] = array(
+				'label' => $labels[ $tab ],
+				'html'  => $body,
+			);
 		}
 	}
 
-	$intro  = dorotape_product_description_format( $parts['intro'] );
-	$extras = dorotape_product_description_format( $extras );
-	$id     = 'product-description-' . $product->get_id();
-	$class  = 'product-description product-description--split' . ( '' === $intro . $extras ? ' product-description--tabs-only' : '' );
-	?>
-	<div class="<?php echo esc_attr( $class ); ?>">
+	$cache[ $product_id ] = array(
+		'intro'  => dorotape_product_description_format( $parts['intro'] ),
+		'extras' => dorotape_product_description_format( $extras ),
+		'panels' => $panels,
+	);
 
-		<?php if ( '' !== $intro ) : ?>
-			<div class="product-description__intro">
-				<?php echo $intro; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it. ?>
-			</div>
-		<?php endif; ?>
-
-		<div class="product-description__tabs js-description-tabs">
-			<?php // Hidden until the script runs, so without it every section shows, each under its own heading. ?>
-			<div class="product-description__tablist" role="tablist" aria-label="<?php esc_attr_e( 'Product details', 'dorotape' ); ?>" hidden>
-				<?php foreach ( array_keys( $panels ) as $n => $tab ) : ?>
-					<button class="product-description__tab" type="button" role="tab" id="<?php echo esc_attr( $id . '-tab-' . $tab ); ?>" aria-controls="<?php echo esc_attr( $id . '-' . $tab ); ?>" aria-selected="<?php echo 0 === $n ? 'true' : 'false'; ?>"<?php echo 0 === $n ? '' : ' tabindex="-1"'; ?>><?php echo esc_html( $labels[ $tab ] ); ?></button>
-				<?php endforeach; ?>
-			</div>
-
-			<?php foreach ( $panels as $tab => $body ) : ?>
-				<div class="product-description__panel product-description__panel--<?php echo esc_attr( $tab ); ?>" id="<?php echo esc_attr( $id . '-' . $tab ); ?>">
-					<h3 class="product-description__panel-title"><?php echo esc_html( $labels[ $tab ] ); ?></h3>
-					<?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, and links escaped above. ?>
-				</div>
-			<?php endforeach; ?>
-		</div>
-
-		<?php // After the tabs in the page, so a video does not push them a screen down on a phone. Beside them from desktop. ?>
-		<?php if ( '' !== $extras ) : ?>
-			<div class="product-description__extras">
-				<?php echo $extras; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it. ?>
-			</div>
-		<?php endif; ?>
-
-	</div>
-	<?php
+	return $cache[ $product_id ];
 }
 
+/**
+ * Print the description tab: the intro, and the notes that belong to the
+ * whole product (the price unit, a blog link).
+ *
+ * Replaces WooCommerce's woocommerce_product_description_tab, keeping its
+ * heading, which the tab bar already says and _product-page.scss hides.
+ */
+function dorotape_product_description_tab(): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	$sections = dorotape_product_description_sections( $product );
+	$heading  = apply_filters( 'woocommerce_product_description_heading', __( 'Description', 'woocommerce' ) );
+
+	if ( $heading ) {
+		echo '<h2>' . esc_html( $heading ) . '</h2>';
+	}
+
+	echo $sections['intro'] . $sections['extras']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, as the_content() prints it.
+}
+
+/**
+ * Print one section as a tab of its own.
+ *
+ * @param string $key Tab key, "dorotape_structure" and so on.
+ */
+function dorotape_product_section_tab( string $key ): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	$panels = dorotape_product_description_sections( $product )['panels'];
+	$tab    = substr( $key, strlen( 'dorotape_' ) );
+
+	if ( ! isset( $panels[ $tab ] ) ) {
+		return;
+	}
+
+	echo '<h2>' . esc_html( $panels[ $tab ]['label'] ) . '</h2>';
+	echo '<div class="product-description__panel product-description__panel--' . esc_attr( $tab ) . '">';
+	echo $panels[ $tab ]['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, and links escaped above.
+	echo '</div>';
+}
+
+/*
+ * Structure, Suitability, Advantages and Downloads as main tabs beside
+ * Description, one each, rather than a second row of tabs inside it (Paul,
+ * 9 November 2026, Meeting 28 Oct A7 and Product A7). Description keeps the
+ * intro and is left out when a description is nothing but sections.
+ */
 add_filter(
 	'woocommerce_product_tabs',
 	static function ( array $tabs ): array {
-		if ( isset( $tabs['description'] ) ) {
-			$tabs['description']['callback'] = 'dorotape_product_description_tab';
+		global $product;
+
+		if ( ! isset( $tabs['description'] ) ) {
+			return $tabs;
+		}
+
+		$tabs['description']['callback'] = 'dorotape_product_description_tab';
+
+		if ( ! $product instanceof WC_Product ) {
+			return $tabs;
+		}
+
+		$sections = dorotape_product_description_sections( $product );
+		$priority = (int) ( $tabs['description']['priority'] ?? 10 );
+
+		foreach ( array_keys( $sections['panels'] ) as $n => $tab ) {
+			$tabs[ 'dorotape_' . $tab ] = array(
+				'title'    => $sections['panels'][ $tab ]['label'],
+				'priority' => $priority + 1 + $n,
+				'callback' => 'dorotape_product_section_tab',
+			);
+		}
+
+		if ( $sections['panels'] && '' === trim( $sections['intro'] . $sections['extras'] ) ) {
+			unset( $tabs['description'] );
 		}
 
 		return $tabs;

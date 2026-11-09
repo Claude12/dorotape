@@ -3,205 +3,13 @@
 @use "base/typography" as *;
 @use "abstracts/button-mixins" as *;
 
-// The product description, split (inc/product-description.php).
-//
-// The intro, video and price note on the left, and Structure, Suitability,
-// Advantages and Downloads as tabs on the right, so a wide screen uses both
-// halves of the band rather than one long column (Site Edits, October 2026,
-// Product A5). Stacked until desktop, where the tabs column is the wider one
-// because the lists are what people come to read. A description with fewer
-// than two sections is not split and none of this applies.
-
-// The panel's reading measure is for one column of prose. Split, it is two.
-.woocommerce-tabs .woocommerce-Tabs-panel:has(> .product-description--split) {
-  max-width: none;
-}
+// The description's sections, each a main product tab of its own
+// (inc/product-description.php, Paul, 9 November 2026). They used to be a
+// second row of tabs inside Description, beside its intro.
 
 .product-description {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--spacer-32);
-
-  // From desktop the intro and the notes under it share the left column and
-  // the tabs take the right, whatever the left one's height. The areas are
-  // named from desktop only: a name with no template to match makes the grid
-  // add columns of its own, sized to the content, which pushed a phone 160px
-  // wide.
-  @include min-breakpoint(desktop) {
-    grid-template-areas:
-      "intro tabs"
-      "extras tabs";
-    grid-template-rows: auto 1fr;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: var(--spacer-32) var(--spacer-64);
-  }
-
-  &--tabs-only {
-    @include min-breakpoint(desktop) {
-      grid-template-areas: "tabs";
-      grid-template-rows: auto;
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  // Its own formatting context, so the PVC free badge that floats right of
-  // the intro stays inside it rather than hanging over the tabs.
-  &__intro {
-    display: flow-root;
-
-    @include min-breakpoint(desktop) {
-      grid-area: intro;
-    }
-  }
-
-  &__tabs {
-    @include min-breakpoint(desktop) {
-      grid-area: tabs;
-    }
-  }
-
-  &__extras {
-    align-self: start;
-
-    @include min-breakpoint(desktop) {
-      grid-area: extras;
-    }
-  }
-
-  &__intro > :first-child,
-  &__extras > :first-child {
-    margin-top: 0;
-  }
-
-  &__intro > :last-child,
-  &__extras > :last-child {
-    margin-bottom: 0;
-  }
-
-  // ── Tab bar ────────────────────────────────────────────────────────────
-
-  // Text tabs over a line, as the Description tab above them, rather than
-  // the blog's category pills (Paul, 29 October 2026). One row that swipes on
-  // a phone, out through the gutter like the case study filter: four tabs
-  // wrapped to two rows looked like two sets of controls.
-  //
-  // The line is a background rather than a border, because the row scrolls on
-  // a phone and a scrolling box clips the -1px the tabs would need to sit on a
-  // border. The selected tab's 2px underline covers it.
-  &__tablist {
-    display: flex;
-    gap: var(--spacer-8);
-    background: linear-gradient(color-mix(in oklab, var(--color-border) 60%, transparent), color-mix(in oklab, var(--color-border) 60%, transparent)) bottom / 100% 1px no-repeat;
-    margin: 0 calc(-1 * #{$gutter}) var(--spacer-24);
-    padding: 0 $gutter;
-    overflow-x: auto;
-    scrollbar-width: none;
-    // On a phone the row scrolls sideways, and the tab cut off at the right
-    // edge fades out so it reads as more to come (meeting, 28 October 2026).
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    // Room past the last tab, so it can scroll clear of the fade.
-    &::after {
-      content: "";
-      flex: 0 0 var(--spacer-24);
-    }
-
-    @include min-breakpoint(tablet) {
-      flex-wrap: wrap;
-      margin: 0 0 var(--spacer-24);
-      padding: 0;
-      overflow: visible;
-      -webkit-mask-image: none;
-      mask-image: none;
-
-      &::after {
-        content: none;
-      }
-    }
-  }
-
-  &__tab {
-    display: inline-flex;
-    flex-shrink: 0;
-    align-items: center;
-    min-height: 44px;
-    padding: var(--spacer-12) var(--spacer-20);
-    border: 0;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    background-color: transparent;
-    color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
-    font-family: inherit;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-sm;
-    white-space: nowrap;
-    cursor: pointer;
-    transition:
-      border-color var(--transition-fast),
-      color var(--transition-fast);
-
-    &:hover {
-      color: var(--color-foreground);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--color-cyan);
-      outline-offset: -2px;
-      color: var(--color-foreground);
-    }
-
-    &[aria-selected="true"] {
-      border-bottom-color: var(--color-magenta);
-      color: var(--color-foreground);
-    }
-  }
-
-  // ── Panels ─────────────────────────────────────────────────────────────
-
-  // Without the script every section shows, so each keeps its heading and
-  // stands off the one above.
-  &__panel + &__panel {
-    margin-top: var(--spacer-32);
-  }
-
-  &__panel[hidden] {
-    display: none;
-  }
-
-  &__panel:focus-visible {
-    outline: 2px solid var(--color-cyan);
-    outline-offset: var(--spacer-8);
-  }
-
   &__panel > ul:first-of-type {
     margin-top: 0;
-  }
-
-  &__panel-title {
-    margin: 0 0 var(--spacer-12);
-    color: var(--color-magenta);
-    font-size: $font-size-base;
-    font-weight: $font-weight-extrabold;
-    line-height: $line-height-base;
-  }
-
-  // The tab says it now.
-  &__tabs.is-enhanced &__panel-title {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   // A second heading inside one tab: the inks under Suitability.
@@ -219,7 +27,7 @@
     margin-top: 0;
   }
 
-  // ── Downloads ──────────────────────────────────────────────────────────
+// ── Downloads ──────────────────────────────────────────────────────────
 
   // Cyan lozenges with the document's name, where the old site had a picture
   // of each label on light grey (Product A9).
@@ -321,13 +129,14 @@
 // ── Reward points ──────────────────────────────────────────────────────────
 
 // Under the price, where the buying decision is, instead of an orange picture
-// half way down the description (Product A10).
+// half way down the description (Product A10). The text is in the icon's gold
+// too (Paul, 9 Nov).
 .product-reward {
   display: flex;
   align-items: center;
   gap: var(--spacer-12);
   margin: var(--spacer-12) 0 0;
-  color: color-mix(in oklab, var(--color-foreground) 85%, transparent);
+  color: var(--color-yellow);
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   line-height: $line-height-md;

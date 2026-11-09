@@ -89,8 +89,21 @@
   }
 
   // Long tables are the one thing that can force a phone to scroll sideways,
-  // so the wrapper scrolls instead of the page.
-  table {
+  // so the box round them scrolls instead of the page (inc/acf.php,
+  // dorotape_wrap_rte_tables). The table stays a table so it fills the column.
+  .rte-table {
+    max-width: 100%;
+    margin: var(--spacer-24) 0;
+    overflow-x: auto;
+
+    table {
+      margin: 0;
+    }
+  }
+
+  // A table that reached the page without the box still must not push it
+  // sideways.
+  > table {
     display: block;
     overflow-x: auto;
     max-width: 100%;

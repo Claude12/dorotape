@@ -27,7 +27,8 @@
 
   // Two to a row on phones too: one per line made five promises a band
   // taller than the screen's first view (Site Edits, October 2026, Category
-  // Main A5). An odd last promise takes the whole row rather than leave a gap.
+  // Main A5). An odd last promise gets a row of its own, centred under the
+  // pair above (Paul, 9 Nov) rather than sitting at the left.
   &__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -57,6 +58,7 @@
 
     &:last-child:nth-child(odd) {
       grid-column: 1 / -1;
+      justify-self: center;
     }
 
     @include min-breakpoint(mobile) {
@@ -66,6 +68,7 @@
     @include min-breakpoint(desktop) {
       &:last-child:nth-child(odd) {
         grid-column: auto;
+        justify-self: stretch;
       }
     }
   }

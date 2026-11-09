@@ -58,6 +58,12 @@
     display: table;
     white-space: normal;
   }
+
+  // In a rich text field the box round it does the scrolling
+  // (components/_rte.scss), so it can stay a full-width table.
+  .rte-table & {
+    display: table;
+  }
 }
 
 // Unclassed tables in migrated content. Scoped to .rte so this cannot reach

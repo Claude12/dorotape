@@ -16,7 +16,6 @@ import { initVideo } from './lib/video';
 import { initAccordion } from './lib/accordion';
 import { initScrollers } from './lib/scroller';
 import { initCaseFilter } from './lib/case-filter';
-import { initDescriptionTabs } from './lib/description-tabs';
 import { initFreeDelivery } from './lib/free-delivery';
 import { initRewardPoints } from './lib/reward-points';
 import { initShareBasket } from './lib/share-basket';
@@ -46,7 +45,6 @@ const features = [
   initAccordion,
   initScrollers,
   initCaseFilter,
-  initDescriptionTabs,
   initFreeDelivery,
   initRewardPoints,
   initShareBasket,

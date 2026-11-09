@@ -287,3 +287,24 @@ function dorotape_hide_empty_page_editor(): void {
 	remove_post_type_support( 'page', 'editor' );
 }
 add_action( 'current_screen', 'dorotape_hide_empty_page_editor' );
+
+/**
+ * Wrap the tables in rich text fields in a box of their own.
+ *
+ * A table that scrolls sideways on a phone has to be display: block, and a
+ * block table no longer stretches its rows to the column, so on desktop the
+ * support pages' tables stopped short of the text beside them (Site Edits,
+ * Support Pages A3, Paul 9 Nov). The box scrolls instead and the table stays
+ * a table, 100% wide (components/_rte.scss).
+ *
+ * @param mixed $value The formatted field value.
+ * @return mixed
+ */
+function dorotape_wrap_rte_tables( $value ) {
+	if ( ! is_string( $value ) || false === stripos( $value, '<table' ) ) {
+		return $value;
+	}
+
+	return (string) preg_replace( '#<table\b.*?</table>#is', '<div class="rte-table">$0</div>', $value );
+}
+add_filter( 'acf/format_value/type=wysiwyg', 'dorotape_wrap_rte_tables', 20 );

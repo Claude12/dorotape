@@ -560,19 +560,57 @@
 }
 
 .woocommerce-tabs {
+  // Description, Structure, Suitability, Advantages, Downloads and
+  // Additional information: one row that swipes on a phone, out through the
+  // gutter, with the tab cut off at the right fading out so it reads as more
+  // to come (meeting, 28 October 2026). Wrapped, six tabs took three rows.
+  //
+  // The line is a background rather than a border, because a scrolling box
+  // clips the -1px the tabs would need to sit on a border. The chosen tab's
+  // 2px underline covers it.
   ul.tabs {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--spacer-8);
-    margin: 0;
-    padding: 0;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    margin: 0 calc(-1 * #{$gutter});
+    padding: 0 $gutter;
+    background: linear-gradient(color-mix(in oklab, var(--color-border) 60%, transparent), color-mix(in oklab, var(--color-border) 60%, transparent)) bottom / 100% 1px no-repeat;
     list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--spacer-48)), transparent);
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    // Room past the last tab, so it can scroll clear of the fade.
+    &::after {
+      content: "";
+      flex: 0 0 var(--spacer-24);
+    }
+
+    @include min-breakpoint(tablet) {
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      -webkit-mask-image: none;
+      mask-image: none;
+
+      &::after {
+        content: none;
+      }
+    }
+  }
+
+  ul.tabs li {
+    flex-shrink: 0;
   }
 
   ul.tabs li a {
     display: block;
-    margin-bottom: -1px;
+    white-space: nowrap;
     padding: var(--spacer-12) var(--spacer-20);
     border-bottom: 2px solid transparent;
     color: color-mix(in oklab, var(--color-foreground) 60%, transparent);
