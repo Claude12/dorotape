@@ -9,6 +9,12 @@ declare( strict_types=1 );
  * the left, a row of headline figures on the right, all over a drifting
  * magenta texture washed into the navy canvas.
  *
+ * With two or more photos in Background Slideshow the texture is replaced by
+ * those photos, fading one into the next under a darker gradient so the copy
+ * stays readable; only the pictures move. assets/js/lib/hero-slideshow.js
+ * runs it, and without that script (or with reduced motion asked for) the
+ * first photo simply stays put.
+ *
  * As the first block on a page it runs up underneath the header, the way the
  * design's fixed header sits over it, so the texture shows through the
  * translucent utility bar. Anywhere further down the page it is an ordinary
@@ -27,6 +33,7 @@ $dt_intro      = get_sub_field( 'intro' );
 $dt_primary    = get_sub_field( 'primary_link' );
 $dt_secondary  = get_sub_field( 'secondary_link' );
 $dt_stats      = get_sub_field( 'stats' );
+$dt_slides     = get_sub_field( 'background_slides' );
 
 // The heading is what the hero is for. Without one the rest has nothing to
 // hang off, so the block hides rather than rendering a tall empty wash.
@@ -49,12 +56,72 @@ $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape
 $dt_classes .= dorotape_background_shape_class( $dt_shape );
 
 $dt_stats = is_array( $dt_stats ) ? $dt_stats : array();
+
+$dt_slides = is_array( $dt_slides ) ? array_values( array_filter( array_map( 'intval', $dt_slides ) ) ) : array();
+if ( count( $dt_slides ) < 2 ) {
+	$dt_slides = array();
+}
+if ( $dt_slides ) {
+	$dt_classes .= ' hero-block--slides';
+}
 ?>
 
 <section class="<?php echo esc_attr( $dt_classes ); ?>">
 	<?php dorotape_background_shape( $dt_shape ); ?>
 
-	<?php if ( ! empty( $dt_background['ID'] ) ) : ?>
+	<?php if ( $dt_slides ) : ?>
+		<?php
+		$dt_pause_label = get_sub_field( 'slides_pause_label' );
+		$dt_play_label  = get_sub_field( 'slides_play_label' );
+		$dt_pause_label = $dt_pause_label ? $dt_pause_label : __( 'Pause background images', 'dorotape' );
+		$dt_play_label  = $dt_play_label ? $dt_play_label : __( 'Play background images', 'dorotape' );
+		?>
+		<div class="hero-block__backdrop hero-block__slides" data-hero-slides aria-hidden="true">
+			<?php foreach ( $dt_slides as $dt_i => $dt_slide_id ) : ?>
+				<?php
+				$dt_lead = 0 === $dt_i;
+				// Decorative, like the single image. Only the first photo is
+				// fetched with the page; the others carry their sources in
+				// data- attributes and the script fills each one in a slide
+				// ahead, so a visitor who never waits downloads one photo.
+				$dt_img = wp_get_attachment_image(
+					$dt_slide_id,
+					'full',
+					false,
+					array(
+						'class'         => 'hero-block__backdrop-image',
+						'alt'           => '',
+						'loading'       => $dt_lead && $dt_is_first ? 'eager' : 'lazy',
+						'fetchpriority' => $dt_lead && $dt_is_first ? 'high' : 'auto',
+						'decoding'      => 'async',
+						'sizes'         => '100vw',
+					)
+				);
+				if ( ! $dt_img ) {
+					continue;
+				}
+				if ( ! $dt_lead ) {
+					$dt_img = preg_replace( '/\s(src|srcset)=/', ' data-$1=', $dt_img );
+				}
+				?>
+				<div class="hero-block__slide<?php echo $dt_lead ? ' is-active' : ''; ?>">
+					<?php echo $dt_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built by wp_get_attachment_image. ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+
+		<div class="container hero-block__controls" data-hero-controls hidden>
+			<div class="hero-block__progress" aria-hidden="true">
+				<?php foreach ( $dt_slides as $dt_i => $dt_slide_id ) : ?>
+					<span class="hero-block__progress-bar<?php echo 0 === $dt_i ? ' is-active' : ''; ?>"></span>
+				<?php endforeach; ?>
+			</div>
+			<button type="button" class="hero-block__toggle" data-hero-toggle aria-label="<?php echo esc_attr( $dt_pause_label ); ?>" data-label-pause="<?php echo esc_attr( $dt_pause_label ); ?>" data-label-play="<?php echo esc_attr( $dt_play_label ); ?>">
+				<svg class="hero-block__toggle-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><rect x="2" y="1.5" width="2.5" height="9" rx="1" fill="currentColor"/><rect x="7.5" y="1.5" width="2.5" height="9" rx="1" fill="currentColor"/></svg>
+				<svg class="hero-block__toggle-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 1.8v8.4a.6.6 0 0 0 .9.5l6.6-4.2a.6.6 0 0 0 0-1L3.9 1.3a.6.6 0 0 0-.9.5Z" fill="currentColor"/></svg>
+			</button>
+		</div>
+	<?php elseif ( ! empty( $dt_background['ID'] ) ) : ?>
 		<div class="hero-block__backdrop" aria-hidden="true">
 			<?php
 			// Decorative: the alt is emptied on purpose so screen readers

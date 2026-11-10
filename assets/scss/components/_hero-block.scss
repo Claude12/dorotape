@@ -59,6 +59,189 @@
     animation: hero-block-drift 9s ease-in-out infinite;
   }
 
+  // ── Slideshow ──────────────────────────────────────────────────────────
+  //
+  // Photos stacked on one another; the active one fades in over the last and
+  // zooms very slowly while it shows. Real photos are busier than the
+  // texture, so the wash is swapped for a heavier one: an even veil on
+  // phones, where the copy runs the full width, and from tablet up a navy
+  // side under the copy that opens out to the right, with the magenta glow
+  // kept in the top left and a fade into the next section along the bottom.
+
+  &--slides {
+    // Matches the script's timing (INTERVAL in hero-slideshow.js).
+    --hero-slide-interval: 6s;
+    --hero-slide-fade: 1.4s;
+
+    &::before {
+      background-image:
+        linear-gradient(to top, var(--color-background), transparent 30%),
+        radial-gradient(
+          90% 70% at 10% 0%,
+          color-mix(in oklab, var(--color-magenta) 30%, transparent),
+          transparent 70%
+        ),
+        linear-gradient(
+          color-mix(in oklab, var(--color-background) 74%, transparent),
+          color-mix(in oklab, var(--color-background) 74%, transparent)
+        );
+
+      @include min-breakpoint(tablet) {
+        background-image:
+          linear-gradient(to top, var(--color-background), transparent 30%),
+          radial-gradient(
+            90% 70% at 10% 0%,
+            color-mix(in oklab, var(--color-magenta) 30%, transparent),
+            transparent 70%
+          ),
+          linear-gradient(
+            90deg,
+            color-mix(in oklab, var(--color-background) 90%, transparent) 0%,
+            color-mix(in oklab, var(--color-background) 70%, transparent) 50%,
+            color-mix(in oklab, var(--color-background) 35%, transparent) 100%
+          );
+      }
+    }
+  }
+
+  &__slides {
+    overflow: hidden;
+  }
+
+  &__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--hero-slide-fade) ease-in-out;
+
+    &.is-active {
+      z-index: 1;
+      opacity: 1;
+    }
+
+    // The one leaving stays on top of the rest while the new one fades in
+    // over it, so the change is photo to photo rather than through navy.
+    &.is-leaving {
+      opacity: 1;
+      transition: none;
+    }
+
+    .hero-block__backdrop-image {
+      animation: none;
+      transform: scale(1.04);
+    }
+
+    &.is-active .hero-block__backdrop-image,
+    &.is-leaving .hero-block__backdrop-image {
+      animation: hero-block-zoom calc(var(--hero-slide-interval) + var(--hero-slide-fade) * 2) linear forwards;
+    }
+  }
+
+  // Thin bars, one per photo, the current one filling over its six seconds,
+  // and a pause button: anything that moves on its own for more than five
+  // seconds needs a way to stop it (WCAG 2.2.2). Bottom right, below the
+  // figures, kept small so it reads as part of the backdrop.
+
+  &__controls {
+    position: absolute;
+    right: 0;
+    bottom: var(--spacer-24);
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacer-12);
+    pointer-events: none;
+
+    &[hidden] {
+      display: none;
+    }
+
+    @include min-breakpoint(tablet) {
+      bottom: var(--spacer-36);
+    }
+  }
+
+  &__progress {
+    display: flex;
+    gap: var(--spacer-6);
+  }
+
+  &__progress-bar {
+    position: relative;
+    width: 18px;
+    height: 2px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-foreground) 25%, transparent);
+
+    @include min-breakpoint(tablet) {
+      width: 28px;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: var(--color-foreground);
+      transform: scaleX(0);
+      transform-origin: left center;
+    }
+
+    &.is-done::after {
+      transform: scaleX(1);
+    }
+
+    &.is-active::after {
+      animation: hero-block-progress var(--hero-slide-interval) linear forwards;
+    }
+  }
+
+  // Paused by the button, or by the script while the hero is off screen or
+  // the tab is hidden: the bar holds where it is and picks up from there.
+  &.is-paused &__progress-bar.is-active::after,
+  &.is-held &__progress-bar.is-active::after {
+    animation-play-state: paused;
+  }
+
+  &__toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-background) 50%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-foreground);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-foreground);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-cyan);
+      outline-offset: 2px;
+    }
+  }
+
+  &__toggle-play {
+    display: none;
+  }
+
+  &.is-paused &__toggle-pause {
+    display: none;
+  }
+
+  &.is-paused &__toggle-play {
+    display: block;
+  }
+
   // ── Layout ─────────────────────────────────────────────────────────────
 
   &__inner {
@@ -205,5 +388,33 @@
 
   50% {
     transform: scale(1.08) translate(-1%, 1%);
+  }
+}
+
+// Each photo's slow push in while it is on screen.
+@keyframes hero-block-zoom {
+  from {
+    transform: scale(1.04);
+  }
+
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes hero-block-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-block__backdrop-image,
+  .hero-block__slide.is-active .hero-block__backdrop-image {
+    animation: none;
   }
 }

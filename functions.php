@@ -276,6 +276,7 @@ require get_template_directory() . '/inc/shop.php';
 require get_template_directory() . '/inc/search.php';
 require get_template_directory() . '/inc/404.php';
 require get_template_directory() . '/inc/blog.php';
+require get_template_directory() . '/inc/photo-gallery.php';
 require get_template_directory() . '/inc/woo-pages.php';
 require get_template_directory() . '/inc/account-pages.php';
 require get_template_directory() . '/inc/stock.php';

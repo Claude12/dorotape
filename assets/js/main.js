@@ -20,6 +20,7 @@ import { initFreeDelivery } from './lib/free-delivery';
 import { initRewardPoints } from './lib/reward-points';
 import { initShareBasket } from './lib/share-basket';
 import { initPostGallery } from './lib/post-gallery';
+import { initHeroSlideshow } from './lib/hero-slideshow';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -49,6 +50,7 @@ const features = [
   initRewardPoints,
   initShareBasket,
   initPostGallery,
+  initHeroSlideshow,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

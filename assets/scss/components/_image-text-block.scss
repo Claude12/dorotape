@@ -182,7 +182,30 @@
   }
 
   // `.link .link--underline` from components/_buttons.scss.
+  //
+  // The whole column is the link, not just its words (Paul, Homepage A3,
+  // 10 November 2026): the link's ::after stretches over the column, so the
+  // photo, heading and text all click through to the same place while there
+  // is still one link for screen readers and keyboards.
+  &__column {
+    position: relative;
+  }
+
   &__link {
     margin-top: var(--spacer-24);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+  }
+
+  // A link typed into the column's text sits above the stretched one so it
+  // still goes where it says.
+  &__column-text a {
+    position: relative;
+    z-index: 2;
   }
 }

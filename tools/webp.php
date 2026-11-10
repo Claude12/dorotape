@@ -2,6 +2,9 @@
 /**
  * Make WebP copies of uploaded images, and sub-sizes where they are missing.
  *
+ * New uploads already get their copies as they are added (inc/webp.php). Run
+ * this for the whole library, after copying files in by hand, or to re-check.
+ *
  * Usage, from the WordPress root or anywhere:
  *   php wp-content/themes/dorotape/tools/webp.php [--dry-run] [--no-sizes]
  *       [--ids=12,34] [--limit=N] [--quality=80]
@@ -45,46 +48,24 @@ $limit   = isset( $opts['limit'] ) ? (int) $opts['limit'] : 0;
 $quality = isset( $opts['quality'] ) ? max( 1, min( 100, (int) $opts['quality'] ) ) : 80;
 $ids     = isset( $opts['ids'] ) ? array_filter( array_map( 'intval', explode( ',', $opts['ids'] ) ) ) : array();
 
-$editor_webp = wp_image_editor_supports( array( 'mime_type' => 'image/webp' ) );
-$cwebp       = getenv( 'CWEBP' ) ?: trim( (string) shell_exec( 'command -v cwebp 2>/dev/null' ) );
+// The conversion itself lives in inc/webp.php, shared with the upload hook
+// that makes copies as images are added. Load it if the theme is not active.
+if ( ! function_exists( 'dorotape_webp_copy' ) ) {
+	require_once dirname( __DIR__ ) . '/inc/webp.php';
+}
+// This run counts its own work, so the upload hook must not convert first
+// when sizing below saves an attachment's metadata.
+remove_filter( 'wp_update_attachment_metadata', 'dorotape_webp_on_metadata', 20 );
 
-if ( ! $editor_webp && ( ! $cwebp || ! is_executable( $cwebp ) ) ) {
+$encoder     = dorotape_webp_encoder();
+$editor_webp = 'editor' === $encoder;
+
+if ( '' === $encoder ) {
 	fwrite( STDERR, "Neither the WordPress image editor nor cwebp can write WebP here. Set CWEBP=/path/to/cwebp.\n" );
 	exit( 1 );
 }
 
-echo 'WebP encoder: ' . ( $editor_webp ? 'WordPress image editor' : $cwebp ) . ", quality $quality" . ( $dry ? ', DRY RUN' : '' ) . "\n";
-
-/**
- * Write a WebP copy of $src to $dest. Returns its size in bytes, or 0.
- */
-function dorotape_tools_encode_webp( string $src, string $dest, int $quality, bool $editor_webp, string $cwebp ): int {
-	if ( $editor_webp ) {
-		$editor = wp_get_image_editor( $src );
-		if ( is_wp_error( $editor ) ) {
-			return 0;
-		}
-		$editor->set_quality( $quality );
-		$saved = $editor->save( $dest, 'image/webp' );
-		// The editor may add its own extension; make sure the copy lands at $dest.
-		if ( is_wp_error( $saved ) ) {
-			return 0;
-		}
-		if ( $saved['path'] !== $dest && is_file( $saved['path'] ) ) {
-			rename( $saved['path'], $dest );
-		}
-	} else {
-		$cmd = escapeshellarg( $cwebp ) . ' -quiet -mt -q ' . $quality . ' -m 6 -metadata none '
-			. escapeshellarg( $src ) . ' -o ' . escapeshellarg( $dest ) . ' 2>&1';
-		exec( $cmd, $out, $code );
-		if ( 0 !== $code ) {
-			@unlink( $dest );
-			return 0;
-		}
-	}
-	clearstatcache( true, $dest );
-	return is_file( $dest ) ? (int) filesize( $dest ) : 0;
-}
+echo 'WebP encoder: ' . ( $editor_webp ? 'WordPress image editor' : $encoder ) . ", quality $quality" . ( $dry ? ', DRY RUN' : '' ) . "\n";
 
 $query = array(
 	'post_type'      => 'attachment',
@@ -138,46 +119,30 @@ foreach ( $attachments as $id ) {
 	}
 
 	// 2. WebP copies of the original and every sub-size.
-	$files = array( $file );
-	if ( is_array( $meta ) && ! empty( $meta['sizes'] ) ) {
-		$dir = dirname( $file );
-		foreach ( $meta['sizes'] as $size ) {
-			if ( ! empty( $size['file'] ) ) {
-				$files[] = $dir . '/' . $size['file'];
-			}
-		}
-	}
-
-	foreach ( array_unique( $files ) as $src ) {
+	foreach ( dorotape_webp_attachment_files( $file, $meta ) as $src ) {
 		if ( ! is_file( $src ) || ! preg_match( '/\.(jpe?g|png|webp)$/i', $src ) ) {
 			continue;
 		}
-		$dest = $src . '.webp';
-		if ( is_file( $dest ) && filemtime( $dest ) >= filemtime( $src ) ) {
-			++$stats['fresh'];
-			continue;
-		}
 
-		$orig = (int) filesize( $src );
 		if ( $dry ) {
-			echo "would webp  " . str_replace( ABSPATH, '', $src ) . ' (' . round( $orig / 1024 ) . "KB)\n";
+			$dest = $src . '.webp';
+			if ( is_file( $dest ) && filemtime( $dest ) >= filemtime( $src ) ) {
+				++$stats['fresh'];
+			} else {
+				echo 'would webp  ' . str_replace( ABSPATH, '', $src ) . ' (' . round( filesize( $src ) / 1024 ) . "KB)\n";
+			}
 			continue;
 		}
 
-		$tmp  = $dest . '.tmp.webp';
-		$size = dorotape_tools_encode_webp( $src, $tmp, $quality, $editor_webp, (string) $cwebp );
-		if ( $size && $size < $orig * 0.9 ) {
-			rename( $tmp, $dest );
+		$copy = dorotape_webp_copy( $src, $quality );
+		if ( 'made' === $copy['status'] ) {
 			++$stats['made'];
-			$stats['before'] += $orig;
-			$stats['after']  += $size;
-			echo 'webp        ' . str_replace( ABSPATH, '', $dest ) . ' ' . round( $orig / 1024 ) . 'KB -> ' . round( $size / 1024 ) . "KB\n";
-		} else {
-			@unlink( $tmp );
-			// A stale copy that is no longer worth it must not keep being served.
-			if ( is_file( $dest ) ) {
-				unlink( $dest );
-			}
+			$stats['before'] += $copy['before'];
+			$stats['after']  += $copy['after'];
+			echo 'webp        ' . str_replace( ABSPATH, '', $src ) . '.webp ' . round( $copy['before'] / 1024 ) . 'KB -> ' . round( $copy['after'] / 1024 ) . "KB\n";
+		} elseif ( 'fresh' === $copy['status'] ) {
+			++$stats['fresh'];
+		} elseif ( 'kept' === $copy['status'] ) {
 			++$stats['kept_orig'];
 		}
 	}

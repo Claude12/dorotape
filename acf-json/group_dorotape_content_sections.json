@@ -29,7 +29,7 @@
                             "name": "background_image",
                             "aria-label": "",
                             "type": "image",
-                            "instructions": "Abstract texture behind the hero. It is washed into the navy with a magenta glow, cropped to fill and drifts slowly. Leave empty for the glow alone.",
+                            "instructions": "Abstract texture behind the hero. It is washed into the navy with a magenta glow, cropped to fill and drifts slowly. Leave empty for the glow alone. Not used when the Background Slideshow below has two or more photos.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -48,6 +48,91 @@
                             "mime_types": "",
                             "allow_in_bindings": 0,
                             "preview_size": "medium"
+                        },
+                        {
+                            "key": "field_dthero000130",
+                            "label": "Background Slideshow",
+                            "name": "background_slides",
+                            "aria-label": "",
+                            "type": "gallery",
+                            "instructions": "Photos that fade slowly one into the next behind the hero, a new one every 6 seconds. The words and buttons stay still. Add two or more to turn it on; with fewer, the Background Image above is used instead. Landscape photos at least 1920 pixels wide look best. Drag to reorder: the first one shows while the page loads.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "id",
+                            "library": "all",
+                            "min": "",
+                            "max": "",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "jpg, jpeg, png, webp",
+                            "insert": "append",
+                            "preview_size": "medium",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dthero000131",
+                            "label": "Pause button label",
+                            "name": "slides_pause_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Read out by screen readers for the small pause button in the corner of the slideshow.",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_dthero000130",
+                                        "operator": "!=empty"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "Pause background images",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dthero000132",
+                            "label": "Play button label",
+                            "name": "slides_play_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "The same button once the slideshow is paused.",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_dthero000130",
+                                        "operator": "!=empty"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "Play background images",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
                         },
                         {
                             "key": "field_dthero000102",
@@ -4856,6 +4941,161 @@
                     ],
                     "min": "",
                     "max": ""
+                },
+                "layout_dtgall000001": {
+                    "key": "layout_dtgall000001",
+                    "name": "gallery_block",
+                    "label": "Gallery",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_dtgall000101",
+                            "label": "Aurora line above",
+                            "name": "divider",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Draw the thin aurora gradient line across the top of the section.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        },
+                        {
+                            "key": "field_dtgall000102",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Small capitals in a cyan outline, above the heading.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_dtgall000103",
+                            "label": "Heading",
+                            "name": "heading",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtgall000104",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "Sits to the right of the heading on desktop.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": 3,
+                            "placeholder": "",
+                            "new_lines": ""
+                        },
+                        {
+                            "key": "field_dtgall000105",
+                            "label": "Photos",
+                            "name": "images",
+                            "aria-label": "",
+                            "type": "gallery",
+                            "instructions": "The first photo shows large with every photo as a thumbnail beside it. It moves on to the next photo every 5 seconds. Drag to reorder. Landscape photos at least 1600 pixels wide look best.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "id",
+                            "library": "all",
+                            "min": "",
+                            "max": "",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "jpg, jpeg, png, webp",
+                            "insert": "append",
+                            "preview_size": "medium",
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_dtgall000120",
+                            "label": "Background shape",
+                            "name": "background_shape",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "None",
+                                "cubes-left": "Cubes, left",
+                                "cubes-right": "Cubes, right",
+                                "triangles-left": "Triangles, left",
+                                "triangles-right": "Triangles, right"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
                 }
             },
             "min": "",
@@ -4954,6 +5194,6 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1793208634,
+    "modified": 1794292617,
     "local_file": "/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape/acf-json/group_dorotape_content_sections.json"
 }
