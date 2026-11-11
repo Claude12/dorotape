@@ -146,7 +146,7 @@ function dorotape_shop_banner(): void {
 			'eyebrow'    => $eyebrow,
 			'heading'    => $heading,
 			'intro'      => $intro,
-			'shape'      => dorotape_shop_field( 'shop_banner_shape', 'cubes-right' ),
+			'shape'      => dorotape_shop_field( 'shop_banner_shape', 'triangles-right' ),
 			'breadcrumb' => true,
 			'dot'        => 'magenta',
 		)
@@ -166,7 +166,7 @@ function dorotape_shop_banner(): void {
  * the breadcrumb with empty navy in between.
  */
 function dorotape_shop_band_classes(): string {
-	$shape = dorotape_background_shape_value( dorotape_shop_field( 'shop_results_shape', 'cubes-right' ) );
+	$shape = dorotape_background_shape_value( dorotape_shop_field( 'shop_results_shape', 'triangles-right' ) );
 
 	return 'category-grid-block category-grid-block--glow-soft category-grid-block--shop category-grid-block--tight' . dorotape_background_shape_class( $shape );
 }
@@ -176,7 +176,7 @@ function dorotape_shop_band_classes(): string {
  * themselves.
  */
 function dorotape_shop_band_shape(): void {
-	dorotape_background_shape( dorotape_background_shape_value( dorotape_shop_field( 'shop_results_shape', 'cubes-right' ) ) );
+	dorotape_background_shape( dorotape_background_shape_value( dorotape_shop_field( 'shop_results_shape', 'triangles-right' ) ) );
 }
 
 /**

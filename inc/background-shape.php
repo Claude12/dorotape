@@ -3,39 +3,31 @@ declare( strict_types=1 );
 /**
  * Shared background shapes for flexible-content blocks.
  *
- * The internals-pages design ("Internal Pages Design") moves two line motifs
- * around behind its sections, so they are a shared component here rather than
- * a fixture of one block: every `content_sections` layout carries a
+ * The internals-pages design ("Internal Pages Design") puts a faint line motif
+ * behind its sections, so it is a shared component here rather than a
+ * fixture of one block: every `content_sections` layout carries a
  * `background_shape` select and calls `dorotape_background_shape()` with it.
- *
- * Cubes (src/components/site/CubePattern.tsx) is the isometric lattice. It is
- * an SVG <pattern> in user-space units, so the cube is always 79.66 x 92 and a
- * taller section means more cubes, never bigger ones. This replaced the older
- * viewBox-scaled version the homepage shipped with, where the cube stretched
- * with the section.
  *
  * Triangles (src/components/site/FacetedWireframe.tsx) is the irregular
  * low-poly mesh drawn for "Industries we work with". It is a fixed 720 x 620
- * drawing sliced into a 620px band, so unlike the cubes it does not repeat.
+ * drawing sliced into a 620px band. It fades out sideways away from the edge
+ * it hugs, and top and bottom. Its gradient stops are classed, not coloured
+ * here, so the palette stays in base/_colors.scss.
  *
- * Both fade out sideways away from the edge they hug, and top and bottom.
- * Their gradient stops are classed, not coloured here, so the palette stays in
- * base/_colors.scss.
+ * Filled triangles (SmarterSourcingBackground.tsx) is the solid faceted
+ * surface behind "Helping you stay competitive": a full-height low-poly
+ * mesh in the same ramp, generated from a fixed seed, faded into the page
+ * by CSS. Added 11 Nov 2026 when the client asked for it on more sections.
+ *
+ * The design also had an isometric cube lattice. The client did not want it
+ * (Site Edits, General row 5, 9 Nov 2026), so it was taken out on 11 Nov 2026
+ * and every cube value now shows the triangles on the same side; see
+ * dorotape_background_shape_value().
  *
  * @package dorotape
  */
 
 defined( 'ABSPATH' ) || exit;
-
-/**
- * Half a cube's width.
- */
-const DOROTAPE_CUBE_R = 39.83;
-
-/**
- * Half a cube's height.
- */
-const DOROTAPE_CUBE_V = 46.0;
 
 /**
  * The low-poly mesh, straight from the design's FACET_LINES.
@@ -67,19 +59,20 @@ const DOROTAPE_FACET_LINES = 'M-24 42 L82 18 L158 84 L246 26 L344 72 L426 8 L520
  */
 function dorotape_background_shapes(): array {
 	return array(
-		'cubes-left'      => array( 'cubes', 'left' ),
-		'cubes-right'     => array( 'cubes', 'right' ),
 		'triangles-left'  => array( 'triangles', 'left' ),
 		'triangles-right' => array( 'triangles', 'right' ),
+		'filled-left'     => array( 'filled', 'left' ),
+		'filled-right'    => array( 'filled', 'right' ),
 	);
 }
 
 /**
  * Normalise a stored `background_shape` value.
  *
- * Product Row carried this field before it was shared, with the values `left`
- * and `right` meaning the cube lattice. Pages saved then still hold those, so
- * they map forward here rather than silently losing their background.
+ * Old values map forward to the triangles on the same side rather than
+ * silently losing their background: `cubes-left` and `cubes-right` from
+ * before the cubes were removed, and the bare `left` and `right` Product Row
+ * stored before the field was shared (which meant cubes then).
  *
  * @param mixed $value Raw field value.
  * @return string A key of dorotape_background_shapes(), or '' for none.
@@ -88,8 +81,10 @@ function dorotape_background_shape_value( $value ): string {
 	$value = is_string( $value ) ? $value : '';
 
 	$legacy = array(
-		'left'  => 'cubes-left',
-		'right' => 'cubes-right',
+		'left'        => 'triangles-left',
+		'right'       => 'triangles-right',
+		'cubes-left'  => 'triangles-left',
+		'cubes-right' => 'triangles-right',
 	);
 
 	$value = $legacy[ $value ] ?? $value;
@@ -111,94 +106,27 @@ function dorotape_background_shape_class( string $shape ): string {
 }
 
 /**
- * One cube, centred on the given point.
- *
- * A hexagon with three edges meeting in its centre, which is what reads as an
- * isometric cube.
- *
- * @param float $cx Centre x.
- * @param float $cy Centre y.
- * @return string Path data.
- */
-function dorotape_cube_path( float $cx, float $cy ): string {
-	$r = DOROTAPE_CUBE_R;
-	$v = DOROTAPE_CUBE_V;
-
-	return sprintf(
-		'M%1$.2F,%2$.2F L%3$.2F,%4$.2F L%3$.2F,%5$.2F L%1$.2F,%6$.2F L%7$.2F,%5$.2F L%7$.2F,%4$.2F Z ' .
-		'M%1$.2F,%8$.2F L%1$.2F,%2$.2F M%1$.2F,%8$.2F L%7$.2F,%5$.2F M%1$.2F,%8$.2F L%3$.2F,%5$.2F ',
-		$cx,
-		$cy - $v,
-		$cx + $r,
-		$cy - $v / 2,
-		$cy + $v / 2,
-		$cy + $v,
-		$cx - $r,
-		$cy
-	);
-}
-
-/**
- * The repeating tile behind the cube lattice.
- *
- * Two cubes make a seamless tile, but each is drawn across the neighbouring
- * repeats as well, so the fragments clipped at the tile edge reassemble into a
- * continuous lattice instead of showing a seam.
- *
- * @return string Path data for one tile.
- */
-function dorotape_cube_tile_path(): string {
-	$tile_w = DOROTAPE_CUBE_R * 2;
-	$row_h  = DOROTAPE_CUBE_V * 1.5;
-	$tile_h = $row_h * 2;
-
-	$centres = array(
-		array( 0.0, 0.0 ),
-		array( DOROTAPE_CUBE_R, $row_h ),
-	);
-
-	$d = '';
-
-	foreach ( $centres as [ $bx, $by ] ) {
-		for ( $i = -1; $i <= 1; $i++ ) {
-			for ( $j = -1; $j <= 1; $j++ ) {
-				$d .= dorotape_cube_path( $bx + $i * $tile_w, $by + $j * $tile_h );
-			}
-		}
-	}
-
-	return trim( $d );
-}
-
-/**
  * The magenta -> indigo -> cyan ramp, and the two fades that thin it out.
  *
- * Shared by both motifs. `$edge` is where the vertical fade reaches full
- * opacity: the cubes fill their section and fade only at the very top and
- * bottom, the triangles sit in a band and fade over a quarter of it.
+ * `$edge` is where the vertical fade reaches full opacity: the triangles sit
+ * in a band and fade over a quarter of it.
  *
  * The horizontal fade always runs from transparent at the outside of the
- * section to solid at the edge the shape hugs, so it is mirrored by side.
- * `$flip_stroke` says whether the colour ramp mirrors with it. The cubes are
- * generated per instance and the design flips them, so the ramp ends on cyan
- * at whichever edge they hug. The facets are one fixed drawing and the design
- * never mirrors them, so their ramp stays put and reads magenta first.
+ * section to solid at the edge the shape hugs, so it is mirrored by side. The
+ * colour ramp is not: the facets are one fixed drawing the design never
+ * mirrors, so the ramp stays put and reads magenta first.
  *
- * @param string $id          Id prefix, unique per instance.
- * @param bool   $right       Whether the shape hugs the right edge.
- * @param float  $edge        Vertical fade offset, 0 to 0.5.
- * @param bool   $flip_stroke Whether the colour ramp mirrors with the side.
+ * @param string $id    Id prefix, unique per instance.
+ * @param bool   $right Whether the shape hugs the right edge.
+ * @param float  $edge  Vertical fade offset, 0 to 0.5.
  * @return string Gradient markup for <defs>.
  */
-function dorotape_background_shape_gradients( string $id, bool $right, float $edge, bool $flip_stroke = true ): string {
+function dorotape_background_shape_gradients( string $id, bool $right, float $edge ): string {
 	$from = $right ? 0 : 1;
 	$to   = $right ? 1 : 0;
 
-	$stroke_from = $flip_stroke ? $from : 0;
-	$stroke_to   = $flip_stroke ? $to : 1;
-
 	return sprintf(
-		'<linearGradient id="%1$s-stroke" x1="%6$d" y1="0" x2="%7$d" y2="1">
+		'<linearGradient id="%1$s-stroke" x1="0" y1="0" x2="1" y2="1">
 			<stop offset="0" class="background-shape__stop background-shape__stop--magenta"/>
 			<stop offset="0.55" class="background-shape__stop background-shape__stop--indigo"/>
 			<stop offset="1" class="background-shape__stop background-shape__stop--cyan"/>
@@ -224,52 +152,14 @@ function dorotape_background_shape_gradients( string $id, bool $right, float $ed
 		$from,
 		$to,
 		esc_attr( (string) round( $edge, 2 ) ),
-		esc_attr( (string) round( 1 - $edge, 2 ) ),
-		$stroke_from,
-		$stroke_to
-	);
-}
-
-/**
- * The cube lattice, as inline SVG.
- *
- * No viewBox: the <pattern> is in user-space units, so the cube keeps its size
- * whatever the section's height and the lattice simply repeats further.
- *
- * @param string $id    Id prefix, unique per instance.
- * @param bool   $right Whether the shape hugs the right edge.
- * @return string SVG markup.
- */
-function dorotape_background_shape_cubes( string $id, bool $right ): string {
-	return sprintf(
-		'<svg class="background-shape__svg" fill="none" focusable="false">
-			<defs>
-				%1$s
-				<pattern id="%2$s-tile" width="%3$s" height="%4$s" patternUnits="userSpaceOnUse">
-					<path d="%5$s" stroke="white" stroke-width="1.4"/>
-				</pattern>
-				<mask id="%2$s-mask-cubes">
-					<rect width="100%%" height="100%%" fill="url(#%2$s-tile)"/>
-				</mask>
-			</defs>
-			<g mask="url(#%2$s-mask-y)">
-				<g mask="url(#%2$s-mask-x)">
-					<rect width="100%%" height="100%%" fill="url(#%2$s-stroke)" mask="url(#%2$s-mask-cubes)" opacity="0.56"/>
-				</g>
-			</g>
-		</svg>',
-		dorotape_background_shape_gradients( $id, $right, 0.1 ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup built above from an escaped id and numbers.
-		esc_attr( $id ),
-		esc_attr( (string) round( DOROTAPE_CUBE_R * 2, 2 ) ),
-		esc_attr( (string) round( DOROTAPE_CUBE_V * 3, 2 ) ),
-		esc_attr( dorotape_cube_tile_path() )
+		esc_attr( (string) round( 1 - $edge, 2 ) )
 	);
 }
 
 /**
  * The low-poly mesh, as inline SVG.
  *
- * Unlike the cubes this is one fixed drawing, so it keeps a viewBox and is
+ * One fixed drawing, so it keeps a viewBox and is
  * sliced to the band. It is anchored to whichever edge it hugs rather than
  * flipped, so the stroke gradient is not mirrored with it: the ramp runs
  * magenta at the top left to cyan at the bottom right whichever side it sits
@@ -288,9 +178,129 @@ function dorotape_background_shape_triangles( string $id, bool $right ): string 
 			</g>
 		</svg>',
 		$right ? 'xMaxYMid' : 'xMinYMid',
-		dorotape_background_shape_gradients( $id, $right, 0.25, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup built above from an escaped id and numbers.
+		dorotape_background_shape_gradients( $id, $right, 0.25 ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup built above from an escaped id and numbers.
 		esc_attr( $id ),
 		esc_attr( DOROTAPE_FACET_LINES )
+	);
+}
+
+/**
+ * The filled facets as SVG path data, one entry per triangle.
+ *
+ * A jittered grid, each cell split into two triangles on a diagonal picked at
+ * random, drawn in a 1200 x 800 box. The generator is seeded, so the drawing
+ * is the same on every page load and every server: it is a fixed picture,
+ * just one drawn in code rather than shipped as an image.
+ *
+ * Each facet also gets a shade, 0.35 to 1, which becomes its fill-opacity.
+ * Shading the facets apart is what makes them read as a faceted surface
+ * rather than a flat gradient.
+ *
+ * @return array<int, array{0: string, 1: float}> [path data, shade] pairs.
+ */
+function dorotape_filled_facets(): array {
+	static $facets = null;
+
+	if ( null !== $facets ) {
+		return $facets;
+	}
+
+	$cols = 16;
+	$rows = 11;
+	$cw   = 1200 / ( $cols - 1 );
+	$ch   = 800 / ( $rows - 1 );
+	$seed = 20261111;
+
+	// A small LCG, not mt_rand(), so nothing else's random state is touched.
+	$rand = static function () use ( &$seed ): float {
+		$seed = ( $seed * 1103515245 + 12345 ) % 2147483648;
+		return $seed / 2147483648;
+	};
+
+	// The points. Those on the outer edge only slide along it, so the mesh
+	// always fills its box to the corners.
+	$points = array();
+	for ( $r = 0; $r < $rows; $r++ ) {
+		for ( $c = 0; $c < $cols; $c++ ) {
+			$x = $c * $cw;
+			$y = $r * $ch;
+
+			if ( $c > 0 && $c < $cols - 1 ) {
+				$x += ( $rand() - 0.5 ) * $cw * 0.7;
+			}
+
+			if ( $r > 0 && $r < $rows - 1 ) {
+				$y += ( $rand() - 0.5 ) * $ch * 0.7;
+			}
+
+			$points[ $r ][ $c ] = array( round( $x, 1 ), round( $y, 1 ) );
+		}
+	}
+
+	$facets = array();
+	$path   = static function ( array ...$p ): string {
+		return sprintf( 'M%s %s L%s %s L%s %sZ', $p[0][0], $p[0][1], $p[1][0], $p[1][1], $p[2][0], $p[2][1] );
+	};
+
+	for ( $r = 0; $r < $rows - 1; $r++ ) {
+		for ( $c = 0; $c < $cols - 1; $c++ ) {
+			$a = $points[ $r ][ $c ];
+			$b = $points[ $r ][ $c + 1 ];
+			$d = $points[ $r + 1 ][ $c ];
+			$e = $points[ $r + 1 ][ $c + 1 ];
+
+			if ( $rand() < 0.5 ) {
+				$facets[] = array( $path( $a, $b, $e ), round( 0.35 + $rand() * 0.65, 2 ) );
+				$facets[] = array( $path( $a, $e, $d ), round( 0.35 + $rand() * 0.65, 2 ) );
+			} else {
+				$facets[] = array( $path( $a, $b, $d ), round( 0.35 + $rand() * 0.65, 2 ) );
+				$facets[] = array( $path( $b, $e, $d ), round( 0.35 + $rand() * 0.65, 2 ) );
+			}
+		}
+	}
+
+	return $facets;
+}
+
+/**
+ * The filled low-poly surface, as inline SVG.
+ *
+ * The design's "Helping you stay competitive" background
+ * (SmarterSourcingBackground.tsx): solid facets coloured with the divider
+ * ramp, magenta at the edge the shape hugs through indigo to cyan, over the
+ * full height of the section. The fade into the page and the overall
+ * strength are CSS (components/_background-shape.scss), as in the design.
+ *
+ * The ramp is in user space, so it runs across the whole surface and each
+ * facet takes the colour of where it sits rather than the full ramp. The
+ * right-hand version is the same drawing flipped, so magenta always sits at
+ * the outside edge.
+ *
+ * @param string $id    Id prefix, unique per instance.
+ * @param bool   $right Whether the shape hugs the right edge.
+ * @return string SVG markup.
+ */
+function dorotape_background_shape_filled( string $id, bool $right ): string {
+	$facets = '';
+	foreach ( dorotape_filled_facets() as [ $d, $shade ] ) {
+		$facets .= sprintf( '<path d="%s" fill-opacity="%s"/>', esc_attr( $d ), esc_attr( (string) $shade ) );
+	}
+
+	return sprintf(
+		'<svg class="background-shape__svg" viewBox="0 0 1200 800" preserveAspectRatio="%4$s slice" focusable="false">
+			<defs>
+				<linearGradient id="%1$s-fill" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="500">
+					<stop offset="0" class="background-shape__stop background-shape__stop--magenta"/>
+					<stop offset="0.55" class="background-shape__stop background-shape__stop--indigo"/>
+					<stop offset="1" class="background-shape__stop background-shape__stop--cyan"/>
+				</linearGradient>
+			</defs>
+			<g%2$s fill="url(#%1$s-fill)" stroke="white" stroke-opacity="0.06" stroke-width="1" stroke-linejoin="round">%3$s</g>
+		</svg>',
+		esc_attr( $id ),
+		$right ? ' transform="translate(1200 0) scale(-1 1)"' : '',
+		$facets, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- paths built above from numbers, each escaped.
+		$right ? 'xMaxYMid' : 'xMinYMid'
 	);
 }
 
@@ -317,8 +327,8 @@ function dorotape_background_shape( $value ): void {
 	$id    = 'dt-shape-' . $instance;
 	$right = 'right' === $side;
 
-	$svg = 'cubes' === $motif
-		? dorotape_background_shape_cubes( $id, $right )
+	$svg = 'filled' === $motif
+		? dorotape_background_shape_filled( $id, $right )
 		: dorotape_background_shape_triangles( $id, $right );
 
 	printf(

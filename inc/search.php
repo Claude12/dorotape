@@ -154,7 +154,7 @@ function dorotape_search_banner(): void {
 			'eyebrow'    => $eyebrow,
 			'heading'    => $heading,
 			'intro'      => $intro,
-			'shape'      => dorotape_search_field( 'search_banner_shape', 'cubes-right' ),
+			'shape'      => dorotape_search_field( 'search_banner_shape', 'triangles-right' ),
 			'breadcrumb' => true,
 			'dot'        => 'magenta',
 		)
@@ -169,7 +169,7 @@ function dorotape_search_banner(): void {
  * glow is sized for the two rows it has there.
  */
 function dorotape_search_band_classes(): string {
-	$shape = dorotape_background_shape_value( dorotape_search_field( 'search_results_shape', 'cubes-right' ) );
+	$shape = dorotape_background_shape_value( dorotape_search_field( 'search_results_shape', 'triangles-right' ) );
 
 	return 'category-grid-block category-grid-block--glow-soft category-grid-block--tight' . dorotape_background_shape_class( $shape );
 }
@@ -179,7 +179,7 @@ function dorotape_search_band_classes(): string {
  * themselves.
  */
 function dorotape_search_band_shape(): void {
-	dorotape_background_shape( dorotape_background_shape_value( dorotape_search_field( 'search_results_shape', 'cubes-right' ) ) );
+	dorotape_background_shape( dorotape_background_shape_value( dorotape_search_field( 'search_results_shape', 'triangles-right' ) ) );
 }
 
 /**

@@ -135,6 +135,34 @@
                             "append": ""
                         },
                         {
+                            "key": "field_dthero000133",
+                            "label": "Indicator label",
+                            "name": "slides_show_label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Read out by screen readers on each of the small bars that pick an image, followed by its number, for example \"Show background image 2 of 4\". Not shown on screen.",
+                            "required": 0,
+                            "conditional_logic": [
+                                [
+                                    {
+                                        "field": "field_dthero000130",
+                                        "operator": "!=empty"
+                                    }
+                                ]
+                            ],
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "Show background image",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
                             "key": "field_dthero000102",
                             "label": "Eyebrow",
                             "name": "eyebrow",
@@ -335,7 +363,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -345,10 +373,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -545,7 +573,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -555,10 +583,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -711,7 +739,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -721,10 +749,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -961,7 +989,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -971,10 +999,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -1125,7 +1153,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1135,10 +1163,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -1369,7 +1397,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1379,10 +1407,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -1596,7 +1624,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1606,10 +1634,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -1829,7 +1857,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -1839,10 +1867,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -2069,7 +2097,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -2079,10 +2107,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -2320,7 +2348,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -2330,10 +2358,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -2497,7 +2525,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -2507,10 +2535,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -2818,7 +2846,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -2828,10 +2856,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -3012,7 +3040,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3022,10 +3050,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -3122,7 +3150,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3132,10 +3160,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -3292,7 +3320,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3302,10 +3330,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -3436,7 +3464,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3446,10 +3474,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -3741,7 +3769,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -3751,10 +3779,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4043,7 +4071,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -4053,10 +4081,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4159,7 +4187,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -4169,10 +4197,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4373,7 +4401,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -4383,10 +4411,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4705,7 +4733,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -4715,10 +4743,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -4912,7 +4940,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -4922,10 +4950,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -5067,7 +5095,7 @@
                             "name": "background_shape",
                             "aria-label": "",
                             "type": "select",
-                            "instructions": "Faint faceted line-work behind this section, taken from the design. Cubes are an isometric lattice that fills the section height; triangles are a low-poly wireframe band centred vertically. Both fade out towards the middle of the page so they never sit under the text.",
+                            "instructions": "Faceted background behind this section, taken from the design. Triangles: a faint low-poly wireframe in a band centred vertically. Filled triangles: a solid faceted surface in magenta, indigo and cyan over the full height of the section, as behind \"Helping you stay competitive\" on About Us. Both fade out towards the middle of the page so they never sit under the text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -5077,10 +5105,10 @@
                             },
                             "choices": {
                                 "": "None",
-                                "cubes-left": "Cubes, left",
-                                "cubes-right": "Cubes, right",
                                 "triangles-left": "Triangles, left",
-                                "triangles-right": "Triangles, right"
+                                "triangles-right": "Triangles, right",
+                                "filled-left": "Filled triangles, left",
+                                "filled-right": "Filled triangles, right"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -5194,6 +5222,6 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1794292617,
+    "modified": 1794398419,
     "local_file": "/Applications/XAMPP/xamppfiles/htdocs/dorotape_wordpresscms/wp-content/themes/dorotape/acf-json/group_dorotape_content_sections.json"
 }

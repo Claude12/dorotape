@@ -47,6 +47,12 @@ if ( $dt_centred ) {
 	$dt_classes .= ' internal-banner-block--centred';
 }
 
+// A left-aligned banner with an image lets it show on the right, away from
+// the text; see components/_internal-banner-block.scss.
+if ( ! empty( $dt_background['ID'] ) ) {
+	$dt_classes .= ' internal-banner-block--has-backdrop';
+}
+
 $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 $dt_classes .= dorotape_background_shape_class( $dt_shape );
 

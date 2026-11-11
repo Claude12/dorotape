@@ -57,10 +57,10 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
             "default_value": "",
             "return_format": "value",
@@ -440,10 +440,10 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
             "default_value": "",
             "return_format": "value",
@@ -511,10 +511,10 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
             "default_value": "",
             "return_format": "value",
@@ -582,10 +582,10 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
             "default_value": "",
             "return_format": "value",
@@ -617,5 +617,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1793203278
+    "modified": 1794397976
 }

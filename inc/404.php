@@ -94,7 +94,7 @@ function dorotape_error_banner(): void {
 			'eyebrow'    => $eyebrow,
 			'heading'    => $heading,
 			'intro'      => $intro,
-			'shape'      => dorotape_error_field( 'error_banner_shape', 'cubes-right' ),
+			'shape'      => dorotape_error_field( 'error_banner_shape', 'triangles-right' ),
 			'breadcrumb' => false,
 		)
 	);
@@ -172,7 +172,7 @@ function dorotape_error_destinations(): void {
 		return;
 	}
 
-	$shape   = dorotape_background_shape_value( dorotape_error_field( 'error_links_shape', 'cubes-right' ) );
+	$shape   = dorotape_background_shape_value( dorotape_error_field( 'error_links_shape', 'triangles-right' ) );
 	$classes = 'category-grid-block category-grid-block--glow-soft category-grid-block--tight' . dorotape_background_shape_class( $shape );
 	$heading = dorotape_error_field( 'error_links_heading', __( 'Where to go next', 'dorotape' ) );
 	$button  = dorotape_error_field( 'error_button', __( 'Go there', 'dorotape' ) );

@@ -40,12 +40,12 @@
             "allow_in_bindings": 0,
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -135,12 +135,12 @@
             "allow_in_bindings": 0,
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,

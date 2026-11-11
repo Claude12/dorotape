@@ -15,6 +15,10 @@
  * srcset in data- attributes, filled in while the photo before it shows, and
  * the slideshow waits for it to load rather than fading to a blank.
  *
+ * Each bar is also a button that jumps to its photo. The slideshow then
+ * carries on from that photo with a fresh bar; if it was paused, it stays
+ * paused on the photo picked.
+ *
  * With reduced motion asked for, nothing starts: the first photo stays, and
  * the controls stay hidden. Turning reduced motion on mid-way stops it there.
  */
@@ -49,6 +53,7 @@ function loaded(img) {
 function setup(hero) {
   const slides = Array.from(hero.querySelectorAll('.hero-block__slide'));
   const bars = Array.from(hero.querySelectorAll('.hero-block__progress-bar'));
+  const buttons = Array.from(hero.querySelectorAll('[data-hero-goto]'));
   const controls = hero.querySelector('[data-hero-controls]');
   const toggle = hero.querySelector('[data-hero-toggle]');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -66,6 +71,13 @@ function setup(hero) {
       bar.classList.toggle('is-active', i === current);
       bar.classList.toggle('is-done', i < current);
     });
+    buttons.forEach((button, i) => {
+      if (i === current) {
+        button.setAttribute('aria-current', 'true');
+      } else {
+        button.removeAttribute('aria-current');
+      }
+    });
   }
 
   function restartBar() {
@@ -75,29 +87,46 @@ function setup(hero) {
     bar.classList.add('is-active');
   }
 
-  async function advance() {
-    if (!running) {
+  // The newest request wins: if a visitor clicks another bar while a photo
+  // is still loading, the earlier change is dropped when its photo arrives.
+  let request = 0;
+
+  async function goTo(next) {
+    if (!running || next === current) {
       return;
     }
-    const next = (current + 1) % slides.length;
+    const ticket = ++request;
     const img = imageOf(next);
     fill(img);
     await loaded(img);
-    if (!running) {
+    if (!running || ticket !== request || next === current) {
       return;
     }
 
+    // A second change can land mid-fade. Only the photo on screen now stays
+    // underneath the new one; anything still fading out from before goes.
+    slides.forEach((slide) => slide.classList.remove('is-leaving'));
     const leaving = slides[current];
     leaving.classList.add('is-leaving');
     leaving.classList.remove('is-active');
     slides[next].classList.add('is-active');
-    window.setTimeout(() => leaving.classList.remove('is-leaving'), FADE);
+    window.setTimeout(() => {
+      if (!leaving.classList.contains('is-active')) {
+        leaving.classList.remove('is-leaving');
+      }
+    }, FADE);
 
     current = next;
     setBars();
+    // A fresh six seconds for the new photo. If paused, the bar sits empty
+    // and stays held until play is pressed.
     restartBar();
     // Fetch the one after while this one shows.
     fill(imageOf((current + 1) % slides.length));
+  }
+
+  function advance() {
+    goTo((current + 1) % slides.length);
   }
 
   function onBarEnd(event) {
@@ -132,6 +161,12 @@ function setup(hero) {
   bars.forEach((bar) => bar.addEventListener('animationend', onBarEnd));
 
   toggle.addEventListener('click', () => setPaused(!hero.classList.contains('is-paused')));
+
+  // Picking a bar shows that photo straight away. The slideshow carries on
+  // from there as normal, and a paused one stays paused on the chosen photo.
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => goTo(Number(button.dataset.heroGoto)));
+  });
 
   let onScreen = true;
   const hold = () => hero.classList.toggle('is-held', !onScreen || document.hidden);

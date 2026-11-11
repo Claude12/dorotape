@@ -182,7 +182,7 @@ function dorotape_blog_banner(): void {
 			'eyebrow' => dorotape_blog_field( 'blog_eyebrow', __( 'Blog', 'dorotape' ) ),
 			'heading' => $heading,
 			'intro'   => $intro,
-			'shape'   => dorotape_blog_field( 'blog_banner_shape', 'cubes-right' ),
+			'shape'   => dorotape_blog_field( 'blog_banner_shape', 'triangles-right' ),
 		)
 	);
 }
@@ -194,7 +194,7 @@ function dorotape_blog_banner(): void {
  * under the banner.
  */
 function dorotape_blog_band_classes(): string {
-	$shape = dorotape_background_shape_value( dorotape_blog_field( 'blog_results_shape', 'cubes-right' ) );
+	$shape = dorotape_background_shape_value( dorotape_blog_field( 'blog_results_shape', 'triangles-right' ) );
 
 	return 'category-grid-block category-grid-block--glow-soft category-grid-block--tight blog-band' . dorotape_background_shape_class( $shape );
 }
@@ -203,7 +203,7 @@ function dorotape_blog_band_classes(): string {
  * The band's background shape.
  */
 function dorotape_blog_band_shape(): void {
-	dorotape_background_shape( dorotape_background_shape_value( dorotape_blog_field( 'blog_results_shape', 'cubes-right' ) ) );
+	dorotape_background_shape( dorotape_background_shape_value( dorotape_blog_field( 'blog_results_shape', 'triangles-right' ) ) );
 }
 
 /**

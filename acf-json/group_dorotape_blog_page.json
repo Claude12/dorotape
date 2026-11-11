@@ -57,12 +57,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -150,12 +150,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -390,5 +390,5 @@
     "active": true,
     "description": "The wording on the blog page, its category pages and each article. The articles themselves are ordinary posts (Posts in the admin menu).",
     "show_in_rest": 0,
-    "modified": 1793253202
+    "modified": 1794397976
 }

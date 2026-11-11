@@ -151,9 +151,9 @@ function dorotape_product_notices(): void {
  */
 function dorotape_product_hero_open(): void {
 	?>
-	<section class="product-hero<?php echo esc_attr( dorotape_background_shape_class( dorotape_product_page_field( 'product_hero_shape', 'cubes-right' ) ) ); ?>">
+	<section class="product-hero<?php echo esc_attr( dorotape_background_shape_class( dorotape_product_page_field( 'product_hero_shape', 'triangles-right' ) ) ); ?>">
 		<div class="product-hero__wash" aria-hidden="true"></div>
-		<?php dorotape_background_shape( dorotape_product_page_field( 'product_hero_shape', 'cubes-right' ) ); ?>
+		<?php dorotape_background_shape( dorotape_product_page_field( 'product_hero_shape', 'triangles-right' ) ); ?>
 
 		<div class="container product-hero__inner">
 			<div class="product-hero__grid">
@@ -486,7 +486,7 @@ function dorotape_product_related(): void {
 		dorotape_product_grid_products( $ids, max( 1, $limit ) ),
 		dorotape_product_page_field( 'product_related_eyebrow', __( 'You may also need', 'dorotape' ) ),
 		dorotape_product_page_field( 'product_related_heading', __( 'Related products', 'dorotape' ) ),
-		dorotape_product_page_field( 'product_related_shape', 'cubes-left' )
+		dorotape_product_page_field( 'product_related_shape', 'triangles-left' )
 	);
 }
 

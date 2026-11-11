@@ -39,7 +39,7 @@ $dt_link        = get_sub_field( 'link' );
 $dt_badge       = get_sub_field( 'badge' );
 $dt_hover_label = get_sub_field( 'hover_label' );
 
-// The row used to carry its own cube pattern. It now shares the block-wide
+// The row used to carry its own pattern. It now shares the block-wide
 // control, which still understands the old 'left' and 'right' values.
 $dt_shape = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 

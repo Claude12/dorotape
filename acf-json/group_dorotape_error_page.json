@@ -39,12 +39,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -134,12 +134,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -260,5 +260,5 @@
     "active": true,
     "description": "The wording, background shapes and destination cards on the 404 page.",
     "show_in_rest": 0,
-    "modified": 1790245368
+    "modified": 1794397976
 }

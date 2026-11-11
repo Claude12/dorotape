@@ -36,10 +36,10 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
             "default_value": "",
             "return_format": "value",
@@ -461,5 +461,5 @@
     "active": true,
     "description": "The wording and background shapes on the nine screens behind /my-account/. What is inside them is WooCommerce's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1790948405
+    "modified": 1794397976
 }

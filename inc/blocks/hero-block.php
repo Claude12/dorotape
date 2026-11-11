@@ -75,6 +75,8 @@ if ( $dt_slides ) {
 		$dt_play_label  = get_sub_field( 'slides_play_label' );
 		$dt_pause_label = $dt_pause_label ? $dt_pause_label : __( 'Pause background images', 'dorotape' );
 		$dt_play_label  = $dt_play_label ? $dt_play_label : __( 'Play background images', 'dorotape' );
+		$dt_show_label  = trim( (string) get_sub_field( 'slides_show_label' ) );
+		$dt_show_label  = $dt_show_label ? $dt_show_label : __( 'Show background image', 'dorotape' );
 		?>
 		<div class="hero-block__backdrop hero-block__slides" data-hero-slides aria-hidden="true">
 			<?php foreach ( $dt_slides as $dt_i => $dt_slide_id ) : ?>
@@ -111,9 +113,11 @@ if ( $dt_slides ) {
 		</div>
 
 		<div class="container hero-block__controls" data-hero-controls hidden>
-			<div class="hero-block__progress" aria-hidden="true">
+			<div class="hero-block__progress">
 				<?php foreach ( $dt_slides as $dt_i => $dt_slide_id ) : ?>
-					<span class="hero-block__progress-bar<?php echo 0 === $dt_i ? ' is-active' : ''; ?>"></span>
+					<button type="button" class="hero-block__progress-button" data-hero-goto="<?php echo esc_attr( (string) $dt_i ); ?>" aria-label="<?php echo esc_attr( sprintf( '%1$s %2$d of %3$d', $dt_show_label, $dt_i + 1, count( $dt_slides ) ) ); ?>"<?php echo 0 === $dt_i ? ' aria-current="true"' : ''; ?>>
+						<span class="hero-block__progress-bar<?php echo 0 === $dt_i ? ' is-active' : ''; ?>"></span>
+					</button>
 				<?php endforeach; ?>
 			</div>
 			<button type="button" class="hero-block__toggle" data-hero-toggle aria-label="<?php echo esc_attr( $dt_pause_label ); ?>" data-label-pause="<?php echo esc_attr( $dt_pause_label ); ?>" data-label-play="<?php echo esc_attr( $dt_play_label ); ?>">

@@ -84,6 +84,28 @@
     opacity: 0.6;
   }
 
+  // Left-aligned with an image (About, the heat press guide): the radial wash
+  // above buried the image to a pink smudge, so here a sideways fade keeps
+  // the text on navy and lets the image come through on the right, clear
+  // and close to full strength (Site Edits, 11 Nov 2026). Centred banners
+  // (the case studies) keep the wash, because a photo behind centred text
+  // needs it.
+  &--has-backdrop:not(&--centred) {
+    &::before {
+      background-image: linear-gradient(
+        100deg,
+        var(--color-background) 12%,
+        color-mix(in oklab, var(--color-background) 75%, transparent) 42%,
+        color-mix(in oklab, var(--color-background) 30%, transparent) 72%,
+        color-mix(in oklab, var(--color-background) 10%, transparent) 100%
+      );
+    }
+
+    .internal-banner-block__backdrop-image {
+      opacity: 0.85;
+    }
+  }
+
   &__inner {
     max-width: 48rem;
   }

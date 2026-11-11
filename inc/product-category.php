@@ -387,7 +387,7 @@ function dorotape_category_banner(): void {
 		$image_id = (int) get_term_meta( $term->term_id, 'thumbnail_id', true );
 	}
 
-	$shape   = dorotape_background_shape_value( dorotape_category_field( 'category_banner_shape', 'cubes-right' ) );
+	$shape   = dorotape_background_shape_value( dorotape_category_field( 'category_banner_shape', 'triangles-right' ) );
 	$classes = 'internal-banner-block internal-banner-block--overlap internal-banner-block--media';
 	$classes .= dorotape_background_shape_class( $shape );
 	?>
@@ -632,7 +632,7 @@ function dorotape_category_ranges(): void {
 
 	$button = dorotape_category_page_field( 'category_ranges_button', __( 'View all', 'dorotape' ) );
 
-	$shape   = dorotape_background_shape_value( dorotape_category_page_field( 'category_ranges_shape', 'cubes-right' ) );
+	$shape   = dorotape_background_shape_value( dorotape_category_page_field( 'category_ranges_shape', 'triangles-right' ) );
 	// --glow-soft because a category can run to twenty ranges: the homepage's
 	// own corner glow is sized for the two rows it has there.
 	$classes  = 'category-grid-block category-grid-block--glow-soft';

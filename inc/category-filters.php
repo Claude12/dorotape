@@ -808,7 +808,7 @@ function dorotape_category_shop(): void {
 	 */
 	$filters = $facets || count( $product_ids ) >= 12;
 
-	$shape   = dorotape_background_shape_value( dorotape_category_page_field( 'category_products_shape', 'cubes-right' ) );
+	$shape   = dorotape_background_shape_value( dorotape_category_page_field( 'category_products_shape', 'triangles-right' ) );
 	$classes  = 'category-grid-block category-grid-block--glow-soft category-grid-block--shop';
 	$has_sections = dorotape_category_has_term_sections();
 	$classes     .= $has_sections ? ' category-grid-block--divider' : '';

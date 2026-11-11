@@ -165,7 +165,29 @@
 
   &__progress {
     display: flex;
-    gap: var(--spacer-6);
+  }
+
+  // Each bar picks its photo. The button is far taller than the 2px bar so
+  // it is easy to hit on a phone; the padding stands in for the old gap.
+  &__progress-button {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 3px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    pointer-events: auto;
+
+    &:hover .hero-block__progress-bar {
+      background-color: color-mix(in oklab, var(--color-foreground) 50%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-cyan);
+      outline-offset: -4px;
+      border-radius: 6px;
+    }
   }
 
   &__progress-bar {

@@ -8,7 +8,7 @@
             "name": "product_hero_shape",
             "aria-label": "",
             "type": "select",
-            "instructions": "Faint line-work behind the gallery and summary. The design uses cubes on the right.",
+            "instructions": "Faint line-work behind the gallery and summary. Triangles on the right by default.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -18,12 +18,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-right",
+            "default_value": "triangles-right",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -40,7 +40,7 @@
             "name": "product_related_shape",
             "aria-label": "",
             "type": "select",
-            "instructions": "Behind the Related products grid. The design uses cubes on the left.",
+            "instructions": "Behind the Related products grid. Triangles on the left by default.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -50,12 +50,12 @@
             },
             "choices": {
                 "": "None",
-                "cubes-left": "Cubes, left",
-                "cubes-right": "Cubes, right",
                 "triangles-left": "Triangles, left",
-                "triangles-right": "Triangles, right"
+                "triangles-right": "Triangles, right",
+                "filled-left": "Filled triangles, left",
+                "filled-right": "Filled triangles, right"
             },
-            "default_value": "cubes-left",
+            "default_value": "triangles-left",
             "return_format": "value",
             "multiple": 0,
             "allow_null": 0,
@@ -568,5 +568,5 @@
     "active": true,
     "description": "Settings the single product page reads on every product: the two background shapes, the Related products headings, and the assurance lines under add to cart.",
     "show_in_rest": 0,
-    "modified": 1793203926
+    "modified": 1794397976
 }
