@@ -212,3 +212,42 @@
     object-fit: contain;
   }
 }
+
+// The blog link, moved out of whichever section held it into Advantages as a
+// lozenge like the ink chips (Michael, Site Edits Product Page 16,
+// 12 November 2026). A link, so it takes the cyan on hover the download
+// lozenges take.
+.product-blog-link {
+  margin: var(--spacer-16) 0 0;
+
+  &__lozenge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacer-8);
+    min-height: 44px;
+    padding: var(--spacer-4) var(--spacer-16) var(--spacer-4) var(--spacer-8);
+    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border-radius: var(--radius-pill);
+    background-color: color-mix(in oklab, var(--color-surface) 40%, transparent);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-sm;
+    text-decoration: none;
+    transition:
+      border-color var(--transition-fast),
+      color var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+    }
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}

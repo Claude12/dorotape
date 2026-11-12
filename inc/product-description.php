@@ -137,13 +137,38 @@ function dorotape_product_description_parts( int $product_id ): array {
 		$html   = str_replace( $videos, '', $html );
 	}
 
+	// The price unit ("Prices shown are per 50 metre roll at 1370mm wide"),
+	// which says the roll size, for under the short description rather than
+	// down in the Description tab (Michael, Site Edits Product Page 15,
+	// 12 November 2026).
+	$size_note = '';
+
+	if ( preg_match( dorotape_product_size_note_pattern(), $html, $found ) ) {
+		$size_note = trim( (string) preg_replace( '#\s+#', ' ', html_entity_decode( wp_strip_all_tags( $found[0] ) ) ) );
+		$html      = (string) preg_replace( dorotape_product_size_note_pattern(), '', $html );
+	}
+
+	// The blog link (Blog.png and a bold line), from whichever section it sat
+	// in, for a lozenge in Advantages (Product Page 16).
+	$blog = null;
+
+	if ( preg_match( dorotape_product_blog_link_pattern(), $html, $found ) ) {
+		$blog = array(
+			'url'  => html_entity_decode( $found[1] ),
+			'text' => trim( (string) preg_replace( '#\s+#', ' ', html_entity_decode( wp_strip_all_tags( $found[2] ) ) ) ),
+		);
+		$html = (string) preg_replace( dorotape_product_blog_link_pattern(), '', $html, 1 );
+	}
+
 	$parts = array(
-		'logo'   => null,
-		'intro'  => $html,
-		'tabs'   => array(),
-		'extras' => '',
-		'badges' => array_values( $badges ),
-		'videos' => $videos,
+		'logo'      => null,
+		'intro'     => $html,
+		'tabs'      => array(),
+		'extras'    => '',
+		'badges'    => array_values( $badges ),
+		'videos'    => $videos,
+		'size_note' => $size_note,
+		'blog'      => $blog,
 	);
 
 	$headings = dorotape_product_description_find_headings( $html );
@@ -235,6 +260,52 @@ function dorotape_product_description_parts( int $product_id ): array {
 	$cache[ $product_id ] = $parts;
 
 	return $parts;
+}
+
+/**
+ * The price unit paragraph: "Prices shown are per linear metre at 1370mm
+ * wide", "The price shown is for a 25mm x 50m roll" and the like.
+ *
+ * @return string Pattern.
+ */
+function dorotape_product_size_note_pattern(): string {
+	return '#<p\b[^>]*>(?:\s*<(?:b|strong|span)\b[^>]*>)*\s*(?:The\s+)?prices?\s+(?:shown\s+)?(?:are|is)\b(?:(?!</p>).)*</p>#is';
+}
+
+/**
+ * The blog link: Blog.png in a link, and the bold line beside it.
+ *
+ * @return string Pattern. Group 1 is the address, group 2 the line.
+ */
+function dorotape_product_blog_link_pattern(): string {
+	return '#(?:<p\b[^>]*>\s*)?<a\b[^>]*\bhref=["\']?([^"\'\s>]+)["\']?[^>]*>\s*<img\b[^>]*Blog\.png[^>]*>\s*(?:</p>\s*)?<span\b[^>]*>\s*<b>(.*?)</b>\s*(?:</span>\s*</a>|</a>\s*</span>|</a>)(?:\s*</p>)?#is';
+}
+
+/**
+ * The roll size the price note gives, short, for the category card.
+ *
+ * @param string $note The note, as text.
+ * @return string "1370mm x 50m", "1370mm wide", "50m roll", or ''.
+ */
+function dorotape_size_from_note( string $note ): string {
+	if ( preg_match( '#(\d+(?:\.\d+)?)\s*mm\s*x\s*(\d+(?:\.\d+)?)\s*(m|metre|yd)s?\b#i', $note, $m ) ) {
+		return $m[1] . 'mm x ' . $m[2] . ( 'yd' === strtolower( $m[3] ) ? 'yd' : 'm' );
+	}
+
+	preg_match( '#(\d+(?:\.\d+)?)\s*(?:m\b|metres?\b|yd\b|yards?\b)(?!\s*wide)#i', $note, $length );
+	preg_match( '#(\d+(?:\.\d+)?)\s*mm\s+wide#i', $note, $width );
+
+	$unit = isset( $length[0] ) && preg_match( '#yd|yard#i', $length[0] ) ? 'yd' : 'm';
+
+	if ( $length && $width ) {
+		return $width[1] . 'mm x ' . $length[1] . $unit;
+	}
+
+	if ( $width ) {
+		return $width[1] . 'mm wide';
+	}
+
+	return $length ? $length[1] . $unit . ' roll' : '';
 }
 
 /**
@@ -415,10 +486,11 @@ function dorotape_product_description_sections( WC_Product $product ): array {
 	}
 
 	$parts = dorotape_product_description_parts( $product_id );
+	$blog  = dorotape_product_blog_lozenge( $parts['blog'] );
 
 	if ( ! $parts['tabs'] ) {
 		$cache[ $product_id ] = array(
-			'intro'  => dorotape_product_description_format( $parts['intro'] ),
+			'intro'  => dorotape_product_description_format( $parts['intro'] ) . $blog,
 			'extras' => '',
 			'panels' => array(),
 		);
@@ -473,6 +545,11 @@ function dorotape_product_description_sections( WC_Product $product ): array {
 			$body .= dorotape_product_description_format( $chunk['html'] );
 		}
 
+		if ( 'advantages' === $tab && '' !== trim( $body ) ) {
+			$body .= $blog;
+			$blog  = '';
+		}
+
 		if ( '' !== trim( $body ) ) {
 			$panels[ $tab ] = array(
 				'label' => $labels[ $tab ],
@@ -481,13 +558,57 @@ function dorotape_product_description_sections( WC_Product $product ): array {
 		}
 	}
 
+	// No Advantages section: the lozenge stays in Description.
 	$cache[ $product_id ] = array(
 		'intro'  => dorotape_product_description_format( $parts['intro'] ),
-		'extras' => dorotape_product_description_format( $extras ),
+		'extras' => dorotape_product_description_format( $extras ) . $blog,
 		'panels' => $panels,
 	);
 
 	return $cache[ $product_id ];
+}
+
+/**
+ * The blog link as a lozenge, like the ink chips, with the blog picture.
+ *
+ * The label is the Blog row of the download labels (Product Pages), and the
+ * old site's line ("Read our blog about...") is the tooltip.
+ *
+ * @param array{url:string,text:string}|null $blog The link.
+ * @return string HTML, or '' with no link.
+ */
+function dorotape_product_blog_lozenge( ?array $blog ): string {
+	if ( ! $blog || '' === $blog['url'] ) {
+		return '';
+	}
+
+	$label = dorotape_product_download_labels()['blog'];
+	$icon  = content_url( 'uploads/kryptronic-media/media/ecom/onpagegraphics/Blog.png' );
+
+	return sprintf(
+		'<p class="product-blog-link"><a class="product-blog-link__lozenge" href="%1$s" title="%2$s"><img class="product-blog-link__icon" src="%3$s" alt="" width="20" height="20" loading="lazy" decoding="async">%4$s</a></p>',
+		esc_url( $blog['url'] ),
+		esc_attr( '' !== $blog['text'] ? $blog['text'] : $label ),
+		esc_url( $icon ),
+		esc_html( $label )
+	);
+}
+
+/**
+ * The roll size note, under the short description.
+ */
+function dorotape_product_size_note(): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	$note = dorotape_product_description_parts( $product->get_id() )['size_note'];
+
+	if ( '' !== $note ) {
+		echo '<p class="product-size-note">' . esc_html( $note ) . '</p>';
+	}
 }
 
 /**
@@ -538,6 +659,20 @@ function dorotape_product_section_tab( string $key ): void {
 	echo $panels[ $tab ]['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Post content, and links escaped above.
 	echo '</div>';
 }
+
+/*
+ * No Additional Information tab. It only repeated the attributes already
+ * chosen above the cart; Michael asked for it to go (Site Edits, Product
+ * Page E5, 12 November 2026).
+ */
+add_filter(
+	'woocommerce_product_tabs',
+	static function ( array $tabs ): array {
+		unset( $tabs['additional_information'] );
+		return $tabs;
+	},
+	98
+);
 
 /*
  * Structure, Suitability, Advantages and Downloads as main tabs beside
@@ -828,6 +963,8 @@ add_action(
 		// pill (Claudius, 29 October 2026).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_brand_logo', 29 );
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_badges', 33 );
+		// Straight under the short description (20).
+		add_action( 'woocommerce_single_product_summary', 'dorotape_product_size_note', 21 );
 		// After the summary, before the hero closes (1).
 		add_action( 'woocommerce_after_single_product_summary', 'dorotape_product_video', 0 );
 	}

@@ -44,13 +44,18 @@ $dt_hover_label = get_sub_field( 'hover_label' );
 $dt_shape = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 
 $dt_classes = 'product-row-block' . dorotape_background_shape_class( $dt_shape );
+
+// An optional id so a menu link can jump here, e.g. the header's New
+// products quick link to /#new-products (Site Edits, Header Nav E13,
+// 12 November 2026).
+$dt_anchor = sanitize_title( (string) get_sub_field( 'anchor' ) );
 ?>
 
 <?php if ( $dt_divider ) : ?>
 	<div class="aurora-rule" aria-hidden="true"></div>
 <?php endif; ?>
 
-<section class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
+<section<?php echo $dt_anchor ? ' id="' . esc_attr( $dt_anchor ) . '"' : ''; ?> class="<?php echo esc_attr( $dt_classes ); ?>"<?php dorotape_animate_attr(); ?>>
 	<?php dorotape_background_shape( $dt_shape ); ?>
 
 	<div class="container product-row-block__container js-scroller">

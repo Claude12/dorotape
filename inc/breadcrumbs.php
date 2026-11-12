@@ -157,7 +157,9 @@ function dorotape_ancestor_crumbs(): array {
 	$object = get_queried_object();
 
 	if ( $object instanceof WP_Term ) {
-		if ( dorotape_is_product_taxonomy( $object->taxonomy ) ) {
+		if ( 'product_brand' === $object->taxonomy && function_exists( 'dorotape_brand_parent_crumb' ) ) {
+			$crumbs[] = dorotape_brand_parent_crumb();
+		} elseif ( dorotape_is_product_taxonomy( $object->taxonomy ) ) {
 			$crumbs[] = dorotape_shop_crumb();
 		}
 

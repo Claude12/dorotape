@@ -59,6 +59,8 @@ function dorotape_eyebrow_colour( $value, string $default ): string {
  *                              as a blog article has.
  *     @type string $dot        Eyebrow dot colour: magenta for the product
  *                              pages (shop, search), cyan for the rest.
+ *     @type int    $image      Attachment shown beside the text on desktop,
+ *                              as a category banner has. 0 for none.
  * }
  */
 function dorotape_page_banner( array $args = array() ): void {
@@ -72,19 +74,27 @@ function dorotape_page_banner( array $args = array() ): void {
 			'breadcrumb' => true,
 			'centred'    => false,
 			'dot'        => 'cyan',
+			'image'      => 0,
 		)
 	);
 
-	$shape   = dorotape_background_shape_value( (string) $args['shape'] );
-	$classes = 'internal-banner-block internal-banner-block--overlap' . dorotape_background_shape_class( $shape );
+	$shape    = dorotape_background_shape_value( (string) $args['shape'] );
+	$image_id = (int) $args['image'];
+	$classes  = 'internal-banner-block internal-banner-block--overlap' . dorotape_background_shape_class( $shape );
 	if ( $args['centred'] ) {
 		$classes .= ' internal-banner-block--centred';
+	}
+	if ( $image_id > 0 ) {
+		$classes .= ' internal-banner-block--media';
 	}
 	?>
 	<section class="<?php echo esc_attr( $classes ); ?>">
 		<?php dorotape_background_shape( $shape ); ?>
 
 		<div class="container">
+			<?php if ( $image_id > 0 ) : ?>
+			<div class="internal-banner-block__grid">
+			<?php endif; ?>
 			<div class="internal-banner-block__inner">
 
 				<?php if ( '' !== $args['eyebrow'] ) : ?>
@@ -105,6 +115,30 @@ function dorotape_page_banner( array $args = array() ): void {
 				<?php endif; ?>
 
 			</div>
+			<?php if ( $image_id > 0 ) : ?>
+				<figure class="internal-banner-block__media">
+					<?php
+					// The category banner's picture (inc/product-category.php),
+					// so the shop opens the way its categories do (Michael,
+					// email 12 November 2026). Decoration: the heading names
+					// the page.
+					echo wp_get_attachment_image(
+						$image_id,
+						'large',
+						false,
+						array(
+							'class'         => 'internal-banner-block__image',
+							'alt'           => '',
+							'loading'       => 'eager',
+							'fetchpriority' => 'high',
+							'decoding'      => 'async',
+							'sizes'         => '(min-width: 1024px) 50vw, 100vw',
+						)
+					);
+					?>
+				</figure>
+			</div>
+			<?php endif; ?>
 		</div>
 	</section>
 	<?php

@@ -18,6 +18,38 @@
     padding: var(--spacer-112) 0;
   }
 
+  // Background variants, one modifier per choice of the background_color
+  // select, matching the Rich Text block's. Added 12 Nov 2026 so the
+  // Sustainability "Net zero" section can take test-page option 66 (aurora
+  // wash with filled triangles). Each layer sits under the content and
+  // under any background shape, which comes after it in the markup.
+  &--bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  &--bg-surface-2 {
+    background-color: var(--color-surface-2);
+  }
+
+  &--bg-aurora {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--gradient-aurora-soft);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+  }
+
+  &--bg-magenta {
+    @include magenta-glow;
+  }
+
   &__grid {
     display: grid;
     align-items: start;

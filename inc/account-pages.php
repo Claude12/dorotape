@@ -101,6 +101,7 @@ function dorotape_account_view(): string {
 	$endpoints = array(
 		'view-order'      => 'view-order',
 		'orders'          => 'orders',
+		'order-again'     => 'order-again',
 		'downloads'       => 'downloads',
 		'edit-address'    => 'addresses',
 		'address-book'    => 'address-book',
@@ -150,6 +151,7 @@ function dorotape_account_defaults(): array {
 		'dashboard'       => __( 'Your account', 'dorotape' ),
 		'orders'          => __( 'Your orders', 'dorotape' ),
 		'view-order'      => __( 'Order details', 'dorotape' ),
+		'order-again'     => __( 'Order again', 'dorotape' ),
 		'downloads'       => __( 'Your downloads', 'dorotape' ),
 		'addresses'       => __( 'Your addresses', 'dorotape' ),
 		'address-book'    => __( 'Your address book', 'dorotape' ),

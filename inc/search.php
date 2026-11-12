@@ -333,8 +333,21 @@ function dorotape_render_search_sections(): void {
 add_action(
 	'template_redirect',
 	function (): void {
-		if ( ! dorotape_is_product_search() ) {
+		$brand = dorotape_is_brand_archive();
+
+		if ( ! dorotape_is_product_search() && ! $brand ) {
 			return;
+		}
+
+		// A brand page (inc/brands.php) is a product list with no category
+		// behind it, which is what a search result page already is: same
+		// band, same cards, its own banner. The leaf category's filter bar
+		// is for a range, and WooCommerce's term description and logo would
+		// sit above the banner.
+		if ( $brand ) {
+			remove_action( 'woocommerce_before_shop_loop', 'dorotape_render_filter_bar', 15 );
+			remove_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
+			remove_action( 'woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10 );
 		}
 
 		// Woo's own chrome. The breadcrumb is drawn in the banner, the result
@@ -354,7 +367,7 @@ add_action(
 		add_action( 'woocommerce_before_main_content', 'dorotape_category_wrapper_start', 10 );
 		add_action( 'woocommerce_after_main_content', 'dorotape_category_wrapper_end', 90 );
 
-		add_action( 'woocommerce_before_main_content', 'dorotape_search_banner', 20 );
+		add_action( 'woocommerce_before_main_content', $brand ? 'dorotape_brand_banner' : 'dorotape_search_banner', 20 );
 
 		// The band around the loop. Opened before it and closed after the
 		// pagination, which Woo prints at priority 10, so the page numbers sit

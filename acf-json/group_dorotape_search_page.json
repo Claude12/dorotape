@@ -208,6 +208,46 @@
             "allow_in_bindings": 0,
             "rows": 3,
             "new_lines": ""
+        },
+        {
+            "key": "field_dtsearch0010",
+            "label": "Brand page eyebrow",
+            "name": "brand_eyebrow",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Small capitals above the brand name on a brand page (opened from a brand logo). {brand} is replaced with the brand name.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Our brands",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtsearch0011",
+            "label": "Brand page standfirst",
+            "name": "brand_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "The line under the brand name. {n} is replaced with the number of products, {brand} with the brand name. A brand with its own description in Products, Brands shows that instead.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "{n} {brand} products in our range.",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
         }
     ],
     "location": [
@@ -228,5 +268,5 @@
     "active": true,
     "description": "The wording and background shapes on the search results page. Both routes use it: the product search the header's box submits, and a site-wide search that also finds pages.",
     "show_in_rest": 0,
-    "modified": 1794397976
+    "modified": 1794502919
 }

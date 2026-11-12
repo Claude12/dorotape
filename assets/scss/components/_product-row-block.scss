@@ -17,6 +17,8 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  // A jump to the row's anchor lands below the sticky header, not under it.
+  scroll-margin-top: var(--site-header-height);
   padding: var(--spacer-80) 0;
   background-color: var(--color-background);
   color: var(--color-foreground);

@@ -248,6 +248,150 @@
             "append": ""
         },
         {
+            "key": "field_dtacct0050",
+            "label": "Order again",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "The gallery of products the customer has bought before.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_dtacct0051",
+            "label": "Page heading",
+            "name": "account_order_again_heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The h1 at the top of the page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Order again",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0052",
+            "label": "Menu label",
+            "name": "account_order_again_menu",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The tab in the account menu and the card on the dashboard.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Order again",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0053",
+            "label": "Intro",
+            "name": "account_order_again_intro",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "One line above the products.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Everything you have bought from us, most recent first.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtacct0054",
+            "label": "Last ordered label",
+            "name": "account_order_again_last",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "On each card. {date} is the date of the latest order with that product.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Last ordered {date}",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtacct0055",
+            "label": "No orders yet",
+            "name": "account_order_again_empty",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown to a customer with no orders.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Products you order will appear here, ready to order again.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_dtacct0056",
+            "label": "No orders button",
+            "name": "account_order_again_empty_button",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button under that message, to the shop.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Browse products",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtacct0024",
             "label": "Downloads",
             "name": "",
@@ -461,5 +605,5 @@
     "active": true,
     "description": "The wording and background shapes on the nine screens behind /my-account/. What is inside them is WooCommerce's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1794397976
+    "modified": 1794503182
 }

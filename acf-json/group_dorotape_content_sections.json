@@ -2343,6 +2343,27 @@
                             "append": ""
                         },
                         {
+                            "key": "field_dtprow000112",
+                            "label": "Anchor",
+                            "name": "anchor",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Optional. Lets a link jump to this row: enter new-products here, then link to \/#new-products. Lower case letters, numbers and hyphens.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
                             "key": "field_dtprow000111",
                             "label": "Background shape",
                             "name": "background_shape",
@@ -3033,6 +3054,38 @@
                             "mime_types": "",
                             "allow_in_bindings": 0,
                             "preview_size": "medium"
+                        },
+                        {
+                            "key": "field_dttimg000121",
+                            "label": "Background Color",
+                            "name": "background_color",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "Section background. \"Default\" sits on the page’s navy canvas.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "": "Default (navy)",
+                                "surface": "Raised panel",
+                                "surface-2": "Raised panel (lighter)",
+                                "aurora": "Aurora wash",
+                                "magenta": "Magenta glow"
+                            },
+                            "default_value": false,
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
                         },
                         {
                             "key": "field_dttimg000120",

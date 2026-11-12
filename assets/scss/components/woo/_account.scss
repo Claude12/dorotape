@@ -1095,3 +1095,10 @@
     text-align: right;
   }
 }
+
+// Order again (inc/order-again.php): the one-line intro above the cards, and
+// the empty state's message kept off its button.
+.woo-page .dt-order-again__intro,
+.woo-page .dt-order-again__empty {
+  margin: 0 0 24px;
+}

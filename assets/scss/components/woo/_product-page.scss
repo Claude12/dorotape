@@ -339,6 +339,16 @@
   line-height: $line-height-relaxed;
 }
 
+// The roll size, from the price note the Description tab used to end on
+// (Michael, Site Edits Product Page 15, 12 November 2026).
+.product-size-note {
+  max-width: 36rem;
+  margin: var(--spacer-12) 0 0;
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-base;
+}
+
 // ── Buying controls ────────────────────────────────────────────────────────
 
 .single-product form.cart {

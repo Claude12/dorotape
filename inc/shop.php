@@ -149,6 +149,7 @@ function dorotape_shop_banner(): void {
 			'shape'      => dorotape_shop_field( 'shop_banner_shape', 'triangles-right' ),
 			'breadcrumb' => true,
 			'dot'        => 'magenta',
+			'image'      => function_exists( 'get_field' ) ? (int) get_field( 'shop_banner_image', DOROTAPE_SHOP_SECTIONS_ID ) : 0,
 		)
 	);
 }

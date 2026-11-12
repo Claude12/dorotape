@@ -175,10 +175,11 @@
     padding-block: var(--spacer-48) var(--spacer-112);
   }
 
-  // Centred under the centred banner. The text inside stays left aligned,
-  // since a ragged left edge is hard to read over more than a few lines.
+  // The full container width, as the case studies run, after Michael asked
+  // why articles sat narrower (email, 12 November 2026). The text stays left
+  // aligned, since a ragged left edge is hard to read over more than a few
+  // lines.
   &__inner {
-    max-width: 800px;
     margin-inline: auto;
   }
 

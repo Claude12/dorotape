@@ -539,6 +539,30 @@ function dorotape_category_filter_pills( WC_Product $product ): array {
 		$pills[] = array( 'label' => sprintf( __( 'Item no. %s', 'dorotape' ), $sku ) );
 	}
 
+	// The roll size on a product with no options, which goes straight in the
+	// basket from the card (Michael, Site Edits Product Page 15, 12 November
+	// 2026). Left off when the name already says it.
+	if ( ! $product->is_type( 'variable' ) ) {
+		$size = dorotape_roll_size_label( $product->get_id() );
+
+		if ( '' === $size && function_exists( 'dorotape_product_description_parts' ) ) {
+			$size = dorotape_size_from_note( dorotape_product_description_parts( $product->get_id() )['size_note'] );
+		}
+
+		if ( preg_match( '#^\d+mm$#', $size ) ) {
+			$size .= ' wide';
+		} elseif ( preg_match( '#^[\d.]+m$#', $size ) ) {
+			$size .= ' roll';
+		}
+
+		$squash = static fn ( string $s ): string => strtolower( (string) preg_replace( '#\s+|wide$|roll$#', '', $s ) );
+
+		if ( '' !== $size && false === strpos( $squash( $product->get_name() ), $squash( $size ) ) ) {
+			/* translators: %s: roll size, such as "1370mm x 50m". */
+			$pills[] = array( 'label' => sprintf( __( 'Roll size: %s', 'dorotape' ), $size ) );
+		}
+	}
+
 	return $pills;
 }
 

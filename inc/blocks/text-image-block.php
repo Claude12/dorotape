@@ -31,6 +31,11 @@ if ( 'left' === get_sub_field( 'image_side' ) ) {
 	$dt_classes .= ' text-image-block--image-left';
 }
 
+$dt_background = (string) get_sub_field( 'background_color' );
+if ( '' !== $dt_background ) {
+	$dt_classes .= ' text-image-block--bg-' . sanitize_html_class( $dt_background );
+}
+
 $dt_shape    = dorotape_background_shape_value( get_sub_field( 'background_shape' ) );
 $dt_classes .= dorotape_background_shape_class( $dt_shape );
 

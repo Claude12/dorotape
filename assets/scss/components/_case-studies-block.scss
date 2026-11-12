@@ -24,6 +24,22 @@
     @include magenta-glow;
   }
 
+  // The grid runs far taller than the triangles' 620px band, so here the
+  // band takes the section's full height instead: Michael asked for the
+  // background to "extend both up and downwards" (Site Edits, Case Studies
+  // E3, 12 November 2026). The stroke keeps its weight as the drawing
+  // scales up.
+  .background-shape--triangles-left .background-shape__svg,
+  .background-shape--triangles-right .background-shape__svg {
+    top: 0;
+    height: 100%;
+    transform: none;
+
+    path {
+      vector-effect: non-scaling-stroke;
+    }
+  }
+
   // ── Header ─────────────────────────────────────────────────────────────
 
   &__header {
