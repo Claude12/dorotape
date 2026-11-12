@@ -68,3 +68,11 @@
     }
   }
 }
+
+// The RewardsWP launcher is fixed over the bottom right corner, which is where
+// the mobile menu drawer puts its Basket link, so it covered Basket (QA,
+// 12 Nov). It steps aside while the drawer is open and comes back when it
+// closes. The panel itself, once opened, is not affected.
+body:has(.site-header.is-drawer-open) rewards-panel {
+  display: none;
+}

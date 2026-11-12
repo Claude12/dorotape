@@ -167,3 +167,26 @@ function dorotape_wpforms_single_noscript( $message, $form_data ): string {
 	return $message;
 }
 add_filter( 'wpforms_frontend_noscript_error_message', 'dorotape_wpforms_single_noscript', 10, 2 );
+
+/**
+ * Smart phone fields start on the UK, not on wherever the visitor's IP says.
+ *
+ * WPForms looks the visitor's country up from their IP (geo.wpforms.com) and
+ * preselects it, so a tester abroad saw South Africa (QA, 12 Nov). Nearly all
+ * of this shop's customers are in the UK. The visitor can still pick another
+ * country from the flag list.
+ *
+ * The plugin offers no PHP setting for this, so its default options are
+ * wrapped once its script has loaded and before its wpformsReady handler runs.
+ * If a future version renames the function this does nothing.
+ */
+add_action(
+	'wpforms_frontend_js',
+	static function (): void {
+		wp_add_inline_script(
+			'wpforms-smart-phone-field-core',
+			'(function(p){if(!p||"function"!==typeof p.getDefaultSmartFieldOptions)return;var d=p.getDefaultSmartFieldOptions;p.getDefaultSmartFieldOptions=function(){var o=d.apply(this,arguments)||{};delete o.geoIpLookup;o.initialCountry="gb";return o;};})(window.WPFormsPhoneField);'
+		);
+	},
+	20
+);

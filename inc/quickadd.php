@@ -120,6 +120,22 @@ function dorotape_quick_add_total(): void {
 }
 
 /**
+ * How a quick-add price is counted: "per roll" on roll goods, "each" otherwise.
+ *
+ * The page headline already says "From £8.91 per roll" from the product's
+ * Sold per setting, so the tier note and the mix and match line follow the
+ * same setting rather than always saying "each" (QA, 12 Nov).
+ *
+ * @param WC_Product $product The quick-add product.
+ * @return string e.g. "per roll".
+ */
+function dorotape_quick_add_per( WC_Product $product ): string {
+	$per = trim( dorotape_price_unit_suffix( $product->get_id() ) );
+
+	return '' !== $per ? $per : __( 'each', 'dorotape' );
+}
+
+/**
  * Build the quick-add rows for a product: one per purchasable variation.
  *
  * Split out of the form so the combined-total box above the grid can be built
@@ -168,9 +184,10 @@ function dorotape_quick_add_rows( WC_Product $product ): array {
 			if ( $best ) {
 				$tier_note = sprintf(
 					/* translators: 1: minimum quantity, 2: discounted price */
-					esc_html__( '%1$d+: %2$s each', 'dorotape' ),
+					esc_html__( '%1$d+: %2$s %3$s', 'dorotape' ),
 					(int) $best['min_qty'],
-					wp_strip_all_tags( wc_price( (float) $best['tier_price'] ) )
+					wp_strip_all_tags( wc_price( (float) $best['tier_price'] ) ),
+					esc_html( dorotape_quick_add_per( $product ) )
 				);
 			}
 		}
@@ -235,9 +252,10 @@ function dorotape_quick_add_form(): void {
 					<?php
 					printf(
 						/* translators: 1: combined quantity needed, 2: discounted unit price */
-						esc_html__( 'Mix and match: any %1$d in total gets them all at %2$s each.', 'dorotape' ),
+						esc_html__( 'Mix and match: any %1$d in total gets them all at %2$s %3$s.', 'dorotape' ),
 						(int) $mix_min,
-						esc_html( wp_strip_all_tags( wc_price( $mix_price ) ) )
+						esc_html( wp_strip_all_tags( wc_price( $mix_price ) ) ),
+						esc_html( dorotape_quick_add_per( $product ) )
 					);
 					?>
 				</span>

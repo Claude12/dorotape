@@ -1058,3 +1058,40 @@
     background-color: var(--color-magenta);
   }
 }
+
+// ── Reward points (inc/rewards-account.php) ────────────────────────────────
+//
+// The history borrows the orders table's classes, so it is cards on a phone
+// and a table from tablet up like Orders. What it adds: the line saying what
+// the points were for reads as the row's main text, and the points line up
+// on the right.
+
+.woo-page .dt-rewards-account__balance {
+  margin-bottom: var(--spacer-16);
+  font-size: $font-size-md;
+}
+
+.woo-page .dt-rewards-account .woocommerce-orders-table {
+  margin-top: var(--spacer-24);
+}
+
+.woo-page .dt-rewards-account__details {
+  margin-top: var(--spacer-4);
+  color: var(--color-foreground);
+}
+
+.woo-page .dt-rewards-account__details a {
+  color: var(--color-cyan);
+}
+
+.woo-page .dt-rewards-account__state {
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+}
+
+@include min-breakpoint(tablet) {
+  .woo-page .dt-rewards-account__points,
+  .woo-page .dt-rewards-account .woocommerce-orders-table__header:last-child {
+    text-align: right;
+  }
+}

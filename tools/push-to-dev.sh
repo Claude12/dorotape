@@ -165,7 +165,12 @@ BACKUPS="\"\$HOME\"/$(printf %q "$DEV_BACKUP_DIR")"
 purge_dev_caches() {
 	rsh "$REMOTE_CD && {
 		wp cache flush >/dev/null && echo '    Object cache flushed.'
-		wp rewrite flush >/dev/null 2>&1 && echo '    Permalinks flushed.'
+		# A hard flush, the same as pressing Save on Settings > Permalinks: it
+		# rewrites the WordPress block in .htaccess too. A soft flush left dev
+		# serving a 500 on every pretty URL after the 12 Nov 2026 push until
+		# Permalinks was saved by hand. got_rewrite is forced on because WP-CLI
+		# cannot detect mod_rewrite, and only the WordPress block is touched.
+		wp eval 'require_once ABSPATH . \"wp-admin/includes/file.php\"; require_once ABSPATH . \"wp-admin/includes/misc.php\"; add_filter(\"got_rewrite\", \"__return_true\"); flush_rewrite_rules(true);' >/dev/null 2>&1 && echo '    Permalinks flushed (.htaccess rewritten).' || echo '    Permalink flush failed: save Settings > Permalinks on dev.'
 		if wp plugin is-active sg-cachepress 2>/dev/null; then wp sg purge >/dev/null && echo '    SiteGround cache purged.'; fi
 		if wp plugin is-active w3-total-cache 2>/dev/null; then wp w3-total-cache flush all >/dev/null && echo '    W3 Total Cache flushed.'; fi
 		true

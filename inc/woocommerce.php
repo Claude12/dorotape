@@ -1257,6 +1257,41 @@ add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $p
 	);
 }, 20, 2 );
 
+/**
+ * Put the unit on a single price too: "£12.73 per roll ex VAT".
+ *
+ * The "From" prices above carry a unit, but a simple product's price and the
+ * price of a chosen width did not, so the unit vanished from the page the
+ * moment a width was picked (QA, 12 Nov). A variation reads its parent's Sold
+ * per setting. As with the "From" prices, a product with no unit set shows
+ * none rather than guessing metres.
+ *
+ * Runs after the "From" filter and leaves alone any price that already says
+ * its unit, POA badges and variable ranges (they have their own filter).
+ */
+add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $product ): string {
+	if ( '' === $html || $product->is_type( array( 'variable', 'grouped' ) ) ) {
+		return $html;
+	}
+	if ( function_exists( 'dorotape_is_poa' ) && dorotape_is_poa( $product ) ) {
+		return $html;
+	}
+
+	$id     = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
+	$suffix = dorotape_price_unit_suffix( $id );
+	if ( '' === $suffix || false !== strpos( $html, trim( $suffix ) ) ) {
+		return $html;
+	}
+
+	$unit = '<span class="dt-price-unit">' . esc_html( $suffix ) . '</span>';
+	$vat  = strpos( $html, '<small class="woocommerce-price-suffix">' );
+
+	// Before "ex VAT", so it reads "£12.73 per roll ex VAT".
+	return false === $vat
+		? $html . $unit
+		: rtrim( substr( $html, 0, $vat ) ) . $unit . ' ' . substr( $html, $vat );
+}, 30, 2 );
+
 // ─── Archive buttons for products that still need a choice ────────────────────
 
 /**

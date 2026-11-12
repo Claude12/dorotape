@@ -810,6 +810,71 @@ function dorotape_rewards_handle_refund( $order_id ): void {
  */
 add_action( 'woocommerce_order_status_refunded', 'dorotape_rewards_handle_refund', 5 );
 
+/**
+ * Note on the order what a partial refund took back.
+ *
+ * RewardsWP takes the points back itself on woocommerce_order_refunded
+ * (priority 10) but leaves the order silent, while a full refund gets a note
+ * from dorotape_rewards_deduct_for_refund(). This runs after it and reads the
+ * deduction rows it made for this refund, so the note never claims more than
+ * was actually taken (QA, 12 Nov 2026).
+ *
+ * @param int $order_id  Order that was partly refunded.
+ * @param int $refund_id The refund just created.
+ */
+function dorotape_rewards_note_partial_refund( $order_id, $refund_id ): void {
+	if ( ! function_exists( 'Awesomemotive\Rewardswp\Helpers\get_points_entries' ) ) {
+		return;
+	}
+
+	$order = wc_get_order( $order_id );
+
+	if ( ! $order || 'refunded' === $order->get_status() ) {
+		return; // full refunds are noted by dorotape_rewards_deduct_for_refund()
+	}
+
+	$entries = Awesomemotive\Rewardswp\Helpers\get_points_entries(
+		array(
+			'source_type' => 'partial_refund',
+			'source_id'   => (int) $order_id,
+			'type'        => 'spent',
+			'status'      => 'approved',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- one order's rows, on a refund only.
+			'meta_query'  => array(
+				array(
+					'key'   => 'refund_id',
+					'value' => (int) $refund_id,
+				),
+			),
+		),
+		99,
+		1
+	);
+
+	$off = 0;
+	$member_id = 0;
+	foreach ( (array) $entries as $entry ) {
+		$off      += (int) $entry->points;
+		$member_id = (int) $entry->member_id;
+	}
+
+	if ( $off < 1 ) {
+		return;
+	}
+
+	$member = Awesomemotive\Rewardswp\Helpers\get_member( $member_id );
+
+	$order->add_order_note(
+		sprintf(
+			/* translators: 1: number of points taken back, 2: the customer's balance afterwards */
+			__( '%1$d reward point(s) taken back for the partial refund. Balance now %2$d.', 'dorotape' ),
+			$off,
+			$member ? (int) $member->points_balance : 0
+		)
+	);
+}
+add_action( 'woocommerce_order_refunded', 'dorotape_rewards_note_partial_refund', 20, 2 );
+
 /*
  * ---------------------------------------------------------------------------
  * The rewards panel, loaded after the page instead of inside it.
@@ -882,6 +947,23 @@ function dorotape_rewards_defer_panel(): void {
 		nocache_headers();
 		header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
 		header( 'X-Robots-Tag: noindex, nofollow' );
+
+		/*
+		 * RewardsWP flags a member it has just created (at registration or a
+		 * first order) to see a welcome screen, and while that flag is set the
+		 * panel opens over the page on every load until it is closed. In QA it
+		 * covered pages and swallowed an Add to cart click. The flag is cleared
+		 * before the panel renders, so the panel stays shut until the visitor
+		 * opens it. The loader also removes the plugin's matching localStorage
+		 * key, which would open it once more on the next page.
+		 */
+		if ( function_exists( 'Awesomemotive\Rewardswp\Helpers\get_current_member' ) ) {
+			$member = Awesomemotive\Rewardswp\Helpers\get_current_member();
+			if ( $member && $member->get_meta( 'show_welcome_flow' ) ) {
+				$member->delete_meta( 'show_welcome_flow' );
+			}
+		}
+
 		call_user_func( $callback );
 		exit;
 	}
@@ -908,6 +990,11 @@ function dorotape_rewards_panel_loader(): void {
 				.then(function (html) {
 					var slot = document.getElementById('dt-rewards-slot');
 					if (!html || !slot) return;
+					try {
+						Object.keys(localStorage).forEach(function (k) {
+							if (0 === k.indexOf('rewardswp_just_joined_')) localStorage.removeItem(k);
+						});
+					} catch (e) {}
 					var t = document.createElement('template');
 					t.innerHTML = html;
 					slot.replaceWith(t.content);

@@ -173,3 +173,31 @@ function dorotape_redirect_comment_admin() {
 	}
 }
 add_action( 'admin_init', 'dorotape_redirect_comment_admin' );
+
+// ─── Order screen: customer box ───────────────────────────────────────────────
+
+/**
+ * Show the order's customer as "Name (#12 - email)", not "Name (#12 &ndash; email)".
+ *
+ * WooCommerce builds the label with an "&ndash;" entity and then escapes it
+ * twice on the order edit screen (htmlspecialchars inside esc_html), so the
+ * entity prints as literal text (QA, 12 Nov). Its own filter on that label is
+ * used here to swap the entity for a plain hyphen.
+ *
+ * The same filter also feeds the customer search box over AJAX, which prints
+ * its labels correctly, so that request is left alone.
+ *
+ * @param array|mixed $customers Labels keyed by user ID (one, unkeyed, on the order screen).
+ * @return array|mixed
+ */
+function dorotape_order_customer_label( $customers ) {
+	if ( ! is_array( $customers ) || wp_doing_ajax() ) {
+		return $customers;
+	}
+
+	return array_map(
+		static fn ( $label ) => is_string( $label ) ? str_replace( '&ndash;', '-', $label ) : $label,
+		$customers
+	);
+}
+add_filter( 'woocommerce_json_search_found_customers', 'dorotape_order_customer_label' );
