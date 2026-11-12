@@ -248,6 +248,25 @@
             "allow_in_bindings": 0,
             "rows": 2,
             "new_lines": ""
+        },
+        {
+            "key": "field_dtsearch0012",
+            "label": "Brand page standfirst, one product",
+            "name": "brand_intro_one",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Used instead of the line above when a brand has only one product. {brand} is replaced with the brand name.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "1 {brand} product in our range.",
+            "allow_in_bindings": 0,
+            "rows": 2,
+            "new_lines": ""
         }
     ],
     "location": [
@@ -268,5 +287,5 @@
     "active": true,
     "description": "The wording and background shapes on the search results page. Both routes use it: the product search the header's box submits, and a site-wide search that also finds pages.",
     "show_in_rest": 0,
-    "modified": 1794502919
+    "modified": 1794504423
 }

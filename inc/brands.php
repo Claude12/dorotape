@@ -48,12 +48,20 @@ function dorotape_brand_banner(): void {
 	$intro = trim( wp_strip_all_tags( (string) $term->description ) );
 
 	if ( '' === $intro ) {
+		// A brand with one product gets its own wording, or it reads
+		// "1 Jessup products".
 		$intro = $swap(
-			dorotape_search_field(
-				'brand_intro',
-				/* translators: {n} is the number of products, {brand} the brand's name. */
-				__( '{n} {brand} products in our range.', 'dorotape' )
-			)
+			1 === $count
+				? dorotape_search_field(
+					'brand_intro_one',
+					/* translators: {brand} is the brand's name. */
+					__( '1 {brand} product in our range.', 'dorotape' )
+				)
+				: dorotape_search_field(
+					'brand_intro',
+					/* translators: {n} is the number of products, {brand} the brand's name. */
+					__( '{n} {brand} products in our range.', 'dorotape' )
+				)
 		);
 	}
 
