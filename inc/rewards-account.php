@@ -55,10 +55,13 @@ add_action(
 				return;
 			}
 		}
-		if ( get_transient( 'dorotape_rewards_account_flush' ) ) {
+		// Keyed by site: a database copied from another site carries that
+		// site's flag, which would otherwise hold this repair back for an hour.
+		$flag = 'dorotape_rewards_account_flush_' . md5( home_url() );
+		if ( get_transient( $flag ) ) {
 			return;
 		}
-		set_transient( 'dorotape_rewards_account_flush', 1, HOUR_IN_SECONDS );
+		set_transient( $flag, 1, HOUR_IN_SECONDS );
 		flush_rewrite_rules( false );
 	},
 	11

@@ -57,11 +57,14 @@ add_action( 'init', function (): void {
 	// all, this would otherwise flush on every single request, and a rewrite
 	// flush is one of the more expensive things WordPress does. Once an hour
 	// turns that failure mode into something slow rather than something fatal.
-	if ( get_transient( 'dorotape_address_book_flush' ) ) {
+	// The key names the site, because a database copied from another site
+	// brings that site's flag with it and would hold this repair back.
+	$flag = 'dorotape_address_book_flush_' . md5( home_url() );
+	if ( get_transient( $flag ) ) {
 		return;
 	}
 
-	set_transient( 'dorotape_address_book_flush', 1, HOUR_IN_SECONDS );
+	set_transient( $flag, 1, HOUR_IN_SECONDS );
 	flush_rewrite_rules( false );
 }, 11 );
 
