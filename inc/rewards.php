@@ -1108,3 +1108,36 @@ function dorotape_rewards_panel_loader(): void {
 	</script>
 	<?php
 }
+
+/**
+ * Points count when the order is dispatched, not when it is paid.
+ *
+ * The plugin confirms an order's points at the first paid status, so a card
+ * order had its point, and could spend it, before anything had left the
+ * building. An order that was then cancelled or changed had to have the point
+ * taken back. Its callback is taken off the two "paid" hooks and left on
+ * Completed, which is the status an order gets when it is dispatched. Until
+ * then the entry the plugin made when the order was placed stays pending, and
+ * the plugin's own order confirmation already words that case as points to
+ * come.
+ *
+ * If a future version renames the method, nothing here matches and the plugin
+ * goes back to confirming on payment.
+ */
+add_action( 'wp_loaded', function (): void {
+	foreach ( array( 'woocommerce_order_status_processing', 'woocommerce_payment_complete' ) as $hook ) {
+		if ( empty( $GLOBALS['wp_filter'][ $hook ] ) ) {
+			continue;
+		}
+
+		foreach ( $GLOBALS['wp_filter'][ $hook ]->callbacks as $priority => $callbacks ) {
+			foreach ( $callbacks as $registered ) {
+				$callback = $registered['function'];
+
+				if ( is_array( $callback ) && is_object( $callback[0] ) && 'action_maybe_award_purchase_points' === $callback[1] ) {
+					remove_action( $hook, $callback, $priority );
+				}
+			}
+		}
+	}
+} );

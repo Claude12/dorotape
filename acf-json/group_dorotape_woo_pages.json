@@ -223,7 +223,7 @@
             "name": "woo_reward_points_pending",
             "aria-label": "",
             "type": "text",
-            "instructions": "Shown in brackets beside an order on My Account > Reward points while its points do not count yet. Points count once the order has been paid.",
+            "instructions": "Shown in brackets beside an order on My Account > Reward points while its points do not count yet. Points count once the order has been dispatched.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -231,7 +231,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "pending until the order has been paid",
+            "default_value": "pending until the order is dispatched",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -252,7 +252,28 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "No points yet. They appear here once an order has been paid for.",
+            "default_value": "No points yet. They appear here once an order has been dispatched.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0048",
+            "label": "Delivery: to be quoted",
+            "name": "woo_delivery_quoted_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown in place of FREE on the basket and checkout when delivery is quoted afterwards (Europe, rest of world, Highlands and islands).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "To be quoted",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -680,5 +701,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1794568990
+    "modified": 1794571931
 }

@@ -359,6 +359,13 @@
   }
 }
 
+// The same white bar lists its results underneath, and "No results" there
+// inherited the near-white text as well.
+.dgwt-wcas-overlay-mobile-on .dgwt-wcas-suggestions-wrapp,
+.dgwt-wcas-overlay-mobile-on .dgwt-wcas-suggestion-nores {
+  color: #111;
+}
+
 // One class deeper than pirx's base input rule, so it also ties the plugin's
 // mobile-wrapper variant (which would otherwise strip the fill and radius in
 // the drawer) and wins on source order.
