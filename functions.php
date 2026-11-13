@@ -249,6 +249,7 @@ require get_template_directory() . '/inc/category-sections.php';
 require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/webp.php';
 require get_template_directory() . '/inc/admin.php';
+require get_template_directory() . '/inc/admin-email-copies.php';
 require get_template_directory() . '/inc/setup.php';
 require get_template_directory() . '/inc/header.php';
 require get_template_directory() . '/inc/header-menu.php';
