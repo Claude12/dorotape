@@ -995,6 +995,21 @@ function dorotape_rewards_panel_loader(): void {
 							if (0 === k.indexOf('rewardswp_just_joined_')) localStorage.removeItem(k);
 						});
 					} catch (e) {}
+					/*
+					 * The panel opens itself whenever the address ends in a
+					 * #rewardswp-... hash, and buttons like "Ways to earn"
+					 * leave that hash in the browser history. In QA, logging
+					 * out and pressing Back reopened the panel over the
+					 * signed-out My Account page. A hash now only opens the
+					 * panel on a fresh visit to a link, never on Back, Forward
+					 * or a reload.
+					 */
+					try {
+						var nav = performance.getEntriesByType('navigation')[0];
+						if (nav && 'navigate' !== nav.type && 0 === location.hash.indexOf('#rewardswp-')) {
+							history.replaceState(history.state, '', location.pathname + location.search);
+						}
+					} catch (e) {}
 					var t = document.createElement('template');
 					t.innerHTML = html;
 					slot.replaceWith(t.content);

@@ -196,7 +196,19 @@ function dorotape_order_customer_label( $customers ) {
 	}
 
 	return array_map(
-		static fn ( $label ) => is_string( $label ) ? str_replace( '&ndash;', '-', $label ) : $label,
+		static function ( $label ) {
+			if ( ! is_string( $label ) ) {
+				return $label;
+			}
+			$label = str_replace( '&ndash;', '-', $label );
+			// A customer with no first or last name read " (#1 - email)" (QA, 13 Nov):
+			// lead with their display name instead.
+			if ( preg_match( '/^\s*\(#(\d+)\b/', $label, $m ) ) {
+				$user  = get_userdata( (int) $m[1] );
+				$label = ( $user && $user->display_name ? $user->display_name . ' ' : '' ) . ltrim( $label );
+			}
+			return $label;
+		},
 		$customers
 	);
 }
