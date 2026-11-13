@@ -109,6 +109,41 @@ add_filter(
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
+/**
+ * How points are earned, in one line, at the rate set in RewardsWP.
+ *
+ * Without it a member whose order was too small for a point sees an empty
+ * tab and no reason why.
+ *
+ * @return string Empty when earning on purchases is off.
+ */
+function dorotape_rewards_account_rule(): string {
+	if ( ! function_exists( '\Awesomemotive\Rewardswp\Helpers\get_option_value' ) ) {
+		return '';
+	}
+
+	$earn     = \Awesomemotive\Rewardswp\Helpers\get_option_value( \Awesomemotive\Rewardswp\Settings\Options\Points\EarnActionsOption::class );
+	$purchase = is_array( $earn ) ? ( $earn['purchase'] ?? array() ) : array();
+	$rate     = (float) ( $purchase['points_per_dollar'] ?? 0 );
+	$base     = (float) ( $purchase['base_amount'] ?? 1 );
+
+	if ( empty( $purchase['enabled'] ) || $rate <= 0 || $base <= 0 ) {
+		return '';
+	}
+
+	$decimals = floor( $base ) === $base ? 0 : wc_get_price_decimals();
+	$points   = floor( $rate ) === $rate ? (int) $rate : $rate;
+
+	return strtr(
+		dorotape_woo_pages_field( 'woo_reward_points_rule', __( 'You earn {points} for every {amount} ex VAT spent on reward products.', 'dorotape' ) ),
+		array(
+			/* translators: %s: number of points. */
+			'{points}' => sprintf( _n( '%s point', '%s points', (int) ceil( $rate ), 'dorotape' ), number_format_i18n( $points, is_int( $points ) ? 0 : 2 ) ),
+			'{amount}' => html_entity_decode( wp_strip_all_tags( wc_price( $base, array( 'decimals' => $decimals ) ) ), ENT_QUOTES, 'UTF-8' ),
+		)
+	);
+}
+
 add_action(
 	'woocommerce_account_' . DOROTAPE_REWARDS_ENDPOINT . '_endpoint',
 	function ( $page = '' ): void {
@@ -146,6 +181,10 @@ add_action(
 				);
 				?>
 			</p>
+			<?php $rule = dorotape_rewards_account_rule(); ?>
+			<?php if ( '' !== $rule ) : ?>
+				<p class="dt-rewards-account__rule"><?php echo esc_html( $rule ); ?></p>
+			<?php endif; ?>
 			<p>
 				<a class="button" href="#rewardswp-redeem"><?php esc_html_e( 'Spend points', 'dorotape' ); ?></a>
 				<a class="button" href="#rewardswp-earn"><?php esc_html_e( 'Ways to earn', 'dorotape' ); ?></a>
