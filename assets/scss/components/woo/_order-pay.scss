@@ -1,0 +1,260 @@
+@use "abstracts/mixins" as *;
+@use "abstracts/field-mixins" as *;
+@use "base/typography" as *;
+@use "abstracts/button-mixins" as *;
+
+// Pay for an order (/checkout/order-pay/{id}/).
+//
+// The one checkout screen that is not the Checkout block: WooCommerce draws it
+// from its classic form-pay template, so none of the block rules in
+// _checkout.scss reach it. It is where a cancelled card payment, the Pay link
+// in My Account and the emailed payment link all land, and unstyled it was a
+// bare table over a bulleted list.
+//
+// Two cards, the order and then the payment, at the width of a checkout
+// column rather than the full band.
+
+.woocommerce-order-pay .woo-page #order_review {
+  display: grid;
+  gap: var(--spacer-24);
+  max-width: 760px;
+}
+
+.woocommerce-order-pay .woo-page #order_review > .shop_table,
+.woocommerce-order-pay .woo-page #payment {
+  padding: var(--spacer-24);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+
+  @include min-breakpoint(tablet) {
+    padding: var(--spacer-32);
+  }
+}
+
+// ── The order ──────────────────────────────────────────────────────────────
+//
+// A table cannot take padding and a radius as a table, so it is laid out as a
+// block with its rows as a grid: name, quantity, amount.
+
+.woocommerce-order-pay .woo-page #order_review > .shop_table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+
+  thead,
+  tbody,
+  tfoot {
+    display: block;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: var(--spacer-16);
+    align-items: start;
+    padding: var(--spacer-12) 0;
+  }
+
+  th,
+  td {
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+
+  thead tr {
+    padding-top: 0;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-label;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .product-name {
+    color: var(--color-foreground);
+    font-weight: $font-weight-semibold;
+  }
+
+  td.product-quantity,
+  th.product-quantity {
+    color: var(--color-muted-foreground);
+    white-space: nowrap;
+  }
+
+  .product-subtotal,
+  .product-total {
+    color: var(--color-foreground);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .woocommerce-Price-amount {
+    white-space: nowrap;
+  }
+
+  // The foot has two cells a row, a label spanning the first two columns.
+  tfoot tr {
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  }
+
+  tfoot th {
+    color: var(--color-muted-foreground);
+    font-weight: $font-weight-semibold;
+  }
+
+  // The last row with an amount in it is the total. The payment method the
+  // order was placed with follows it.
+  tfoot tr:has(.woocommerce-Price-amount):not(:has(~ tr .woocommerce-Price-amount)) {
+    th,
+    td {
+      color: var(--color-foreground);
+      font-size: $font-size-md;
+      font-weight: $font-weight-extrabold;
+    }
+  }
+
+  tfoot tr:last-child {
+    padding-bottom: 0;
+  }
+
+  .shipped_via {
+    display: block;
+    color: var(--color-muted-foreground);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-regular;
+  }
+}
+
+.woocommerce-order-pay .woo-page .wc-item-meta {
+  margin: var(--spacer-4) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-regular;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacer-4);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+// ── Payment ────────────────────────────────────────────────────────────────
+
+.woocommerce-order-pay .woo-page .wc_payment_methods {
+  display: grid;
+  gap: var(--spacer-12);
+  margin: 0 0 var(--spacer-24);
+  padding: 0;
+  list-style: none;
+}
+
+.woocommerce-order-pay .woo-page .wc_payment_method {
+  padding: var(--spacer-16);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface-2);
+
+  &:has(.input-radio:checked) {
+    border-color: color-mix(in oklab, var(--color-magenta) 60%, transparent);
+  }
+
+  > label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacer-8);
+    color: var(--color-foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+  }
+
+  > label img {
+    width: auto;
+    height: 22px;
+    border-radius: 3px;
+  }
+
+  .input-radio {
+    margin: 0 var(--spacer-8) 0 0;
+    accent-color: var(--color-magenta);
+  }
+}
+
+.woocommerce-order-pay .woo-page .payment_box {
+  margin-top: var(--spacer-8);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+
+  p {
+    margin: 0;
+  }
+}
+
+.woocommerce-order-pay .woo-page #payment .form-row {
+  margin: 0;
+  padding: 0;
+}
+
+.woocommerce-order-pay .woo-page .woocommerce-privacy-policy-text p {
+  margin: 0 0 var(--spacer-16);
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+}
+
+.woocommerce-order-pay .woo-page #payment .woocommerce-terms-and-conditions-wrapper .form-row {
+  margin: 0 0 var(--spacer-20);
+}
+
+.woocommerce-order-pay .woo-page .woocommerce-form__label-for-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacer-12);
+  color: var(--color-foreground);
+  font-size: $font-size-sm;
+  cursor: pointer;
+
+  .input-checkbox {
+    @include checkbox-base;
+  }
+
+  .woocommerce-terms-and-conditions-checkbox-text {
+    flex: 0 1 auto;
+  }
+
+  .required {
+    color: var(--color-danger);
+    text-decoration: none;
+  }
+}
+
+.woocommerce-order-pay .woo-page #payment a {
+  color: var(--color-cyan);
+}
+
+.woocommerce-order-pay .woo-page #place_order {
+  @include button-base;
+  @include button-size-lg;
+  @include button-primary;
+
+  width: 100%;
+
+  @include min-breakpoint(tablet) {
+    width: auto;
+  }
+}

@@ -218,6 +218,48 @@
             "append": ""
         },
         {
+            "key": "field_dtwoo0046",
+            "label": "Reward points: pending note",
+            "name": "woo_reward_points_pending",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown in brackets beside an order on My Account > Reward points while its points do not count yet. Points count once the order has been paid.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "pending until the order has been paid",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0047",
+            "label": "Reward points: nothing earned yet",
+            "name": "woo_reward_points_empty",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown on My Account > Reward points when the customer has no points entries.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "No points yet. They appear here once an order has been paid for.",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtwoo0032",
             "label": "Share basket: heading",
             "name": "woo_share_heading",
@@ -638,5 +680,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1794560903
+    "modified": 1794568990
 }

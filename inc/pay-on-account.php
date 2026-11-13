@@ -50,10 +50,50 @@ function dorotape_can_pay_on_account( ?int $user_id = null ): bool {
 	 */
 	return (bool) apply_filters(
 		'dorotape_can_pay_on_account',
-		(bool) get_field( 'pay_on_account_approved', 'user_' . $user_id ),
+		(bool) get_field( 'pay_on_account_approved', 'user_' . $user_id )
+			|| (bool) get_user_meta( $user_id, DOROTAPE_WOOSAGE_ALLOW_ACCOUNT_META, true ),
 		$user_id
 	);
 }
+
+/**
+ * Woosage's own tick box on the user profile, "Allow on account".
+ *
+ * Woosage runs a gate of its own over this payment method and looks only at its
+ * own box, so a customer approved with ours alone was still refused the method,
+ * and nobody could tell why. Either box now approves the customer.
+ */
+const DOROTAPE_WOOSAGE_ALLOW_ACCOUNT_META = 'woosage_allow_on_account';
+
+/**
+ * Tell Woosage that a customer approved here may use the method.
+ *
+ * Stands aside when Woosage's extra checks (account exists in Sage, account not
+ * held) are switched on: those are its to enforce and this must not wave a
+ * customer past them.
+ *
+ * @param bool   $allowed
+ * @param int    $user_id
+ * @param string $method
+ */
+add_filter(
+	'woosage_user_can_pay_with_method',
+	function ( $allowed, $user_id = 0, $method = '' ) {
+		if ( $allowed || DOROTAPE_ACCOUNT_GATEWAY_ID !== $method ) {
+			return $allowed;
+		}
+
+		$checks = function_exists( 'WS50' ) ? WS50()->get_setting( 'additional_checks' ) : array();
+
+		if ( is_array( $checks ) && array_filter( $checks ) ) {
+			return $allowed;
+		}
+
+		return dorotape_can_pay_on_account( (int) $user_id );
+	},
+	10,
+	3
+);
 
 /**
  * Remove the gateway for anyone not approved.

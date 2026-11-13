@@ -166,13 +166,16 @@
   white-space: nowrap;
 }
 
-.woo-page .wishlist-in-stock {
+// The longer selector is what beats YITH's own
+// `.wishlist_table .product-stock-status span.wishlist-in-stock`, which set a
+// dark green (#297e29) that all but vanished on this pill.
+.woo-page .wishlist_table .product-stock-status span.wishlist-in-stock {
   border-color: color-mix(in oklab, var(--color-success) 40%, transparent);
   background-color: color-mix(in oklab, var(--color-success) 12%, var(--color-background));
   color: var(--color-success);
 }
 
-.woo-page .wishlist-out-of-stock {
+.woo-page .wishlist_table .product-stock-status span.wishlist-out-of-stock {
   border-color: color-mix(in oklab, var(--color-danger) 40%, transparent);
   background-color: color-mix(in oklab, var(--color-danger) 12%, var(--color-background));
   color: var(--color-danger);

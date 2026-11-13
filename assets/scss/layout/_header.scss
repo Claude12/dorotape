@@ -344,6 +344,21 @@
   background: transparent;
 }
 
+// On a phone the plugin lifts the form out of the header into its own white
+// full-screen bar on <body>. The site's text colour is near-white, so what was
+// typed there could not be read. Dark text on the white bar, caret included.
+.dgwt-wcas-overlay-mobile .dgwt-wcas-search-wrapp .dgwt-wcas-sf-wrapp input[type="search"].dgwt-wcas-search-input {
+  background-color: #fff;
+  color: #111;
+  caret-color: #111;
+  -webkit-text-fill-color: #111;
+
+  &::placeholder {
+    color: #6b6b6b;
+    -webkit-text-fill-color: #6b6b6b;
+  }
+}
+
 // One class deeper than pirx's base input rule, so it also ties the plugin's
 // mobile-wrapper variant (which would otherwise strip the fill and radius in
 // the drawer) and wins on source order.

@@ -191,7 +191,7 @@ add_action(
 			</p>
 
 			<?php if ( empty( $entries ) ) : ?>
-				<p><?php esc_html_e( 'No points yet. They appear here once an order has been dispatched.', 'dorotape' ); ?></p>
+				<p><?php echo esc_html( dorotape_woo_pages_field( 'woo_reward_points_empty', __( 'No points yet. They appear here once an order has been paid for.', 'dorotape' ) ) ); ?></p>
 			<?php else : ?>
 				<table class="woocommerce-orders-table shop_table shop_table_responsive my_account_orders dt-rewards-account__table">
 					<thead>
@@ -315,7 +315,10 @@ function dorotape_rewards_entry_order_link( $entry ): string {
  */
 function dorotape_rewards_entry_state( $entry ): string {
 	if ( method_exists( $entry, 'is_pending' ) && $entry->is_pending() ) {
-		return __( 'pending until the order is dispatched', 'dorotape' );
+		// Paid, not dispatched: RewardsWP counts the points as soon as the order
+		// is paid, so a card order never shows this and an order waiting on a
+		// phone call, a payment link or the account does until it is moved on.
+		return (string) dorotape_woo_pages_field( 'woo_reward_points_pending', __( 'pending until the order has been paid', 'dorotape' ) );
 	}
 	if ( method_exists( $entry, 'is_revoked' ) && $entry->is_revoked() ) {
 		return __( 'cancelled', 'dorotape' );

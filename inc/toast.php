@@ -54,6 +54,13 @@ function dorotape_toast_capture(): void {
 		return;
 	}
 
+	// My Account keeps its confirmations on the page. "Address saved" after a
+	// reload is something a person looks for where the form was, and a toast
+	// that had gone by the time they looked read as nothing having happened.
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		return;
+	}
+
 	$notices = wc_get_notices();
 
 	if ( empty( $notices['success'] ) ) {

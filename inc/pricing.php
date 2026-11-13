@@ -884,6 +884,12 @@ function dorotape_tier_label( array $tier, WC_Product $product, int $product_id 
 		return '';
 	}
 
+	// A Sage price-list price replaces the website price and tiers are skipped
+	// for it, so the line must not claim a quantity discount it did not get.
+	if ( dorotape_user_has_role_price( $product ) ) {
+		return '';
+	}
+
 	$unit = dorotape_unit_strings( dorotape_price_unit( $product_id ) );
 
 	return (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate · save ' . $saving_pct . '%';

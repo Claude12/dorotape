@@ -214,3 +214,25 @@ function dorotape_apply_address_to_order( WC_Order $order, array $address, strin
 		)
 	);
 }
+
+/**
+ * Keep the saved address picker off the admin order screen.
+ *
+ * The field only records which saved address was picked, as its internal id.
+ * The address itself is already on the order, so on the admin screen it was a
+ * line reading "Use a saved delivery address: addr_..." that told staff nothing.
+ *
+ * @param array $fields
+ * @return array
+ */
+function dorotape_hide_address_picker_in_admin( $fields ) {
+	if ( ! is_array( $fields ) ) {
+		return $fields;
+	}
+
+	unset( $fields[ dorotape_address_field_id( 'billing' ) ], $fields[ dorotape_address_field_id( 'shipping' ) ] );
+
+	return $fields;
+}
+add_filter( 'woocommerce_admin_billing_fields', 'dorotape_hide_address_picker_in_admin', 20 );
+add_filter( 'woocommerce_admin_shipping_fields', 'dorotape_hide_address_picker_in_admin', 20 );

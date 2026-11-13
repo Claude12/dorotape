@@ -821,6 +821,19 @@ add_action( 'woocommerce_checkout_create_order_line_item', function (
 }, 10, 3 );
 
 /**
+ * Keep the Sage copy of the cut sizes off the admin order screen.
+ *
+ * The line already shows "Cut Sizes" for staff. The second copy exists only
+ * for the export, and printed beside the first under its internal name.
+ */
+add_filter( 'woocommerce_hidden_order_itemmeta', function ( $hidden ) {
+	$hidden   = is_array( $hidden ) ? $hidden : array();
+	$hidden[] = '_dt_cut_sizes_note';
+
+	return $hidden;
+} );
+
+/**
  * Surface the cut-size note to Sage.
  *
  * Woosage's REST response is rebuilt strictly from its declared schema

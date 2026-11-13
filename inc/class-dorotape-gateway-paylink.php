@@ -46,6 +46,28 @@ class Dorotape_Gateway_Paylink extends Dorotape_Gateway_Offline {
 	}
 
 	/**
+	 * Mark the order as one that is paid through its link.
+	 *
+	 * The mark outlives the payment method on the order: once the customer opens
+	 * the link and picks the card method, WooCommerce stores that method instead,
+	 * and a cancelled card attempt must not leave them with a link that no longer
+	 * opens.
+	 *
+	 * @param int $order_id
+	 * @return array{result: string, redirect: string}
+	 */
+	public function process_payment( $order_id ): array {
+		$order = wc_get_order( $order_id );
+
+		if ( $order ) {
+			$order->update_meta_data( DOROTAPE_PAYLINK_META, 'yes' );
+			$order->save();
+		}
+
+		return parent::process_payment( $order_id );
+	}
+
+	/**
 	 * Put the payment link in front of the customer as well as in their email.
 	 *
 	 * The instructions promise a link, so the order received page should carry
@@ -58,7 +80,7 @@ class Dorotape_Gateway_Paylink extends Dorotape_Gateway_Offline {
 		$order_id = absint( get_query_var( 'order-received' ) );
 		$order    = $order_id ? wc_get_order( $order_id ) : null;
 
-		if ( ! $order instanceof WC_Order || $this->id !== $order->get_payment_method() || $order->is_paid() ) {
+		if ( ! $order instanceof WC_Order || ! dorotape_order_awaits_paylink( $order ) ) {
 			return;
 		}
 
@@ -67,5 +89,34 @@ class Dorotape_Gateway_Paylink extends Dorotape_Gateway_Offline {
 			esc_url( $order->get_checkout_payment_url() ),
 			esc_html__( 'Pay for this order now', 'dorotape' )
 		);
+	}
+
+	/**
+	 * The link itself, in the customer's email.
+	 *
+	 * WooCommerce only prints a payment link in the invoice email, which is sent
+	 * by hand. The on-hold email this order gets has none, so without this the
+	 * customer is told a link has been emailed and never receives one.
+	 *
+	 * @param WC_Order $order
+	 * @param bool     $sent_to_admin
+	 * @param bool     $plain_text
+	 */
+	public function email_instructions( $order, $sent_to_admin, $plain_text = false ): void {
+		parent::email_instructions( $order, $sent_to_admin, $plain_text );
+
+		if ( $sent_to_admin || ! $order instanceof WC_Order || ! dorotape_order_awaits_paylink( $order ) ) {
+			return;
+		}
+
+		$url   = $order->get_checkout_payment_url();
+		$label = __( 'Pay for this order now', 'dorotape' );
+
+		if ( $plain_text ) {
+			echo esc_html( $label ) . ': ' . esc_url_raw( $url ) . PHP_EOL . PHP_EOL;
+			return;
+		}
+
+		printf( '<p><a href="%s"><strong>%s</strong></a></p>', esc_url( $url ), esc_html( $label ) );
 	}
 }

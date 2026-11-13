@@ -167,6 +167,10 @@ function dorotape_save_address( array $data, ?string $address_id = null, ?int $u
 		return $errors;
 	}
 
+	if ( '' !== $address['postcode'] ) {
+		$address['postcode'] = wc_format_postcode( $address['postcode'], $address['country'] ?? '' );
+	}
+
 	if ( '' === $address['label'] ) {
 		$address['label'] = dorotape_address_fallback_label( $address );
 	}
@@ -238,6 +242,20 @@ function dorotape_validate_address( array $address, string $type ): WP_Error {
 				)
 			);
 		}
+	}
+
+	// The same postcode test the checkout applies. Without it an address the
+	// checkout would refuse could be saved here and then picked at checkout.
+	$postcode = trim( (string) ( $address['postcode'] ?? '' ) );
+	$country  = (string) ( $address['country'] ?? '' );
+
+	if ( '' !== $postcode && '' !== $country && ! WC_Validation::is_postcode( $postcode, $country ) ) {
+		$errors->add(
+			'dorotape_address_postcode',
+			'GB' === $country
+				? __( 'Please enter a valid UK postcode.', 'dorotape' )
+				: __( 'Please enter a valid postcode.', 'dorotape' )
+		);
 	}
 
 	return $errors;

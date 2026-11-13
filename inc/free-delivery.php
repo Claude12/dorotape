@@ -197,6 +197,13 @@ add_filter(
 			return $content;
 		}
 
+		// Paying for or looking back at an order: the notice reads the basket,
+		// which is not what is on this page, and said "qualifies for free
+		// delivery" above an order that had been charged for it.
+		if ( is_wc_endpoint_url( 'order-pay' ) || is_wc_endpoint_url( 'order-received' ) ) {
+			return $content;
+		}
+
 		return dorotape_free_delivery_notice() . $content;
 	},
 	20,

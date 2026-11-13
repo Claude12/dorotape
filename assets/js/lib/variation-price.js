@@ -19,8 +19,35 @@ export function initVariationPriceSwap() {
   var discountHint = document.getElementById( 'dt_discount_hint' );
   var swapTimer;
 
+  // The note under the description says what the price is for: "Prices shown
+  // are per linear metre at 625mm wide". Where the widths are the options, the
+  // price moved with the choice and the note went on naming the first width.
+  // Only a note that names exactly one width is touched, so "25mm x 50m" and
+  // anything worded another way is left as written.
+  var sizeNote     = document.querySelector( '.product-size-note' );
+  var sizeNoteText = sizeNote ? sizeNote.textContent : '';
+  var widthInNote  = /\d+(?:\.\d+)?\s*mm(?=\s+wide)/gi;
+  var noteHasWidth = ( sizeNoteText.match( widthInNote ) || [] ).length === 1;
+
+  function chosenWidth( variation ) {
+    var attrs = ( variation && variation.attributes ) || {};
+    for ( var key in attrs ) {
+      if ( key.indexOf( 'width' ) === -1 ) continue;
+      var found = String( attrs[ key ] ).match( /^(\d+(?:\.\d+)?)\s*mm$/i );
+      if ( found ) return found[ 1 ] + 'mm';
+    }
+    return '';
+  }
+
+  function updateSizeNote( variation ) {
+    if ( ! sizeNote || ! noteHasWidth ) return;
+    var width = chosenWidth( variation );
+    sizeNote.textContent = width ? sizeNoteText.replace( widthInNote, width ) : sizeNoteText;
+  }
+
   function showVariation( variation ) {
     clearTimeout( swapTimer );
+    updateSizeNote( variation );
 
     // Does this specific variation have tier pricing?
     var hasTiers = false;
@@ -71,6 +98,7 @@ export function initVariationPriceSwap() {
 
   function resetVariation() {
     clearTimeout( swapTimer );
+    updateSizeNote( null );
 
     // Fade tier table out, then hide.
     if ( tierTable ) {

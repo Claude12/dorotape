@@ -311,3 +311,118 @@ function dorotape_seed_collection_title(): void {
 	update_option( 'dorotape_pickup_title_seeded', 1, true );
 }
 add_action( 'admin_init', 'dorotape_seed_collection_title' );
+
+// ─── Pay by emailed link ──────────────────────────────────────────────────────
+//
+// Here rather than beside the gateway class, which is only loaded when
+// WooCommerce builds its gateway list. These have to answer on pages that never
+// build it, such as the order list in My Account.
+
+/** Order meta: this order was placed to be paid through its link. */
+const DOROTAPE_PAYLINK_META = '_dorotape_paylink';
+
+/**
+ * Is this order still waiting to be paid through its link?
+ */
+function dorotape_order_awaits_paylink( WC_Order $order ): bool {
+	return $order->has_status( 'on-hold' )
+		&& ! $order->is_paid()
+		&& ( 'dorotape_paylink' === $order->get_payment_method() || 'yes' === $order->get_meta( DOROTAPE_PAYLINK_META ) );
+}
+
+/**
+ * Let the link be used.
+ *
+ * WooCommerce takes payment for pending and failed orders only, and these are
+ * held as on-hold so the warehouse does not pick them. Without this the link
+ * opens a page saying the order cannot be paid for.
+ */
+add_filter(
+	'woocommerce_valid_order_statuses_for_payment',
+	function ( $statuses, $order = null ) {
+		if ( $order instanceof WC_Order && dorotape_order_awaits_paylink( $order ) ) {
+			$statuses[] = 'on-hold';
+		}
+
+		return $statuses;
+	},
+	10,
+	2
+);
+
+/**
+ * On the payment page for one of these orders, offer the pay-now methods only.
+ *
+ * Offering "email me a link" or "call me" again on the page the link leads to
+ * would send the customer round in a circle. If taking them away would leave
+ * nothing, the list is left as it was.
+ */
+add_filter(
+	'woocommerce_available_payment_gateways',
+	function ( $gateways ) {
+		if ( ! is_array( $gateways ) || ! function_exists( 'is_checkout_pay_page' ) || ! is_checkout_pay_page() ) {
+			return $gateways;
+		}
+
+		$order = wc_get_order( absint( get_query_var( 'order-pay' ) ) );
+
+		if ( ! $order instanceof WC_Order || ! dorotape_order_awaits_paylink( $order ) ) {
+			return $gateways;
+		}
+
+		$kept = array_diff_key( $gateways, array_flip( array( 'dorotape_paylink', 'dorotape_phone', 'cod', 'igfw_invoice_gateway' ) ) );
+
+		return $kept ? $kept : $gateways;
+	},
+	130
+);
+
+// ─── Delivery that is quoted, not priced ──────────────────────────────────────
+
+/**
+ * Is the basket going somewhere we quote delivery for afterwards?
+ *
+ * Europe and the rest of the world have one option, "we will contact you to
+ * arrange payment", carried at 0.00 because the price is not known yet.
+ */
+function dorotape_delivery_is_quoted(): bool {
+	if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+		return false;
+	}
+
+	foreach ( (array) WC()->session->get( 'chosen_shipping_methods', array() ) as $rate_id ) {
+		$rate_id = (string) $rate_id;
+
+		if ( 0 === strpos( $rate_id, DOROTAPE_TARIFF_METHOD ) && ':quote' === substr( $rate_id, -6 ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * No paying now for an order whose delivery has not been priced.
+ *
+ * A card payment at checkout took the goods total with 0.00 delivery, so the
+ * delivery then had to be collected as a second payment. The card and the
+ * emailed link are held back and the order is placed for a call, or on the
+ * account, which is what the delivery option already says will happen.
+ *
+ * Not on the pay-for-order page: by then the order has its delivery price and
+ * paying it by card is the point.
+ */
+add_filter(
+	'woocommerce_available_payment_gateways',
+	function ( $gateways ) {
+		if ( ! is_array( $gateways ) || is_admin() || is_wc_endpoint_url( 'order-pay' ) || ! dorotape_delivery_is_quoted() ) {
+			return $gateways;
+		}
+
+		$held = $gateways;
+		unset( $held['sagepayform'], $held['dorotape_paylink'] );
+
+		return $held ? $held : $gateways;
+	},
+	110
+);
