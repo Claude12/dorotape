@@ -984,6 +984,21 @@ function dorotape_rewards_panel_loader(): void {
 	<script>
 	(function () {
 		var url = <?php echo wp_json_encode( esc_url_raw( $url ) ); ?>;
+		/*
+		 * Has the visitor clicked, tapped or typed yet, and did they arrive
+		 * on a link meant to open the panel (?rewardswp=... or #rewardswp-...)?
+		 * Read before anything can change the address. See guard() below.
+		 */
+		var acted = false;
+		var deepLink = false;
+		try {
+			var arrival = performance.getEntriesByType('navigation')[0];
+			deepLink = (!arrival || 'navigate' === arrival.type)
+				&& (/[?&]rewardswp=/.test(location.search) || 0 === location.hash.indexOf('#rewardswp-'));
+		} catch (e) {}
+		['pointerdown', 'touchstart', 'keydown'].forEach(function (type) {
+			window.addEventListener(type, function (e) { if (e.isTrusted) acted = true; }, { capture: true, passive: true });
+		});
 		function fill() {
 			fetch(url, { credentials: 'same-origin' })
 				.then(function (r) { return r.ok ? r.text() : ''; })
@@ -1012,12 +1027,39 @@ function dorotape_rewards_panel_loader(): void {
 					} catch (e) {}
 					var t = document.createElement('template');
 					t.innerHTML = html;
+					guard();
 					slot.replaceWith(t.content);
 					// Only when the plugin is set to its default of icon and
 					// text. An editor who picked icon only or text only keeps it.
 					if (/launcherDisplayMode:\s*'icon_with_text'/.test(html)) collapse();
 				})
 				.catch(function () {});
+		}
+		/*
+		 * The panel only opens when the visitor asks for it. In QA on dev
+		 * (13 Nov) it opened by itself over the signed-out My Account page
+		 * after every log out, covering the Register button, in a way we
+		 * could not reproduce here. RewardsWP has several ways of opening
+		 * itself on page load (welcome screens, hashes, query strings), so
+		 * rather than chase each one: if the panel opens before the visitor
+		 * has clicked, tapped or typed anything on this page, it is closed
+		 * again straight away. A link meant to open it, such as
+		 * /shop/#rewardswp-home in an email, still does.
+		 */
+		function guard() {
+			if (deepLink || acted || !window.MutationObserver) return;
+			var watch = new MutationObserver(function () {
+				if (acted) {
+					watch.disconnect();
+					return;
+				}
+				if (!document.body.classList.contains('rwp-panel-open')) return;
+				var host = document.querySelector('rewards-panel');
+				var root = host && (host.shadowRoot || host);
+				var close = root && root.querySelector('button[x-on\\:click="open = false"]');
+				if (close) close.click();
+			});
+			watch.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 		}
 		/*
 		 * The launcher is fixed over the bottom right corner at every width,
