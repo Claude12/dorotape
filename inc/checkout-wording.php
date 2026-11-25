@@ -56,6 +56,10 @@ function dorotape_invoice_wording(): array {
 		'Use same address for billing'                                      => __( 'Use same address for invoice', 'dorotape' ),
 		'Enter the billing and shipping address that matches your payment method.' => __( 'Enter the invoice and delivery address that matches your payment method.', 'dorotape' ),
 		'Enter the billing address that matches your payment method.'      => __( 'Enter the invoice address that matches your payment method.', 'dorotape' ),
+		// The address edit page and order screens said "Shipping address" where
+		// the rest of the site says Delivery (dev retest, 25 November 2026).
+		'Shipping address'                                                  => __( 'Delivery address', 'dorotape' ),
+		'Shipping Address'                                                  => __( 'Delivery address', 'dorotape' ),
 		// The My Account dashboard's opening line (dev QA, 25 November 2026).
 		'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">shipping and billing addresses</a>, and <a href="%3$s">edit your password and account details</a>.' => __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">invoice and delivery addresses</a>, and <a href="%3$s">edit your password and account details</a>.', 'dorotape' ),
 		'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">billing address</a>, and <a href="%3$s">edit your password and account details</a>.' => __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">invoice address</a>, and <a href="%3$s">edit your password and account details</a>.', 'dorotape' ),

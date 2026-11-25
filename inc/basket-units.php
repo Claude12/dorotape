@@ -133,6 +133,13 @@ add_action(
 			var said = String(item.quantity) + ' ' + (1 === item.quantity ? words[unit].one : words[unit].many);
 			if (spans[0].textContent !== shown) spans[0].textContent = shown;
 			if (spans[1].textContent !== said) spans[1].textContent = said;
+			// WooCommerce's hidden line price, "Total price for 10 <name> items: £99.00"
+			// (dev retest, 25 Nov), becomes "Total price for 10 metres of <name>: £99.00".
+			row.querySelectorAll('.screen-reader-text').forEach(function (sr) {
+				var m = /^Total price for \S+ ([\s\S]*?) items?:/.exec(sr.textContent);
+				if (!m) return;
+				sr.textContent = 'Total price for ' + said + ' of ' + m[1] + ':' + sr.textContent.slice(m[0].length);
+			});
 		});
 	}
 	data.subscribe(function () {

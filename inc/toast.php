@@ -61,6 +61,15 @@ function dorotape_toast_capture(): void {
 		return;
 	}
 
+	// The basket too. Order again lands here after a reload, and its "added
+	// to your basket" went by as a toast in the corner while the basket was
+	// still drawing, offering "View basket" on the basket itself; the tester
+	// never saw it (dev retest, 25 November 2026). WooCommerce prints it at the
+	// top of the basket instead.
+	if ( function_exists( 'is_cart' ) && is_cart() ) {
+		return;
+	}
+
 	$notices = wc_get_notices();
 
 	if ( empty( $notices['success'] ) ) {
@@ -266,3 +275,22 @@ function dorotape_toast_cart_fragment( array $fragments ): array {
 	return $fragments;
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'dorotape_toast_cart_fragment' );
+
+/**
+ * Print the queued notices at the top of the basket.
+ *
+ * The basket is WooCommerce's Cart block, which does not print the notice
+ * queue, so a confirmation left for the basket page (see the is_cart() case
+ * in dorotape_toast_capture()) would otherwise wait in the session and turn up
+ * on some later page.
+ *
+ * @param string $content
+ * @return string
+ */
+add_filter( 'render_block_woocommerce/cart', function ( $content ) {
+	if ( ! function_exists( 'wc_print_notices' ) || ! WC()->session || ! wc_notice_count() ) {
+		return $content;
+	}
+
+	return '<div class="woocommerce-notices-wrapper dt-basket-notices">' . wc_print_notices( true ) . '</div>' . $content;
+} );
