@@ -66,10 +66,9 @@
 // lozenge with a green icon in place of the drop (inc/eco-badges.php, Paul
 // Houghton, 17 November 2026).
 .eco-list {
-  margin-top: var(--spacer-24);
-
-  .product-inks + & {
-    margin-top: var(--spacer-16);
+  .ink-list__item {
+    border-color: color-mix(in oklab, var(--color-success) 55%, transparent);
+    background-color: color-mix(in oklab, var(--color-success) 14%, transparent);
   }
 
   &__icon {

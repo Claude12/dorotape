@@ -56,6 +56,9 @@ function dorotape_invoice_wording(): array {
 		'Use same address for billing'                                      => __( 'Use same address for invoice', 'dorotape' ),
 		'Enter the billing and shipping address that matches your payment method.' => __( 'Enter the invoice and delivery address that matches your payment method.', 'dorotape' ),
 		'Enter the billing address that matches your payment method.'      => __( 'Enter the invoice address that matches your payment method.', 'dorotape' ),
+		// The My Account dashboard's opening line (dev QA, 25 November 2026).
+		'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">shipping and billing addresses</a>, and <a href="%3$s">edit your password and account details</a>.' => __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">invoice and delivery addresses</a>, and <a href="%3$s">edit your password and account details</a>.', 'dorotape' ),
+		'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">billing address</a>, and <a href="%3$s">edit your password and account details</a>.' => __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">invoice address</a>, and <a href="%3$s">edit your password and account details</a>.', 'dorotape' ),
 	);
 }
 
@@ -117,3 +120,36 @@ function dorotape_checkout_wording_script(): void {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'dorotape_checkout_wording_script' );
+
+/**
+ * Keep the Subtotal row when delivery is free.
+ *
+ * WooCommerce drops it unless there is a delivery charge, fee or discount,
+ * and does not count VAT, so a free delivery order showed no net figure. See
+ * assets/js/blocks/cart-subtotal.js.
+ */
+function dorotape_cart_subtotal_script(): void {
+	if ( ! function_exists( 'is_checkout' ) || ! ( is_checkout() || is_cart() ) || is_wc_endpoint_url() ) {
+		return;
+	}
+
+	$relative = '/assets/js/blocks/cart-subtotal.js';
+
+	wp_enqueue_script(
+		'dorotape-cart-subtotal',
+		get_template_directory_uri() . $relative,
+		array( 'wp-data' ),
+		dorotape_asset_version( $relative ),
+		true
+	);
+
+	wp_localize_script(
+		'dorotape-cart-subtotal',
+		'dorotapeSubtotal',
+		array(
+			'label'        => __( 'Subtotal', 'woocommerce' ),
+			'includingTax' => 'incl' === get_option( 'woocommerce_tax_display_cart' ),
+		)
+	);
+}
+add_action( 'wp_enqueue_scripts', 'dorotape_cart_subtotal_script' );

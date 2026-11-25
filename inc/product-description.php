@@ -612,6 +612,35 @@ function dorotape_product_size_note(): void {
 }
 
 /**
+ * Drop the short description's own "Prices shown are per roll" sentence when
+ * the size note is shown under it.
+ *
+ * The old site's short descriptions end with a price unit sentence that
+ * often disagrees with the description's, and the description's is the one
+ * the size note shows. On CRA31 that read "Prices shown are per roll" straight
+ * over "Prices shown are per metre at 1370mm wide" (dev QA, 25 November 2026).
+ * Forty-odd products do the same, so the sentence is dropped here rather than
+ * edited out of each one.
+ *
+ * @param string $excerpt Short description.
+ * @return string
+ */
+function dorotape_short_description_drop_unit( $excerpt ) {
+	global $product;
+
+	if ( ! is_string( $excerpt ) || ! $product instanceof WC_Product || ! is_product() ) {
+		return $excerpt;
+	}
+
+	if ( '' === dorotape_product_description_parts( $product->get_id() )['size_note'] ) {
+		return $excerpt;
+	}
+
+	return (string) preg_replace( '#\s*(?:The\s+)?prices?\s+shown\s+(?:are|is)\s+per\b[^.<]*\.?#i', '', $excerpt );
+}
+add_filter( 'woocommerce_short_description', 'dorotape_short_description_drop_unit', 12 );
+
+/**
  * Print the description tab: the intro, and the notes that belong to the
  * whole product (the price unit, a blog link).
  *

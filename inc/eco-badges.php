@@ -137,7 +137,12 @@ function dorotape_product_eco_chips(): void {
 
 	$badges = dorotape_eco_badges();
 
-	echo '<ul class="ink-list eco-list" aria-label="' . esc_attr( dorotape_product_page_field( 'product_badges_label', __( 'Certifications', 'dorotape' ) ) ) . '">';
+	// Under a heading of their own and tinted green, so they do not read as a
+	// second row of inks under "Ink compatibility" (dev QA, 25 November 2026).
+	$title = dorotape_product_page_field( 'product_eco_title', __( 'Sustainability', 'dorotape' ) );
+
+	echo '<div class="product-inks product-eco"><p class="product-inks__title">' . esc_html( $title ) . '</p>';
+	echo '<ul class="ink-list eco-list" aria-label="' . esc_attr( $title ) . '">';
 
 	foreach ( $keys as $key ) {
 		$badge = $badges[ $key ];
@@ -153,5 +158,5 @@ function dorotape_product_eco_chips(): void {
 		);
 	}
 
-	echo '</ul>';
+	echo '</ul></div>';
 }

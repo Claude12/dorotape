@@ -517,3 +517,23 @@ function dorotape_product_grid_products( array $ids, int $limit ): array {
 
 	return $products;
 }
+
+/**
+ * "Add to basket", not WooCommerce's "Add to cart", on the product page and
+ * the product cards, to match the rest of the site (dev QA, 25 November 2026).
+ *
+ * Only WooCommerce's own "Add to cart" is replaced, so "Select options",
+ * "Read more" and the like are left as they are.
+ *
+ * @param string $text
+ * @return string
+ */
+function dorotape_add_to_basket_text( $text ) {
+	if ( __( 'Add to cart', 'woocommerce' ) !== $text ) {
+		return $text;
+	}
+
+	return dorotape_product_page_field( 'product_add_to_basket', __( 'Add to basket', 'dorotape' ) );
+}
+add_filter( 'woocommerce_product_single_add_to_cart_text', 'dorotape_add_to_basket_text', 20 );
+add_filter( 'woocommerce_product_add_to_cart_text', 'dorotape_add_to_basket_text', 20 );

@@ -205,3 +205,104 @@ add_action( 'woocommerce_view_order', function ( $order_id ): void {
 	}
 	echo '</div>';
 }, 5 );
+
+/**
+ * Order again adds to the basket instead of replacing it.
+ *
+ * Core empties the basket first, so anything the customer had already put in
+ * was lost without a word (dev QA, 25 November 2026). Now the old order goes in
+ * alongside it.
+ *
+ * Core keys each line by product and options, so a product already in the
+ * basket on the same terms would be overwritten by the old order's line rather
+ * than added to. The basket as it stood is noted here, before core starts, and
+ * the next filter adds the two quantities together.
+ *
+ * @return bool
+ */
+add_filter( 'woocommerce_empty_cart_when_order_again', function (): bool {
+	$GLOBALS['dorotape_basket_before_order_again'] = WC()->session ? (array) WC()->session->get( 'cart', array() ) : array();
+	$GLOBALS['dorotape_order_again_merged']        = 0;
+
+	return false;
+} );
+
+/**
+ * Add the basket's quantity to the old order's line when both are the same
+ * product on the same terms.
+ *
+ * After the quantity step filter above, so the old order's amount is already
+ * a whole number of steps, and so is the basket's, so the sum is too.
+ *
+ * @param array  $cart_item
+ * @param string $cart_id
+ * @return array
+ */
+add_filter( 'woocommerce_add_order_again_cart_item', function ( $cart_item, $cart_id ) {
+	$before = $GLOBALS['dorotape_basket_before_order_again'] ?? array();
+
+	if ( isset( $before[ $cart_id ]['quantity'] ) ) {
+		$cart_item['quantity'] = dorotape_stock_amount( (float) $cart_item['quantity'] + (float) $before[ $cart_id ]['quantity'] );
+		$GLOBALS['dorotape_order_again_merged'] = ( $GLOBALS['dorotape_order_again_merged'] ?? 0 ) + 1;
+	}
+
+	return $cart_item;
+}, 20, 2 );
+
+/**
+ * Core's notices, put right for a basket that was added to.
+ *
+ * Core counts lines that failed to go in as "lines on the old order minus new
+ * lines in the basket", so a line that joined one already there was reported
+ * as unavailable. The count is corrected, and the notice dropped when nothing
+ * was missing. "The cart has been filled" no longer describes what happened.
+ */
+add_filter( 'woocommerce_add_error', function ( $message ) {
+	$merged = (int) ( $GLOBALS['dorotape_order_again_merged'] ?? 0 );
+
+	if ( ! dorotape_is_order_again() || $merged < 1 || ! is_string( $message ) || ! preg_match( '/^(\d+) items? from your previous order/', $message, $m ) ) {
+		return $message;
+	}
+
+	$missing = (int) $m[1] - $merged;
+
+	if ( $missing < 1 ) {
+		return '';
+	}
+
+	return sprintf(
+		/* translators: %d item count */
+		_n(
+			'%d item from your previous order is currently unavailable and could not be added to your cart.',
+			'%d items from your previous order are currently unavailable and could not be added to your cart.',
+			$missing,
+			'woocommerce'
+		),
+		$missing
+	);
+} );
+
+add_filter( 'woocommerce_add_success', function ( $message ) {
+	if ( dorotape_is_order_again() && __( 'The cart has been filled with the items from your previous order.', 'woocommerce' ) === $message ) {
+		return __( 'The items from your previous order have been added to your basket.', 'dorotape' );
+	}
+
+	return $message;
+} );
+
+/**
+ * When every line joined one already in the basket, core counts nothing added
+ * and says nothing at all, so the customer lands on the basket with no word of
+ * what changed. Say it here instead.
+ *
+ * @param int   $order_id
+ * @param array $order_items
+ * @param array $cart
+ */
+add_action( 'woocommerce_ordered_again', function ( $order_id, $order_items, $cart ): void {
+	$before = $GLOBALS['dorotape_basket_before_order_again'] ?? array();
+
+	if ( (int) ( $GLOBALS['dorotape_order_again_merged'] ?? 0 ) > 0 && count( (array) $cart ) <= count( $before ) ) {
+		wc_add_notice( __( 'The items from your previous order have been added to your basket.', 'dorotape' ) );
+	}
+}, 10, 3 );

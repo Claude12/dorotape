@@ -296,6 +296,27 @@
             "append": ""
         },
         {
+            "key": "field_dtprod0041",
+            "label": "Add to basket button",
+            "name": "product_add_to_basket",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The button that puts a product in the basket, on product pages and product cards. WooCommerce calls it Add to cart.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Add to basket",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Add to basket",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtprod0035",
             "label": "Certifications label",
             "name": "product_badges_label",
@@ -512,6 +533,27 @@
             ]
         },
         {
+            "key": "field_dtprod0040",
+            "label": "Sustainability heading",
+            "name": "product_eco_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The small heading over the rPET, PVC Free, Recycled and Recyclable lozenges on the product page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Sustainability",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "Sustainability",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtprod0036",
             "label": "Sustainability lozenges",
             "name": "product_eco_badges",
@@ -672,5 +714,5 @@
     "active": true,
     "description": "Settings the single product page reads on every product: the two background shapes, the Related products headings, and the assurance lines under add to cart.",
     "show_in_rest": 0,
-    "modified": 1794397977
+    "modified": 1795604814
 }
