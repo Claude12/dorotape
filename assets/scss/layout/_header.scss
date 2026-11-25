@@ -975,6 +975,15 @@
   white-space: nowrap;
 }
 
+// The pane of a group with no links under it (see dorotape_menu_intro()).
+.site-header__mega-intro {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+}
+
 .site-header__mega-links {
   margin: 0;
   padding: 0;

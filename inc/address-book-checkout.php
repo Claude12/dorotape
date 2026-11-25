@@ -134,12 +134,63 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		'dorotape-checkout-address-book',
 		'dorotapeAddressBook',
 		array(
-			'book'      => $book,
+			'book'      => (object) $book,
 			'formValue' => DOROTAPE_ADDRESS_FORM_VALUE,
 			'fields'    => array(
 				'shipping' => dorotape_address_field_id( 'shipping' ),
 				'billing'  => dorotape_address_field_id( 'billing' ),
 			),
+		)
+	);
+} );
+
+/**
+ * Invoice address first, then "Use same address for shipping".
+ *
+ * For every customer, guests included, since it is how the checkout reads
+ * rather than anything to do with the address book. The checkout page puts
+ * the invoice block above the shipping one; the script turns WooCommerce's
+ * "same address" box round to match. See the script for how.
+ *
+ * The customer's saved delivery address goes with it, so unticking the box
+ * shows that rather than an empty form.
+ */
+add_action( 'wp_enqueue_scripts', function (): void {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() || is_wc_endpoint_url() ) {
+		return;
+	}
+
+	$delivery = array();
+
+	if ( is_user_logged_in() ) {
+		$customer = new WC_Customer( get_current_user_id() );
+
+		foreach ( array_keys( dorotape_address_book_fields( 'shipping' ) ) as $key ) {
+			$getter = "get_shipping_{$key}";
+			if ( method_exists( $customer, $getter ) ) {
+				$delivery[ $key ] = (string) $customer->$getter();
+			}
+		}
+	}
+
+	$relative = '/assets/js/blocks/checkout-same-address.js';
+
+	wp_enqueue_script(
+		'dorotape-checkout-same-address',
+		get_template_directory_uri() . $relative,
+		array( 'wp-data' ),
+		dorotape_asset_version( $relative ),
+		true
+	);
+
+	wp_localize_script(
+		'dorotape-checkout-same-address',
+		'dorotapeSameAddress',
+		array(
+			'label'       => __( 'Use same address for shipping', 'dorotape' ),
+			'delivery'    => (object) $delivery,
+			'pickerField' => is_user_logged_in() && dorotape_get_address_book_by_type( 'shipping' ) ? dorotape_address_field_id( 'shipping' ) : '',
+			'formValue'   => DOROTAPE_ADDRESS_FORM_VALUE,
 		)
 	);
 } );

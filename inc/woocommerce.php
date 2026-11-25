@@ -446,6 +446,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 		} ) );
 
 		$variation_tiers[ (int) $var_id ] = array(
+			'unit'       => dorotape_price_unit( (int) $var_id ),
 			'base_price' => $var_base,
 			'tiers'      => array_map(
 				static function ( array $t ): array {
@@ -552,14 +553,22 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 	if ( $product->is_type( 'variable' ) ) {
 		$prices = array();
+		$units  = array(); // only variations sold differently from the product
 		foreach ( $product->get_children() as $var_id ) {
 			$var = wc_get_product( (int) $var_id );
 			if ( $var instanceof WC_Product && '' !== $var->get_price() ) {
 				// Clean fixed-decimal string (avoids float noise like 57.3999… in the JSON).
 				$prices[ (int) $var_id ] = wc_format_decimal( $var->get_price(), wc_get_price_decimals() );
+				$var_unit                = dorotape_price_unit( (int) $var_id );
+				if ( $var_unit !== $unit ) {
+					$units[ (int) $var_id ] = $var_unit;
+				}
 			}
 		}
 		$attrs .= ' data-variation-prices="' . esc_attr( (string) wp_json_encode( $prices ) ) . '"';
+		if ( $units ) {
+			$attrs .= ' data-variation-units="' . esc_attr( (string) wp_json_encode( $units ) ) . '"';
+		}
 	} else {
 		$attrs .= ' data-base="' . esc_attr( wc_format_decimal( $product->get_price(), wc_get_price_decimals() ) ) . '"';
 	}
@@ -1176,15 +1185,16 @@ add_action( 'woocommerce_no_products_found', 'dorotape_render_filter_bar', 5 );
 /**
  * The unit suffix for a price, or '' when the product has not declared one.
  *
- * Deliberately reads the raw meta rather than dorotape_price_unit(), which
+ * Deliberately reads the stored unit rather than dorotape_price_unit(), which
  * treats an unset unit as metres: a card should say "From £X" plainly rather
- * than assert a unit the product never declared.
+ * than assert a unit the product never declared. A variation's own unit wins
+ * over its parent's (a sheet on a product sold by the metre says "each").
  *
- * @param int $product_id
+ * @param int $product_id Product or variation ID.
  * @return string Leading-space suffix, e.g. " per metre".
  */
 function dorotape_price_unit_suffix( int $product_id ): string {
-	switch ( get_post_meta( $product_id, '_dt_price_unit', true ) ) {
+	switch ( dorotape_price_unit_meta( $product_id ) ) {
 		case 'metre':
 			return __( ' per metre', 'dorotape' );
 		case 'roll':
@@ -1211,11 +1221,21 @@ add_filter( 'woocommerce_variable_price_html', function ( string $price, WC_Prod
 		return $price; // single price — WooCommerce's default is fine
 	}
 
+	// Metres and sheets on one product: the floor is a sheet, so "per metre"
+	// would be untrue. Name no unit rather than the wrong one.
+	$suffix = dorotape_price_unit_suffix( $product->get_id() );
+	foreach ( $product->get_children() as $child_id ) {
+		if ( dorotape_price_unit_suffix( (int) $child_id ) !== $suffix ) {
+			$suffix = '';
+			break;
+		}
+	}
+
 	return sprintf(
 		/* translators: 1: lowest obtainable price, 2: unit text e.g. " per metre" */
 		esc_html__( 'From %1$s%2$s', 'dorotape' ),
 		wc_price( wc_get_price_to_display( $product, array( 'price' => $lowest ) ) ),
-		esc_html( dorotape_price_unit_suffix( $product->get_id() ) )
+		esc_html( $suffix )
 	);
 }, 10, 2 );
 
@@ -1262,9 +1282,9 @@ add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $p
  *
  * The "From" prices above carry a unit, but a simple product's price and the
  * price of a chosen width did not, so the unit vanished from the page the
- * moment a width was picked (QA, 12 Nov). A variation reads its parent's Sold
- * per setting. As with the "From" prices, a product with no unit set shows
- * none rather than guessing metres.
+ * moment a width was picked (QA, 12 Nov). A variation reads its own Sold per
+ * setting, else its parent's. As with the "From" prices, a product with no
+ * unit set shows none rather than guessing metres.
  *
  * Runs after the "From" filter and leaves alone any price that already says
  * its unit, POA badges and variable ranges (they have their own filter).
@@ -1277,8 +1297,7 @@ add_filter( 'woocommerce_get_price_html', function ( string $html, WC_Product $p
 		return $html;
 	}
 
-	$id     = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
-	$suffix = dorotape_price_unit_suffix( $id );
+	$suffix = dorotape_price_unit_suffix( $product->get_id() );
 	if ( '' === $suffix || false !== strpos( $html, trim( $suffix ) ) ) {
 		return $html;
 	}

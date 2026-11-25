@@ -8,7 +8,7 @@ declare( strict_types=1 );
  * intro, then Structure, Suitability, Advantages, Ink Compatibility and
  * Technical Information, each a magenta bold span over a list. On a wide
  * screen that left the right half of the band empty and the page very long,
- * so the sections became tabs: Structure, Suitability (with the inks),
+ * so the sections became tabs: Structure, Suitability, Ink compatibility,
  * Advantages and Downloads (Site Edits, October 2026, Product A5). Since
  * 9 November 2026 they are main tabs beside Description (Paul).
  *
@@ -37,16 +37,18 @@ defined( 'ABSPATH' ) || exit;
  * The sections the description is split into, in tab order, and the
  * headings that open each one.
  *
- * Material Characteristics is the Cover Styl' range's word for Structure, and
- * the inks were always a separate heading that the client wants under
- * Suitability. "Compatability" is how ten descriptions spell it.
+ * Material Characteristics is the Cover Styl' range's word for Structure.
+ * The inks sat under Suitability until Michael asked for a tab of their own
+ * (Site Edits 2, Product Page 18, 25 November 2026). "Compatability" is how
+ * ten descriptions spell it.
  *
  * @return array<string, string[]> Tab key => headings, lower case, no colon.
  */
 function dorotape_product_description_tab_headings(): array {
 	return array(
 		'structure'   => array( 'structure', 'material characteristics' ),
-		'suitability' => array( 'suitability', 'ink compatibility', 'ink compatability' ),
+		'suitability' => array( 'suitability' ),
+		'inks'        => array( 'ink compatibility', 'ink compatability' ),
 		'advantages'  => array( 'advantages' ),
 		'downloads'   => array( 'technical information' ),
 	);
@@ -501,10 +503,10 @@ function dorotape_product_description_sections( WC_Product $product ): array {
 	$labels = array(
 		'structure'   => dorotape_product_page_field( 'product_tab_structure', __( 'Structure', 'dorotape' ) ),
 		'suitability' => dorotape_product_page_field( 'product_tab_suitability', __( 'Suitability', 'dorotape' ) ),
+		'inks'        => dorotape_product_page_field( 'product_tab_inks', __( 'Ink compatibility', 'dorotape' ) ),
 		'advantages'  => dorotape_product_page_field( 'product_tab_advantages', __( 'Advantages', 'dorotape' ) ),
 		'downloads'   => dorotape_product_page_field( 'product_tab_downloads', __( 'Downloads', 'dorotape' ) ),
 	);
-	$inks   = dorotape_product_page_field( 'product_tab_inks', __( 'Ink compatibility', 'dorotape' ) );
 	$extras = $parts['extras'];
 	$panels = array();
 
@@ -535,11 +537,9 @@ function dorotape_product_description_sections( WC_Product $product ): array {
 				continue;
 			}
 
-			// A second heading inside one tab keeps its name over its list:
-			// the inks under Suitability, mostly.
-			if ( $n > 0 || 0 === strpos( $chunk['heading'], 'ink' ) ) {
-				$title = 0 === strpos( $chunk['heading'], 'ink' ) ? $inks : ucfirst( $chunk['heading'] );
-				$body .= '<h4 class="product-description__subheading">' . esc_html( $title ) . '</h4>';
+			// A second heading inside one tab keeps its name over its list.
+			if ( $n > 0 ) {
+				$body .= '<h4 class="product-description__subheading">' . esc_html( ucfirst( $chunk['heading'] ) ) . '</h4>';
 			}
 
 			$body .= dorotape_product_description_format( $chunk['html'] );
@@ -926,7 +926,12 @@ function dorotape_product_badges(): void {
 		return;
 	}
 
-	$badges = dorotape_product_description_parts( $product->get_id() )['badges'];
+	// rPET, PVC Free, Recycled and Recyclable show as lozenges over the brand
+	// logo instead (inc/eco-badges.php).
+	$badges = array_filter(
+		dorotape_product_description_parts( $product->get_id() )['badges'],
+		static fn ( array $badge ): bool => ! function_exists( 'dorotape_eco_badge_key' ) || '' === dorotape_eco_badge_key( (string) $badge['src'] )
+	);
 
 	if ( ! $badges ) {
 		return;
@@ -958,6 +963,9 @@ add_action(
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_reward_line', 11 );
 		// Over the form (30), and under the assurance lines (32).
 		add_action( 'woocommerce_single_product_summary', 'dorotape_product_ink_chips', 29 );
+		// rPET, PVC Free and the like, as lozenges under the inks (Paul
+		// Houghton, 17 November 2026).
+		add_action( 'woocommerce_single_product_summary', 'dorotape_product_eco_chips', 29 );
 		// Under the ink chips, at the same priority so it follows them, where
 		// it has the room to be read rather than squeezed beside the category
 		// pill (Claudius, 29 October 2026).

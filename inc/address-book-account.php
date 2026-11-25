@@ -90,7 +90,12 @@ add_filter( 'woocommerce_get_query_vars', function ( array $vars ): array {
 } );
 
 /**
- * Put the tab directly after Addresses, which is the thing it extends.
+ * The address book takes the place of WooCommerce's Addresses tab.
+ *
+ * Having both read as two screens for the same thing (Scott Bale, 19 November
+ * 2026), so the book now shows the default delivery and invoice addresses as
+ * well and Addresses leaves the menu. Its edit screens still work, reached
+ * from the default cards at the top of the book.
  *
  * @param array $items
  * @return array
@@ -99,10 +104,11 @@ add_filter( 'woocommerce_account_menu_items', function ( array $items ): array {
 	$out = array();
 
 	foreach ( $items as $key => $label ) {
-		$out[ $key ] = $label;
 		if ( 'edit-address' === $key ) {
 			$out[ DOROTAPE_ADDRESS_BOOK_ENDPOINT ] = __( 'Address book', 'dorotape' );
+			continue;
 		}
+		$out[ $key ] = $label;
 	}
 
 	if ( ! isset( $out[ DOROTAPE_ADDRESS_BOOK_ENDPOINT ] ) ) {
@@ -110,6 +116,37 @@ add_filter( 'woocommerce_account_menu_items', function ( array $items ): array {
 	}
 
 	return $out;
+}, 20 );
+
+/**
+ * Light up Address book in the menu while editing a default address, since
+ * that is where the customer came from.
+ *
+ * @param array  $classes
+ * @param string $endpoint
+ * @return array
+ */
+add_filter( 'woocommerce_account_menu_item_classes', function ( array $classes, string $endpoint ): array {
+	if ( DOROTAPE_ADDRESS_BOOK_ENDPOINT === $endpoint && function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'edit-address' ) ) {
+		$classes[] = 'is-active';
+	}
+	return $classes;
+}, 10, 2 );
+
+/**
+ * The bare Addresses screen only listed the two defaults, which the book now
+ * shows, so send it there. WooCommerce also lands here after a default is
+ * saved, and the "Address changed" notice travels with the redirect.
+ */
+add_action( 'template_redirect', function (): void {
+	if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'edit-address' ) || ! is_user_logged_in() ) {
+		return;
+	}
+
+	if ( '' === (string) get_query_var( 'edit-address' ) && empty( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- only checks that nothing was posted.
+		wp_safe_redirect( wc_get_account_endpoint_url( DOROTAPE_ADDRESS_BOOK_ENDPOINT ) );
+		exit;
+	}
 }, 20 );
 
 /**
@@ -154,8 +191,13 @@ add_action( 'template_redirect', function (): void {
 	}
 
 	if ( 'set_default' === $action ) {
-		if ( dorotape_set_default_address( $address_id ) ) {
-			wc_add_notice( __( 'Default address updated. Checkout will start with this one.', 'dorotape' ) );
+		$as = isset( $_POST['as'] ) ? sanitize_key( wp_unslash( $_POST['as'] ) ) : '';
+		if ( dorotape_set_default_address( $address_id, null, '' !== $as ? $as : null ) ) {
+			wc_add_notice(
+				'billing' === $as
+					? __( 'Default invoice address updated. Checkout will start with this one.', 'dorotape' )
+					: __( 'Default delivery address updated. Checkout will start with this one.', 'dorotape' )
+			);
 		} else {
 			wc_add_notice( __( 'That address could not be found.', 'dorotape' ), 'error' );
 		}
@@ -224,42 +266,61 @@ add_action( 'woocommerce_account_' . DOROTAPE_ADDRESS_BOOK_ENDPOINT . '_endpoint
  * The list of saved addresses.
  */
 function dorotape_render_address_list(): void {
-	$book = dorotape_get_address_book();
+	$book     = dorotape_get_address_book();
+	$customer = new WC_Customer( get_current_user_id() );
 
 	printf(
 		'<p>%s</p>',
-		esc_html__( 'Addresses saved here can be chosen at checkout. Your default billing and shipping addresses are managed under Addresses.', 'dorotape' )
+		esc_html__( 'Your default delivery and invoice addresses are the ones checkout starts with. Addresses saved below can be chosen at checkout, or made a default.', 'dorotape' )
 	);
+
+	dorotape_render_default_addresses( $customer );
+
+	printf( '<h2 class="dorotape-address-book__heading">%s</h2>', esc_html__( 'Saved addresses', 'dorotape' ) );
 
 	if ( ! $book ) {
 		printf( '<p>%s</p>', esc_html__( 'You have not saved any addresses yet.', 'dorotape' ) );
 	} else {
-		$customer = new WC_Customer( get_current_user_id() );
-
 		echo '<ul class="dorotape-address-book">';
 
 		foreach ( $book as $address_id => $address ) {
 			$edit_url = add_query_arg( 'edit', rawurlencode( $address_id ), wc_get_account_endpoint_url( DOROTAPE_ADDRESS_BOOK_ENDPOINT ) );
 
-			$is_default = dorotape_address_is_default( $address, $customer );
+			$default_delivery = dorotape_address_is_default( $address, $customer, 'shipping' );
+			$default_invoice  = dorotape_address_is_default( $address, $customer, 'billing' );
+
+			// Any address can be made either default, so a default badge says
+			// what the address is used for and the saved type would contradict
+			// it ("Delivery" beside "Default invoice"). The type shows only on
+			// an address that is not a default.
+			$type_badge = '';
+			if ( ! $default_delivery && ! $default_invoice ) {
+				$type_badge = ' <span class="dorotape-address-book__type">' . (
+					'billing' === $address['type']
+						? esc_html__( 'Invoice', 'dorotape' )
+						: esc_html__( 'Delivery', 'dorotape' )
+				) . '</span>';
+			}
 
 			echo '<li class="dorotape-address-book__item">';
 			printf(
-				'<h3 class="dorotape-address-book__label">%s <span class="dorotape-address-book__type">%s</span>%s</h3>',
+				'<h3 class="dorotape-address-book__label">%s%s%s%s</h3>',
 				esc_html( $address['label'] ),
-				'billing' === $address['type']
-					? esc_html__( 'Invoice', 'dorotape' )
-					: esc_html__( 'Delivery', 'dorotape' ),
-				$is_default ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default', 'dorotape' ) . '</span>' : ''
+				$type_badge, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
+				$default_delivery ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default delivery', 'dorotape' ) . '</span>' : '',
+				$default_invoice ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default invoice', 'dorotape' ) . '</span>' : ''
 			);
 			printf( '<address>%s</address>', wp_kses( dorotape_format_address( $address ), array( 'br' => array() ) ) );
 
-			// Wrapped because the last two are each a form of their own, so
-			// there is nothing else for the row they sit in to be drawn on.
+			// Wrapped because the buttons after Edit are each a form of their
+			// own, so there is nothing else for the row they sit in to be drawn on.
 			echo '<div class="dorotape-address-book__actions">';
 			printf( '<a class="button" href="%s">%s</a>', esc_url( $edit_url ), esc_html__( 'Edit', 'dorotape' ) );
-			if ( ! $is_default ) {
-				dorotape_address_action_button( 'set_default', $address_id, __( 'Make default', 'dorotape' ) );
+			if ( ! $default_delivery ) {
+				dorotape_address_action_button( 'set_default', $address_id, __( 'Make default delivery', 'dorotape' ), false, 'shipping' );
+			}
+			if ( ! $default_invoice ) {
+				dorotape_address_action_button( 'set_default', $address_id, __( 'Make default invoice', 'dorotape' ), false, 'billing' );
 			}
 			dorotape_address_action_button( 'delete', $address_id, __( 'Delete', 'dorotape' ), true );
 			echo '</div>';
@@ -278,6 +339,42 @@ function dorotape_render_address_list(): void {
 }
 
 /**
+ * The two WooCommerce defaults, as cards at the top of the book, each editable
+ * in place through WooCommerce's own address form.
+ *
+ * @param WC_Customer $customer
+ */
+function dorotape_render_default_addresses( WC_Customer $customer ): void {
+	$cards = array(
+		'shipping' => __( 'Default delivery address', 'dorotape' ),
+		'billing'  => __( 'Default invoice address', 'dorotape' ),
+	);
+
+	echo '<ul class="dorotape-address-book dorotape-address-book--defaults">';
+
+	foreach ( $cards as $type => $title ) {
+		$formatted = wc_get_account_formatted_address( $type, $customer->get_id() );
+
+		echo '<li class="dorotape-address-book__item">';
+		printf( '<h3 class="dorotape-address-book__label">%s</h3>', esc_html( $title ) );
+		printf(
+			'<address>%s</address>',
+			$formatted ? wp_kses( $formatted, array( 'br' => array() ) ) : esc_html__( 'Not set yet.', 'dorotape' )
+		);
+		echo '<div class="dorotape-address-book__actions">';
+		printf(
+			'<a class="button" href="%s">%s</a>',
+			esc_url( wc_get_endpoint_url( 'edit-address', $type, wc_get_page_permalink( 'myaccount' ) ) ),
+			$formatted ? esc_html__( 'Edit', 'dorotape' ) : esc_html__( 'Add', 'dorotape' )
+		);
+		echo '</div>';
+		echo '</li>';
+	}
+
+	echo '</ul>';
+}
+
+/**
  * Whether a saved address is what the customer's WooCommerce default of the
  * same type currently holds, which is what "Make default" writes.
  *
@@ -286,9 +383,10 @@ function dorotape_render_address_list(): void {
  *
  * @param array       $address
  * @param WC_Customer $customer
+ * @param string|null $type 'shipping' or 'billing'; the address's own type when omitted.
  */
-function dorotape_address_is_default( array $address, WC_Customer $customer ): bool {
-	$type = $address['type'] ?? '';
+function dorotape_address_is_default( array $address, WC_Customer $customer, ?string $type = null ): bool {
+	$type = $type ?? ( $address['type'] ?? '' );
 
 	foreach ( array( 'first_name', 'last_name', 'address_1', 'address_2', 'city', 'postcode', 'country' ) as $key ) {
 		$getter = "get_{$type}_{$key}";
@@ -310,13 +408,14 @@ function dorotape_address_is_default( array $address, WC_Customer $customer ): b
  * @param string $address_id
  * @param string $label
  * @param bool   $confirm
+ * @param string $as      For set_default: 'shipping' or 'billing'.
  */
-function dorotape_address_action_button( string $action, string $address_id, string $label, bool $confirm = false ): void {
+function dorotape_address_action_button( string $action, string $address_id, string $label, bool $confirm = false, string $as = '' ): void {
 	printf(
 		'<form method="post" class="dorotape-address-book__action">
 			%s
 			<input type="hidden" name="dorotape_address_action" value="%s">
-			<input type="hidden" name="address_id" value="%s">
+			<input type="hidden" name="address_id" value="%s">%s
 			<button type="submit" class="button"%s>%s</button>
 		</form>',
 		// Not wp_nonce_field(): it gives every copy the same id, and this
@@ -324,6 +423,7 @@ function dorotape_address_action_button( string $action, string $address_id, str
 		'<input type="hidden" name="dorotape_address_nonce" value="' . esc_attr( wp_create_nonce( 'dorotape_address_' . $action ) ) . '">', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		esc_attr( $action ),
 		esc_attr( $address_id ),
+		'' !== $as ? '<input type="hidden" name="as" value="' . esc_attr( $as ) . '">' : '',
 		$confirm ? ' data-dorotape-confirm="' . esc_attr__( 'Delete this address?', 'dorotape' ) . '"' : '',
 		esc_html( $label )
 	);

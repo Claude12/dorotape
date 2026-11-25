@@ -54,14 +54,37 @@ export function initTierTable() {
     } catch { /* malformed data attribute, keep the empty default above */ }
   }
 
+  // A variation can be sold differently from its product (a 305 x 500mm sheet
+  // on a film sold by the metre). The live total's map lists only those.
+  var productUnit    = livePriceEl ? livePriceEl.dataset.unit : ( tierContainer ? tierContainer.dataset.unit : '' );
+  var variationUnits = {};
+  if ( livePriceEl ) {
+    try {
+      variationUnits = JSON.parse( livePriceEl.dataset.variationUnits || '{}' );
+    } catch { /* malformed data attribute, keep the empty default above */ }
+  }
+
+  function applyUnit( id ) {
+    var tierData = variationTiers[ String( id ) ];
+    var unit     = ( tierData && tierData.unit ) || variationUnits[ String( id ) ] || productUnit;
+    if ( ! unit ) return;
+    if ( tierContainer ) tierContainer.dataset.unit = unit;
+    if ( livePriceEl ) livePriceEl.dataset.unit = unit;
+  }
+
   jQuery( varIdInput ).on( 'change', function () {
     var newId = parseInt( this.value, 10 );
     if ( ! newId ) return; // 0 or empty = variation deselected, keep current table
+    applyUnit( newId );
     if ( table && tierContainer ) {
       var varData = variationTiers[ String( newId ) ];
       if ( varData ) {
         rebuildTbody( table, varData.tiers || [], varData.base_price || 0 );
         currentTiers = tiersFromTable( table );
+      } else {
+        // No breaks on this one (its table is hidden): price it from
+        // #dt_live_price, not from the rows left by the last choice.
+        currentTiers = [];
       }
     }
     refresh();

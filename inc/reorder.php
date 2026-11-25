@@ -154,3 +154,54 @@ add_filter( 'woocommerce_my_account_my_orders_actions', function ( $actions, $or
 
 	return $actions;
 }, 10, 2 );
+
+/**
+ * Offer Order again on any order that went through, not only completed ones.
+ *
+ * Core allows completed orders only, so a customer whose last order was still
+ * processing or on hold had no button at all. That is how Scott Bale tested
+ * it and asked for one (19 November 2026). Core's own button on the order
+ * view reads the same filter, so both places follow.
+ *
+ * @param string[] $statuses
+ * @return string[]
+ */
+add_filter( 'woocommerce_valid_order_statuses_for_order_again', function ( $statuses ) {
+	return array_values( array_unique( array_merge( (array) $statuses, array( 'completed', 'processing', 'on-hold' ) ) ) );
+} );
+
+/**
+ * Pay on the order view as well as on the orders list.
+ *
+ * The list gets its Pay button from wc_get_account_orders_actions(); the
+ * single order view had none (Scott Bale, 19 November 2026). Same actions
+ * and the same rules, so the two cannot disagree. View is left out because
+ * this is the view, and Order again because core prints its own button
+ * under the order.
+ *
+ * @param int $order_id
+ */
+add_action( 'woocommerce_view_order', function ( $order_id ): void {
+	$order = wc_get_order( $order_id );
+
+	if ( ! $order instanceof WC_Order || ! function_exists( 'wc_get_account_orders_actions' ) ) {
+		return;
+	}
+
+	$actions = array_diff_key( wc_get_account_orders_actions( $order ), array_flip( array( 'view', 'order-again' ) ) );
+
+	if ( ! isset( $actions['pay'] ) ) {
+		return;
+	}
+
+	echo '<div class="dt-order-actions">';
+	foreach ( $actions as $key => $action ) {
+		printf(
+			'<a href="%1$s" class="woocommerce-button button %2$s">%3$s</a>',
+			esc_url( $action['url'] ),
+			esc_attr( sanitize_html_class( $key ) ),
+			esc_html( $action['name'] )
+		);
+	}
+	echo '</div>';
+}, 5 );

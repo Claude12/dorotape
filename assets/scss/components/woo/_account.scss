@@ -434,19 +434,19 @@
 .woo-page .woocommerce-orders-table__cell-order-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--spacer-8);
   margin-top: var(--spacer-16);
 }
 
-// Viewing the order is what the row is for, so it takes the fill. Ordering
-// it again is the second thing anyone does and takes the outline. Both are
-// secondary to the page, but both are the site's standard button size.
+// Every action on the list is a filled pill: Scott asked for Order again in
+// magenta beside View (19 November 2026). Under a single order, core's Order
+// again button stays the outline, below the order it repeats.
 .woo-page--account .woocommerce-orders-table .button,
 .woo-page--account .order-again .button {
   @include button-size-md;
 }
 
-.woo-page--account a.button.order-again,
 .woo-page--account .order-again .button {
   @include button-outline;
 }
@@ -666,7 +666,10 @@
   display: none;
 }
 
-.woo-page--account .order-again {
+// The wrapper under a single order only. The orders list puts the same
+// class on its Order again pill, and this margin there pushed that pill down
+// and stretched Pay and View to match on a phone (25 November 2026).
+.woo-page--account .order-again:not(.button) {
   margin: var(--spacer-20) 0 0;
 }
 
@@ -1101,4 +1104,68 @@
 .woo-page .dt-order-again__intro,
 .woo-page .dt-order-again__empty {
   margin: 0 0 24px;
+}
+
+// ── Pay, on the single order view ──────────────────────────────────────────
+//
+// From inc/reorder.php, above the order, for an order still waiting to be paid.
+
+.dt-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacer-8);
+  margin: 0 0 var(--spacer-24);
+
+  .button {
+    @include button-size-md;
+  }
+}
+
+// ── Address book: defaults and saved ───────────────────────────────────────
+
+.dorotape-address-book--defaults {
+  margin-bottom: var(--spacer-32);
+}
+
+.dorotape-address-book__heading {
+  margin: 0 0 var(--spacer-16);
+  font-size: $font-size-lg;
+}
+
+// ── Additional information (purchase order number and the like) ────────────
+//
+// WooCommerce prints it after the address cards, inside the customer details
+// section, which is drawn without a panel when there are two cards. So it sat
+// against the bottom of the invoice address card with no gap (Scott Bale,
+// 19 November 2026). Given a card and the gap the cards keep between them.
+
+.woo-page .wc-block-order-confirmation-additional-fields-wrapper {
+  box-sizing: border-box;
+  margin: var(--spacer-24) 0 0;
+  padding: var(--spacer-24);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background-color: var(--color-surface);
+
+  h2 {
+    margin: 0 0 var(--spacer-12);
+  }
+
+  .wc-block-components-additional-fields-list {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--spacer-8) var(--spacer-16);
+    margin: 0;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  dt {
+    color: var(--color-muted-foreground);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
 }

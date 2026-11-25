@@ -15,9 +15,11 @@
 ( function ( wp, data ) {
   'use strict';
 
-  if ( ! wp || ! wp.data || ! data || ! data.book ) {
+  if ( ! wp || ! wp.data || ! data ) {
     return;
   }
+
+  data.book = data.book || {};
 
   var CART = 'wc/store/cart';
   var CHECKOUT = 'wc/store/checkout';
@@ -91,6 +93,74 @@
     } );
   }
 
+  // ── The pickers, inside the address boxes ──────────────────────────────
+  //
+  // The pickers are WooCommerce additional fields, which can only sit in the
+  // contact, address-form or order sections, so they landed under
+  // "Additional order information", away from the address they change
+  // (Scott Bale, 19 November 2026). WooCommerce's own select is cloned into
+  // the top of each address box and the original is hidden by CSS. The clone
+  // writes to the same field in the checkout store, so the server and the
+  // logic below work exactly as before. The clone sits outside the nodes
+  // React draws, and is put back if the box is redrawn without it.
+
+  var boxes = {
+    shipping: '.wp-block-woocommerce-checkout-shipping-address-block',
+    billing: '.wp-block-woocommerce-checkout-billing-address-block'
+  };
+
+  function fieldClass( type ) {
+    return 'wc-block-components-select-input-' + pickers[ type ][ 0 ].replace( '/', '-' );
+  }
+
+  function placePicker( type, value, hidden ) {
+    var box = document.querySelector( boxes[ type ] );
+    var original = document.querySelector( '.' + fieldClass( type ) + ':not(.dt-address-picker)' );
+
+    if ( ! box || ! original ) {
+      return;
+    }
+
+    var clone = box.querySelector( '.dt-address-picker' );
+
+    if ( ! clone ) {
+      var content = box.querySelector( '.wc-block-components-checkout-step__content' );
+
+      if ( ! content ) {
+        return;
+      }
+
+      clone = original.cloneNode( true );
+      clone.classList.add( 'dt-address-picker' );
+
+      var select = clone.querySelector( 'select' );
+
+      select.id = 'dt-picker-' + type;
+      select.removeAttribute( 'name' );
+      clone.querySelector( 'label' ).setAttribute( 'for', select.id );
+      select.addEventListener( 'change', function () {
+        var update = {};
+        update[ pickers[ type ][ 0 ] ] = select.value;
+        wp.data.dispatch( CHECKOUT ).setAdditionalFields( update );
+      } );
+
+      box.insertBefore( clone, content );
+
+      // Only now hide the original, so the picker never disappears altogether.
+      document.documentElement.classList.add( 'dt-pickers-moved-' + type );
+    }
+
+    var cloneSelect = clone.querySelector( 'select' );
+
+    if ( cloneSelect.value !== value ) {
+      cloneSelect.value = value;
+    }
+
+    if ( ( 'none' === clone.style.display ) !== hidden ) {
+      clone.style.display = hidden ? 'none' : '';
+    }
+  }
+
   wp.data.subscribe( function () {
     var checkoutStore = wp.data.select( CHECKOUT );
     var cartStore = wp.data.select( CART );
@@ -102,10 +172,12 @@
     var values = checkoutStore.getAdditionalFields() || {};
     var cart = cartStore.getCustomerData ? cartStore.getCustomerData() : null;
     var collection = collecting( cartStore );
-    var deliveryPicker = document.querySelector( '.wc-block-components-select-input-' + data.fields.shipping.replace( '/', '-' ) );
 
-    if ( deliveryPicker && ( 'none' === deliveryPicker.style.display ) !== collection ) {
-      deliveryPicker.style.display = collection ? 'none' : '';
+    if ( data.fields.shipping ) {
+      placePicker( 'shipping', values[ data.fields.shipping ] || '', collection );
+    }
+    if ( data.fields.billing ) {
+      placePicker( 'billing', values[ data.fields.billing ] || '', false );
     }
 
     // A delivery address picked before switching to collection would still

@@ -23,18 +23,38 @@
 
 /**
  * The unit a product is sold and tier-priced in: 'metre' (default), 'roll',
- * or 'item'. Stored as _dt_price_unit post meta (parent product only) and
- * CMS-managed via Product data → Advanced. Vinyl sold by the metre keeps the
- * historical default; roll goods (Hook & Loop) and accessories override it so
- * tier tables and discount labels stop saying "per metre".
+ * or 'item'. Stored as _dt_price_unit post meta and CMS-managed via Product
+ * data → Advanced. Vinyl sold by the metre keeps the historical default; roll
+ * goods (Hook & Loop) and accessories override it so tier tables and discount
+ * labels stop saying "per metre".
  *
- * @param int $product_id Parent product ID (variations resolve to parent).
+ * A variation may set its own unit and otherwise inherits its parent's. The
+ * Ritrama etch films sell metre widths and 305 x 500mm sheets as options of
+ * one product, and the sheets were showing "£3.50/m" with a Metre(s) box.
+ *
+ * @param int $product_id Product or variation ID.
  * @return string 'metre' | 'roll' | 'item'
  */
 function dorotape_price_unit( int $product_id ): string {
-	$parent = wp_get_post_parent_id( $product_id );
-	$unit   = get_post_meta( $parent ? $parent : $product_id, '_dt_price_unit', true );
+	$unit = dorotape_price_unit_meta( $product_id );
 	return in_array( $unit, array( 'roll', 'item' ), true ) ? $unit : 'metre';
+}
+
+/**
+ * The unit as stored, without the metre fallback: the variation's own setting,
+ * else its parent's, else ''. Cards and price suffixes read this so a product
+ * that never declared a unit is not labelled "per metre" by default.
+ *
+ * @param int $product_id Product or variation ID.
+ * @return string 'metre' | 'roll' | 'item' | ''
+ */
+function dorotape_price_unit_meta( int $product_id ): string {
+	$unit = (string) get_post_meta( $product_id, '_dt_price_unit', true );
+	if ( '' === $unit ) {
+		$parent = wp_get_post_parent_id( $product_id );
+		$unit   = $parent ? (string) get_post_meta( $parent, '_dt_price_unit', true ) : '';
+	}
+	return in_array( $unit, array( 'metre', 'roll', 'item' ), true ) ? $unit : '';
 }
 
 /**
@@ -99,12 +119,66 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
 		return;
 	}
 	$unit = wc_clean( wp_unslash( $_POST['_dt_price_unit'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	if ( in_array( $unit, array( 'roll', 'item' ), true ) ) {
+	// Metre is stored too, not deleted as the default: the cards' "per metre"
+	// reads the stored value, so deleting it dropped the label on every save.
+	if ( in_array( $unit, array( 'metre', 'roll', 'item' ), true ) ) {
 		$product->update_meta_data( '_dt_price_unit', $unit );
-	} else {
-		$product->delete_meta_data( '_dt_price_unit' ); // metre = default
 	}
 } );
+
+// ─── Variation field (each variation's panel) ────────────────────────────────
+
+add_action( 'woocommerce_product_after_variable_attributes', function ( int $loop, array $_variation_data, WP_Post $variation ): void {
+	woocommerce_wp_select(
+		array(
+			'id'            => "dorotape_variation_unit_{$loop}",
+			'name'          => "dorotape_variation_unit[{$loop}]",
+			'label'         => __( 'Sold per', 'dorotape' ),
+			'value'         => (string) get_post_meta( $variation->ID, '_dt_price_unit', true ),
+			'options'       => array(
+				''      => __( 'Same as the product', 'dorotape' ),
+				'metre' => __( 'Metre', 'dorotape' ),
+				'roll'  => __( 'Roll', 'dorotape' ),
+				'item'  => __( 'Item / each (e.g. a sheet)', 'dorotape' ),
+			),
+			'wrapper_class' => 'form-row form-row-full',
+			'description'   => __( 'Only change this when this option is sold differently from the rest, such as a sheet on a product otherwise sold by the metre.', 'dorotape' ),
+		)
+	);
+}, 12, 3 );
+
+add_action( 'woocommerce_save_product_variation', function ( int $variation_id, int $loop ): void {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the variation save.
+	if ( ! isset( $_POST['dorotape_variation_unit'][ $loop ] ) ) {
+		return;
+	}
+	$unit = wc_clean( wp_unslash( $_POST['dorotape_variation_unit'][ $loop ] ) );
+	// phpcs:enable
+	if ( in_array( $unit, array( 'metre', 'roll', 'item' ), true ) ) {
+		update_post_meta( $variation_id, '_dt_price_unit', $unit );
+	} else {
+		delete_post_meta( $variation_id, '_dt_price_unit' );
+	}
+}, 10, 2 );
+
+/**
+ * Hand each variation's unit wording to the page, so picking a sheet on a
+ * product sold by the metre switches the quantity label, tier table and
+ * running total to "each".
+ */
+add_filter( 'woocommerce_available_variation', function ( $data, $parent, $variation ) {
+	if ( $variation instanceof WC_Product ) {
+		$unit              = dorotape_price_unit( $variation->get_id() );
+		$data['dt_unit']   = $unit;
+		$u                 = dorotape_unit_strings( $unit );
+		$data['dt_labels'] = array(
+			'header'    => dorotape_price_header( $u, $variation->get_id() ),
+			'qty_label' => $u['qty_label'],
+			'note'      => $u['note'],
+		);
+	}
+	return $data;
+}, 10, 3 );
 
 // ─── Quantity unit label ──────────────────────────────────────────────────────
 
@@ -599,6 +673,11 @@ function dorotape_read_acf_flat_tiers( int $product_id ): array {
  * falling back to the parent's tiers keeps the table (and live price update)
  * working instead of quietly disappearing.
  *
+ * The parent's tiers are inherited only when they start at this variation's
+ * own price. They were written for one size, and on any other they priced the
+ * basket wrong: a £3.50 PTA sheet charged £8.52 (the metre rate), a £34.70
+ * 13143SPET charged £30.20 (19 Nov scan, 12 of 15 inheriting variations).
+ *
  * @param int $product_id Variation ID or product ID.
  * @return array Array of arrays with 'min_qty' and 'tier_price' keys.
  */
@@ -609,7 +688,19 @@ function dorotape_parse_legacy_tiers( int $product_id ): array {
 	}
 
 	$parent_id = wp_get_post_parent_id( $product_id );
-	return $parent_id ? dorotape_parse_legacy_tiers_own( $parent_id ) : array();
+	$inherited = $parent_id ? dorotape_parse_legacy_tiers_own( $parent_id ) : array();
+	if ( empty( $inherited ) ) {
+		return array();
+	}
+
+	$first = $inherited[0];
+	foreach ( $inherited as $tier ) {
+		if ( (int) $tier['min_qty'] < (int) $first['min_qty'] ) {
+			$first = $tier;
+		}
+	}
+	$own_price = (float) get_post_meta( $product_id, '_regular_price', true );
+	return abs( (float) $first['tier_price'] - $own_price ) < 0.005 ? $inherited : array();
 }
 
 /**
@@ -890,7 +981,8 @@ function dorotape_tier_label( array $tier, WC_Product $product, int $product_id 
 		return '';
 	}
 
-	$unit = dorotape_unit_strings( dorotape_price_unit( $product_id ) );
+	// The variation's own unit where it has one (a sheet on a metre product).
+	$unit = dorotape_unit_strings( dorotape_price_unit( $product->get_id() ?: $product_id ) );
 
 	return (int) $tier['min_qty'] . $unit['qty_suffix'] . ' rate · save ' . $saving_pct . '%';
 }

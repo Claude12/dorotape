@@ -300,3 +300,46 @@
     grid-column: 1 / -1;
   }
 }
+
+// ── Saved address pickers, inside the address boxes ────────────────────────
+//
+// assets/js/blocks/checkout-address-book.js clones each picker into the top
+// of its address box and marks the page when it has, so the original under
+// "Additional order information" is only hidden once its copy is in place.
+
+.dt-pickers-moved-shipping .wc-block-components-select-input-dorotape-delivery-address:not(.dt-address-picker),
+.dt-pickers-moved-billing .wc-block-components-select-input-dorotape-invoice-address:not(.dt-address-picker) {
+  display: none;
+}
+
+.dt-address-picker {
+  margin: 0 0 var(--spacer-16);
+}
+
+// ── Invoice first, "Use same address for shipping" ─────────────────────────
+//
+// assets/js/blocks/checkout-same-address.js puts its own box at the top of
+// the shipping section and marks the page once it has, so WooCommerce's
+// reversed box is only hidden while ours is there. While it is ticked the
+// shipping address is a copy of the invoice address, so the form and the
+// saved address picker have nothing to offer.
+
+.dt-same-address-ready .wc-block-checkout__use-address-for-billing {
+  display: none;
+}
+
+.dt-same-address {
+  margin: 0 0 var(--spacer-16);
+}
+
+.dt-ship-same .wp-block-woocommerce-checkout-shipping-address-block {
+  .wc-block-components-checkout-step__content,
+  .wc-block-components-checkout-step__description,
+  .dt-address-picker {
+    display: none !important;
+  }
+
+  .dt-same-address {
+    margin-bottom: 0;
+  }
+}

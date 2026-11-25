@@ -241,6 +241,39 @@ function dorotape_menu_thumb( WP_Post $item ): string {
 }
 
 /**
+ * The short intro shown in the pane of a group that has no links under it.
+ *
+ * A group with nothing under it used to be a plain link with no pane, so
+ * resting on it left the group above it showing: hovering Museums &
+ * Galleries showed Paint Masking (Michael, 16 November 2026). It now has a
+ * pane like the rest, and as there are no links to list, the pane carries
+ * the category's banner intro (or its description) instead.
+ */
+function dorotape_menu_intro( WP_Post $item ): string {
+	if ( 'taxonomy' !== $item->type || 'product_cat' !== $item->object ) {
+		return '';
+	}
+
+	$term_id = (int) $item->object_id;
+	$html    = (string) get_term_meta( $term_id, 'category_banner_intro', true );
+
+	if ( '' === trim( wp_strip_all_tags( $html ) ) ) {
+		$html = term_description( $term_id );
+	}
+
+	// Descriptions open with a bold tagline; the pane title already does that job.
+	$html = preg_replace( '#^\s*<p>\s*<(b|strong)>.*?</\1>\s*(<br\s*/?>|</p>)#is', '<p>', $html );
+	$html = preg_replace( '#<br\s*/?>|</p>|</h\d>|</li>#i', ' ', $html );
+	$text = trim( preg_replace( '/\s+/', ' ', html_entity_decode( wp_strip_all_tags( $html ), ENT_QUOTES, 'UTF-8' ) ) );
+
+	if ( '' === $text ) {
+		return '';
+	}
+
+	return '<p class="site-header__mega-intro">' . esc_html( wp_trim_words( $text, 45 ) ) . '</p>';
+}
+
+/**
  * The desktop menu bar.
  */
 function dorotape_header_nav(): void {
@@ -394,8 +427,8 @@ function dorotape_header_mega_panel( array $node, string $id ): void {
 					$pane = $id . '-' . (int) $item->ID;
 					?>
 					<li class="site-header__mega-group js-mega-group<?php echo $first ? ' is-active' : ''; ?>">
-						<?php if ( ! $group['children'] ) : ?>
-							<a class="site-header__mega-tab"<?php echo dorotape_menu_link_attrs( $item, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $item->title ); ?></a>
+						<?php if ( ! $group['children'] && ! dorotape_menu_has_url( $item ) ) : ?>
+							<span class="site-header__mega-tab"><?php echo esc_html( $item->title ); ?></span>
 						<?php else : ?>
 							<?php if ( dorotape_menu_has_url( $item ) ) : ?>
 								<a class="site-header__mega-tab js-mega-tab"<?php echo dorotape_menu_link_attrs( $item, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
@@ -417,13 +450,17 @@ function dorotape_header_mega_panel( array $node, string $id ): void {
 										</a>
 									<?php endif; ?>
 								</div>
-								<ul class="site-header__mega-links">
-									<?php foreach ( $group['children'] as $link ) : ?>
-										<li>
-											<a class="site-header__mega-link"<?php echo dorotape_menu_link_attrs( $link['item'], true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $link['item']->title ); ?></a>
-										</li>
-									<?php endforeach; ?>
-								</ul>
+								<?php if ( $group['children'] ) : ?>
+									<ul class="site-header__mega-links">
+										<?php foreach ( $group['children'] as $link ) : ?>
+											<li>
+												<a class="site-header__mega-link"<?php echo dorotape_menu_link_attrs( $link['item'], true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $link['item']->title ); ?></a>
+											</li>
+										<?php endforeach; ?>
+									</ul>
+								<?php else : ?>
+									<?php echo dorotape_menu_intro( $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?>
+								<?php endif; ?>
 							</div>
 						<?php endif; ?>
 					</li>

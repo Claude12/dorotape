@@ -12,7 +12,9 @@
     margin-top: 0;
   }
 
-  // A second heading inside one tab: the inks under Suitability.
+  // A second heading inside one tab, as Material Characteristics under
+  // Structure. The inks were one until they got their own tab (Site Edits 2,
+  // Product Page 18, 25 November 2026).
   &__subheading {
     margin: var(--spacer-24) 0 var(--spacer-8);
     color: var(--color-muted-foreground);
@@ -25,6 +27,19 @@
 
   &__panel > &__subheading:first-child {
     margin-top: 0;
+  }
+
+  // The old descriptions put the ink pictures and names straight inside a
+  // list with no items, which a list's indent pushed in from the tab's edge.
+  &__panel--inks > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    line-height: 2;
+  }
+
+  &__panel--inks img {
+    vertical-align: middle;
   }
 
 // ── Downloads ──────────────────────────────────────────────────────────

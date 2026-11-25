@@ -27,10 +27,57 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string, string>
  */
 function dorotape_checkout_wording(): array {
-	return array(
-		'Create an account with %s' => __( 'Save my details for future use', 'dorotape' ),
+	return array_merge(
+		array(
+			'Create an account with %s' => __( 'Save my details for future use', 'dorotape' ),
+		),
+		dorotape_invoice_wording()
 	);
 }
+
+/**
+ * "Billing" becomes "invoice" wherever the customer sees it.
+ *
+ * The trade calls it the invoice address (Scott Bale, 19 November 2026). The
+ * address book already said Invoice, so this brings checkout, the account
+ * screens, the order pages and the emails into line with it.
+ *
+ * @return array<string, string>
+ */
+function dorotape_invoice_wording(): array {
+	return array(
+		'Billing address'                                                   => __( 'Invoice address', 'dorotape' ),
+		'Billing Address'                                                   => __( 'Invoice address', 'dorotape' ),
+		'Billing addresses'                                                 => __( 'Invoice addresses', 'dorotape' ),
+		'Billing details'                                                   => __( 'Invoice details', 'dorotape' ),
+		'Billing &amp; Shipping'                                            => __( 'Invoice &amp; delivery', 'dorotape' ),
+		'Billing and shipping address'                                      => __( 'Invoice and delivery address', 'dorotape' ),
+		'Edit billing address'                                              => __( 'Edit invoice address', 'dorotape' ),
+		'Use same address for billing'                                      => __( 'Use same address for invoice', 'dorotape' ),
+		'Enter the billing and shipping address that matches your payment method.' => __( 'Enter the invoice and delivery address that matches your payment method.', 'dorotape' ),
+		'Enter the billing address that matches your payment method.'      => __( 'Enter the invoice address that matches your payment method.', 'dorotape' ),
+	);
+}
+
+/**
+ * The same, for WooCommerce's PHP strings: the account address screens, the
+ * order and thank you pages, and the emails.
+ *
+ * @param string $translation
+ * @param string $text
+ * @return string
+ */
+add_filter(
+	'gettext_woocommerce',
+	static function ( $translation, $text ) {
+		static $map = null;
+		$map      ??= dorotape_invoice_wording();
+
+		return $map[ $text ] ?? $translation;
+	},
+	10,
+	2
+);
 
 /**
  * Hand the replacements to wp.i18n before the basket and checkout render.

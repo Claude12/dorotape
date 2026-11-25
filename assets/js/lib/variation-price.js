@@ -29,25 +29,78 @@ export function initVariationPriceSwap() {
   var widthInNote  = /\d+(?:\.\d+)?\s*mm(?=\s+wide)/gi;
   var noteHasWidth = ( sizeNoteText.match( widthInNote ) || [] ).length === 1;
 
+  // A width option: "625mm" under a width attribute, or "1220mm-per-metre" /
+  // "1220mm wide" under any attribute. Never "305mm x 500mm", a cut piece.
+  function widthOf( key, value ) {
+    var v = String( value );
+    var found = key.indexOf( 'width' ) !== -1
+      ? v.match( /^(\d+(?:\.\d+)?)\s*mm$/i )
+      : v.match( /^(\d+(?:\.\d+)?)\s*mm[\s-]+(?:per[\s-]+metre|wide)\b/i );
+    return found ? found[ 1 ] + 'mm' : '';
+  }
+
   function chosenWidth( variation ) {
     var attrs = ( variation && variation.attributes ) || {};
     for ( var key in attrs ) {
-      if ( key.indexOf( 'width' ) === -1 ) continue;
-      var found = String( attrs[ key ] ).match( /^(\d+(?:\.\d+)?)\s*mm$/i );
-      if ( found ) return found[ 1 ] + 'mm';
+      var width = widthOf( key, attrs[ key ] );
+      if ( width ) return width;
     }
     return '';
   }
 
+  // Until a width is picked the note names none: "at 625mm wide" read as if
+  // the first width were the only one. Only where two or more widths are on
+  // offer, so a product in one width keeps its note as written.
+  var widthOptions = 0;
+  variationsForm.querySelectorAll( 'select[name^="attribute_"] option' ).forEach( function ( opt ) {
+    var key = opt.closest( 'select' ).name.replace( /^attribute_/, '' );
+    if ( widthOf( key, opt.value ) ) widthOptions++;
+  } );
+  var widthIsChoice = widthOptions > 1;
+  var noteNoWidth   = sizeNoteText.replace( /\s+at\s+\d+(?:\.\d+)?\s*mm\s+wide/i, '' );
+
+  // A variation sold another way (a sheet on a film sold by the metre) gets
+  // no note: "per linear metre" is not what its price is for.
+  var productUnit = ( document.getElementById( 'dt_live_price' ) || tierTable || {} ).dataset;
+  productUnit = productUnit ? productUnit.unit : '';
+
   function updateSizeNote( variation ) {
-    if ( ! sizeNote || ! noteHasWidth ) return;
+    if ( ! sizeNote ) return;
+    var otherUnit = !! ( variation && variation.dt_unit && productUnit && variation.dt_unit !== productUnit );
+    sizeNote.hidden = otherUnit;
+    if ( ! noteHasWidth || otherUnit ) return;
     var width = chosenWidth( variation );
-    sizeNote.textContent = width ? sizeNoteText.replace( widthInNote, width ) : sizeNoteText;
+    if ( width ) {
+      sizeNote.textContent = sizeNoteText.replace( widthInNote, width );
+    } else {
+      sizeNote.textContent = widthIsChoice ? noteNoWidth : sizeNoteText;
+    }
+  }
+  updateSizeNote( null );
+
+  // The wording that follows the unit: the quantity box caption, the tier
+  // table's price header and its footnote. A sheet on a film sold by the metre
+  // reads "Item(s)" and "Price each" while it is the one selected.
+  var qtyLabel    = document.querySelector( 'form.cart .dt-qty-label' );
+  var tierHeader  = tierTable ? tierTable.querySelector( 'thead th:nth-child(2)' ) : null;
+  var tierNote    = tierTable ? tierTable.querySelector( '.dt-tier-pricing__note' ) : null;
+  var origLabels  = {
+    qty_label: qtyLabel ? qtyLabel.textContent : '',
+    header:    tierHeader ? tierHeader.textContent : '',
+    note:      tierNote ? tierNote.textContent : '',
+  };
+
+  function updateUnitLabels( variation ) {
+    var labels = ( variation && variation.dt_labels ) || origLabels;
+    if ( qtyLabel && labels.qty_label ) qtyLabel.textContent = labels.qty_label;
+    if ( tierHeader && labels.header ) tierHeader.textContent = labels.header;
+    if ( tierNote && labels.note ) tierNote.textContent = labels.note;
   }
 
   function showVariation( variation ) {
     clearTimeout( swapTimer );
     updateSizeNote( variation );
+    updateUnitLabels( variation );
 
     // Does this specific variation have tier pricing?
     var hasTiers = false;
@@ -99,6 +152,7 @@ export function initVariationPriceSwap() {
   function resetVariation() {
     clearTimeout( swapTimer );
     updateSizeNote( null );
+    updateUnitLabels( null );
 
     // Fade tier table out, then hide.
     if ( tierTable ) {

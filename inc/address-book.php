@@ -293,10 +293,15 @@ function dorotape_delete_address( string $address_id, ?int $user_id = null ): bo
  * This is what makes a saved address the one checkout starts with, and it is
  * why the book stores WooCommerce's own field names.
  *
- * @param string   $address_id
- * @param int|null $user_id
+ * Any saved address can be made either default, whatever type it was saved
+ * as: Scott asked to pick the default delivery and invoice addresses
+ * separately from the one list (19 November 2026).
+ *
+ * @param string      $address_id
+ * @param int|null    $user_id
+ * @param string|null $as 'shipping' or 'billing'; the address's own type when omitted.
  */
-function dorotape_set_default_address( string $address_id, ?int $user_id = null ): bool {
+function dorotape_set_default_address( string $address_id, ?int $user_id = null, ?string $as = null ): bool {
 	$user_id = $user_id ?? get_current_user_id();
 	$address = dorotape_get_address( $address_id, $user_id );
 
@@ -305,7 +310,7 @@ function dorotape_set_default_address( string $address_id, ?int $user_id = null 
 	}
 
 	$customer = new WC_Customer( $user_id );
-	$type     = $address['type'];
+	$type     = in_array( $as, array( 'shipping', 'billing' ), true ) ? $as : $address['type'];
 
 	foreach ( array_keys( dorotape_address_book_fields( $type ) ) as $key ) {
 		$setter = "set_{$type}_{$key}";
