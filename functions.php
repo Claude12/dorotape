@@ -273,6 +273,7 @@ require get_template_directory() . '/inc/toast.php';
 require get_template_directory() . '/inc/footer.php';
 require get_template_directory() . '/inc/newsletter-assets.php';
 require get_template_directory() . '/inc/non-blocking-styles.php';
+require get_template_directory() . '/inc/script-placement.php';
 require get_template_directory() . '/inc/background-shape.php';
 require get_template_directory() . '/inc/product-card.php';
 require get_template_directory() . '/inc/product-row.php';
