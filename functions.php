@@ -264,6 +264,21 @@ require get_template_directory() . '/inc/product-sections.php';
 require get_template_directory() . '/inc/category-sections.php';
 require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/webp.php';
+
+/*
+ * No sizes="auto" on lazy images. Chrome then sizes the download to the box
+ * the image is laid out in, which ignores object-fit: cover cropping, so cover
+ * photos (category tiles, cards, blog thumbnails) came down too small and
+ * looked soft on phones. Each template's own sizes attribute is used instead.
+ * Measured 27 Nov 2026: 0 to 23 KB more per page, all of it below the fold.
+ *
+ * A named callback, not __return_false: several blocks add and then remove
+ * __return_false around their own images, which would take this off too.
+ */
+function dorotape_no_auto_sizes(): bool {
+	return false;
+}
+add_filter( 'wp_img_tag_add_auto_sizes', 'dorotape_no_auto_sizes' );
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/admin-email-copies.php';
 require get_template_directory() . '/inc/setup.php';
