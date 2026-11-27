@@ -44,6 +44,9 @@ yarn-error.log*
 # The directory now lives outside the webroot. This entry stops it, or anything
 # like it, being committed back. Raw data does not belong in the theme.
 dorotape-migration/
+# feedback/ is working material: the client's sheets, their backups, QA
+# checklists and the photos they send. None of it is used by the site.
+feedback/
 *.csv
 *.sql
 *.xlsx
