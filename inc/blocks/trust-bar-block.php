@@ -91,7 +91,8 @@ $dt_classes = 'trust-bar-block' . dorotape_background_shape_class( $dt_shape ) .
 						'alt'      => $dt_logo['name'],
 						'loading'  => $dt_loading,
 						'decoding' => 'async',
-						'sizes'    => '200px',
+						// Plain logos are capped at 128px wide; the colour cards allow more.
+						'sizes'    => $dt_colour ? '200px' : '128px',
 					)
 				);
 				?>
