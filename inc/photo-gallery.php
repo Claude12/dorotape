@@ -43,7 +43,7 @@ function dorotape_photo_gallery( array $ids, array $args = array() ): void {
 			'label'       => dorotape_blog_field( 'post_photo_label', __( 'Show photo {number}', 'dorotape' ) ),
 			'sizes_main'  => '(min-width: 880px) 620px, (min-width: 576px) 75vw, 92vw',
 			'sizes_solo'  => '(min-width: 880px) 800px, 92vw',
-			'sizes_thumb' => '(min-width: 880px) 180px, (min-width: 576px) 22vw, 31vw',
+			'sizes_thumb' => '(min-width: 1400px) 295px, (min-width: 576px) 22vw, 31vw',
 			'class'       => '',
 		)
 	);
