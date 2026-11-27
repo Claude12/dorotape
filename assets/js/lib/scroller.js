@@ -52,8 +52,13 @@ function prepareProductTabs() {
         return;
       }
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // Measured on screen: offsetLeft counts from the wrapping box, not
+      // from the start of the row, and would land off centre.
+      const tabBox = tab.getBoundingClientRect();
+      const listBox = list.getBoundingClientRect();
+      const tabStart = list.scrollLeft + tabBox.left - listBox.left - list.clientLeft;
       list.scrollTo({
-        left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+        left: tabStart - (list.clientWidth - tabBox.width) / 2,
         behavior: reducedMotion ? 'auto' : 'smooth',
       });
     });
