@@ -1,7 +1,7 @@
 <?php
 declare( strict_types=1 );
 /**
- * The header's main navigation: desktop menu bar and mobile drawer.
+ * The header's main navigation: the desktop menu bar and its panels.
  *
  * Both are drawn from the menu in the Primary Navigation slot, which is three
  * levels deep (Products > Sign & Display Vinyl > Signmaking Vinyl), so the
@@ -28,6 +28,11 @@ declare( strict_types=1 );
  * a button and would otherwise leave that page unreachable. The label comes
  * from Theme Settings > Header.
  *
+ * The phone drawer shows the same menu as an accordion. It is not printed
+ * here: header.js builds it from this bar the first time the drawer opens.
+ * Printing both put the whole menu in every page twice, about 58KB of HTML
+ * and 980 elements that only phone users who open the menu ever need.
+ *
  * Behaviour is assets/js/lib/header.js, styles assets/scss/layout/_header.scss.
  *
  * @package dorotape
@@ -39,7 +44,7 @@ defined( 'ABSPATH' ) || exit;
  * The menu in a theme location as a tree, with WordPress's current-item
  * classes applied.
  *
- * Memoised, because the header draws the same menu twice (bar and drawer).
+ * Memoised, because the Quick links menu is drawn twice (bar and drawer).
  *
  * @param string $location Theme location slug.
  * @return array<int, array{item: WP_Post, children: array}> Top-level nodes.
@@ -557,86 +562,5 @@ function dorotape_header_mega_panel( array $node, string $id ): void {
 			<?php endif; ?>
 		</div>
 	</div>
-	<?php
-}
-
-/**
- * The drawer's menu: the same tree as an accordion, two levels of toggles.
- *
- * Every parent is a button that opens its list in place. A parent with a
- * page of its own gets that page as the first entry of its list ("View all
- * Sign & Display Vinyl"), so nothing the bar links to is missing here.
- */
-function dorotape_header_drawer_menu(): void {
-	$tree = dorotape_menu_tree( 'primary' );
-
-	if ( ! $tree ) {
-		return;
-	}
-	?>
-	<nav aria-label="<?php esc_attr_e( 'Main menu', 'dorotape' ); ?>">
-		<ul class="site-header__drawer-list" id="primary-menu-drawer">
-			<?php
-			$current = dorotape_menu_current_top( $tree );
-			foreach ( $tree as $node ) :
-				$classes = array( 'site-header__drawer-item' );
-
-				// Same test as the bar: a mega section is a product section,
-				// and takes the product accent here too.
-				if ( $node['children'] && dorotape_menu_is_mega( $node ) ) {
-					$classes[] = 'site-header__drawer-item--mega';
-				}
-				if ( (int) $node['item']->ID === $current ) {
-					$classes[] = 'is-current';
-				}
-				?>
-				<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-menu-item="<?php echo (int) $node['item']->ID; ?>">
-					<?php dorotape_header_drawer_node( $node, 0 ); ?>
-				</li>
-			<?php endforeach; ?>
-		</ul>
-	</nav>
-	<?php
-}
-
-/**
- * One drawer entry: a link, or a toggle and the list it opens.
- */
-function dorotape_header_drawer_node( array $node, int $depth ): void {
-	$item  = $node['item'];
-	$class = 0 === $depth ? 'site-header__drawer-link' : 'site-header__drawer-sublink';
-
-	if ( ! $node['children'] ) {
-		?>
-		<a class="<?php echo esc_attr( $class ); ?>"<?php echo dorotape_menu_link_attrs( $item, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $item->title ); ?></a>
-		<?php
-		return;
-	}
-
-	$id       = 'drawer-sub-' . (int) $item->ID;
-	$view_all = trim( (string) dorotape_setting( 'header_menu_view_all' ) );
-	$overview = 0 === $depth
-		? dorotape_menu_overview( $node )
-		: ( dorotape_menu_has_url( $item ) ? array(
-			'url'   => (string) $item->url,
-			'label' => trim( $view_all . ' ' . $item->title ),
-		) : null );
-	?>
-	<button type="button" class="<?php echo esc_attr( $class ); ?> site-header__drawer-toggle js-drawer-toggle" aria-expanded="false" aria-controls="<?php echo esc_attr( $id ); ?>">
-		<span><?php echo esc_html( $item->title ); ?></span>
-		<?php echo dorotape_ui_icon( 'chevron-down', 'site-header__drawer-chevron' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-	</button>
-	<ul class="site-header__drawer-submenu site-header__drawer-submenu--<?php echo (int) $depth; ?>" id="<?php echo esc_attr( $id ); ?>">
-		<?php if ( $overview ) : ?>
-			<li>
-				<a class="site-header__drawer-sublink site-header__drawer-sublink--overview" href="<?php echo esc_url( $overview['url'] ); ?>"><?php echo esc_html( $overview['label'] ); ?></a>
-			</li>
-		<?php endif; ?>
-		<?php foreach ( $node['children'] as $child ) : ?>
-			<li class="site-header__drawer-subitem">
-				<?php dorotape_header_drawer_node( $child, $depth + 1 ); ?>
-			</li>
-		<?php endforeach; ?>
-	</ul>
 	<?php
 }

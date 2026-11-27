@@ -109,6 +109,9 @@ function initDrawer(header) {
   }
 
   function setOpen(open, focusSearch) {
+    if (open) {
+      buildDrawerMenu(header, drawer);
+    }
     header.classList.toggle(STATE_DRAWER_OPEN, open);
     toggles.forEach(function (button) {
       button.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -194,6 +197,185 @@ function initDrawer(header) {
   } else if (wide.addListener) {
     // Safari below 14.
     wide.addListener(onChange);
+  }
+}
+
+/**
+ * The drawer's menu, copied from the menu row.
+ *
+ * The server prints the menu once, as the row (inc/header-menu.php). The
+ * drawer shows the same tree as an accordion, so it is built from the row
+ * the first time the drawer opens; until then it costs the page nothing.
+ * The drawer can only be opened from script, so nothing is lost without it.
+ *
+ * Row to drawer:
+ *   top-level link                  link
+ *   dropdown or mega panel          toggle, then its "View all" link and
+ *                                   its entries
+ *   mega group with links           toggle, then its "View all" link (the
+ *                                   pane's heading link) and its links
+ *   mega group without links        link (or plain text with no page)
+ */
+function buildDrawerMenu(header, drawer) {
+  const source = header.querySelector('.js-header-nav .site-header__nav-list');
+
+  if (!source || drawer.querySelector('.site-header__drawer-list')) {
+    return;
+  }
+
+  const chevronSource = source.querySelector('.site-header__nav-chevron');
+  let count = 0;
+
+  function el(tag, className) {
+    const node = document.createElement(tag);
+    if (className) {
+      node.className = className;
+    }
+    return node;
+  }
+
+  function text(node) {
+    return node.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // A link with the same destination, and the same target, rel, title and
+  // aria-current the row's link was printed with.
+  function link(from, className) {
+    const a = el('a', className);
+    ['href', 'target', 'rel', 'title', 'aria-current'].forEach(function (name) {
+      if (from.hasAttribute(name)) {
+        a.setAttribute(name, from.getAttribute(name));
+      }
+    });
+    a.textContent = text(from);
+    return a;
+  }
+
+  function item(nodes, className) {
+    const li = el('li', className);
+    li.append.apply(li, nodes);
+    return li;
+  }
+
+  // A toggle and the list it opens: [button, ul].
+  function section(title, className, overview, entries, depth) {
+    const id = 'drawer-sub-' + ++count;
+    const button = el('button', className + ' site-header__drawer-toggle js-drawer-toggle');
+    const label = el('span');
+    const list = el('ul', 'site-header__drawer-submenu site-header__drawer-submenu--' + depth);
+
+    button.type = 'button';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', id);
+    label.textContent = title;
+    button.append(label);
+
+    if (chevronSource) {
+      const chevron = chevronSource.cloneNode(true);
+      chevron.setAttribute('class', 'site-header__drawer-chevron');
+      button.append(chevron);
+    }
+
+    list.id = id;
+
+    if (overview) {
+      list.append(item([link(overview, 'site-header__drawer-sublink site-header__drawer-sublink--overview')]));
+    }
+
+    entries.forEach(function (nodes) {
+      list.append(item(nodes, 'site-header__drawer-subitem'));
+    });
+
+    return [button, list];
+  }
+
+  function group(row) {
+    const tab = row.querySelector(':scope > .site-header__mega-tab');
+    const links = row.querySelectorAll('.site-header__mega-links a');
+
+    if (!tab) {
+      return null;
+    }
+
+    if (!links.length) {
+      if (tab.tagName === 'A') {
+        return [link(tab, 'site-header__drawer-sublink')];
+      }
+      const span = el('span', 'site-header__drawer-sublink');
+      span.textContent = text(tab);
+      return [span];
+    }
+
+    return section(
+      text(tab),
+      'site-header__drawer-sublink',
+      row.querySelector('.site-header__overview--head'),
+      Array.prototype.map.call(links, function (a) {
+        return [link(a, 'site-header__drawer-sublink')];
+      }),
+      1
+    );
+  }
+
+  const list = el('ul', 'site-header__drawer-list');
+  list.id = 'primary-menu-drawer';
+
+  Array.prototype.forEach.call(source.children, function (row) {
+    const li = el('li', 'site-header__drawer-item');
+    const trigger = row.querySelector(':scope > .js-nav-trigger');
+    const panel = row.querySelector(':scope > .js-nav-panel');
+
+    // Same accent and current tab as the row. breadcrumb-route.js moves
+    // is-current by data-menu-item, on both copies.
+    if (row.classList.contains('site-header__nav-item--mega')) {
+      li.classList.add('site-header__drawer-item--mega');
+    }
+    if (row.classList.contains('is-current')) {
+      li.classList.add('is-current');
+    }
+    if (row.hasAttribute('data-menu-item')) {
+      li.setAttribute('data-menu-item', row.getAttribute('data-menu-item'));
+    }
+
+    if (!trigger || !panel) {
+      const a = row.querySelector(':scope > a');
+      if (a) {
+        li.append(link(a, 'site-header__drawer-link'));
+      }
+      list.append(li);
+      return;
+    }
+
+    const groups = panel.querySelectorAll('.site-header__mega-groups > li');
+    const entries = groups.length
+      ? Array.prototype.map.call(groups, group).filter(Boolean)
+      : Array.prototype.map.call(panel.querySelectorAll('.site-header__dropdown-list > li > a'), function (a) {
+        return [link(a, 'site-header__drawer-sublink')];
+      });
+
+    li.append.apply(
+      li,
+      section(
+        text(trigger),
+        'site-header__drawer-link',
+        panel.querySelector(':scope > .site-header__overview, :scope > .site-header__mega-rail > .site-header__overview'),
+        entries,
+        0
+      )
+    );
+    list.append(li);
+  });
+
+  const nav = el('nav');
+  const label = source.closest('nav');
+  nav.setAttribute('aria-label', label ? label.getAttribute('aria-label') || '' : '');
+  nav.append(list);
+
+  const utility = drawer.querySelector('.site-header__drawer-utility');
+  if (utility) {
+    utility.before(nav);
+  } else {
+    (drawer.firstElementChild || drawer).append(nav);
   }
 }
 

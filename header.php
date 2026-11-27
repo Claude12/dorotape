@@ -152,7 +152,10 @@ $dorotape_search_sm  = (string) dorotape_setting( 'header_search_placeholder_sho
 			<div class="container">
 				<?php dorotape_header_search_field( 'dt-search-drawer', '' !== $dorotape_search_sm ? $dorotape_search_sm : $dorotape_search ); ?>
 
-				<?php dorotape_header_drawer_menu(); ?>
+				<?php
+				// The menu goes here, built by header.js from the bar above
+				// the first time the drawer opens (inc/header-menu.php says why).
+				?>
 
 				<div class="site-header__drawer-utility">
 					<?php dorotape_header_drawer_shortcuts(); ?>

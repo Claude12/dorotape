@@ -25,13 +25,20 @@ defined( 'ABSPATH' ) || exit;
  * @return string[]
  */
 function dorotape_non_blocking_style_handles(): array {
-	return (array) apply_filters(
-		'dorotape_non_blocking_styles',
-		array(
-			'photoswipe',
-			'photoswipe-default-skin',
-		)
+	$handles = array(
+		'photoswipe',
+		'photoswipe-default-skin',
 	);
+
+	// RewardsWP's components sheet styles only its two banners: the points
+	// notice on a product page and the thank-you banner after an order. It
+	// loads on every page and blocked the first paint of all of them (theme
+	// audit, 27 Nov 2026). Where a banner can show, it still loads normally.
+	if ( ! ( function_exists( 'is_product' ) && is_product() ) && ! ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) ) {
+		$handles[] = 'rewardswp-components';
+	}
+
+	return (array) apply_filters( 'dorotape_non_blocking_styles', $handles );
 }
 
 /**
