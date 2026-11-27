@@ -157,6 +157,12 @@ function dorotape_menu_holds_current( array $node ): bool {
  * @return int Menu item ID, or 0 when none is current.
  */
 function dorotape_menu_current_top( array $tree ): int {
+	$by_category = dorotape_menu_top_for_terms( $tree, dorotape_menu_current_terms() );
+
+	if ( $by_category ) {
+		return $by_category;
+	}
+
 	foreach ( $tree as $node ) {
 		if ( dorotape_menu_holds_current( $node ) ) {
 			return (int) $node['item']->ID;
@@ -164,6 +170,80 @@ function dorotape_menu_current_top( array $tree ): int {
 	}
 
 	return 0;
+}
+
+/**
+ * The categories the current page sits in, outermost first.
+ *
+ * On a product, its main category (dorotape_main_term()) and that category's
+ * ancestors; on a category page, the category and its ancestors. Empty
+ * anywhere else.
+ *
+ * @return int[] Term IDs.
+ */
+function dorotape_menu_current_terms(): array {
+	$term = null;
+
+	if ( function_exists( 'is_product' ) && is_product() ) {
+		$terms = get_the_terms( get_queried_object_id(), 'product_cat' );
+		$term  = is_array( $terms ) ? dorotape_main_term( $terms ) : null;
+	} elseif ( function_exists( 'is_product_category' ) && is_product_category() ) {
+		$term = get_queried_object();
+	}
+
+	if ( ! $term instanceof WP_Term ) {
+		return array();
+	}
+
+	return array_reverse( array_merge( array( $term->term_id ), get_ancestors( $term->term_id, $term->taxonomy, 'taxonomy' ) ) );
+}
+
+/**
+ * The top-level item whose section holds the outermost of these categories
+ * that is in the menu at all, the first in menu order on a tie.
+ *
+ * Outermost, because that is the family the trail starts with: Decorative
+ * Window Films is listed under Applications but not under Products, while
+ * its family, Sign & Display Vinyl, is a Products column.
+ *
+ * WordPress marks every menu entry for every category a product is in, so a
+ * glitter film that is also filed under Applications > Retail Display lit up
+ * Applications, while the trail under the title said Sign & Display Vinyl
+ * (Site Edits (1), Product Page row 29). The tab now follows the trail.
+ *
+ * @param array<int, array{item: WP_Post, children: array}> $tree  Top-level nodes.
+ * @param int[]                                           $terms Term IDs, outermost first.
+ * @return int Menu item ID, or 0 when none of them is in the menu.
+ */
+function dorotape_menu_top_for_terms( array $tree, array $terms ): int {
+	foreach ( $terms as $term_id ) {
+		foreach ( $tree as $node ) {
+			if ( dorotape_menu_holds_term( $node, (int) $term_id ) ) {
+				return (int) $node['item']->ID;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Whether a node, or anything under it, is a menu entry for this category.
+ */
+function dorotape_menu_holds_term( array $node, int $term_id ): bool {
+	$item = $node['item'];
+
+	if ( 'taxonomy' === $item->type && (int) $item->object_id === $term_id ) {
+		return true;
+	}
+
+	foreach ( $node['children'] as $child ) {
+		if ( dorotape_menu_holds_term( $child, $term_id ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -301,7 +381,7 @@ function dorotape_header_nav(): void {
 				$classes[] = 'is-current';
 			}
 			?>
-			<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+			<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-menu-item="<?php echo (int) $item->ID; ?>">
 				<?php if ( ! $node['children'] ) : ?>
 					<a class="site-header__nav-link"<?php echo dorotape_menu_link_attrs( $item, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?>><?php echo esc_html( $item->title ); ?></a>
 				<?php else : ?>
@@ -510,7 +590,7 @@ function dorotape_header_drawer_menu(): void {
 					$classes[] = 'is-current';
 				}
 				?>
-				<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+				<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-menu-item="<?php echo (int) $node['item']->ID; ?>">
 					<?php dorotape_header_drawer_node( $node, 0 ); ?>
 				</li>
 			<?php endforeach; ?>

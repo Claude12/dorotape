@@ -16,25 +16,28 @@
  *
  *   [ 'addr_65b2f1c8a9' => [
  *         'label'      => 'Head office',
- *         'type'       => 'billing',      // or 'shipping'
  *         'first_name' => ..., 'last_name' => ...,
  *         'address_1'  => ..., 'address_2' => ..., 'city'      => ...,
  *         'state'      => ..., 'postcode'  => ..., 'country'   => ...,
  *         'phone'      => ...,
  *     ], ... ]
  *
- * Only `label` and `type` are guaranteed. Everything else comes from
- * WooCommerce's own address fields for the country and type, so the set moves
- * with the store's settings: company is switched off here, and phone is on for
- * both types. DR-18 should read the keys it finds rather than assume this list.
+ * Only `label` is guaranteed. Everything else comes from WooCommerce's own
+ * address fields for the country, so the set moves with the store's settings:
+ * company is switched off here, and phone is on. DR-18 should read the keys it
+ * finds rather than assume this list.
  *
  * Two deliberate choices in that shape, both for DR-18's benefit:
  *
  *  - The field names are WooCommerce's own, unprefixed. An entry can be handed
  *    to WC_Order::set_address() as-is, and Sage's invoice and delivery address
  *    blocks map field for field with no translation layer to keep in step.
- *  - `type` keeps invoice and delivery addresses separate, which is Sage's model
- *    too. An address is one or the other, never implicitly both.
+ *  - An address has no type. Any saved address can be used as the invoice or
+ *    the delivery address, at checkout or as a default (Site Edits (1),
+ *    General row 19, 27 November 2026). Entries saved before then still carry
+ *    a `type` key, which nothing reads. Sage keeps invoice and delivery
+ *    addresses apart, so DR-18 should take the role from where an address is
+ *    used (the order's billing or shipping side), not from the book.
  *
  * The customer's WooCommerce billing and shipping addresses are untouched and
  * remain the defaults. The address book sits alongside them rather than
@@ -72,17 +75,48 @@ function dorotape_get_address_book( ?int $user_id = null ): array {
 }
 
 /**
- * Saved addresses of one type.
+ * The fields that make two addresses the same place for the same person.
  *
- * @param string   $type    'billing' or 'shipping'.
- * @param int|null $user_id
- * @return array
+ * Label, phone and county are left out: a different phone number on the same
+ * site is not a second address worth keeping.
  */
-function dorotape_get_address_book_by_type( string $type, ?int $user_id = null ): array {
-	return array_filter(
-		dorotape_get_address_book( $user_id ),
-		static fn( array $address ): bool => ( $address['type'] ?? '' ) === $type
-	);
+function dorotape_address_identity_keys(): array {
+	return array( 'first_name', 'last_name', 'address_1', 'address_2', 'city', 'postcode', 'country' );
+}
+
+/**
+ * Whether two addresses are the same, ignoring case and spaces, so "le1 1aa"
+ * and "LE1 1AA" do not count as two.
+ *
+ * @param array $a
+ * @param array $b
+ */
+function dorotape_addresses_match( array $a, array $b ): bool {
+	$norm = static fn( $v ): string => strtolower( preg_replace( '/\s+/', '', (string) $v ) );
+
+	foreach ( dorotape_address_identity_keys() as $key ) {
+		if ( $norm( $a[ $key ] ?? '' ) !== $norm( $b[ $key ] ?? '' ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * The id of the saved address matching this one, or null.
+ *
+ * @param array    $address Bare WooCommerce keys.
+ * @param int|null $user_id
+ */
+function dorotape_find_saved_address( array $address, ?int $user_id = null ): ?string {
+	foreach ( dorotape_get_address_book( $user_id ) as $address_id => $saved ) {
+		if ( dorotape_addresses_match( $saved, $address ) ) {
+			return (string) $address_id;
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -151,18 +185,18 @@ function dorotape_save_address( array $data, ?string $address_id = null, ?int $u
 		);
 	}
 
-	$type = in_array( $data['type'] ?? '', array( 'billing', 'shipping' ), true ) ? $data['type'] : 'shipping';
-
+	// No type: any saved address serves as either (see the file header).
+	// Delivery and invoice have the same fields here once email is set
+	// aside, so the delivery set is the one used to read and check it.
 	$address = array(
 		'label' => sanitize_text_field( (string) ( $data['label'] ?? '' ) ),
-		'type'  => $type,
 	);
 
-	foreach ( array_keys( dorotape_address_book_fields( $type ) ) as $key ) {
+	foreach ( array_keys( dorotape_address_book_fields( 'shipping' ) ) as $key ) {
 		$address[ $key ] = sanitize_text_field( (string) ( $data[ $key ] ?? '' ) );
 	}
 
-	$errors = dorotape_validate_address( $address, $type );
+	$errors = dorotape_validate_address( $address, 'shipping' );
 	if ( $errors->has_errors() ) {
 		return $errors;
 	}
@@ -299,7 +333,7 @@ function dorotape_delete_address( string $address_id, ?int $user_id = null ): bo
  *
  * @param string      $address_id
  * @param int|null    $user_id
- * @param string|null $as 'shipping' or 'billing'; the address's own type when omitted.
+ * @param string|null $as 'shipping' or 'billing'; delivery when omitted.
  */
 function dorotape_set_default_address( string $address_id, ?int $user_id = null, ?string $as = null ): bool {
 	$user_id = $user_id ?? get_current_user_id();
@@ -310,7 +344,7 @@ function dorotape_set_default_address( string $address_id, ?int $user_id = null,
 	}
 
 	$customer = new WC_Customer( $user_id );
-	$type     = in_array( $as, array( 'shipping', 'billing' ), true ) ? $as : $address['type'];
+	$type     = 'billing' === $as ? 'billing' : 'shipping';
 
 	foreach ( array_keys( dorotape_address_book_fields( $type ) ) as $key ) {
 		$setter = "set_{$type}_{$key}";
@@ -323,6 +357,90 @@ function dorotape_set_default_address( string $address_id, ?int $user_id = null,
 
 	return true;
 }
+
+// ─── Keeping the defaults in the book ────────────────────────────────────────
+
+/**
+ * Add the customer's default delivery and invoice addresses to the book if
+ * they are not in it already.
+ *
+ * A default changed to a new address, under Addresses or by typing one at
+ * checkout, used to replace the old default and leave no copy anywhere, so
+ * the customer had to type it again next time it was needed (Site Edits (1),
+ * General row 18, 27 November 2026). The book now keeps every address that
+ * has been a default. An amended default is a new entry, and the version
+ * before it stays saved until the customer deletes it.
+ *
+ * Quietly does nothing when the book is full or the address is incomplete:
+ * the change the customer actually asked for has already been made.
+ *
+ * @param int      $user_id
+ * @param string[] $types Which defaults to look at.
+ */
+function dorotape_remember_default_addresses( int $user_id, array $types = array( 'shipping', 'billing' ) ): void {
+	if ( ! $user_id ) {
+		return;
+	}
+
+	$customer = new WC_Customer( $user_id );
+
+	foreach ( $types as $type ) {
+		$address = array();
+
+		foreach ( array_keys( dorotape_address_book_fields( $type ) ) as $key ) {
+			$getter = "get_{$type}_{$key}";
+			if ( method_exists( $customer, $getter ) ) {
+				$address[ $key ] = (string) $customer->$getter();
+			}
+		}
+
+		if ( '' === trim( $address['address_1'] ?? '' ) || null !== dorotape_find_saved_address( $address, $user_id ) ) {
+			continue;
+		}
+
+		dorotape_save_address( $address, null, $user_id );
+	}
+}
+
+// Addresses > Edit, WooCommerce's own form for each default.
+add_action( 'woocommerce_customer_save_address', function ( $user_id ): void {
+	dorotape_remember_default_addresses( (int) $user_id );
+}, 20 );
+
+/**
+ * After checkout, which writes what was typed there back to the customer's
+ * defaults. On a collection order the delivery side is whatever was left in
+ * the hidden form, or the collection point, not somewhere the customer sends
+ * goods, so only the invoice address is looked at.
+ *
+ * @param WC_Order|false $order
+ */
+function dorotape_remember_checkout_addresses( $order ): void {
+	if ( ! $order instanceof WC_Order || ! $order->get_customer_id() ) {
+		return;
+	}
+
+	$types = array( 'billing' );
+
+	$collecting = false;
+	foreach ( $order->get_shipping_methods() as $method ) {
+		if ( in_array( $method->get_method_id(), array( 'local_pickup', 'pickup_location' ), true ) ) {
+			$collecting = true;
+		}
+	}
+
+	if ( $order->has_shipping_address() && ! $collecting ) {
+		$types[] = 'shipping';
+	}
+
+	dorotape_remember_default_addresses( (int) $order->get_customer_id(), $types );
+}
+
+// The block checkout fires the first, the classic one the second.
+add_action( 'woocommerce_store_api_checkout_order_processed', 'dorotape_remember_checkout_addresses' );
+add_action( 'woocommerce_checkout_order_processed', static function ( $order_id ): void {
+	dorotape_remember_checkout_addresses( wc_get_order( $order_id ) );
+} );
 
 /**
  * Format an address for display, using WooCommerce's per-country rules.

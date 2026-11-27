@@ -744,6 +744,20 @@ add_filter(
 	98
 );
 
+/*
+ * Arrows for the tab row on a phone. Six tabs run off the side of the screen
+ * there, and the fade at the edge was not enough of a hint (Site Edits (1),
+ * Product Page row 18, 27 November 2026). Printed here, inside the tabs
+ * wrapper, and moved beside the row by lib/scroller.js, which also hides
+ * them while every tab fits.
+ */
+add_action(
+	'woocommerce_product_after_tabs',
+	static function (): void {
+		dorotape_scroller_nav( 'product-tabs-nav' );
+	}
+);
+
 /**
  * The white logo filter, once per page.
  *

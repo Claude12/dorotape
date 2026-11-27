@@ -63,3 +63,15 @@ $flat-sections: ".accordion-block, .case-studies-block, .contact-block, .cta-car
 .site-main--blocks > :is(#{$flat-sections}):not([class*="--bg-"]) + :is(#{$flat-sections}):not([class*="--bg-"]) {
   padding-top: 0;
 }
+
+// The same for the first block under a page banner. The banner already ends
+// in its own 56px and fades into the navy, so a plain block's full top
+// padding on top of it left about 170px of empty navy under the breadcrumb on
+// the one column pages: Reward Points Terms, Terms & conditions, Delivery,
+// Returns (Site Edits (1), Footer row 11, 27 Nov 2026). A block with its own
+// background still keeps its padding, as above, and so does the block under
+// a photo banner (--has-backdrop, the case studies): the photo stops in a hard
+// edge, and the text needs the full space below it.
+.site-main--blocks > .internal-banner-block:not(.internal-banner-block--has-backdrop) + :is(#{$flat-sections}):not([class*="--bg-"]) {
+  padding-top: 0;
+}

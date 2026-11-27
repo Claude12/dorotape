@@ -260,6 +260,48 @@
             "append": ""
         },
         {
+            "key": "field_dtwoo0049",
+            "label": "Reward points: Ways to earn line",
+            "name": "woo_reward_points_widget",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown in the Rewards tab (bottom right of every page) under Ways to earn > Make a purchase. {points} becomes \"1 point\" or \"2 points\" and {amount} the spend needed for them. Both come from the RewardsWP settings, so the line follows the rate.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "{points} for every {amount} spent on reward products",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_dtwoo0050",
+            "label": "Category cards: roll size when there are several widths",
+            "name": "woo_card_various_widths",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown in the Roll size pill on a category card when the product's options come in more than one width, as \"Roll size: various widths\". A product with one width shows that width instead.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "100",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "various widths",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_dtwoo0048",
             "label": "Delivery: to be quoted",
             "name": "woo_delivery_quoted_label",
@@ -701,5 +743,5 @@
     "active": true,
     "description": "The wording and background shapes on the basket, checkout, order received and wishlist pages. What is inside those pages is WooCommerce's and YITH's own markup, so only the chrome around it is editable here.",
     "show_in_rest": 0,
-    "modified": 1794571931
+    "modified": 1795795530
 }

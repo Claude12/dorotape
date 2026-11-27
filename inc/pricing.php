@@ -222,16 +222,7 @@ add_action( 'woocommerce_product_options_advanced', function (): void {
 			'id'          => '_dt_qty_step',
 			'label'       => __( 'Quantity step', 'dorotape' ),
 			'value'       => get_post_meta( $post->ID, '_dt_qty_step', true ) ?: '1',
-			'options'     => array(
-				'1'    => __( 'None (order any quantity)', 'dorotape' ),
-				'3'    => __( 'Jumps of 3', 'dorotape' ),
-				'5'    => __( 'Jumps of 5', 'dorotape' ),
-				'10'   => __( 'Jumps of 10', 'dorotape' ),
-				'12.5' => __( 'Jumps of 12.5', 'dorotape' ),
-				'15'   => __( 'Jumps of 15', 'dorotape' ),
-				'25'   => __( 'Jumps of 25', 'dorotape' ),
-				'50'   => __( 'Jumps of 50', 'dorotape' ),
-			),
+			'options'     => dorotape_qty_step_options(),
 			'description' => __( 'Forces the quantity box on the product page to increment in steps (e.g. 5, 10, 15...) instead of one at a time.', 'dorotape' ),
 		)
 	);
@@ -265,10 +256,81 @@ add_action( 'woocommerce_admin_process_product_object', function ( WC_Product $p
  * @return int|float
  */
 function dorotape_qty_step( WC_Product $product ) {
+	// One width can be sold differently from the rest: Orajet 3268 and DFP07
+	// at 500mm come only as 25m rolls, while their 1370mm goes in 5s or 10s
+	// (Site Edits, 27 November 2026). A variation's own step wins.
+	if ( $product->is_type( 'variation' ) ) {
+		$own = dorotape_stock_amount( get_post_meta( $product->get_id(), '_dt_qty_step', true ) );
+		if ( $own > 1 ) {
+			return $own;
+		}
+	}
 	$id   = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
 	$step = dorotape_stock_amount( get_post_meta( $id, '_dt_qty_step', true ) );
 	return $step > 1 ? $step : 1;
 }
+
+/**
+ * The step choices, shared by the product and variation settings.
+ *
+ * @return array<string, string>
+ */
+function dorotape_qty_step_options(): array {
+	return array(
+		'1'    => __( 'None (order any quantity)', 'dorotape' ),
+		'3'    => __( 'Jumps of 3', 'dorotape' ),
+		'5'    => __( 'Jumps of 5', 'dorotape' ),
+		'10'   => __( 'Jumps of 10', 'dorotape' ),
+		'12.5' => __( 'Jumps of 12.5', 'dorotape' ),
+		'15'   => __( 'Jumps of 15', 'dorotape' ),
+		'25'   => __( 'Jumps of 25', 'dorotape' ),
+		'50'   => __( 'Jumps of 50', 'dorotape' ),
+	);
+}
+
+/**
+ * A step of its own on each variation, in the variation's settings.
+ *
+ * "Same as the product" leaves the product's step in charge.
+ */
+add_action(
+	'woocommerce_variation_options_pricing',
+	function ( $loop, $variation_data, $variation ): void {
+		$options      = dorotape_qty_step_options();
+		$options['1'] = __( 'Same as the product', 'dorotape' );
+		woocommerce_wp_select(
+			array(
+				'id'            => "_dt_qty_step_var{$loop}",
+				'name'          => "_dt_qty_step_var[{$loop}]",
+				'label'         => __( 'Quantity step', 'dorotape' ),
+				'value'         => get_post_meta( $variation->ID, '_dt_qty_step', true ) ?: '1',
+				'options'       => $options,
+				'wrapper_class' => 'form-row form-row-full',
+				'desc_tip'      => true,
+				'description'   => __( 'For a width sold in different jumps from the rest, e.g. 25m rolls only.', 'dorotape' ),
+			)
+		);
+	},
+	10,
+	3
+);
+
+add_action(
+	'woocommerce_save_product_variation',
+	function ( $variation_id, $loop ): void {
+		if ( ! isset( $_POST['_dt_qty_step_var'][ $loop ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC verified.
+			return;
+		}
+		$step = wc_clean( wp_unslash( $_POST['_dt_qty_step_var'][ $loop ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( '1' !== $step && array_key_exists( $step, dorotape_qty_step_options() ) ) {
+			update_post_meta( $variation_id, '_dt_qty_step', $step );
+		} else {
+			delete_post_meta( $variation_id, '_dt_qty_step' );
+		}
+	},
+	10,
+	2
+);
 
 /**
  * Quantities to two decimal places, replacing WooCommerce's own intval.
@@ -381,6 +443,9 @@ add_filter( 'woocommerce_available_variation', function ( $data, $parent, $varia
 		if ( $step > 1 ) {
 			$data['min_qty'] = max( (int) $data['min_qty'], $step );
 		}
+		// WooCommerce's script resets min but never the step, so qty-step.js
+		// sets it from this when the width has a step of its own.
+		$data['dt_qty_step'] = $step;
 	}
 	return $data;
 }, 10, 3 );

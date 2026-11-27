@@ -24,7 +24,9 @@
   var CART = 'wc/store/cart';
   var CHECKOUT = 'wc/store/checkout';
 
-  // Address book type => [ additional field id, cart store setter ].
+  // Which picker => [ additional field id, cart store setter ]. Either picker
+  // lists the whole book: an address has no type (Site Edits (1), General
+  // row 19). An empty picker means the address in the form.
   var pickers = {
     shipping: [ data.fields.shipping, 'setShippingAddress' ],
     billing: [ data.fields.billing, 'setBillingAddress' ]
@@ -37,13 +39,14 @@
   function apply( type, id ) {
     var address = data.book[ id ];
 
-    if ( ! address || address.type !== type ) {
+    if ( ! address ) {
       return;
     }
 
     var fields = {};
 
     Object.keys( address ).forEach( function ( key ) {
+      // `type` is only on entries saved before addresses lost their type.
       if ( 'label' !== key && 'type' !== key ) {
         fields[ key ] = address[ key ];
       }
@@ -182,10 +185,10 @@
 
     // A delivery address picked before switching to collection would still
     // be copied onto the order by the server, so let it go.
-    if ( collection && values[ data.fields.shipping ] && data.formValue !== values[ data.fields.shipping ] ) {
+    if ( collection && values[ data.fields.shipping ] ) {
       var clear = {};
-      clear[ data.fields.shipping ] = data.formValue;
-      seen.shipping = data.formValue;
+      clear[ data.fields.shipping ] = '';
+      seen.shipping = '';
       wp.data.dispatch( CHECKOUT ).setAdditionalFields( clear );
       return;
     }
@@ -204,21 +207,21 @@
       if ( value !== seen[ type ] ) {
         seen[ type ] = value;
 
-        if ( value && data.formValue !== value ) {
+        if ( value ) {
           apply( type, value );
         }
         return;
       }
 
       // The customer picked a saved address and then changed it in the form.
-      // Step the picker back to "the address entered above", or the server
-      // would copy the saved version over their edit when the order is placed.
+      // Empty the picker, or the server would copy the saved version over
+      // their edit when the order is placed.
       var current = cart && ( 'billing' === type ? cart.billingAddress : cart.shippingAddress );
 
-      if ( value && data.formValue !== value && current && ! matches( type, value, current ) ) {
+      if ( value && current && ! matches( type, value, current ) ) {
         var update = {};
-        update[ fieldId ] = data.formValue;
-        seen[ type ] = data.formValue;
+        update[ fieldId ] = '';
+        seen[ type ] = '';
         wp.data.dispatch( CHECKOUT ).setAdditionalFields( update );
       }
     } );

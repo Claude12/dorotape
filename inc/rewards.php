@@ -1141,3 +1141,28 @@ add_action( 'wp_loaded', function (): void {
 		}
 	}
 } );
+
+/**
+ * The Rewards tab's "Make a purchase" line.
+ *
+ * RewardsWP writes "1 point for every £100 spent", which reads as if every
+ * purchase earns, but only reward products do (see dorotape_reward_multiplier).
+ * Swap the plugin's template for the ACF line on the shop text page, turning
+ * {points} and {amount} back into the plugin's own placeholders so the
+ * numbers still come from the RewardsWP settings. Front end only: the admin
+ * screen describing the rule keeps the plugin's wording.
+ */
+add_filter(
+	'gettext_rewardswp',
+	function ( $translation, $text ) {
+		if ( '%1$s %2$s for every %3$s spent' !== $text || is_admin() && ! wp_doing_ajax() ) {
+			return $translation;
+		}
+
+		$line = dorotape_woo_pages_field( 'woo_reward_points_widget', __( '{points} for every {amount} spent on reward products', 'dorotape' ) );
+
+		return str_replace( array( '{points}', '{amount}' ), array( '%1$s %2$s', '%3$s' ), str_replace( '%', '%%', $line ) );
+	},
+	10,
+	2
+);

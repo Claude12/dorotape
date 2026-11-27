@@ -94,9 +94,9 @@
       if ( data.pickerField ) {
         var values = wp.data.select( CHECKOUT ).getAdditionalFields() || {};
 
-        if ( values[ data.pickerField ] && data.formValue !== values[ data.pickerField ] ) {
+        if ( values[ data.pickerField ] ) {
           var reset = {};
-          reset[ data.pickerField ] = data.formValue;
+          reset[ data.pickerField ] = '';
           wp.data.dispatch( CHECKOUT ).setAdditionalFields( reset );
         }
       }

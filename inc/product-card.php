@@ -63,9 +63,105 @@ function dorotape_card_loading(): string {
  */
 function dorotape_product_card_meta( WC_Product $product ): string {
 	$terms = get_the_terms( $product->get_id(), 'product_cat' );
-	$best  = is_array( $terms ) ? dorotape_deepest_term( $terms ) : null;
+	$best  = is_array( $terms ) ? dorotape_main_term( $terms ) : null;
 
 	return $best ? $best->name : '';
+}
+
+/**
+ * The category a product belongs under, when it is in several.
+ *
+ * A product can sit in a product family (Sign & Display Vinyl > Glitter Vinyl)
+ * and in an application (Applications > Retail Display > Silver Films). The
+ * family is where it lives, so the trail, the chip above the title and the
+ * highlighted menu tab go through the family (Site Edits (1), Product Page
+ * rows 28 and 29, November 2026). "Family" is read from the main menu rather
+ * than from any category name: the category found under the earliest menu
+ * tab wins (Products before Applications), and the deepest one wins between
+ * equals.
+ *
+ * @param WP_Term[] $terms Terms from one hierarchical taxonomy.
+ * @return WP_Term|null Null when the list is empty.
+ */
+function dorotape_main_term( array $terms ): ?WP_Term {
+	$order = dorotape_menu_term_order();
+	$best  = null;
+	$rank  = null;
+
+	foreach ( $terms as $term ) {
+		if ( ! $term instanceof WP_Term ) {
+			continue;
+		}
+
+		$chain    = array_merge( array( $term->term_id ), get_ancestors( $term->term_id, $term->taxonomy, 'taxonomy' ) );
+		$position = PHP_INT_MAX;
+
+		foreach ( $chain as $id ) {
+			if ( isset( $order[ $id ] ) ) {
+				$position = min( $position, $order[ $id ] );
+			}
+		}
+
+		// Earlier in the menu first, then deeper.
+		$this_rank = array( $position, -count( $chain ) );
+
+		if ( null === $rank || $this_rank < $rank ) {
+			$best = $term;
+			$rank = $this_rank;
+		}
+	}
+
+	return $best;
+}
+
+/**
+ * Which top-level tab of the main menu each category first appears under, by
+ * term ID: 0 for the first tab (Products), 1 for the next, and so on.
+ *
+ * By tab rather than by position inside it, so the only thing this decides
+ * is a family against an application. Between two families in the same tab
+ * (a laminate also filed under a vinyl) the deeper category still wins, as
+ * before.
+ *
+ * @return array<int, int> Term ID => tab index.
+ */
+function dorotape_menu_term_order(): array {
+	static $order = null;
+
+	if ( null !== $order ) {
+		return $order;
+	}
+
+	$order     = array();
+	$locations = get_nav_menu_locations();
+	$items     = empty( $locations['primary'] ) ? array() : wp_get_nav_menu_items( $locations['primary'], array( 'update_post_term_cache' => false ) );
+	$parents   = array();
+	$tabs      = array();
+
+	foreach ( (array) $items as $item ) {
+		$parents[ (int) $item->ID ] = (int) $item->menu_item_parent;
+
+		if ( ! (int) $item->menu_item_parent ) {
+			$tabs[ (int) $item->ID ] = count( $tabs );
+		}
+	}
+
+	foreach ( (array) $items as $item ) {
+		if ( 'taxonomy' !== $item->type || isset( $order[ (int) $item->object_id ] ) ) {
+			continue;
+		}
+
+		$top = (int) $item->ID;
+		for ( $guard = 0; ! empty( $parents[ $top ] ) && $guard < 10; $guard++ ) {
+			$top = $parents[ $top ];
+		}
+
+		if ( isset( $tabs[ $top ] ) ) {
+			$order[ (int) $item->object_id ] = $tabs[ $top ];
+		}
+	}
+
+	return $order;
 }
 
 /**

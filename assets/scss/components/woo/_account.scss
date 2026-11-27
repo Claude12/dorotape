@@ -778,8 +778,9 @@
   font-size: $font-size-md;
 }
 
-// Delivery or Invoice. The badge the product card wears, in the quiet colours
-// rather than the aurora: this classifies an address, it does not sell one.
+// The badge shape, the one the product card wears. Only the default badges
+// below use it now: addresses lost their Delivery or Invoice tag when they
+// stopped having a type (Site Edits (1), General row 19).
 .dorotape-address-book__type {
   padding: var(--spacer-4) var(--spacer-12);
   border-radius: var(--radius-pill);

@@ -53,8 +53,9 @@ function dorotape_breadcrumb_trail(): array {
  *
  * With no primary category set, Rank Math takes the first category by name,
  * which put every Dichroic film under "Christmassy Films for Festive
- * Displays" (Site Edits, October 2026). The most specific category is the
- * one the chip above the title already names, so the two now agree.
+ * Displays" (Site Edits, October 2026). The trail now takes the same
+ * category the chip above the title names: the product's family before an
+ * application, then the most specific (dorotape_main_term()).
  *
  * @param WP_Term   $term  Rank Math's choice.
  * @param WP_Term[] $terms Every term on the post in that taxonomy.
@@ -65,7 +66,7 @@ function dorotape_breadcrumb_main_term( $term, $terms ) {
 		return $term;
 	}
 
-	return dorotape_deepest_term( $terms ) ?? $term;
+	return dorotape_main_term( $terms ) ?? $term;
 }
 add_filter( 'rank_math/frontend/breadcrumb/main_term', 'dorotape_breadcrumb_main_term', 10, 2 );
 
@@ -265,9 +266,11 @@ function dorotape_term_crumbs( WP_Term $term ): array {
  * Prints nothing when there is no trail, so a caller does not have to test
  * first.
  *
- * @param string $class Extra class for the <nav>, for placement only.
+ * @param string $class  Extra class for the <nav>, for placement only.
+ * @param array  $routes Other trails a script may swap in (a product's
+ *                       categories, inc/single-product.php). Optional.
  */
-function dorotape_breadcrumb_nav( string $class = '' ): void {
+function dorotape_breadcrumb_nav( string $class = '', array $routes = array() ): void {
 	$trail = dorotape_breadcrumb_trail();
 
 	if ( ! $trail ) {
@@ -277,9 +280,10 @@ function dorotape_breadcrumb_nav( string $class = '' ): void {
 	$classes = 'breadcrumb' . ( '' !== $class ? ' ' . $class : '' );
 
 	printf(
-		'<nav class="%1$s" aria-label="%2$s"><ol class="breadcrumb__trail">',
+		'<nav class="%1$s" aria-label="%2$s"%3$s><ol class="breadcrumb__trail">',
 		esc_attr( $classes ),
-		esc_attr__( 'Breadcrumb', 'dorotape' )
+		esc_attr__( 'Breadcrumb', 'dorotape' ),
+		$routes ? ' data-routes="' . esc_attr( (string) wp_json_encode( $routes ) ) . '"' : ''
 	);
 
 	foreach ( $trail as $index => $crumb ) {

@@ -289,24 +289,13 @@ function dorotape_render_address_list(): void {
 			$default_delivery = dorotape_address_is_default( $address, $customer, 'shipping' );
 			$default_invoice  = dorotape_address_is_default( $address, $customer, 'billing' );
 
-			// Any address can be made either default, so a default badge says
-			// what the address is used for and the saved type would contradict
-			// it ("Delivery" beside "Default invoice"). The type shows only on
-			// an address that is not a default.
-			$type_badge = '';
-			if ( ! $default_delivery && ! $default_invoice ) {
-				$type_badge = ' <span class="dorotape-address-book__type">' . (
-					'billing' === $address['type']
-						? esc_html__( 'Invoice', 'dorotape' )
-						: esc_html__( 'Delivery', 'dorotape' )
-				) . '</span>';
-			}
-
+			// No Invoice or Delivery badge: an address has no type and serves as
+			// either (Site Edits (1), General row 19). Only the defaults it is
+			// currently holding are marked.
 			echo '<li class="dorotape-address-book__item">';
 			printf(
-				'<h3 class="dorotape-address-book__label">%s%s%s%s</h3>',
+				'<h3 class="dorotape-address-book__label">%s%s%s</h3>',
 				esc_html( $address['label'] ),
-				$type_badge, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
 				$default_delivery ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default delivery', 'dorotape' ) . '</span>' : '',
 				$default_invoice ? ' <span class="dorotape-address-book__type dorotape-address-book__type--default">' . esc_html__( 'Default invoice', 'dorotape' ) . '</span>' : ''
 			);
@@ -375,29 +364,30 @@ function dorotape_render_default_addresses( WC_Customer $customer ): void {
 }
 
 /**
- * Whether a saved address is what the customer's WooCommerce default of the
- * same type currently holds, which is what "Make default" writes.
+ * Whether a saved address is what the customer's WooCommerce default delivery
+ * or invoice address currently holds, which is what "Make default" writes.
  *
  * Compared field by field rather than remembered, because the default can also
  * be changed under Addresses or by checkout, and a stored flag would go stale.
  *
  * @param array       $address
  * @param WC_Customer $customer
- * @param string|null $type 'shipping' or 'billing'; the address's own type when omitted.
+ * @param string      $type 'shipping' or 'billing'.
  */
-function dorotape_address_is_default( array $address, WC_Customer $customer, ?string $type = null ): bool {
-	$type = $type ?? ( $address['type'] ?? '' );
+function dorotape_address_is_default( array $address, WC_Customer $customer, string $type ): bool {
+	$default = array();
 
-	foreach ( array( 'first_name', 'last_name', 'address_1', 'address_2', 'city', 'postcode', 'country' ) as $key ) {
+	foreach ( dorotape_address_identity_keys() as $key ) {
 		$getter = "get_{$type}_{$key}";
 
-		if ( ! method_exists( $customer, $getter )
-			|| strcasecmp( trim( (string) $customer->$getter() ), trim( (string) ( $address[ $key ] ?? '' ) ) ) !== 0 ) {
+		if ( ! method_exists( $customer, $getter ) ) {
 			return false;
 		}
+
+		$default[ $key ] = $customer->$getter();
 	}
 
-	return true;
+	return dorotape_addresses_match( $address, $default );
 }
 
 /**
@@ -445,8 +435,7 @@ function dorotape_render_address_form( string $address_id ): void {
 	// Keep whatever was typed if validation sent us back here.
 	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- display only, all output escaped.
 	$posted  = isset( $_POST['dorotape_address_action'] ) ? wp_unslash( $_POST ) : array();
-	$address = $address ?? array( 'type' => 'shipping', 'label' => '' );
-	$type    = sanitize_key( $posted['type'] ?? $address['type'] ?? 'shipping' );
+	$address = $address ?? array( 'label' => '' );
 	$value   = static fn( string $key ): string => (string) ( $posted[ $key ] ?? $address[ $key ] ?? '' );
 
 	echo '<form method="post" class="dorotape-address-form">';
@@ -466,20 +455,8 @@ function dorotape_render_address_form( string $address_id ): void {
 		$value( 'label' )
 	);
 
-	woocommerce_form_field(
-		'type',
-		array(
-			'type'     => 'select',
-			'label'    => __( 'Address type', 'dorotape' ),
-			'required' => true,
-			'class'    => array( 'form-row-wide' ),
-			'options'  => array(
-				'shipping' => __( 'Delivery address', 'dorotape' ),
-				'billing'  => __( 'Invoice address', 'dorotape' ),
-			),
-		),
-		$type
-	);
+	// No delivery or invoice choice here: any saved address can be used as
+	// either at checkout (Site Edits (1), General row 19, 27 November 2026).
 
 	// A new address starts in the shop's own country, as WooCommerce's own
 	// address forms do, rather than on "Select a country".
@@ -493,7 +470,7 @@ function dorotape_render_address_form( string $address_id ): void {
 	// wrapper. The names stay bare, which is what the book stores. Billing
 	// and delivery have the same fields here, so one set of ids serves both.
 	echo '<div class="woocommerce-address-fields"><div class="woocommerce-address-fields__field-wrapper">';
-	foreach ( dorotape_address_book_fields( $type ) as $key => $field ) {
+	foreach ( dorotape_address_book_fields( 'shipping' ) as $key => $field ) {
 		$field['id'] = 'shipping_' . $key;
 		if ( 'state' === $key ) {
 			$field['country'] = $country;

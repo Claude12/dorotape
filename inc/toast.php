@@ -248,7 +248,7 @@ function dorotape_toast_continue_url(): string {
 	}
 
 	$terms = get_the_terms( get_queried_object_id(), 'product_cat' );
-	$term  = is_array( $terms ) ? dorotape_deepest_term( $terms ) : null;
+	$term  = is_array( $terms ) ? dorotape_main_term( $terms ) : null;
 	$url   = $term ? get_term_link( $term ) : '';
 
 	return is_string( $url ) && '' !== $url ? $url : (string) wc_get_page_permalink( 'shop' );

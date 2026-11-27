@@ -21,6 +21,7 @@ import { initRewardPoints } from './lib/reward-points';
 import { initShareBasket } from './lib/share-basket';
 import { initPostGallery } from './lib/post-gallery';
 import { initHeroSlideshow } from './lib/hero-slideshow';
+import { initBreadcrumbRoute } from './lib/breadcrumb-route';
 
 /*
  * Each feature starts independently. Run bare, a throw in any one of these
@@ -51,6 +52,7 @@ const features = [
   initShareBasket,
   initPostGallery,
   initHeroSlideshow,
+  initBreadcrumbRoute,
 ];
 
 document.addEventListener('DOMContentLoaded', () => {

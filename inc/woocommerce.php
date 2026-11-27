@@ -447,6 +447,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 		$variation_tiers[ (int) $var_id ] = array(
 			'unit'       => dorotape_price_unit( (int) $var_id ),
+			'step'       => $var_step,
 			'base_price' => $var_base,
 			'tiers'      => array_map(
 				static function ( array $t ): array {
@@ -471,6 +472,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 	$init_tiers = $variation_tiers[ $init_id ]['tiers'];
 	$base_price = $variation_tiers[ $init_id ]['base_price'];
+	$init_step  = $variation_tiers[ $init_id ]['step'];
 	$unit       = dorotape_price_unit( $product->get_id() );
 	$u          = dorotape_unit_strings( $unit );
 
@@ -480,7 +482,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 	echo '<div class="dt-tier-pricing" id="dt_variable_tier_table"'
 		. ' data-unit="' . esc_attr( $unit ) . '"'
-		. ' data-qty-step="' . esc_attr( (string) max( 1, dorotape_qty_step( $product ) ) ) . '"'
+		. ' data-qty-step="' . esc_attr( (string) $init_step ) . '"'
 		. ' data-variation-tiers="' . esc_attr( wp_json_encode( $variation_tiers ) ) . '">';
 	// h2, not h3: this is the first heading after the product H1, and a level
 	// skipped there is a screen reader being told a section is missing. The
@@ -496,7 +498,7 @@ add_action( 'woocommerce_single_product_summary', function (): void {
 
 	// Base-rate label follows the quantity step, as in the simple-product table.
 	echo '<tr class="dt-tier-pricing__row dt-tier-pricing__row--base" data-min="0" data-price="' . esc_attr( $base_price ) . '">';
-	echo '<td>' . esc_html( max( 1, dorotape_qty_step( $product ) ) . $u['qty_suffix'] ) . '</td>';
+	echo '<td>' . esc_html( $init_step . $u['qty_suffix'] ) . '</td>';
 	echo '<td>' . wp_kses_post( wc_price( $base_price ) ) . esc_html( $u['suffix'] ) . '</td>';
 	echo '<td>&ndash;</td>';
 	echo '</tr>';

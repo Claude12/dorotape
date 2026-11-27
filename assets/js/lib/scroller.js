@@ -20,7 +20,44 @@ const STATE_HIDDEN = 'is-hidden';
 const EDGE = 2;
 
 export function initScrollers() {
+  prepareProductTabs();
   document.querySelectorAll('.js-scroller').forEach(initScroller);
+}
+
+// The product page's tab row comes from WooCommerce's own template, so it
+// cannot be printed as a scroller. PHP adds the arrows after the panels; put
+// them in a box with the row, which then works like any other strip.
+// WooCommerce's tab script looks the row up from the outer wrapper, so the
+// extra box does not get in its way.
+function prepareProductTabs() {
+  document.querySelectorAll('.woocommerce-tabs').forEach((tabs) => {
+    const list = tabs.querySelector(':scope > ul.tabs');
+    const nav = tabs.querySelector(':scope > .product-tabs-nav');
+
+    if (!list || !nav) {
+      return;
+    }
+
+    const box = document.createElement('div');
+    box.className = 'product-tabs-scroll js-scroller';
+    list.parentNode.insertBefore(box, list);
+    box.append(list, nav);
+    list.classList.add('js-scroller-track');
+
+    // A tab tapped while half under an arrow slides to the middle of the
+    // row, so the chosen one is always fully in view.
+    list.addEventListener('click', (e) => {
+      const tab = e.target.closest('li');
+      if (!tab || list.scrollWidth <= list.clientWidth) {
+        return;
+      }
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      list.scrollTo({
+        left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
+    });
+  });
 }
 
 function initScroller(scroller) {

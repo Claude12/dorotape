@@ -206,7 +206,49 @@ function dorotape_product_category_pill(): void {
  * come from Rank Math and both look the same.
  */
 function dorotape_product_breadcrumb(): void {
-	dorotape_breadcrumb_nav( 'product-hero__breadcrumb' );
+	dorotape_breadcrumb_nav( 'product-hero__breadcrumb', dorotape_product_routes() );
+}
+
+/**
+ * Every trail the product could be reached by, one per category it is in.
+ *
+ * The trail printed is the product's main category (dorotape_main_term()),
+ * because that is what search engines are told and what a visitor from
+ * outside the site sees. A visitor who browsed in through another of its
+ * categories expects the trail to lead back the way they came: ASLAN SE70
+ * Nebula found under Dichroic Films should not say Window Films (Site Edits
+ * (1), Product Page row 30). The page is cached as one copy for everyone, so
+ * the server cannot pick by where each visitor came from; it lists the
+ * routes and assets/js/lib/breadcrumb-route.js picks the one that matches
+ * the page they arrived from.
+ *
+ * @return array<int, array{crumbs: array, menu: int, url: string}> Routes, or empty for a product in fewer than two categories.
+ */
+function dorotape_product_routes(): array {
+	$terms = get_the_terms( get_queried_object_id(), 'product_cat' );
+	$trail = dorotape_breadcrumb_trail();
+
+	if ( ! is_array( $terms ) || count( $terms ) < 2 || count( $trail ) < 2 ) {
+		return array();
+	}
+
+	$tree   = function_exists( 'dorotape_menu_tree' ) ? dorotape_menu_tree( 'primary' ) : array();
+	$first  = $trail[0];
+	$last   = $trail[ array_key_last( $trail ) ];
+	$routes = array();
+
+	foreach ( $terms as $term ) {
+		$crumbs = dorotape_term_crumbs( $term );
+		$chain  = array_reverse( array_merge( array( $term->term_id ), get_ancestors( $term->term_id, 'product_cat', 'taxonomy' ) ) );
+
+		$routes[] = array(
+			'crumbs' => array_merge( array( $first ), $crumbs, array( $last ) ),
+			'menu'   => $tree ? dorotape_menu_top_for_terms( $tree, $chain ) : 0,
+			'url'    => (string) $crumbs[ array_key_last( $crumbs ) ]['url'],
+		);
+	}
+
+	return $routes;
 }
 
 /**

@@ -79,6 +79,9 @@ export function initTierTable() {
     if ( table && tierContainer ) {
       var varData = variationTiers[ String( newId ) ];
       if ( varData ) {
+        // A width can be sold in its own step (500mm in 25m rolls only), and
+        // the base row reads "25m+" off this.
+        if ( varData.step ) tierContainer.dataset.qtyStep = String( varData.step );
         rebuildTbody( table, varData.tiers || [], varData.base_price || 0 );
         currentTiers = tiersFromTable( table );
       } else {

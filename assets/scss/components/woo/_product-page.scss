@@ -618,6 +618,49 @@
     flex-shrink: 0;
   }
 
+  // The arrows sit over either end of the row on a phone, on top of the
+  // fade, and only the one that has somewhere to go shows. From tablet up
+  // the row wraps and they are not needed.
+  .product-tabs-scroll {
+    position: relative;
+  }
+
+  .product-tabs-nav {
+    position: absolute;
+    inset: 0 0 1px;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+
+    @include min-breakpoint(tablet) {
+      display: none;
+    }
+
+    .scroller-nav__button {
+      width: 32px;
+      height: 32px;
+      background-color: var(--color-background);
+      pointer-events: auto;
+
+      &:disabled {
+        visibility: hidden;
+      }
+    }
+
+    .js-scroller-prev {
+      margin-left: calc(-1 * var(--spacer-12));
+    }
+
+    .js-scroller-next {
+      margin-right: calc(-1 * var(--spacer-12));
+    }
+  }
+
+  // A nav that has not been moved beside the row (scripts off) stays hidden.
+  > .product-tabs-nav {
+    display: none;
+  }
+
   ul.tabs li a {
     display: block;
     white-space: nowrap;

@@ -8,10 +8,12 @@
  *
  * How it fits together:
  *
- *  1. A select field is registered per address type, but only for a logged-in
- *     customer who actually has saved addresses of that type. Nobody else sees
- *     an empty dropdown.
- *  2. The customer picks one. The value stored is the address book id.
+ *  1. Two select fields are registered, one for delivery and one for invoice,
+ *     but only for a logged-in customer who actually has saved addresses.
+ *     Nobody else sees an empty dropdown. Both list every saved address:
+ *     an address has no type (Site Edits (1), General row 19).
+ *  2. The customer picks one, or leaves it on "Choose a saved address" and
+ *     uses the form. The value stored is the address book id, or empty.
  *  3. woocommerce_store_api_checkout_update_order_from_request fires after the
  *     Store API has populated the order from the request and after additional
  *     fields have been persisted, so it is the first point where the choice and
@@ -25,13 +27,14 @@
  * @package dorotape
  */
 
-/** Field ids, by address book type. */
+/** Field ids: 'shipping' for the delivery picker, 'billing' for the invoice one. */
 function dorotape_address_field_id( string $type ): string {
 	return 'dorotape/' . ( 'billing' === $type ? 'invoice' : 'delivery' ) . '-address';
 }
 
-/** The value meaning "use the address typed into the form". */
-define( 'DOROTAPE_ADDRESS_FORM_VALUE', 'form' );
+// There is no "Use the address entered above" option. It read oddly in both
+// boxes, since the invoice box has no address above it (Site Edits (1),
+// Checkout row 12, 27 November 2026). An empty picker means the form.
 
 // ─── Registration ─────────────────────────────────────────────────────────────
 
@@ -40,29 +43,24 @@ add_action( 'woocommerce_init', function (): void {
 		return;
 	}
 
-	foreach ( array( 'shipping', 'billing' ) as $type ) {
-		$saved = dorotape_get_address_book_by_type( $type );
+	$saved = dorotape_get_address_book();
 
-		if ( ! $saved ) {
-			continue;
-		}
+	if ( ! $saved ) {
+		return;
+	}
 
-		$options = array(
-			array(
-				'value' => DOROTAPE_ADDRESS_FORM_VALUE,
-				'label' => __( 'Use the address entered above', 'dorotape' ),
-			),
+	$options = array();
+
+	foreach ( $saved as $address_id => $address ) {
+		$options[] = array(
+			'value' => (string) $address_id,
+			// The whole address, so two sites with similar names can be told
+			// apart before one is picked.
+			'label' => $address['label'] . ': ' . dorotape_notice_to_plain( dorotape_format_address( $address ) ),
 		);
+	}
 
-		foreach ( $saved as $address_id => $address ) {
-			$options[] = array(
-				'value' => $address_id,
-				// The whole address, so two sites with similar names can be told
-				// apart before one is picked.
-				'label' => $address['label'] . ': ' . dorotape_notice_to_plain( dorotape_format_address( $address ) ),
-			);
-		}
-
+	foreach ( array( 'shipping', 'billing' ) as $type ) {
 		woocommerce_register_additional_checkout_field(
 			array(
 				'id'       => dorotape_address_field_id( $type ),
@@ -78,21 +76,14 @@ add_action( 'woocommerce_init', function (): void {
 				// read as a second, oddly labelled copy of the same thing.
 				'show_in_order_confirmation' => false,
 				'options'  => $options,
-				'validate_callback' => function ( $value ) use ( $type ) {
-					if ( '' === $value || DOROTAPE_ADDRESS_FORM_VALUE === $value ) {
+				'validate_callback' => function ( $value ) {
+					if ( '' === $value || null === $value ) {
 						return;
 					}
 					if ( ! dorotape_get_address( (string) $value ) ) {
 						return new WP_Error(
 							'dorotape_unknown_address',
 							__( 'That saved address is no longer available. Please choose another.', 'dorotape' )
-						);
-					}
-					$address = dorotape_get_address( (string) $value );
-					if ( ( $address['type'] ?? '' ) !== $type ) {
-						return new WP_Error(
-							'dorotape_wrong_address_type',
-							__( 'That address cannot be used for this purpose.', 'dorotape' )
 						);
 					}
 				},
@@ -135,7 +126,6 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		'dorotapeAddressBook',
 		array(
 			'book'      => (object) $book,
-			'formValue' => DOROTAPE_ADDRESS_FORM_VALUE,
 			'fields'    => array(
 				'shipping' => dorotape_address_field_id( 'shipping' ),
 				'billing'  => dorotape_address_field_id( 'billing' ),
@@ -189,8 +179,7 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		array(
 			'label'       => __( 'Use same address for shipping', 'dorotape' ),
 			'delivery'    => (object) $delivery,
-			'pickerField' => is_user_logged_in() && dorotape_get_address_book_by_type( 'shipping' ) ? dorotape_address_field_id( 'shipping' ) : '',
-			'formValue'   => DOROTAPE_ADDRESS_FORM_VALUE,
+			'pickerField' => is_user_logged_in() && dorotape_get_address_book() ? dorotape_address_field_id( 'shipping' ) : '',
 		)
 	);
 } );
@@ -220,7 +209,7 @@ add_action( 'woocommerce_store_api_checkout_update_order_from_request', function
 	foreach ( array( 'shipping', 'billing' ) as $type ) {
 		$choice = $order->get_meta( '_wc_other/' . dorotape_address_field_id( $type ), true );
 
-		if ( ! $choice || DOROTAPE_ADDRESS_FORM_VALUE === $choice ) {
+		if ( ! $choice ) {
 			continue;
 		}
 
@@ -228,7 +217,7 @@ add_action( 'woocommerce_store_api_checkout_update_order_from_request', function
 		// value cannot be pointed at somebody else's address book.
 		$address = dorotape_get_address( (string) $choice, $customer_id );
 
-		if ( ! $address || ( $address['type'] ?? '' ) !== $type ) {
+		if ( ! $address ) {
 			continue;
 		}
 

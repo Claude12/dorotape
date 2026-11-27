@@ -149,6 +149,33 @@ export function initQtyStep() {
   // WooCommerce restores its own attributes when it shows one.
   var variationsForm = document.querySelector( '.variations_form' );
   if ( variationsForm ) {
+    var qtyInput  = variationsForm.querySelector( '.quantity input[type="number"], .quantity input.qty' );
+    var noteEl    = variationsForm.querySelector( '.dt-qty-step__note' );
+    var baseStep  = qtyInput ? stepOf( qtyInput ) : 1;
+    var noteText  = noteEl ? noteEl.textContent : '';
+    var tierTable = document.querySelector( '#dt_variable_tier_table' );
+
+    // One width can have a step of its own (Orajet 3268 500mm is 25m rolls
+    // only, its 1370mm goes in 5s). WooCommerce resets min on a swap but
+    // never step, so set it here, with the note and the price table's base
+    // row, and put the product's own step back when the choice is cleared.
+    function applyStep( step ) {
+      if ( ! qtyInput ) return;
+      step = step > 1 ? step : 1;
+      qtyInput.setAttribute( 'step', String( step ) );
+      if ( noteEl ) {
+        noteEl.textContent = noteText.replace( /[\d.]+\s*$/, String( step ) );
+        noteEl.hidden = step <= 1;
+      }
+      if ( tierTable ) tierTable.dataset.qtyStep = String( step );
+    }
+
+    jQuery( variationsForm ).on( 'show_variation', function ( e, variation ) {
+      if ( variation && variation.dt_qty_step ) applyStep( parseFloat( variation.dt_qty_step ) );
+    } );
+    jQuery( variationsForm ).on( 'reset_data', function () {
+      applyStep( baseStep );
+    } );
     jQuery( variationsForm ).on( 'show_variation reset_data', function () {
       window.setTimeout( function () { lock( variationsForm ); }, 0 );
     } );

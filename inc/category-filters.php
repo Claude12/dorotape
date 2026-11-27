@@ -534,36 +534,167 @@ function dorotape_category_filter_pills( WC_Product $product ): array {
 
 	$sku = $product->get_sku();
 
+	// Several products with options carry no item number of their own, only
+	// one per option (Orajet 3268 is 32681370 and 3268500). Their shared stem
+	// is the number the range goes by (Site Edits (1), Product Page row 22).
+	if ( '' === $sku && $product->is_type( 'variable' ) ) {
+		$sku = dorotape_card_item_stem( $product );
+	}
+
 	if ( '' !== $sku ) {
 		/* translators: %s: product SKU. */
 		$pills[] = array( 'label' => sprintf( __( 'Item no. %s', 'dorotape' ), $sku ) );
 	}
 
-	// The roll size on a product with no options, which goes straight in the
-	// basket from the card (Michael, Site Edits Product Page 15, 12 November
-	// 2026). Left off when the name already says it.
-	if ( ! $product->is_type( 'variable' ) ) {
-		$size = dorotape_roll_size_label( $product->get_id() );
+	// The roll size, on every card that has one (Michael, Site Edits Product
+	// Page 15, 12 November 2026, and Site Edits (1) Product Page row 22,
+	// 27 November 2026). It used to be left off when the name gave the size
+	// and on products with options; Michael asked for it on all of them, and
+	// for "various widths" where the options come in more than one.
+	$size = dorotape_card_roll_size( $product );
 
-		if ( '' === $size && function_exists( 'dorotape_product_description_parts' ) ) {
-			$size = dorotape_size_from_note( dorotape_product_description_parts( $product->get_id() )['size_note'] );
-		}
-
-		if ( preg_match( '#^\d+mm$#', $size ) ) {
-			$size .= ' wide';
-		} elseif ( preg_match( '#^[\d.]+m$#', $size ) ) {
-			$size .= ' roll';
-		}
-
-		$squash = static fn ( string $s ): string => strtolower( (string) preg_replace( '#\s+|wide$|roll$#', '', $s ) );
-
-		if ( '' !== $size && false === strpos( $squash( $product->get_name() ), $squash( $size ) ) ) {
-			/* translators: %s: roll size, such as "1370mm x 50m". */
-			$pills[] = array( 'label' => sprintf( __( 'Roll size: %s', 'dorotape' ), $size ) );
-		}
+	if ( '' !== $size ) {
+		/* translators: %s: roll size, such as "1370mm x 50m". */
+		$pills[] = array( 'label' => sprintf( __( 'Roll size: %s', 'dorotape' ), $size ) );
 	}
 
 	return $pills;
+}
+
+/**
+ * A product's roll size from its own fields, or from the size note.
+ *
+ * @param int $product_id Product or variation.
+ * @return string "1370mm x 50m", "1370mm wide", "50m roll" or ''.
+ */
+function dorotape_card_size_of( int $product_id ): string {
+	$size = dorotape_roll_size_label( $product_id );
+
+	if ( '' === $size && function_exists( 'dorotape_product_description_parts' ) ) {
+		$size = dorotape_size_from_note( dorotape_product_description_parts( $product_id )['size_note'] );
+	}
+
+	if ( preg_match( '#^\d+mm$#', $size ) ) {
+		$size .= ' wide';
+	} elseif ( preg_match( '#^[\d.]+m$#', $size ) ) {
+		$size .= ' roll';
+	}
+
+	return $size;
+}
+
+/**
+ * The roll size pill's text for a card.
+ *
+ * A product with options sold by the metre or the roll reads each option's
+ * width (and length) from its attribute, "1370mm-x-50m-4" or
+ * "size-format-760mm-x-50m", falling back to the roll size fields. One width
+ * gives that size; more than one gives the "various widths" wording from
+ * Shop pages. Options that name no width at
+ * all (a colour, an adhesive level) use the product's own size.
+ *
+ * @param WC_Product $product Product on the card.
+ * @return string
+ */
+function dorotape_card_roll_size( WC_Product $product ): string {
+	// Only a roll's options are widths. A squeegee or a roller sold by the
+	// item comes in sizes in mm too, and they are not roll sizes.
+	if ( ! $product->is_type( 'variable' ) || ! in_array( dorotape_price_unit_meta( $product->get_id() ), array( 'metre', 'roll' ), true ) ) {
+		return dorotape_card_size_of( $product->get_id() );
+	}
+
+	$widths  = array();
+	$lengths = array();
+
+	foreach ( $product->get_children() as $child_id ) {
+		$child = wc_get_product( $child_id );
+		if ( ! $child || 'publish' !== $child->get_status() ) {
+			continue;
+		}
+
+		$attrs = implode( ' ', array_map( 'strval', array_values( $child->get_attributes() ) ) );
+
+		if ( preg_match( '#(\d{3,4})\s*mm#i', $attrs, $w ) ) {
+			$widths[ $w[1] ] = true;
+			$lengths[ preg_match( '#mm[\s-]*x[\s-]*(\d+(?:\.\d+)?)\s*m(?![m])#i', $attrs, $l ) ? $l[1] : '' ] = true;
+			continue;
+		}
+
+		$width = dorotape_roll_width_mm( $child_id );
+		if ( $width ) {
+			$widths[ $width ]                                    = true;
+			$lengths[ (string) dorotape_roll_length_m( $child_id ) ] = true;
+		}
+	}
+
+	if ( count( $widths ) > 1 ) {
+		return dorotape_woo_pages_field( 'woo_card_various_widths', __( 'various widths', 'dorotape' ) );
+	}
+
+	if ( 1 === count( $widths ) ) {
+		$width  = (string) array_key_first( $widths );
+		$length = 1 === count( $lengths ) ? (string) array_key_first( $lengths ) : '';
+
+		if ( '' === $length ) {
+			// The length is the same for every width, so the product's own
+			// fields or note can give it when the option name does not.
+			$own = dorotape_card_size_of( $product->get_id() );
+			if ( preg_match( '#x\s*([\d.]+)(m|yd)$|^([\d.]+)(m|yd) roll$#', $own, $m ) ) {
+				return $width . 'mm x ' . ( $m[1] ?: $m[3] ) . ( $m[2] ?: $m[4] );
+			}
+			return $width . 'mm wide';
+		}
+
+		return $width . 'mm x ' . $length . 'm';
+	}
+
+	return dorotape_card_size_of( $product->get_id() );
+}
+
+/**
+ * The item number a product with options goes by, when it has none itself.
+ *
+ * Each option's item number is the range's stem plus its width (D-VIEW1370,
+ * D-VIEW1520), so take the width off the end and keep what the options
+ * share. Nothing when they share fewer than three characters.
+ *
+ * @param WC_Product $product Variable product.
+ * @return string
+ */
+function dorotape_card_item_stem( WC_Product $product ): string {
+	$stems = array();
+
+	foreach ( $product->get_children() as $child_id ) {
+		$child = wc_get_product( $child_id );
+		$sku   = $child ? (string) $child->get_sku() : '';
+		if ( '' === $sku ) {
+			continue;
+		}
+
+		$attrs = implode( ' ', array_map( 'strval', array_values( $child->get_attributes() ) ) );
+		if ( preg_match( '#(\d{3,4})\s*mm#i', $attrs, $w ) && str_ends_with( $sku, $w[1] ) ) {
+			$sku = substr( $sku, 0, -strlen( $w[1] ) );
+		}
+
+		$stems[] = $sku;
+	}
+
+	if ( ! $stems ) {
+		return '';
+	}
+
+	$stem = array_shift( $stems );
+	foreach ( $stems as $other ) {
+		$n = 0;
+		while ( $n < strlen( $stem ) && $n < strlen( $other ) && $stem[ $n ] === $other[ $n ] ) {
+			++$n;
+		}
+		$stem = substr( $stem, 0, $n );
+	}
+
+	$stem = rtrim( $stem, " -/_" );
+
+	return strlen( $stem ) >= 3 ? $stem : '';
 }
 
 /**
