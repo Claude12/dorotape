@@ -767,7 +767,7 @@ function dorotape_category_filter_grid( array $product_ids, bool $panel ): void 
 							// height cards with the button pinned to the foot,
 							// which is what a grid of them needs in both places.
 							'modifier'    => 'product-card--grid',
-							'sizes'       => '(min-width: 1280px) 300px, (min-width: 576px) 44vw, 88vw',
+							'sizes'       => '(min-width: 1280px) 330px, (min-width: 1024px) 23vw, (min-width: 576px) 46vw, 88vw',
 						)
 					);
 					?>

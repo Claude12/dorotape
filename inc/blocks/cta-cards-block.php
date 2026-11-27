@@ -72,7 +72,7 @@ $dt_classes = 'cta-cards-block' . dorotape_background_shape_class( $dt_shape );
 										'alt'      => '',
 										'loading'  => 0 === (int) get_query_var( 'block_index', 1 ) ? 'eager' : 'lazy',
 										'decoding' => 'async',
-										'sizes'    => '(min-width: 1400px) 434px, (min-width: 768px) 31vw, 100vw',
+										'sizes'    => '(min-width: 1400px) 434px, (min-width: 1024px) 31vw, (min-width: 768px) 50vw, 100vw',
 									)
 								);
 								?>

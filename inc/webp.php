@@ -98,6 +98,28 @@ if ( ! is_admin() ) {
 	add_filter( 'wp_calculate_image_srcset', 'dorotape_webp_srcset', 20 );
 }
 
+/**
+ * Share images (og:image, twitter:image) keep the original JPEG or PNG.
+ *
+ * Rank Math builds them through wp_get_attachment_image_src, so the swap above
+ * is lifted while it looks an image up and put back afterwards. Not every
+ * app that shows link previews (WhatsApp among them) reads WebP.
+ */
+function dorotape_webp_pause(): void {
+	remove_filter( 'wp_get_attachment_image_src', 'dorotape_webp_image_src', 20 );
+}
+
+/**
+ * Put the WebP swap back once Rank Math has its share image.
+ */
+function dorotape_webp_resume(): void {
+	if ( ! is_admin() ) {
+		add_filter( 'wp_get_attachment_image_src', 'dorotape_webp_image_src', 20 );
+	}
+}
+add_action( 'rank_math/opengraph/pre_attachment_image_check', 'dorotape_webp_pause' );
+add_action( 'rank_math/opengraph/post_attachment_image_check', 'dorotape_webp_resume' );
+
 // ── Making the copies ──────────────────────────────────────────────────────
 //
 // New uploads get their WebP copies straight away, so nobody has to remember

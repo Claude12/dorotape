@@ -232,7 +232,7 @@ function dorotape_search_card_args( WC_Product $product ): array {
 		'add_to_cart' => true,
 		'pills'       => $pills,
 		'modifier'    => 'product-card--grid',
-		'sizes'       => '(min-width: 1280px) 300px, (min-width: 576px) 44vw, 88vw',
+		'sizes'       => '(min-width: 1280px) 330px, (min-width: 1024px) 23vw, (min-width: 576px) 46vw, 88vw',
 	);
 }
 

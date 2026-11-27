@@ -19,6 +19,9 @@
 # belong to dev, such as a sync plugin set up against a live system there. They
 # are set aside before the import and put back exactly as they were after it.
 #
+# DEV_ID_FLOOR keeps the orders and accounts made on dev, such as a test
+# team's. See "Dev's own orders and accounts" below.
+#
 # Settings come from .env.push in the theme root (see .env.push.example). It
 # is gitignored, and nothing site-specific is written in this file, so the same
 # script works on any WordPress site with WP-CLI on both ends.
@@ -90,6 +93,12 @@ LOCAL_ONLY_PLUGINS="${LOCAL_ONLY_PLUGINS:-}"
 DEV_ONLY_PLUGINS="${DEV_ONLY_PLUGINS:-}"
 DEV_KEEP_OPTIONS="${DEV_KEEP_OPTIONS:-}"
 DEV_KEEP_TABLES="${DEV_KEEP_TABLES:-}"
+DEV_ID_FLOOR="${DEV_ID_FLOOR:-}"
+
+case "$DEV_ID_FLOOR" in
+	"" | [1-9][0-9][0-9][0-9][0-9]*) ;;
+	*) die "DEV_ID_FLOOR must be a whole number of 10000 or more (it is '$DEV_ID_FLOOR')." ;;
+esac
 
 # Both go straight into SQL, so only the characters a name can sensibly have.
 for name in $DEV_KEEP_OPTIONS $DEV_KEEP_TABLES; do
@@ -258,6 +267,132 @@ keep_summary() {
 	done
 }
 
+# ── Dev's own orders and accounts ───────────────────────────────────────────
+#
+# Testing on dev makes orders and accounts that local never has, and a full
+# import would wipe them. With DEV_ID_FLOOR set, dev numbers everything it
+# makes from that floor up, and local's IDs never get that high, so "made on
+# dev" is simply "ID at or above the floor". Those rows are set aside before
+# the import and put back after it; everything below the floor comes from
+# local as before.
+#
+# Each line: table (no prefix), the column that names a row, and which rows
+# belong to dev. A table's rows are chosen from what was already set aside
+# for the table it hangs off, so an order's items, notes and meta come with
+# the order and nothing else. Tables dev does not have are skipped, along
+# with any that hang off them.
+
+ROWS_STASH=${KEEP_STASH}_rows_
+
+rows_spec() {
+	local F="$DEV_ID_FLOOR" R="$ROWS_STASH"
+	cat <<-EOF
+		posts	ID	ID >= $F AND post_type IN ('shop_order', 'shop_order_placehold', 'shop_order_refund') AND (post_parent = 0 OR post_parent >= $F)
+		postmeta	meta_id	post_id IN (SELECT ID FROM ${R}posts)
+		comments	comment_ID	comment_post_ID IN (SELECT ID FROM ${R}posts)
+		commentmeta	meta_id	comment_id IN (SELECT comment_ID FROM ${R}comments)
+		wc_orders	id	id IN (SELECT ID FROM ${R}posts)
+		wc_orders_meta	id	order_id IN (SELECT ID FROM ${R}posts)
+		wc_order_addresses	id	order_id IN (SELECT ID FROM ${R}posts)
+		wc_order_operational_data	id	order_id IN (SELECT ID FROM ${R}posts)
+		wc_order_stats	order_id	order_id IN (SELECT ID FROM ${R}posts)
+		wc_order_tax_lookup	order_id	order_id IN (SELECT ID FROM ${R}posts)
+		wc_order_coupon_lookup	order_id	order_id IN (SELECT ID FROM ${R}posts)
+		woocommerce_order_items	order_item_id	order_id IN (SELECT ID FROM ${R}posts)
+		woocommerce_order_itemmeta	meta_id	order_item_id IN (SELECT order_item_id FROM ${R}woocommerce_order_items)
+		wc_order_product_lookup	order_item_id	order_item_id IN (SELECT order_item_id FROM ${R}woocommerce_order_items)
+		users	ID	ID >= $F
+		usermeta	umeta_id	user_id IN (SELECT ID FROM ${R}users)
+		wc_customer_lookup	customer_id	customer_id >= $F AND (user_id IS NULL OR user_id IN (SELECT ID FROM ${R}users))
+	EOF
+}
+
+# Tables whose next ID is moved up to the floor after every import. The import
+# brings local's counters, so this has to be done each time.
+ROWS_FLOORED="posts postmeta comments commentmeta users usermeta wc_orders_meta wc_order_addresses wc_order_operational_data woocommerce_order_items woocommerce_order_itemmeta wc_customer_lookup"
+
+rows_sql() { rsh "$REMOTE_CD && wp db query"; }
+
+# Sets ROWS_SPEC to the lines whose table dev has. Run once, in the checks.
+rows_find() {
+	local have t pk where dep
+	have=" $(echo "SHOW TABLES LIKE '${DEV_PREFIX}%';" | dev_sql | sed 1d | tr '\n' ' ') "
+	ROWS_SPEC=""
+	while IFS=$'\t' read -r t pk where; do
+		[ -n "$t" ] || continue
+		case "$have" in *" $DEV_PREFIX$t "*) ;; *) continue ;; esac
+		dep="$(printf '%s' "$where" | grep -o "${ROWS_STASH}[a-z_]*" | sed "s/^$ROWS_STASH//" | sort -u || true)"
+		for d in $dep; do
+			printf '%s\n' "$ROWS_SPEC" | grep -q "^$d	" || continue 2
+		done
+		ROWS_SPEC+="$t	$pk	$where"$'\n'
+	done < <(rows_spec)
+}
+
+rows_save() {
+	local sql="" t pk where
+	while IFS=$'\t' read -r t pk where; do
+		[ -n "$t" ] || continue
+		sql+="DROP TABLE IF EXISTS ${ROWS_STASH}$t;"
+		sql+="CREATE TABLE ${ROWS_STASH}$t LIKE \`$DEV_PREFIX$t\`;"
+		sql+="INSERT INTO ${ROWS_STASH}$t SELECT * FROM \`$DEV_PREFIX$t\` WHERE $where;"
+	done <<<"$ROWS_SPEC"
+	printf '%s\n' "$sql" | rows_sql
+}
+
+# Safe to run more than once: each run deletes what the last one put back.
+# Columns are named rather than SELECT *, and only the ones both copies of a
+# table have, so a plugin update that added a column on one side still works.
+rows_restore() {
+	local sql="SET SESSION group_concat_max_len = 65535;" t pk where
+	while IFS=$'\t' read -r t pk where; do
+		[ -n "$t" ] || continue
+		sql+="DELETE FROM \`$DEV_PREFIX$t\` WHERE \`$pk\` IN (SELECT \`$pk\` FROM ${ROWS_STASH}$t);"
+		sql+="SET @c = (SELECT GROUP_CONCAT(CONCAT('\`', s.COLUMN_NAME, '\`') ORDER BY s.ORDINAL_POSITION) FROM information_schema.COLUMNS s JOIN information_schema.COLUMNS d ON d.TABLE_SCHEMA = s.TABLE_SCHEMA AND d.TABLE_NAME = '$DEV_PREFIX$t' AND d.COLUMN_NAME = s.COLUMN_NAME WHERE s.TABLE_SCHEMA = DATABASE() AND s.TABLE_NAME = '${ROWS_STASH}$t');"
+		sql+="SET @q = CONCAT('INSERT INTO \`$DEV_PREFIX$t\` (', @c, ') SELECT ', @c, ' FROM ${ROWS_STASH}$t');"
+		sql+="PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;"
+	done <<<"$ROWS_SPEC"
+	printf '%s\n' "$sql" | rows_sql
+}
+
+# The table's next ID becomes the floor, or one past its highest row if that
+# is already above it.
+rows_floor() {
+	local sql="" t
+	for t in $ROWS_FLOORED; do
+		printf '%s\n' "$ROWS_SPEC" | grep -q "^$t	" && sql+="ALTER TABLE \`$DEV_PREFIX$t\` AUTO_INCREMENT = $DEV_ID_FLOOR;"
+	done
+	[ -z "$sql" ] || printf '%s\n' "$sql" | rows_sql
+}
+
+rows_drop() {
+	local sql="" t pk where
+	while IFS=$'\t' read -r t pk where; do
+		[ -n "$t" ] && sql+="DROP TABLE IF EXISTS ${ROWS_STASH}$t;"
+	done <<<"$ROWS_SPEC"
+	printf '%s\n' "$sql" | rows_sql
+}
+
+# Counts the kept rows: from dev's tables in the checks, from the held copies
+# once they exist. With HPOS a refund is a placeholder post like any order, so
+# orders are counted from the orders table when there is one.
+rows_summary() {
+	local otable=posts ocol=post_type id=ID orders users
+	if printf '%s\n' "$ROWS_SPEC" | grep -q "^wc_orders	"; then
+		otable=wc_orders ocol=type id=id
+	fi
+	if [ "${1:-}" = held ]; then
+		orders="SELECT COUNT(*) FROM ${ROWS_STASH}$otable WHERE $ocol = 'shop_order';"
+		users="SELECT COUNT(*) FROM ${ROWS_STASH}users;"
+	else
+		orders="SELECT COUNT(*) FROM $DEV_PREFIX$otable WHERE $ocol = 'shop_order' AND $id >= $DEV_ID_FLOOR;"
+		users="SELECT COUNT(*) FROM ${DEV_PREFIX}users WHERE ID >= $DEV_ID_FLOOR;"
+	fi
+	orders="$(echo "$orders" | dev_sql | sed -n 2p)"
+	users="$(echo "$users" | dev_sql | sed -n 2p)"
+	printf '      %s orders and %s accounts made on dev (ID %s and up)\n' "${orders:-0}" "${users:-0}" "$DEV_ID_FLOOR"
+}
+
 confirm() {
 	[ "$ASSUME_YES" = 1 ] && return 0
 	printf '\n    Type the dev host (%s) to go ahead: ' "$DEV_SSH_HOST"
@@ -325,6 +460,20 @@ if [ "$DO_DB" = 1 ]; then
 	done
 fi
 
+# Dev's own rows only stay apart from local's while local's IDs stay below the
+# floor. Held copies left on dev mean a push stopped halfway: running again
+# would overwrite them with the half-imported state, so that is for a person.
+ROWS_SPEC=""
+if [ "$DO_DB" = 1 ] && [ -n "$DEV_ID_FLOOR" ]; then
+	for t in $ROWS_FLOORED; do
+		next="$(lwp db query "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '$LOCAL_PREFIX$t';" --skip-column-names 2>/dev/null || true)"
+		case "$next" in '' | NULL) continue ;; esac
+		[ "$next" -lt "$DEV_ID_FLOOR" ] || die "Local $LOCAL_PREFIX$t is already numbering at $next, at or above DEV_ID_FLOOR ($DEV_ID_FLOOR). Raise the floor in .env.push."
+	done
+	[ -z "$(echo "SHOW TABLES LIKE '${ROWS_STASH}%';" | dev_sql | sed 1d)" ] || die "Dev still holds ${ROWS_STASH}* tables from a push that stopped halfway. Dev's orders and accounts are in them (and in the backup). Put them back by hand, or run --restore, before pushing again."
+	rows_find
+fi
+
 if [ "$DO_UPLOADS" = 1 ]; then
 	rsh "command -v rsync >/dev/null" || die "rsync is not installed on dev. Run with --skip-uploads."
 fi
@@ -362,6 +511,10 @@ if [ "$DO_DB" = 1 ] && { [ -n "$DEV_KEEP_OPTIONS" ] || [ -n "$KEEP_TABLES_FOUND"
 	note "Kept exactly as they are on dev:"
 	keep_summary
 fi
+if [ -n "$ROWS_SPEC" ]; then
+	note "Kept on dev, alongside local's:"
+	rows_summary
+fi
 
 if [ "$DRY_RUN" = 1 ]; then
 	step "Dry run: every check passed, nothing was changed."
@@ -384,6 +537,11 @@ if [ "$DO_DB" = 1 ]; then
 		step "Setting aside what stays on dev"
 		keep_save
 		note "Held in ${KEEP_STASH}_* tables on dev until the import is done."
+	fi
+	if [ -n "$ROWS_SPEC" ]; then
+		step "Setting aside dev's own orders and accounts"
+		rows_save
+		rows_summary held
 	fi
 
 	step "Exporting the local database"
@@ -431,6 +589,12 @@ if [ "$DO_DB" = 1 ]; then
 		step "Putting back what stays on dev"
 		keep_restore
 	fi
+	if [ -n "$ROWS_SPEC" ]; then
+		KEEPING=1
+		step "Putting back dev's own orders and accounts"
+		rows_restore || die "Dev's orders and accounts did not go back in. They are still held in ${ROWS_STASH}* tables on dev, and in the backup above."
+		rows_floor
+	fi
 
 	step "Plugins"
 	for plugin in $LOCAL_ONLY_PLUGINS; do
@@ -441,10 +605,19 @@ if [ "$DO_DB" = 1 ]; then
 	done
 
 	if [ "$KEEPING" = 1 ]; then
-		keep_restore
-		keep_drop
-		note "Kept on dev:"
-		keep_summary
+		if [ -n "$DEV_KEEP_OPTIONS" ] || [ -n "$KEEP_TABLES_FOUND" ]; then
+			keep_restore
+			keep_drop
+			note "Kept on dev:"
+			keep_summary
+		fi
+		if [ -n "$ROWS_SPEC" ]; then
+			rows_restore || die "Dev's orders and accounts did not go back in. They are still held in ${ROWS_STASH}* tables on dev, and in the backup above."
+			rows_floor
+			rows_drop
+			note "Kept on dev:"
+			rows_summary
+		fi
 	fi
 fi
 

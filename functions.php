@@ -197,6 +197,22 @@ add_action( 'wp_enqueue_scripts', 'dorotape_remove_block_styles', 100 );
  * that starts showing the button.
  */
 function dorotape_trim_wishlist_assets() {
+	/*
+	 * YITH's main stylesheet (plus jquery.selectBox and prettyPhoto, which it
+	 * pulls in) styles the wishlist table and nothing else here: in a rule by
+	 * rule check on 26 Nov 2026 not one of its 330 rules matched anything on
+	 * any other page. It loaded in <head> on every page and held up the first
+	 * paint, so it now loads on the wishlist page only. The product page's
+	 * button has its own sheet, with its own copy of YITH's colour variables.
+	 * Filter `dorotape_load_wishlist_styles` to true on any other page that
+	 * starts showing a wishlist table.
+	 */
+	$is_wishlist = function_exists( 'yith_wcwl_is_wishlist_page' ) && yith_wcwl_is_wishlist_page();
+	if ( ! apply_filters( 'dorotape_load_wishlist_styles', $is_wishlist ) ) {
+		wp_dequeue_style( 'yith-wcwl-main' );
+		wp_dequeue_style( 'yith-wcwl-user-main' );
+	}
+
 	if ( apply_filters( 'dorotape_load_wishlist_button', function_exists( 'is_product' ) && is_product() ) ) {
 		return;
 	}
@@ -248,6 +264,21 @@ require get_template_directory() . '/inc/product-sections.php';
 require get_template_directory() . '/inc/category-sections.php';
 require get_template_directory() . '/inc/cleanup.php';
 require get_template_directory() . '/inc/webp.php';
+
+/*
+ * No sizes="auto" on lazy images. Chrome then sizes the download to the box
+ * the image is laid out in, which ignores object-fit: cover cropping, so cover
+ * photos (category tiles, cards, blog thumbnails) came down too small and
+ * looked soft on phones. Each template's own sizes attribute is used instead.
+ * Measured 27 Nov 2026: 0 to 23 KB more per page, all of it below the fold.
+ *
+ * A named callback, not __return_false: several blocks add and then remove
+ * __return_false around their own images, which would take this off too.
+ */
+function dorotape_no_auto_sizes(): bool {
+	return false;
+}
+add_filter( 'wp_img_tag_add_auto_sizes', 'dorotape_no_auto_sizes' );
 require get_template_directory() . '/inc/admin.php';
 require get_template_directory() . '/inc/admin-email-copies.php';
 require get_template_directory() . '/inc/setup.php';
@@ -255,6 +286,9 @@ require get_template_directory() . '/inc/header.php';
 require get_template_directory() . '/inc/header-menu.php';
 require get_template_directory() . '/inc/toast.php';
 require get_template_directory() . '/inc/footer.php';
+require get_template_directory() . '/inc/newsletter-assets.php';
+require get_template_directory() . '/inc/non-blocking-styles.php';
+require get_template_directory() . '/inc/script-placement.php';
 require get_template_directory() . '/inc/background-shape.php';
 require get_template_directory() . '/inc/product-card.php';
 require get_template_directory() . '/inc/product-row.php';
