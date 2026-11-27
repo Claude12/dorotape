@@ -182,7 +182,10 @@ function dorotape_defer_newsletter_assets(): void {
 		wp_styles()->do_items( $styles );
 		$css = (string) ob_get_clean();
 
-		$noscript = $css;
+		// The fallback only needs the links: the inline styles printed
+		// above apply with or without scripts, so copying them in as well
+		// just sent the same CSS twice.
+		$noscript = (string) preg_replace( '#<style\b[^>]*>.*?</style>\s*#s', '', $css );
 		$tags     = new WP_HTML_Tag_Processor( $css );
 		while ( $tags->next_tag( 'link' ) ) {
 			if ( 'stylesheet' === strtolower( (string) $tags->get_attribute( 'rel' ) ) ) {

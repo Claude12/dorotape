@@ -1422,3 +1422,26 @@ add_action( 'wp_enqueue_scripts', function (): void {
 
 	wp_localize_script( 'dorotape-checkout-county', 'dorotapeCheckoutCounty', array( 'optional' => $optional ) );
 }, 20 );
+
+/**
+ * Leave the classic cart scripts off the block cart.
+ *
+ * WooCommerce queues wc-cart on any cart page, and with it the classic
+ * country select and address scripts, selectWoo and the password meter. The
+ * Cart block brings its own, so on our cart these only added about 63KB of
+ * country and address data to the page and ran against a form that is not
+ * there. A cart page that is still the [woocommerce_cart] shortcode keeps them.
+ *
+ * Checkout keeps its classic scripts: payment gateways can hook into
+ * wc-checkout, and that is not worth the risk for the bytes.
+ */
+add_action( 'wp_enqueue_scripts', function (): void {
+	if ( ! function_exists( 'is_cart' ) || ! is_cart() || ! has_block( 'woocommerce/cart', wc_get_page_id( 'cart' ) ) ) {
+		return;
+	}
+
+	foreach ( array( 'wc-cart', 'selectWoo', 'wc-password-strength-meter' ) as $handle ) {
+		wp_dequeue_script( $handle );
+	}
+	wp_dequeue_style( 'select2' );
+}, 100 );
